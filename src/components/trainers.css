@@ -210,3 +210,80 @@
 .rl-matrix td:first-child {
   text-align: left;
 }
+
+.sc {
+  margin: var(--ifm-leading) 0;
+}
+
+.sc-question {
+  margin-bottom: var(--ifm-leading);
+  padding: 1rem 1.25rem;
+  border-radius: var(--ifm-code-border-radius);
+  background: var(--ifm-code-background);
+  border: 1px solid var(--ifm-color-emphasis-300);
+}
+
+.sc-q {
+  font-weight: var(--ifm-font-weight-bold);
+  margin-bottom: 0.75rem;
+}
+
+.sc-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.sc-option {
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--ifm-code-border-radius);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  cursor: pointer;
+}
+
+.sc-option:hover:not(:disabled) {
+  border-color: var(--ifm-color-primary);
+}
+
+.sc-option:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+}
+
+.sc-option:disabled {
+  cursor: default;
+}
+
+.sc-option.sc-right {
+  border-color: var(--ifm-color-success);
+  background: var(--ifm-color-success-contrast-background);
+  color: var(--ifm-color-success-contrast-foreground);
+}
+
+.sc-option.sc-wrong {
+  border-color: var(--ifm-color-danger);
+  background: var(--ifm-color-danger-contrast-background);
+  color: var(--ifm-color-danger-contrast-foreground);
+}
+
+.sc-feedback {
+  margin-top: 0.5rem;
+}
+
+.sc-feedback.sc-ok {
+  color: var(--ifm-color-success);
+}
+
+.sc-feedback.sc-no {
+  color: var(--ifm-color-danger);
+}
+
+.sc-why {
+  color: var(--ifm-color-emphasis-700);
+}
+
+.sc-counter {
+  font-weight: var(--ifm-font-weight-bold);
+}
