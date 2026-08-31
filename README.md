@@ -1,43 +1,70 @@
-# Website
+# pgk-champs/platform
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+Учебная платформа pgk-champs: сайт на Docusaurus с главами по трекам (мобилка,
+блокчейн) — конспекты, интерактивные тренажёры, Kotlin-песочница прямо в браузере.
 
-## Installation
+Живая версия: https://pgk-champs.github.io/platform/
 
-```bash
-npm install
-```
-
-**Note**: feel free to use the package manager of your choice.
-
-## Local Development
+## Команды
 
 ```bash
-npm run start
+npm ci          # установка зависимостей (чистая, из package-lock.json)
+npm test        # тесты scripts/*.test.mjs (в т.ч. knowledge-map)
+npm run test:ui # тесты компонентов (vitest + jsdom)
+npm run kmap    # пересобрать src/data/knowledge-map.json из docs/**
+npm run build   # прод-сборка (сама вызывает kmap через prebuild)
+npm run start   # локальный дев-сервер с горячей перезагрузкой
 ```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+## Деплой
 
-## Build
+Автоматом через GitHub Actions (`.github/workflows/deploy.yml`) при каждом
+пуше в `main`: сборка гоняет `npm test`, `npm run test:ui` и `npm run build`,
+и только если всё зелёное — публикует на GitHub Pages.
 
-```bash
-npm run build
+`npm run deploy` (docusaurus deploy) **не используется** — раздача вручную
+через него разойдётся с тем, что видит CI.
+
+## Фронтматтер-контракт главы
+
+Каждый файл в `docs/**` (кроме `index.md`) обязан иметь во фронтматтере:
+
+| поле       | значения                                 |
+|------------|-------------------------------------------|
+| `title`    | любая строка                               |
+| `audience` | `все` \| `мобилка` \| `блокчейн`           |
+| `level`    | `база` \| `углубление` \| `челлендж`       |
+| `order`    | число (порядок внутри трека/уровня)        |
+
+`npm run kmap` (и, соответственно, `npm run build`) падает с ошибкой, если у
+главы нет одного из полей или значение `audience`/`level` не входит в список
+выше — так что без меток собраться просто не выйдет.
+
+Мини-пример:
+
+```md
+---
+title: Переменные и типы
+audience: мобилка
+level: база
+order: 1
+---
+
+# Переменные и типы
+...
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+## Как добавить главу
 
-## Deployment
+1. Создай `.md`/`.mdx` в нужной папке `docs/<трек>/` с фронтматтером выше.
+   Смотри `docs/mobile/01-kotlin-vars.mdx` как образец — там же пример
+   встроенной Kotlin-песочницы (`<KotlinPlay code={...} />`).
+2. Прогони `npm run kmap && npm run test:ui && npm run build` локально.
+3. Открой PR в `main` — CI пересоберёт карту знаний и прогонит тесты сам.
 
-Using SSH:
+## Смежные репозитории
 
-```bash
-USE_SSH=true npm run deploy
-```
-
-Not using SSH:
-
-```bash
-GIT_USER=<Your GitHub username> npm run deploy
-```
-
-If you are using GitHub Pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+- [track-mobile-01-kotlin-basics](https://github.com/pgk-champs/track-mobile-01-kotlin-basics) —
+  шаблон практикума, из которого студентам создаются приватные копии.
+- [ops](https://github.com/pgk-champs/ops) — провижининг и очистка
+  студенческих репозиториев в организации.

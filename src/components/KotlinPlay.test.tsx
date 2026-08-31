@@ -3,6 +3,11 @@ import KotlinPlay from './KotlinPlay';
 
 const code = 'fun main() { println("hi") }';
 
+beforeEach(() => {
+  delete (window as { __kotlinPlayLoadPromise?: Promise<void> }).__kotlinPlayLoadPromise;
+  document.querySelectorAll('script[src*="kotlin-playground"]').forEach((el) => el.remove());
+});
+
 test('renders code inside code.kotlin-playground', () => {
   const { container } = render(<KotlinPlay code={code} />);
   expect(container.querySelector('code.kotlin-playground')?.textContent).toBe(code);

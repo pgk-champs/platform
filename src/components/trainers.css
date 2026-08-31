@@ -14,6 +14,11 @@
   outline: none;
 }
 
+.sb-part:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+}
+
 .sb-part:hover,
 .sb-on {
   background: var(--ifm-color-primary-lightest);
