@@ -71,3 +71,54 @@
 .ct-result button {
   margin-top: 0.5rem;
 }
+
+.fc {
+  margin: var(--ifm-leading) 0;
+}
+
+.fc-card {
+  min-height: 8rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.5rem;
+  border-radius: var(--ifm-code-border-radius);
+  background: var(--ifm-code-background);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  cursor: pointer;
+}
+
+.fc-card:hover,
+.fc-card:focus-visible {
+  border-color: var(--ifm-color-primary);
+  outline: none;
+}
+
+.fc-term {
+  font-size: var(--ifm-h3-font-size);
+  font-weight: var(--ifm-font-weight-bold);
+}
+
+.fc-translation {
+  font-size: var(--ifm-h3-font-size);
+  color: var(--ifm-color-primary);
+}
+
+.fc-note {
+  color: var(--ifm-color-emphasis-700);
+}
+
+.fc-controls {
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.fc-counter {
+  color: var(--ifm-color-emphasis-700);
+}
