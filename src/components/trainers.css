@@ -148,3 +148,60 @@
 .tc-desc {
   color: var(--ifm-color-emphasis-700);
 }
+
+.rl-track-switch {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: var(--ifm-leading);
+}
+
+.rl-list {
+  list-style: none;
+  padding: 0;
+}
+
+.rl-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.rl-badge {
+  margin-left: auto;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--ifm-color-white);
+}
+
+.rl-badge-база {
+  background: var(--ifm-color-success);
+}
+
+.rl-badge-углубление {
+  background: var(--ifm-color-warning);
+}
+
+.rl-badge-челлендж {
+  background: var(--ifm-color-danger);
+}
+
+.rl-matrix {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--ifm-leading);
+}
+
+.rl-matrix th,
+.rl-matrix td {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  padding: 0.4rem 0.75rem;
+  text-align: center;
+}
+
+.rl-matrix th:first-child,
+.rl-matrix td:first-child {
+  text-align: left;
+}

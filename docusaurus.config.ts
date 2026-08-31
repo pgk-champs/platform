@@ -64,6 +64,11 @@ const config: Config = {
       },
       items: [
         {
+          to: '/route',
+          label: 'Маршрут',
+          position: 'left',
+        },
+        {
           to: '/docs/foundation',
           label: 'Фундамент',
           position: 'left',
