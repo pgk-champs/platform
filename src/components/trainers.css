@@ -28,3 +28,46 @@
   color: var(--ifm-font-color-base);
   min-height: 1.5em;
 }
+
+.ct {
+  margin: var(--ifm-leading) 0;
+}
+
+.ct-code {
+  padding: 0.75rem 1rem;
+  border-radius: var(--ifm-code-border-radius);
+  background: var(--ifm-code-background);
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+.ct-ok {
+  color: var(--ifm-color-success);
+}
+
+.ct-err {
+  color: var(--ifm-color-danger);
+  text-decoration: underline;
+}
+
+.ct textarea {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--ifm-code-border-radius);
+  background: var(--ifm-code-background);
+  color: var(--ifm-font-color-base);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  font-family: var(--ifm-font-family-monospace);
+  resize: vertical;
+}
+
+.ct-result {
+  padding: 0.75rem 1rem;
+  border-radius: var(--ifm-code-border-radius);
+  background: var(--ifm-hover-overlay);
+}
+
+.ct-result button {
+  margin-top: 0.5rem;
+}
