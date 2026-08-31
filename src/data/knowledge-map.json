@@ -1,5 +1,69 @@
 [
   {
+    "id": "typing",
+    "title": "Печать и клавиатура",
+    "audience": "все",
+    "level": "база",
+    "order": 1,
+    "path": "foundation/typing.mdx"
+  },
+  {
+    "id": "it-english",
+    "title": "IT-английский: стартовый словарь",
+    "audience": "все",
+    "level": "база",
+    "order": 2,
+    "path": "foundation/it-english.mdx"
+  },
+  {
+    "id": "linux-terminal",
+    "title": "Linux и терминал",
+    "audience": "все",
+    "level": "база",
+    "order": 3,
+    "path": "foundation/linux-terminal.mdx"
+  },
+  {
+    "id": "files-packages-ssh",
+    "title": "Файлы, пакеты, SSH",
+    "audience": "все",
+    "level": "база",
+    "order": 4,
+    "path": "foundation/files-packages-ssh.mdx"
+  },
+  {
+    "id": "git-first-commit",
+    "title": "Git: первый коммит",
+    "audience": "все",
+    "level": "база",
+    "order": 5,
+    "path": "foundation/git-first-commit.mdx"
+  },
+  {
+    "id": "git-branches",
+    "title": "Git: ветки и merge",
+    "audience": "все",
+    "level": "база",
+    "order": 6,
+    "path": "foundation/git-branches.mdx"
+  },
+  {
+    "id": "git-remote",
+    "title": "Git: push, PR и командная работа",
+    "audience": "все",
+    "level": "база",
+    "order": 7,
+    "path": "foundation/git-remote.mdx"
+  },
+  {
+    "id": "android-studio",
+    "title": "Android Studio: знакомство с IDE",
+    "audience": "все",
+    "level": "база",
+    "order": 8,
+    "path": "foundation/android-studio.mdx"
+  },
+  {
     "id": "kotlin-vars",
     "title": "Переменные и типы",
     "audience": "мобилка",
