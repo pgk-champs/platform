@@ -330,3 +330,14 @@
   gap: 0.5rem;
   margin-bottom: var(--ifm-leading);
 }
+
+#reading-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: var(--ifm-color-primary);
+  z-index: calc(var(--ifm-z-index-fixed) + 1);
+  transition: width 0.1s ease-out;
+}

@@ -1,3 +1,5 @@
+import '../components/trainers.css';
+
 // Тонкая полоса прогресса скролла вверху страницы. Docusaurus подключает
 // clientModules и в SSR-сборке, и в браузерном бандле — поэтому весь код
 // обёрнут в проверку document/window, иначе сборка упадёт на Node.
