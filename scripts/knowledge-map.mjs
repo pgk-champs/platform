@@ -10,7 +10,7 @@ export function buildMap(docsDir) {
   const walk = d => fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
     const p = path.join(d, e.name);
     if (e.isDirectory()) return walk(p);
-    if (!/\.mdx?$/.test(e.name) || e.name === 'index.md') return;
+    if (!/\.mdx?$/.test(e.name) || /^index\.mdx?$/.test(e.name)) return;
     const { data } = matter(fs.readFileSync(p, 'utf8'));
     for (const f of ['audience', 'level', 'order', 'title'])
       if (data[f] === undefined) throw new Error(`missing frontmatter: ${p}: ${f}`);
@@ -22,7 +22,7 @@ export function buildMap(docsDir) {
       audience: data.audience,
       level: data.level,
       order: data.order,
-      path: p.split('/docs/')[1] ?? p
+      path: path.relative(docsDir, p)
     });
   });
   walk(docsDir);

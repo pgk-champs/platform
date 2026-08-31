@@ -7,6 +7,7 @@ test('collects tagged chapters sorted by order', () => {
   assert.deepEqual(map.map(e => e.id), ['terminal', 'kotlin-vars']);
   assert.equal(map[0].audience, 'все');
   assert.equal(map[0].level, 'база');
+  assert.equal(map[0].path, 'terminal.md');
 });
 
 test('throws on missing tags', () => {
