@@ -122,3 +122,29 @@
 .fc-counter {
   color: var(--ifm-color-emphasis-700);
 }
+
+.tc {
+  display: block;
+  margin: var(--ifm-leading) 0;
+  padding: 1rem 1.25rem;
+  border-radius: var(--ifm-code-border-radius);
+  background: var(--ifm-code-background);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  text-decoration: none;
+  color: var(--ifm-font-color-base);
+}
+
+.tc:hover {
+  border-color: var(--ifm-color-primary);
+  text-decoration: none;
+  color: var(--ifm-font-color-base);
+}
+
+.tc-name {
+  font-weight: var(--ifm-font-weight-bold);
+  color: var(--ifm-color-primary);
+}
+
+.tc-desc {
+  color: var(--ifm-color-emphasis-700);
+}
