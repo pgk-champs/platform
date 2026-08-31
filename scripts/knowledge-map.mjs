@@ -25,9 +25,14 @@ export function buildMap(docsDir) {
       if (data[f] === undefined) throw new Error(`missing frontmatter: ${p}: ${f}`);
     if (!AUD.includes(data.audience) || !LVL.includes(data.level))
       throw new Error(`missing frontmatter: ${p}: bad value`);
-    const relPath = path.relative(docsDir, p).split(path.sep).map(stripNumberPrefix).join('/');
+    const base = e.name.replace(/\.mdx?$/, '');
+    const ext = e.name.slice(base.length);
+    const id = stripNumberPrefix(base);
+    // extension is stripped before stripNumberPrefix (same order as the id above / Docusaurus), then reattached to the file segment only
+    const relDir = path.relative(docsDir, d).split(path.sep).filter(Boolean).map(stripNumberPrefix);
+    const relPath = [...relDir, id + ext].join('/');
     out.push({
-      id: stripNumberPrefix(path.basename(e.name).replace(/\.mdx?$/, '')),
+      id,
       title: data.title,
       audience: data.audience,
       level: data.level,
