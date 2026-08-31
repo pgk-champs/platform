@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "id": "kotlin-vars",
+    "title": "Переменные и типы",
+    "audience": "мобилка",
+    "level": "база",
+    "order": 1,
+    "path": "mobile/kotlin-vars.mdx"
+  }
+]

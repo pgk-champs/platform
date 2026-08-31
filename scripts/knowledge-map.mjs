@@ -5,6 +5,15 @@ import matter from 'gray-matter';
 const AUD = ['все', 'мобилка', 'блокчейн'];
 const LVL = ['база', 'углубление', 'челлендж'];
 
+// Mirrors Docusaurus's DefaultNumberPrefixParser: it strips a leading "NN-"/"NN_"/"NN."
+// from each path segment when computing doc ids/slugs (e.g. "01-kotlin-vars" -> "kotlin-vars"),
+// so links built from this map must strip it the same way or they 404.
+function stripNumberPrefix(segment) {
+  if (/^\d+[-_.]\d+/.test(segment)) return segment; // date/version-like, e.g. "2024-01-foo"
+  const m = /^\d+\s*[-_.]+\s*([^-_.\s].*)$/.exec(segment);
+  return m ? m[1] : segment;
+}
+
 export function buildMap(docsDir) {
   const out = [];
   const walk = d => fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
@@ -16,13 +25,14 @@ export function buildMap(docsDir) {
       if (data[f] === undefined) throw new Error(`missing frontmatter: ${p}: ${f}`);
     if (!AUD.includes(data.audience) || !LVL.includes(data.level))
       throw new Error(`missing frontmatter: ${p}: bad value`);
+    const relPath = path.relative(docsDir, p).split(path.sep).map(stripNumberPrefix).join('/');
     out.push({
-      id: path.basename(e.name).replace(/\.mdx?$/, ''),
+      id: stripNumberPrefix(path.basename(e.name).replace(/\.mdx?$/, '')),
       title: data.title,
       audience: data.audience,
       level: data.level,
       order: data.order,
-      path: path.relative(docsDir, p)
+      path: relPath
     });
   });
   walk(docsDir);
