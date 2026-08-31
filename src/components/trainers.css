@@ -287,3 +287,46 @@
 .sc-counter {
   font-weight: var(--ifm-font-weight-bold);
 }
+
+.fold {
+  margin: var(--ifm-leading) 0;
+  padding: 0 0.9rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-code-border-radius);
+  background: var(--ifm-code-background);
+}
+
+.fold-summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 0.65rem 0;
+  font-weight: var(--ifm-font-weight-bold);
+}
+
+.fold-summary::-webkit-details-marker {
+  display: none;
+}
+
+.fold-summary::before {
+  content: '▶';
+  display: inline-block;
+  width: 1em;
+  margin-right: 0.4rem;
+  color: var(--ifm-color-primary);
+  transition: transform 0.15s ease;
+}
+
+.fold[open] > .fold-summary::before {
+  transform: rotate(90deg);
+}
+
+.fold-body {
+  padding: 0 0 0.9rem;
+}
+
+.pg-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: var(--ifm-leading);
+}
