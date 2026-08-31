@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Link from '@docusaurus/Link';
 import './trainers.css';
 
 export type Audience = 'все' | 'мобилка' | 'блокчейн';
@@ -62,7 +63,7 @@ export default function RouteList({ map, track }: { map: Entry[]; track: 'моб
               onChange={() => toggle(ch.id)}
               aria-label={`Пройдено: ${ch.title}`}
             />
-            <a href={`/docs/${ch.path.replace(/\.mdx?$/, '')}`}>{ch.title}</a>
+            <Link to={`/docs/${ch.path.replace(/\.mdx?$/, '')}`}>{ch.title}</Link>
             <span className={`rl-badge rl-badge-${ch.level}`}>{ch.level}</span>
           </li>
         ))}
@@ -72,16 +73,16 @@ export default function RouteList({ map, track }: { map: Entry[]; track: 'моб
       <table className="rl-matrix">
         <thead>
           <tr>
-            <th>Глава</th>
+            <th scope="col">Глава</th>
             {LEVELS.map((lvl) => (
-              <th key={lvl}>{lvl}</th>
+              <th scope="col" key={lvl}>{lvl}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {chapters.map((ch) => (
             <tr key={ch.id}>
-              <td>{ch.title}</td>
+              <th scope="row">{ch.title}</th>
               {LEVELS.map((lvl) => (
                 <td key={lvl}>{ch.level === lvl ? '✓' : ''}</td>
               ))}
