@@ -1,0 +1,30 @@
+.sb {
+  margin: var(--ifm-leading) 0;
+}
+
+.sb-code {
+  padding: 0.75rem 1rem;
+  border-radius: var(--ifm-code-border-radius);
+  background: var(--ifm-code-background);
+  overflow-x: auto;
+}
+
+.sb-part {
+  cursor: pointer;
+  outline: none;
+}
+
+.sb-part:hover,
+.sb-on {
+  background: var(--ifm-color-primary-lightest);
+  border-radius: 3px;
+}
+
+.sb-hint {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--ifm-code-border-radius);
+  background: var(--ifm-hover-overlay);
+  color: var(--ifm-font-color-base);
+  min-height: 1.5em;
+}

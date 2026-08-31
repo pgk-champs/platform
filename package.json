@@ -15,6 +15,7 @@
     "typecheck": "tsc",
     "kmap": "node scripts/knowledge-map.mjs",
     "test": "node --test scripts/**/*.test.mjs",
+    "test:ui": "vitest run",
     "prebuild": "npm run kmap"
   },
   "dependencies": {
@@ -32,8 +33,13 @@
     "@docusaurus/module-type-aliases": "3.10.2",
     "@docusaurus/tsconfig": "3.10.2",
     "@docusaurus/types": "3.10.2",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
     "@types/react": "^19.0.0",
-    "typescript": "~6.0.2"
+    "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^25.0.1",
+    "typescript": "~6.0.2",
+    "vitest": "^2.1.8"
   },
   "browserslist": {
     "production": [
