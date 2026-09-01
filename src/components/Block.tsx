@@ -1,5 +1,5 @@
-import React, { useSyncExternalStore } from 'react';
-import { store, type BlockKind } from '../lib/store';
+import React, { useState, useSyncExternalStore } from 'react';
+import { store, type BlockKind, type FavPayload } from '../lib/store';
 import './trainers.css';
 
 const KIND_META: Record<BlockKind, { label: string; icon: string }> = {
@@ -17,17 +17,35 @@ export type BlockProps = {
   /** Нужны вместе, чтобы блок можно было добавить в избранное. */
   chapterId?: string;
   blockId?: string;
+  /** Содержимое, сохраняемое в избранное вместе со ссылкой (см. FavPayload). */
+  favPayload?: FavPayload;
   children: React.ReactNode;
 };
 
-export default function Block({ kind, title, chapterId, blockId, children }: BlockProps) {
+export default function Block({ kind, title, chapterId, blockId, favPayload, children }: BlockProps) {
   // Перерисовываемся при изменениях в store (например, избранное убрали со
-  // страницы «Избранное» в другой вкладке того же приложения).
+  // страницы «Избранное» в другой вкладке того же приложения, или блок
+  // свернули/развернули на другой странице с тем же blockId).
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
 
   const meta = KIND_META[kind];
   const favId = chapterId && blockId ? `${chapterId}:${blockId}` : undefined;
   const isFav = favId ? store.favorites.isFavorite(favId) : false;
+
+  // Без blockId сворачивание работает, но не переживает перезагрузку —
+  // персистить в store нечем ключевать. С blockId (плюс chapterId, если
+  // есть — избегает коллизий одинаковых blockId в разных главах) состояние
+  // запоминается per-blockId, по умолчанию развёрнуто.
+  const collapseKey = favId ?? blockId;
+  const [localCollapsed, setLocalCollapsed] = useState(false);
+  const collapsed = collapseKey ? store.block.isCollapsed(collapseKey) : localCollapsed;
+  const toggleCollapsed = () => {
+    if (collapseKey) {
+      store.block.setCollapsed(collapseKey, !collapsed);
+    } else {
+      setLocalCollapsed((c) => !c);
+    }
+  };
 
   const toggleFav = () => {
     if (!favId || !chapterId) return;
@@ -39,19 +57,31 @@ export default function Block({ kind, title, chapterId, blockId, children }: Blo
         type: kind,
         chapterId,
         title,
-        url: typeof window !== 'undefined' ? window.location.pathname : undefined,
+        url: typeof window !== 'undefined' ? `${window.location.pathname}#${blockId}` : undefined,
+        data: favPayload,
       });
     }
   };
 
   return (
-    <div className={`block block-${kind}`}>
+    <div className={`block block-${kind}`} id={blockId}>
       <div className="block-header">
-        <span className="block-icon" aria-hidden="true">
-          {meta.icon}
-        </span>
-        <span className="block-badge">{meta.label}</span>
-        <span className="block-title">{title}</span>
+        <button
+          type="button"
+          className="block-toggle"
+          onClick={toggleCollapsed}
+          aria-expanded={!collapsed}
+          aria-label={collapsed ? 'Развернуть блок' : 'Свернуть блок'}
+        >
+          <span className={`block-arrow ${collapsed ? '' : 'block-arrow-open'}`.trim()} aria-hidden="true">
+            ▶
+          </span>
+          <span className="block-icon" aria-hidden="true">
+            {meta.icon}
+          </span>
+          <span className="block-badge">{meta.label}</span>
+          <span className="block-title">{title}</span>
+        </button>
         {favId ? (
           <button
             type="button"
@@ -64,7 +94,9 @@ export default function Block({ kind, title, chapterId, blockId, children }: Blo
           </button>
         ) : null}
       </div>
-      <div className="block-body">{children}</div>
+      <div className="block-body" hidden={collapsed}>
+        {children}
+      </div>
     </div>
   );
 }

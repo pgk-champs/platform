@@ -50,5 +50,76 @@ test('without chapterId/blockId no favorite star is rendered', () => {
       <p>Тело</p>
     </Block>,
   );
-  expect(screen.queryByRole('button')).toBeNull();
+  expect(screen.queryByRole('button', { name: /избранное/i })).toBeNull();
+});
+
+test('container carries id={blockId} for anchor links', () => {
+  const { container } = render(
+    <Block kind="fact" title="Факт" chapterId="typing" blockId="fact-1">
+      <p>Тело</p>
+    </Block>,
+  );
+  expect(container.querySelector('#fact-1')).toBeTruthy();
+});
+
+test('is expanded by default and the header toggle collapses/expands the body for every kind', () => {
+  const kinds: Array<'trainer' | 'quiz' | 'breakdown' | 'vocab' | 'cheatsheet' | 'fact'> = [
+    'trainer',
+    'quiz',
+    'breakdown',
+    'vocab',
+    'cheatsheet',
+    'fact',
+  ];
+  for (const kind of kinds) {
+    const { unmount } = render(
+      <Block kind={kind} title="Заголовок">
+        <p>Тело блока</p>
+      </Block>,
+    );
+    const body = screen.getByText('Тело блока');
+    expect(body).toBeVisible();
+    const toggle = screen.getByRole('button', { name: 'Свернуть блок' });
+    fireEvent.click(toggle);
+    expect(body).not.toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Развернуть блок' }));
+    expect(body).toBeVisible();
+    unmount();
+  }
+});
+
+test('collapsed state persists per blockId in the store across remounts', () => {
+  const { unmount } = render(
+    <Block kind="trainer" title="Т" chapterId="typing" blockId="collapse-1">
+      <p>Тело</p>
+    </Block>,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Свернуть блок' }));
+  unmount();
+
+  render(
+    <Block kind="trainer" title="Т" chapterId="typing" blockId="collapse-1">
+      <p>Тело</p>
+    </Block>,
+  );
+  expect(screen.getByText('Тело')).not.toBeVisible();
+  expect(store.block.isCollapsed('typing:collapse-1')).toBe(true);
+});
+
+test('favPayload is stored with the favorite and the url anchors to the blockId', () => {
+  render(
+    <Block
+      kind="cheatsheet"
+      title="Шпаргалка"
+      chapterId="typing"
+      blockId="sheet-1"
+      favPayload={{ kind: 'table', head: ['A', 'B'], rows: [['1', '2']] }}
+    >
+      <p>Тело</p>
+    </Block>,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'В избранное' }));
+  const saved = store.favorites.list()[0];
+  expect(saved.data).toEqual({ kind: 'table', head: ['A', 'B'], rows: [['1', '2']] });
+  expect(saved.url).toBe('/#sheet-1');
 });

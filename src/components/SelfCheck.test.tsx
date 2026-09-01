@@ -107,3 +107,30 @@ test('without chapterId/quizId no store write happens (works as before)', () => 
   expect(store.getProgress().quizzes).toEqual({});
   expect(store.getXp()).toBe(0);
 });
+
+test('without chapterId/quizId no "Мои результаты" block is shown', () => {
+  render(<SelfCheck questions={questions} />);
+  fireEvent.click(screen.getByText('4'));
+  fireEvent.click(screen.getByText('Москва'));
+  expect(screen.queryByText('Мои результаты')).toBeNull();
+});
+
+test('"Мои результаты" shows best/attempts/streak after a full perfect run', () => {
+  render(<SelfCheck questions={questions} chapterId="typing" quizId="basics" />);
+  fireEvent.click(screen.getByText('4')); // correct
+  fireEvent.click(screen.getByText('Москва')); // correct -> single perfect completion
+  expect(screen.getByText('Мои результаты')).toBeTruthy();
+  expect(screen.getByText('Лучший: 2 из 2')).toBeTruthy();
+  expect(screen.getByText('Попыток всего: 1')).toBeTruthy();
+  expect(screen.getByText('Текущая серия без ошибок: 1')).toBeTruthy();
+});
+
+test('quiz history stats are keyed per quizId and read from store.quiz.stats', () => {
+  store.markQuizDone('typing', 'q1', { correct: 1, total: 2 });
+  store.markQuizDone('typing', 'q1', { correct: 2, total: 2 });
+  store.markQuizDone('typing', 'other', { correct: 2, total: 2 });
+  const stats = store.quiz.stats('typing', 'q1');
+  expect(stats.count).toBe(2);
+  expect(stats.best).toMatchObject({ correct: 2, total: 2 });
+  expect(stats.streak).toBe(1); // last q1 attempt perfect, the one before it was not
+});

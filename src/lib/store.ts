@@ -8,13 +8,23 @@ const STORAGE_KEY = 'pgk-store';
 export type OsId = 'mac' | 'win' | 'linux';
 export type BlockKind = 'trainer' | 'quiz' | 'breakdown' | 'vocab' | 'cheatsheet' | 'fact';
 
+// Содержимое, которое избранное сохраняет вместе со ссылкой, чтобы
+// /favorites могла отрендерить сам контент (таблицу, слово), а не только
+// заголовок-ссылку на блок в главе. Что не распознано ни под один вариант
+// (нет payload или незнакомый kind) — рендерится старым способом: заголовок
+// + ссылка-якорь на блок.
+export type FavPayload =
+  | { kind: 'table'; head: string[]; rows: string[][] }
+  | { kind: 'link'; url: string; desc?: string }
+  | { kind: 'word'; term: string; translation: string; note?: string };
+
 export type FavoriteItem = {
   id: string;
   type: BlockKind | 'link' | 'word';
   chapterId: string;
   title: string;
   url?: string;
-  data?: unknown;
+  data?: FavPayload;
   ts: number;
 };
 
@@ -33,6 +43,7 @@ type State = {
   prefs: { os?: OsId };
   tocCollapsed: Record<string, boolean>;
   quizLog: QuizLogEntry[];
+  blocksCollapsed: Record<string, boolean>;
 };
 
 function emptyState(): State {
@@ -47,6 +58,7 @@ function emptyState(): State {
     prefs: {},
     tocCollapsed: {},
     quizLog: [],
+    blocksCollapsed: {},
   };
 }
 
@@ -204,6 +216,35 @@ function isTocCollapsed(chapterId: string): boolean {
   return state.tocCollapsed[chapterId] ?? false;
 }
 
+// --- collapsible block state (per blockId, default expanded) ---
+function setBlockCollapsed(blockId: string, collapsed: boolean): void {
+  state.blocksCollapsed = { ...state.blocksCollapsed, [blockId]: collapsed };
+  persist();
+}
+
+function isBlockCollapsed(blockId: string): boolean {
+  return state.blocksCollapsed[blockId] ?? false;
+}
+
+// --- quiz attempt history (derived from quizLog written by markQuizDone) ---
+function quizAttempts(chapterId: string, quizId: string): QuizLogEntry[] {
+  return state.quizLog.filter((e) => e.chapterId === chapterId && e.quizId === quizId);
+}
+
+function quizStats(chapterId: string, quizId: string) {
+  const attempts = quizAttempts(chapterId, quizId);
+  let best: QuizLogEntry | undefined;
+  for (const a of attempts) {
+    if (!best || a.correct > best.correct) best = a;
+  }
+  let streak = 0;
+  for (let i = attempts.length - 1; i >= 0; i -= 1) {
+    if (attempts[i].correct !== attempts[i].total) break;
+    streak += 1;
+  }
+  return { attempts, best, count: attempts.length, streak };
+}
+
 // --- progress / snapshot ---
 function getProgress() {
   return { sections: state.sections, quizzes: state.quizzes, trainers: state.trainers };
@@ -229,6 +270,8 @@ export const store = {
   achievements: { unlock: achUnlock, list: achList, isUnlocked: achIsUnlocked },
   prefs: { setOs, getOs },
   toc: { setCollapsed: setTocCollapsed, isCollapsed: isTocCollapsed },
+  block: { setCollapsed: setBlockCollapsed, isCollapsed: isBlockCollapsed },
+  quiz: { attempts: quizAttempts, stats: quizStats },
   snapshot,
   /** Тестовый хелпер: сбрасывает состояние в памяти и в localStorage. */
   __resetForTests(): void {

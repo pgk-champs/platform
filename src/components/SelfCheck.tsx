@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { store } from '../lib/store';
 import './trainers.css';
 
@@ -16,6 +16,11 @@ export default function SelfCheck({
   chapterId?: string;
   quizId?: string;
 }) {
+  // Перерисовываемся при изменениях в store, чтобы блок «Мои результаты»
+  // подхватил только что записанную попытку (markQuizDone пишет в store из
+  // эффекта ниже, уже после первого рендера с allAnswered=true).
+  useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
+
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const rewardedRef = useRef(false);
 
@@ -105,6 +110,21 @@ export default function SelfCheck({
         </div>
       ) : null}
       {perfect ? <div className="sc-result-perfect">+{PERFECT_XP} XP за идеальное прохождение</div> : null}
+      {chapterId && quizId && allAnswered
+        ? (() => {
+            const stats = store.quiz.stats(chapterId, quizId);
+            return (
+              <div className="sc-history">
+                <div className="sc-history-title">Мои результаты</div>
+                <div className="sc-history-row">
+                  Лучший: {stats.best ? `${stats.best.correct} из ${stats.best.total}` : `${correctCount} из ${questions.length}`}
+                </div>
+                <div className="sc-history-row">Попыток всего: {stats.count}</div>
+                <div className="sc-history-row">Текущая серия без ошибок: {stats.streak}</div>
+              </div>
+            );
+          })()
+        : null}
     </div>
   );
 }

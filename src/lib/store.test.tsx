@@ -75,6 +75,35 @@ test('toc setCollapsed/isCollapsed defaults to false', () => {
   expect(store.toc.isCollapsed('typing')).toBe(true);
 });
 
+test('block setCollapsed/isCollapsed defaults to false (expanded) and is keyed independently per id', () => {
+  expect(store.block.isCollapsed('typing:t1')).toBe(false);
+  store.block.setCollapsed('typing:t1', true);
+  expect(store.block.isCollapsed('typing:t1')).toBe(true);
+  expect(store.block.isCollapsed('typing:t2')).toBe(false);
+});
+
+test('quiz.attempts/stats derive history from markQuizDone, keyed per chapterId+quizId', () => {
+  expect(store.quiz.stats('typing', 'q1')).toMatchObject({ best: undefined, count: 0, streak: 0 });
+
+  store.markQuizDone('typing', 'q1', { correct: 1, total: 2 });
+  store.markQuizDone('typing', 'q1', { correct: 2, total: 2 });
+  store.markQuizDone('typing', 'other', { correct: 2, total: 2 });
+
+  const attempts = store.quiz.attempts('typing', 'q1');
+  expect(attempts).toHaveLength(2);
+
+  const stats = store.quiz.stats('typing', 'q1');
+  expect(stats.count).toBe(2);
+  expect(stats.best).toMatchObject({ correct: 2, total: 2 });
+  expect(stats.streak).toBe(1);
+});
+
+test('quiz.stats streak resets to 0 when the latest attempt is imperfect', () => {
+  store.markQuizDone('typing', 'q1', { correct: 2, total: 2 });
+  store.markQuizDone('typing', 'q1', { correct: 1, total: 2 });
+  expect(store.quiz.stats('typing', 'q1').streak).toBe(0);
+});
+
 test('subscribe notifies on every mutation and unsubscribe stops it', () => {
   let calls = 0;
   const unsubscribe = store.subscribe(() => {

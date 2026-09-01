@@ -19,6 +19,94 @@ function groupByChapter(items: FavoriteItem[]): Map<string, FavoriteItem[]> {
   return grouped;
 }
 
+function RemoveButton({ item }: { item: FavoriteItem }) {
+  return (
+    <button
+      type="button"
+      className="fav-remove"
+      onClick={() => store.favorites.remove(item.id)}
+      aria-label={`Убрать «${item.title}» из избранного`}
+    >
+      ✕
+    </button>
+  );
+}
+
+// Содержимое избранного рендерится по форме data.kind: шпаргалка —
+// таблицей, ссылка — ссылкой с описанием, слово — карточкой термина.
+// Всё остальное (нет data, или незнакомый kind) — старым способом:
+// заголовок и ссылка-якорь на сам блок в главе.
+function FavoriteRow({ item }: { item: FavoriteItem }) {
+  const data = item.data;
+
+  if (data?.kind === 'table') {
+    return (
+      <li className="fav-item fav-item-table">
+        <div className="fav-item-row">
+          <span className="fav-item-title">{item.title}</span>
+          <RemoveButton item={item} />
+        </div>
+        <table className="rl-matrix">
+          <thead>
+            <tr>
+              {data.head.map((h, i) => (
+                <th key={i}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.rows.map((row, ri) => (
+              <tr key={ri}>
+                {row.map((cell, ci) => (
+                  <td key={ci}>{cell}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </li>
+    );
+  }
+
+  if (data?.kind === 'link') {
+    return (
+      <li className="fav-item">
+        <div className="fav-item-row">
+          <span className="fav-item-title">
+            <a href={data.url} target="_blank" rel="noreferrer">
+              {item.title}
+            </a>
+          </span>
+          <RemoveButton item={item} />
+        </div>
+        {data.desc ? <div className="fc-note">{data.desc}</div> : null}
+      </li>
+    );
+  }
+
+  if (data?.kind === 'word') {
+    return (
+      <li className="fav-item fav-item-word">
+        <div className="fav-item-row">
+          <span className="fav-item-title fc-term">{data.term}</span>
+          <RemoveButton item={item} />
+        </div>
+        <div className="fc-translation">{data.translation}</div>
+        {data.note ? <div className="fc-note">{data.note}</div> : null}
+      </li>
+    );
+  }
+
+  return (
+    <li className="fav-item">
+      <div className="fav-item-row">
+        <span className="fav-item-title">{item.url ? <Link to={item.url}>{item.title}</Link> : item.title}</span>
+        <RemoveButton item={item} />
+      </div>
+    </li>
+  );
+}
+
 export default function Favorites() {
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
   const items = store.favorites.list();
@@ -38,19 +126,7 @@ export default function Favorites() {
               <h2>{CHAPTER_TITLES[chapterId] ?? chapterId}</h2>
               <ul className="fav-list">
                 {chapterItems.map((item) => (
-                  <li key={item.id} className="fav-item">
-                    <span className="fav-item-title">
-                      {item.url ? <Link to={item.url}>{item.title}</Link> : item.title}
-                    </span>
-                    <button
-                      type="button"
-                      className="fav-remove"
-                      onClick={() => store.favorites.remove(item.id)}
-                      aria-label={`Убрать «${item.title}» из избранного`}
-                    >
-                      ✕
-                    </button>
-                  </li>
+                  <FavoriteRow key={item.id} item={item} />
                 ))}
               </ul>
             </section>

@@ -1,13 +1,54 @@
 import React, { useSyncExternalStore } from 'react';
 import Layout from '@theme/Layout';
-import { store } from '../lib/store';
+import { store, type TrainerResult } from '../lib/store';
 import { ACHIEVEMENTS } from '../lib/achievements';
+import knowledgeMap from '../data/knowledge-map.json';
 import '../components/trainers.css';
+
+const CHAPTER_TITLES: Record<string, string> = Object.fromEntries(
+  (knowledgeMap as { id: string; title: string }[]).map((e) => [e.id, e.title]),
+);
+
+type QuizRecord = { chapterId: string; quizId: string; best: number; total: number; attempts: number };
+
+function quizRecords(quizLog: ReturnType<typeof store.snapshot>['quizLog']): QuizRecord[] {
+  const byKey = new Map<string, QuizRecord>();
+  for (const e of quizLog) {
+    const key = `${e.chapterId}:${e.quizId}`;
+    const row = byKey.get(key);
+    if (!row) {
+      byKey.set(key, { chapterId: e.chapterId, quizId: e.quizId, best: e.correct, total: e.total, attempts: 1 });
+    } else {
+      row.attempts += 1;
+      if (e.correct > row.best) {
+        row.best = e.correct;
+        row.total = e.total;
+      }
+    }
+  }
+  return [...byKey.values()];
+}
+
+type TrainerRecord = { chapterId: string; trainerId: string; cpm: number };
+
+function trainerRecords(trainers: Record<string, Record<string, TrainerResult>>): TrainerRecord[] {
+  const rows: TrainerRecord[] = [];
+  for (const [chapterId, byId] of Object.entries(trainers)) {
+    for (const [trainerId, entry] of Object.entries(byId)) {
+      const cpm = (entry.result as { cpm?: unknown } | undefined)?.cpm;
+      if (typeof cpm === 'number') rows.push({ chapterId, trainerId, cpm });
+    }
+  }
+  return rows;
+}
 
 export default function Achievements() {
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
   const xp = store.getXp();
   const unlocked = new Set(store.achievements.list());
+  const snap = store.snapshot();
+  const quizRows = quizRecords(snap.quizLog);
+  const trainerRows = trainerRecords(snap.trainers);
 
   return (
     <Layout title="Достижения" description="Достижения и опыт на платформе PGK Champs">
@@ -28,6 +69,64 @@ export default function Achievements() {
             );
           })}
         </div>
+
+        <h2>Рекорды</h2>
+        <p className="ach-records-note">
+          Соревновательный рейтинг появится вместе с симулятором — общий лидерборд между учениками честно требует
+          сервера (этап 3). Пока здесь только твои личные локальные рекорды.
+        </p>
+
+        <h3>Квизы</h3>
+        {quizRows.length > 0 ? (
+          <table className="rl-matrix">
+            <thead>
+              <tr>
+                <th>Глава</th>
+                <th>Квиз</th>
+                <th>Лучший счёт</th>
+                <th>Попыток</th>
+              </tr>
+            </thead>
+            <tbody>
+              {quizRows.map((r) => (
+                <tr key={`${r.chapterId}:${r.quizId}`}>
+                  <td>{CHAPTER_TITLES[r.chapterId] ?? r.chapterId}</td>
+                  <td>{r.quizId}</td>
+                  <td>
+                    {r.best} из {r.total}
+                  </td>
+                  <td>{r.attempts}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className="fav-empty">Пока нет пройденных квизов.</p>
+        )}
+
+        <h3>Тренажёры</h3>
+        {trainerRows.length > 0 ? (
+          <table className="rl-matrix">
+            <thead>
+              <tr>
+                <th>Глава</th>
+                <th>Тренажёр</th>
+                <th>Лучшая скорость</th>
+              </tr>
+            </thead>
+            <tbody>
+              {trainerRows.map((r) => (
+                <tr key={`${r.chapterId}:${r.trainerId}`}>
+                  <td>{CHAPTER_TITLES[r.chapterId] ?? r.chapterId}</td>
+                  <td>{r.trainerId}</td>
+                  <td>{r.cpm} зн/мин</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className="fav-empty">Пока нет тренажёров с записанной скоростью.</p>
+        )}
       </main>
     </Layout>
   );
