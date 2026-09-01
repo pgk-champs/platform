@@ -15,10 +15,11 @@ import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
+import GitSim from '@site/src/components/GitSim';
 
 # Git: ветки и merge
 
-<ChapterProgress chapterId="git-branches" totalSections={14} totalQuizzes={5} totalTrainers={2} />
+<ChapterProgress chapterId="git-branches" totalSections={14} totalQuizzes={5} totalTrainers={4} />
 
 ## Зачем это нужно
 
@@ -437,6 +438,15 @@ Deleted branch feature-timer (was 1c96c1a).
 ]} />
 </Block>
 
+<Block kind="trainer" title="Git-симулятор: слей ветку сам" chapterId="git-branches" blockId="trainer-gitsim-merge">
+<GitSim
+  scenario="branches"
+  quest={{ title: 'Создай ветку, закоммить в ней и слей её в main', goal: 'merged' }}
+  chapterId="git-branches"
+  trainerId="trainer-gitsim-merge"
+/>
+</Block>
+
 <SectionAnchor chapterId="git-branches" sectionId="merge-three-way" />
 
 ### Конфликт: когда Git не может выбрать сам
@@ -649,6 +659,15 @@ git branch -d feature-name-fix
 ```text
 Deleted branch feature-name-fix (was f1d457a).
 ```
+
+<Block kind="trainer" title="Git-симулятор: устрой конфликт и разреши его" chapterId="git-branches" blockId="trainer-gitsim-conflict">
+<GitSim
+  scenario="branches"
+  quest={{ title: 'Измени одну и ту же строку в двух ветках, получи конфликт при merge и разреши его', goal: 'conflict-resolved' }}
+  chapterId="git-branches"
+  trainerId="trainer-gitsim-conflict"
+/>
+</Block>
 
 <Block kind="quiz" title="Конфликт" chapterId="git-branches" blockId="quiz-conflict">
 <SelfCheck chapterId="git-branches" quizId="q4" questions={[

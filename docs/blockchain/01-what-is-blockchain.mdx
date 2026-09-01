@@ -14,10 +14,12 @@ import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
+import HashPlayground from '@site/src/components/HashPlayground';
+import BlockChainDemo from '@site/src/components/BlockChainDemo';
 
 # Что такое блокчейн
 
-<ChapterProgress chapterId="what-is-blockchain" totalSections={13} totalQuizzes={4} totalTrainers={3} />
+<ChapterProgress chapterId="what-is-blockchain" totalSections={13} totalQuizzes={4} totalTrainers={5} />
 
 ## Зачем это нужно
 
@@ -58,6 +60,10 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 Если запустить `shasum -a 256` (macOS, Linux) или `sha256sum` (Linux) над файлом с текстом `Alice->Bob:5` — на любом компьютере в мире получится ровно этот же результат. Попробуй дома: результат совпадёт до последнего символа, потому что SHA-256 — открытый, детерминированный алгоритм, а не секрет конкретной программы.
 </Hint>
 
+<Block kind="trainer" title="Живой SHA-256: лавинный эффект" chapterId="what-is-blockchain" blockId="trainer-hash-playground">
+<HashPlayground chapterId="what-is-blockchain" trainerId="trainer-hash-playground" />
+</Block>
+
 ### Блок: данные плюс хеш предыдущего блока
 
 Блок (block) — это пачка данных (обычно — набор транзакций за какой-то промежуток времени), у которой есть номер, собственный хеш и одно особое поле: **хеш предыдущего блока**. Именно это поле и превращает набор отдельных блоков в цепочку (chain).
@@ -90,6 +96,10 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 <Hint id="what-is-blockchain-h2" type="important">
 Подделать один блок незаметно нельзя: пришлось бы пересчитать хеши у него и у вообще всех блоков после него, причём быстрее, чем остальная сеть добавляет новые блоки. Дальше в этой главе разберём, почему в приватной и в публичной сети это «быстрее, чем остальная сеть» устроено по-разному.
 </Hint>
+
+<Block kind="trainer" title="Цепочка блоков: испорти и почини" chapterId="what-is-blockchain" blockId="trainer-blockchain-demo">
+<BlockChainDemo chapterId="what-is-blockchain" trainerId="trainer-blockchain-demo" />
+</Block>
 
 <Block kind="quiz" title="Блок и хеш" chapterId="what-is-blockchain" blockId="quiz-hash-chain">
 <SelfCheck chapterId="what-is-blockchain" quizId="q1" questions={[

@@ -16,10 +16,11 @@ import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import KeysTabs from '@site/src/components/KeysTabs';
+import TerminalSim from '@site/src/components/TerminalSim';
 
 # Linux и терминал
 
-<ChapterProgress chapterId="linux-terminal" totalSections={13} totalQuizzes={5} totalTrainers={2} />
+<ChapterProgress chapterId="linux-terminal" totalSections={13} totalQuizzes={5} totalTrainers={3} />
 
 ## Зачем это нужно
 
@@ -174,6 +175,16 @@ bash: cd: nope: No such file or directory
   { q: 'Чем cd docs отличается от cd /docs?', options: ['Ничем, это одно и то же', 'cd docs — относительный путь от текущего каталога; cd /docs — абсолютный путь от корня системы', 'cd /docs работает быстрее', 'cd docs работает только в домашнем каталоге'], correct: 1, why: 'Путь без ведущего / — относительный, отсчитывается от текущего места. Путь с / — абсолютный, всегда от корня.' },
   { q: 'Что сделает команда cd без аргументов вообще?', options: ['Покажет ошибку — аргумент обязателен', 'Вернёт в домашний каталog пользователя, как и cd ~', 'Поднимет на уровень вверх, как cd ..', 'Ничего не сделает и ничего не выведет'], correct: 1, why: 'cd без аргумента — то же самое, что cd ~: переход в домашний каталог.' },
 ]} />
+</Block>
+
+<Block kind="trainer" title="Настоящий терминал: pwd, ls, cd" chapterId="linux-terminal" blockId="trainer-terminal-free">
+<TerminalSim initialFs={{
+  project: {
+    'README.md': 'Проект для чемпионата Профессионалы\n',
+    docs: {},
+    src: { 'main.py': '' },
+  },
+}} />
 </Block>
 
 <SectionAnchor chapterId="linux-terminal" sectionId="navigation" />
@@ -456,6 +467,18 @@ ls -la
 ```
 
 Несколько команд можно склеить в одну строку через `&&`: вторая выполнится, только если первая завершилась без ошибки. Например, шаги 6 и 9 можно было бы записать как `cp -r src src_backup && ls -la` — если копирование провалится, лишний `ls` просто не запустится.
+
+<Block kind="trainer" title="Квест: построй дерево проекта" chapterId="linux-terminal" blockId="trainer-terminal-quest">
+<TerminalSim
+  quest={{
+    title: 'Построй дерево проекта',
+    requiredPaths: ['project/README.md', 'project/src/main.py', 'project/docs/README.md'],
+    forbiddenPaths: ['project/src_backup'],
+  }}
+  chapterId="linux-terminal"
+  trainerId="trainer-terminal-quest"
+/>
+</Block>
 
 <SectionAnchor chapterId="linux-terminal" sectionId="practice-project" />
 

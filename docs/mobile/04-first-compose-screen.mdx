@@ -15,10 +15,11 @@ import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
+import ComposePreview from '@site/src/components/ComposePreview';
 
 # Первый экран Compose
 
-<ChapterProgress chapterId="first-compose-screen" totalSections={15} totalQuizzes={5} totalTrainers={2} />
+<ChapterProgress chapterId="first-compose-screen" totalSections={15} totalQuizzes={5} totalTrainers={3} />
 
 ## Зачем это нужно
 
@@ -416,6 +417,26 @@ fun WelcomeScreenPreview() {
 - **Строки 19–21: `WelcomeScreenPreview`** — вызывает `WelcomeScreen` с конкретными данными: именем `"Олег"` и пустой лямбдой `{}` для клика (в Preview нажать всё равно нельзя, поэтому реальная логика клика не нужна).
 
 **Что должно появиться в Preview:** экран на весь белый фон предпросмотра, с отступом от края в 16dp, посередине по горизонтали — строка `Привет, Олег!`, под ней `Готов к тренировке?`, под ними кнопка с надписью `Начать`.
+
+<Block kind="trainer" title="Живой мокап: покрути WelcomeScreen" chapterId="first-compose-screen" blockId="trainer-compose-preview">
+<ComposePreview
+  editable
+  tree={{
+    type: 'Column',
+    fillMaxSize: true,
+    padding: 16,
+    arrangement: 'start',
+    alignment: 'center',
+    children: [
+      { type: 'Text', text: 'Привет, Олег!', fontSize: 20 },
+      { type: 'Text', text: 'Готов к тренировке?', fontSize: 16 },
+      { type: 'Button', text: 'Начать' },
+    ],
+  }}
+  chapterId="first-compose-screen"
+  trainerId="trainer-compose-preview"
+/>
+</Block>
 
 <SectionAnchor chapterId="first-compose-screen" sectionId="first-screen" />
 

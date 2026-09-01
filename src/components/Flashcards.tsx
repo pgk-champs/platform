@@ -1,5 +1,6 @@
 import React, { useState, useSyncExternalStore } from 'react';
 import { store } from '../lib/store';
+import SpeakButton from './SpeakButton';
 import './trainers.css';
 
 export type Card = { term: string; translation: string; note?: string };
@@ -75,7 +76,17 @@ export default function Flashcards({ cards, chapterId }: { cards: Card[]; chapte
             {card.note ? <div className="fc-note">{card.note}</div> : null}
           </>
         ) : (
-          <div className="fc-term">{card.term}</div>
+          <div className="fc-term">
+            {card.term}
+            {/* stopPropagation: озвучка не должна переворачивать карточку */}
+            <span
+              className="fc-speak"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            >
+              <SpeakButton text={card.term} />
+            </span>
+          </div>
         )}
       </div>
       <div className="fc-controls">

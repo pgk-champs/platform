@@ -1,4 +1,4 @@
-import React, { useRef, useState, useSyncExternalStore } from 'react';
+import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { store } from '../lib/store';
 import InteractiveKeyboard, { charToKey } from './InteractiveKeyboard';
 import './trainers.css';
@@ -6,7 +6,9 @@ import './trainers.css';
 const FIRST_XP = 10;
 const GOAL_XP = 15;
 
-type TypingResult = { cpm: number; accuracy: number };
+// timeline/snippet появляются у рекорда в режиме ghost: позиции по секундам
+// и фрагмент, на котором рекорд поставлен (гонка честная только на нём же).
+type TypingResult = { cpm: number; accuracy: number; timeline?: number[]; snippet?: string };
 
 export type CodeTypingPool = { label: string; snippets: string[] };
 export type CodeTypingPreset = 'latin' | 'symbols' | 'code' | 'git';
@@ -84,6 +86,9 @@ export type CodeTypingProps = {
   targetAccuracy?: number;
   /** Live-клавиатура под полем ввода: подсвечивает ожидаемую и нажатую клавишу. */
   keyboard?: boolean;
+  /** Гонка с собой: при повторном прохождении фрагмента показывает призрачный
+   * прогресс лучшей попытки. Нужны chapterId/trainerId (рекорд живёт в store). */
+  ghost?: boolean;
 };
 
 function countCorrect(value: string, snippet: string): number {
@@ -117,6 +122,7 @@ export default function CodeTyping({
   targetCpm,
   targetAccuracy,
   keyboard = false,
+  ghost = false,
 }: CodeTypingProps) {
   // Перерисовываемся при изменениях в store, чтобы «Лучший: N» не отставал
   // (например после сброса тренажёра «Ещё раз» с новым личным рекордом).
@@ -138,6 +144,9 @@ export default function CodeTyping({
   const [result, setResult] = useState<TypingResult | null>(null);
   const [lastKey, setLastKey] = useState<{ id: string; state: 'ok' | 'err' } | null>(null);
   const startRef = useRef<number | null>(null);
+  const samplesRef = useRef<{ t: number; pos: number }[]>([]);
+  const [record, setRecord] = useState(false);
+  const [, setTick] = useState(0);
   const done = result !== null;
 
   const reset = () => {
@@ -145,7 +154,9 @@ export default function CodeTyping({
     setElapsed(0);
     setResult(null);
     setLastKey(null);
+    setRecord(false);
     startRef.current = null;
+    samplesRef.current = [];
   };
 
   const nextFragment = () => {
@@ -176,7 +187,23 @@ export default function CodeTyping({
     const prevMetGoal = !!prevBest && meetsTargets(prevBest, targetCpm, targetAccuracy);
 
     if (!prevBest || cpm > prevBest.cpm) {
-      store.markTrainerDone(chapterId, trainerId, finalResult);
+      let stored: TypingResult = finalResult;
+      if (ghost) {
+        // Таймлайн рекорда: сколько символов было набрано к каждой секунде.
+        // Из него при следующем прохождении строится «призрак» для гонки с собой.
+        const seconds = Math.max(1, Math.ceil(elapsedMs / 1000));
+        const timeline: number[] = [];
+        for (let s = 0; s <= seconds; s += 1) {
+          let pos = 0;
+          for (const sample of samplesRef.current) {
+            if (sample.t <= s * 1000) pos = sample.pos;
+          }
+          timeline.push(pos);
+        }
+        stored = { ...finalResult, timeline, snippet: activeSnippet };
+        if (prevBest) setRecord(true);
+      }
+      store.markTrainerDone(chapterId, trainerId, stored);
     }
     if (!prevBest) {
       store.addXp(FIRST_XP, `trainer:${chapterId}:${trainerId}`);
@@ -190,6 +217,9 @@ export default function CodeTyping({
     const next = e.target.value;
     if (startRef.current === null && next.length > 0) {
       startRef.current = Date.now();
+    }
+    if (!done && startRef.current !== null) {
+      samplesRef.current.push({ t: Date.now() - startRef.current, pos: next.length });
     }
     if (keyboard) {
       if (next.length > value.length) {
@@ -217,6 +247,29 @@ export default function CodeTyping({
     chapterId && trainerId
       ? (store.getProgress().trainers[chapterId]?.[trainerId]?.result as TypingResult | undefined)
       : undefined;
+
+  // Призрак показывается только на том же фрагменте, где поставлен рекорд —
+  // иначе гонка с другой фразой была бы бессмысленной.
+  const ghostTimeline = ghost && best?.timeline && best.snippet === activeSnippet ? best.timeline : null;
+
+  const racing = !!(ghostTimeline && !done && startRef.current !== null);
+  useEffect(() => {
+    if (!racing) return undefined;
+    // Тик, чтобы призрак бежал и между нажатиями — гонка живая, а не рывками.
+    const id = setInterval(() => setTick((t) => t + 1), 250);
+    return () => clearInterval(id);
+  }, [racing]);
+
+  let ghostPct = 0;
+  if (ghostTimeline && activeSnippet.length > 0) {
+    const sec = liveElapsedMs / 1000;
+    const i0 = Math.min(Math.floor(sec), ghostTimeline.length - 1);
+    const i1 = Math.min(i0 + 1, ghostTimeline.length - 1);
+    const frac = Math.min(1, Math.max(0, sec - i0));
+    const pos = ghostTimeline[i0] + (ghostTimeline[i1] - ghostTimeline[i0]) * frac;
+    ghostPct = Math.min(100, Math.round((100 * pos) / activeSnippet.length));
+  }
+  const youPct = activeSnippet.length > 0 ? Math.min(100, Math.round((100 * value.length) / activeSnippet.length)) : 0;
 
   const hasGoal = targetCpm !== undefined || targetAccuracy !== undefined;
   const goalMet = result ? meetsTargets(result, targetCpm, targetAccuracy) : false;
@@ -254,6 +307,7 @@ export default function CodeTyping({
           <p>Точность: {result.accuracy}%</p>
           <p>Скорость: {result.cpm} зн/мин</p>
           <p>Время: {elapsed} сек.</p>
+          {record ? <p className="ct-record">Новый рекорд! Призрак обновлён 👻</p> : null}
           {hasGoal ? (
             <p className={goalMet ? 'ct-goal-ok' : 'ct-goal-no'}>
               {goalMet ? 'Цель достигнута!' : 'Цель пока не достигнута'}
@@ -276,6 +330,26 @@ export default function CodeTyping({
           {value.length > 0 ? (
             <p className="ct-live">
               {liveCpm} зн/мин · точность {liveAccuracy}%
+            </p>
+          ) : null}
+          {ghostTimeline ? (
+            <div className="ct-ghost">
+              <div className="ct-ghost-row">
+                <span className="ct-ghost-label">Ты</span>
+                <div className="ct-ghost-track">
+                  <div className="ct-ghost-fill ct-ghost-you" style={{ width: `${youPct}%` }} />
+                </div>
+              </div>
+              <div className="ct-ghost-row">
+                <span className="ct-ghost-label">Рекорд</span>
+                <div className="ct-ghost-track">
+                  <div className="ct-ghost-fill ct-ghost-past" style={{ width: `${ghostPct}%` }} />
+                </div>
+              </div>
+            </div>
+          ) : ghost && chapterId && trainerId ? (
+            <p className="ct-ghost-hint">
+              Пройди фрагмент — появится призрак твоего рекорда, и начнётся гонка с собой 👻
             </p>
           ) : null}
           <textarea

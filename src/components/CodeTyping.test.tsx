@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
+import { vi } from 'vitest';
 import { store } from '../lib/store';
 import CodeTyping from './CodeTyping';
 
@@ -121,4 +122,71 @@ test('keyboard prop marks the last typed key ok or err by comparing against the 
 test('without the keyboard prop no InteractiveKeyboard is rendered', () => {
   render(<CodeTyping snippet="ab" />);
   expect(screen.queryByRole('img', { name: 'клавиша A' })).toBeNull();
+});
+
+// --- ghost: гонка с собой ---
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
+test('ghost: рекорд сохраняет таймлайн позиций по секундам вместе с фрагментом', () => {
+  vi.useFakeTimers();
+  render(<CodeTyping snippet="ab" chapterId="c" trainerId="t" ghost />);
+  const input = screen.getByRole('textbox');
+  fireEvent.change(input, { target: { value: 'a' } });
+  act(() => {
+    vi.advanceTimersByTime(1500);
+  });
+  fireEvent.change(input, { target: { value: 'ab' } });
+  const saved = store.getProgress().trainers.c.t.result as { timeline?: number[]; snippet?: string };
+  expect(saved.snippet).toBe('ab');
+  expect(saved.timeline).toEqual([1, 1, 2]);
+});
+
+test('ghost: до первого прохождения показывается подсказка про призрака', () => {
+  render(<CodeTyping snippet="ab" chapterId="c" trainerId="t" ghost />);
+  expect(screen.getByText(/призрак твоего рекорда/)).toBeTruthy();
+});
+
+test('ghost: после «Ещё раз» видна гонка — бары «Ты» и «Рекорд»', () => {
+  vi.useFakeTimers();
+  render(<CodeTyping snippet="ab" chapterId="c" trainerId="t" ghost />);
+  const input = screen.getByRole('textbox');
+  fireEvent.change(input, { target: { value: 'a' } });
+  act(() => {
+    vi.advanceTimersByTime(1000);
+  });
+  fireEvent.change(input, { target: { value: 'ab' } });
+  fireEvent.click(screen.getByText('Ещё раз'));
+  expect(screen.getByText('Ты')).toBeTruthy();
+  expect(screen.getByText('Рекорд')).toBeTruthy();
+  expect(screen.queryByText(/призрак твоего рекорда/)).toBeNull();
+});
+
+test('ghost: побив рекорд, видим «Новый рекорд!» и призрак обновляется', () => {
+  vi.useFakeTimers();
+  render(<CodeTyping snippet="ab" chapterId="c" trainerId="t" ghost />);
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'a' } });
+  act(() => {
+    vi.advanceTimersByTime(2000);
+  });
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'ab' } }); // медленная попытка — рекорд №1
+  fireEvent.click(screen.getByText('Ещё раз'));
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'a' } });
+  act(() => {
+    vi.advanceTimersByTime(100);
+  });
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'ab' } }); // быстрее — новый рекорд
+  expect(screen.getByText(/Новый рекорд/)).toBeTruthy();
+  const saved = store.getProgress().trainers.c.t.result as { timeline: number[] };
+  expect(saved.timeline).toEqual([1, 2]);
+});
+
+test('без ghost таймлайн не пишется (обратная совместимость)', () => {
+  render(<CodeTyping snippet="ab" chapterId="c" trainerId="t" />);
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'ab' } });
+  const saved = store.getProgress().trainers.c.t.result as { timeline?: number[] };
+  expect(saved.timeline).toBeUndefined();
+  expect(document.querySelector('.ct-ghost')).toBeNull();
 });
