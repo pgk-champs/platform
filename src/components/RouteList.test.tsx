@@ -120,3 +120,40 @@ test('an unlocked (current) chapter link never prompts for confirmation', () => 
   expect(confirmSpy).not.toHaveBeenCalled();
   confirmSpy.mockRestore();
 });
+
+// --- Отдельные темы (level 'углубление') — волна 7 ---
+
+const mapWithDeep: Entry[] = [
+  ...map,
+  { id: 'grep-regex', title: 'Регулярные выражения для grep', audience: 'все', level: 'углубление', order: 1, path: 'advanced/grep-regex.mdx' },
+];
+
+test('deep-dive topics render in their own «Отдельные темы» section, not in the main route', () => {
+  render(<RouteList map={mapWithDeep} track="мобилка" />);
+  expect(screen.getByRole('heading', { name: 'Отдельные темы' })).toBeTruthy();
+  const lists = screen.getAllByRole('list');
+  expect(lists[0].textContent).not.toContain('Регулярные выражения');
+  expect(lists[1].textContent).toContain('Регулярные выражения');
+  expect(lists[1].textContent).toContain('углубление');
+});
+
+test('deep-dive topics carry no lock and never gate the main route', () => {
+  render(<RouteList map={mapWithDeep} track="мобилка" />);
+  const lists = screen.getAllByRole('list');
+  // In the deep-dive list: no lock even though earlier chapters are not passed.
+  expect(lists[1].textContent).not.toContain('дальше');
+  // Main-route lock logic unchanged: second base chapter is still gated by the first.
+  expect(lists[0].textContent).toContain('дальше');
+});
+
+test('without deep-dive entries the «Отдельные темы» section is absent', () => {
+  render(<RouteList map={map} track="мобилка" />);
+  expect(screen.queryByRole('heading', { name: 'Отдельные темы' })).toBeNull();
+});
+
+test('deep-dive progress checkbox persists like a regular chapter', () => {
+  render(<RouteList map={mapWithDeep} track="мобилка" />);
+  const checkboxes = screen.getAllByRole('checkbox');
+  fireEvent.click(checkboxes[checkboxes.length - 1]); // the deep-dive row
+  expect(JSON.parse(localStorage.getItem('pgk-progress')!)['grep-regex']).toBe(true);
+});

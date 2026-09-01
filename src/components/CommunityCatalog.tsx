@@ -17,7 +17,7 @@ export const SUBMIT_URL =
 
 export type CommunityItem = {
   id: string;
-  type: 'preset' | 'repo' | 'link';
+  type: 'preset' | 'repo' | 'link' | 'video' | 'source';
   title: string;
   author: string;
   chapterId?: string;
@@ -29,6 +29,8 @@ export const TYPE_LABELS: Record<CommunityItem['type'], string> = {
   preset: 'Пресет тренажёра',
   repo: 'Репозиторий',
   link: 'Ссылка',
+  video: 'Видео',
+  source: 'Источник',
 };
 
 // Защитный разбор: бот пишет каталог сам, но битые записи не должны
@@ -40,7 +42,7 @@ export function parseItems(raw: unknown): CommunityItem[] {
       !!x &&
       typeof x === 'object' &&
       typeof (x as CommunityItem).id === 'string' &&
-      ['preset', 'repo', 'link'].includes((x as CommunityItem).type) &&
+      (x as CommunityItem).type in TYPE_LABELS &&
       typeof (x as CommunityItem).title === 'string' &&
       typeof (x as CommunityItem).author === 'string',
   );

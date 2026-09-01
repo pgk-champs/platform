@@ -49,7 +49,7 @@ const config: Config = {
     },
   ],
 
-  clientModules: ['./src/clientModules/readingProgress.ts'],
+  clientModules: ['./src/clientModules/readingProgress.ts', './src/clientModules/konami.ts'],
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -65,6 +65,9 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
+          // «Редактировать страницу» под каждой главой: GitHub сам предложит
+          // форк и PR любому залогиненному. Подпись локализована в i18n/ru/code.json.
+          editUrl: 'https://github.com/pgk-champs/platform/edit/main/',
         },
         blog: false,
         theme: {

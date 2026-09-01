@@ -23,6 +23,7 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 import GitSim from '@site/src/components/GitSim';
 import GitStatusReader from '@site/src/components/GitStatusReader';
 import CommitMsgBuilder from '@site/src/components/CommitMsgBuilder';
+import Figure from '@site/src/components/Figure';
 
 # Git: первый коммит
 
@@ -37,6 +38,10 @@ import CommitMsgBuilder from '@site/src/components/CommitMsgBuilder';
 <CollapsibleToc toc={toc} chapterId="git-first-commit" />
 
 <SectionAnchor chapterId="git-first-commit" sectionId="why" />
+
+import HistoryNote from '@site/src/components/HistoryNote';
+
+<HistoryNote id="git-2005">Git написал Линус Торвальдс в апреле 2005 года, когда у разработчиков ядра Linux внезапно отобрали бесплатную лицензию на систему контроля версий BitKeeper. Линус сел за замену 3 апреля, уже 7 апреля git хранил историю самого себя, а через две недели, 16 апреля, Линус перевёл на него разработку всего ядра Linux. Слово «git» на британском сленге значит «мерзавец» — Линус шутил, что называет проекты в честь себя.</HistoryNote>
 
 ## Сквозной пример: репозиторий шаг за шагом
 
@@ -202,6 +207,8 @@ nothing added to commit but untracked files present (use "git add" to track)
 ### git add: коробка для посылки
 
 Git не коммитит всё подряд автоматически — и это осознанное решение, а не недоработка. Представь, что отправляешь посылку: на столе перед тобой десять разных вещей, но в коробку идут не все сразу, а только те, что ты сам туда положил. Коробка — это индекс (index), его ещё называют staging area («зона подготовки», «корзина для коммита»): промежуточное место между рабочей папкой (working directory — где ты правишь файлы как обычно) и историей коммитов. Команда `git add` кладёт конкретный файл в эту коробку; ничего в историю при этом ещё не попадает — снимок делает только следующая команда, `git commit`.
+
+<Figure scheme="git-three-zones" caption="Три зоны Git: git add переносит файл из рабочей папки в индекс (staging), git commit делает снимок и добавляет его в историю." />
 
 Смысл в том, что можно поправить сразу пять файлов, а закоммитить только два связанных между собой, — остальные подождут своего, отдельного коммита. Положим `main.py` в коробку:
 

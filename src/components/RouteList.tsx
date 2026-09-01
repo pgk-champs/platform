@@ -62,7 +62,11 @@ export default function RouteList({ map, track }: { map: Entry[]; track: 'моб
   // перерисовываться при его изменениях (например после квиза на другой вкладке).
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
 
-  const chapters = map.filter((e) => e.audience === 'все' || e.audience === track);
+  const visible = map.filter((e) => e.audience === 'все' || e.audience === track);
+  // Углубления — необязательные отдельные темы: не участвуют в основном
+  // маршруте (порядок/замки/сертификат), показываются своей секцией ниже.
+  const chapters = visible.filter((e) => e.level !== 'углубление');
+  const deepDives = visible.filter((e) => e.level === 'углубление');
   const [progress, setProgress] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -119,6 +123,31 @@ export default function RouteList({ map, track }: { map: Entry[]; track: 'моб
         })}
       </ul>
 
+      {deepDives.length > 0 && (
+        <>
+          <h2>Отдельные темы</h2>
+          <p className="rl-deep-note">Углубления вне основного маршрута — проходи в любом порядке.</p>
+          <ul className="rl-list">
+            {deepDives.map((ch) => {
+              const status = statusOf(ch.id, !!progress[ch.id]);
+              return (
+                <li key={ch.id}>
+                  <input
+                    type="checkbox"
+                    checked={!!progress[ch.id]}
+                    onChange={() => toggle(ch.id)}
+                    aria-label={`Пройдено: ${ch.title}`}
+                  />
+                  <Link to={`/docs/${ch.path.replace(/\.mdx?$/, '')}`}>{ch.title}</Link>
+                  <span className={`rl-status rl-status-${status}`}>{STATUS_LABEL[status]}</span>
+                  <span className={`rl-badge rl-badge-${ch.level}`}>{ch.level}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+
       <h2>Матрица</h2>
       <table className="rl-matrix">
         <thead>
@@ -130,7 +159,7 @@ export default function RouteList({ map, track }: { map: Entry[]; track: 'моб
           </tr>
         </thead>
         <tbody>
-          {chapters.map((ch) => (
+          {[...chapters, ...deepDives].map((ch) => (
             <tr key={ch.id}>
               <th scope="row">{ch.title}</th>
               {LEVELS.map((lvl) => (

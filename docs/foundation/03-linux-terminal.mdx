@@ -22,6 +22,7 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 import KeysTabs from '@site/src/components/KeysTabs';
 import TerminalSim from '@site/src/components/TerminalSim';
 import FsTreeViz from '@site/src/components/FsTreeViz';
+import Figure from '@site/src/components/Figure';
 
 # Linux и терминал
 
@@ -38,6 +39,10 @@ import FsTreeViz from '@site/src/components/FsTreeViz';
 <CollapsibleToc toc={toc} chapterId="linux-terminal" />
 
 <SectionAnchor chapterId="linux-terminal" sectionId="why" />
+
+import HistoryNote from '@site/src/components/HistoryNote';
+
+<HistoryNote id="linux-1991">25 августа 1991 года 21-летний студент из Хельсинки Линус Торвальдс написал в новостную группу comp.os.minix, что делает свободную операционную систему — «просто хобби, ничего большого и профессионального». Из этого «хобби» вырос Linux: сегодня он работает на всех 500 мощнейших суперкомпьютерах мира, на большинстве серверов интернета и внутри каждого Android-смартфона — включая тот терминал Ubuntu, который ты сейчас изучаешь.</HistoryNote>
 
 ## Терминал, оболочка и анатомия команды
 
@@ -56,6 +61,8 @@ import FsTreeViz from '@site/src/components/FsTreeViz';
 Уточнения вроде `-l` и `-a` называются флагами (flag): они начинаются с дефиса и меняют поведение команды, но не обязательны — без них команда работает в базовом режиме. То, над чем команда работает (в примере выше — `/home/student`), называется аргументом (argument).
 
 Путь (path) — это адрес файла или каталога (directory — то же самое, что папка, просто более «системное» слово, принятое в Linux и в текстах ошибок). `/home/student` читается так: в корне файловой системы (root — самая верхняя точка, у которой нет родителя) есть каталог `home`, в нём — `student`. Это домашний каталог (home directory) пользователя student — место, куда система пускает его без вопросов и где хранятся его личные файлы. У домашнего каталога есть короткое имя-псевдоним: `~` (тильда).
+
+<Figure scheme="linux-fs-tree" caption="Дерево файловой системы: от корня / вниз к домашнему каталогу /home/student — у него есть короткое имя ~." />
 
 Если забыл, как работает команда, у большинства из них есть встроенная подсказка — допиши `--help`: например, `ls --help` выведет список всех флагов прямо в терминале. Более полное описание хранится в man-странице (от manual — «руководство»): `man ls` открывает её на весь экран, листать — стрелками, выйти — клавишей `q`. Это первоисточник: любой урок в интернете, включая эту главу, пересказывает именно man-страницы.
 
@@ -710,6 +717,8 @@ cat: src: Is a directory
 Дальше по теме:
 - [GNU Bash Manual — Bourne Shell Builtins](https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html) — официальное руководство bash: полное описание cd и других встроенных команд, включая флаги, о которых мы не говорили
 - [Filesystem Hierarchy Standard](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) — что означают каталоги верхнего уровня вроде /home, /etc, /usr и зачем файловая система Linux устроена именно так
+
+→ Отдельная тема: [Регулярные выражения для grep](/docs/advanced/grep-regex) — как искать в файлах не точный текст, а шаблон: классы символов, якоря и квантификаторы с нуля.
 
 </details>
 

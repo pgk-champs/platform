@@ -15,7 +15,8 @@ export type AchievementCategory =
   | 'язык'
   | 'блокчейн'
   | 'чемпионат'
-  | 'серии';
+  | 'серии'
+  | 'пасхалки';
 
 export type AchievementRarity = 'обычное' | 'редкое' | 'эпическое';
 
@@ -38,6 +39,7 @@ export const ACHIEVEMENT_CATEGORIES: AchievementCategory[] = [
   'блокчейн',
   'чемпионат',
   'серии',
+  'пасхалки',
 ];
 
 function isPerfect(q: QuizLogEntry): boolean {
@@ -512,6 +514,35 @@ export const ACHIEVEMENTS: Achievement[] = [
     category: 'серии',
     rarity: 'редкое',
     check: (s) => allActivityTs(s).some((ts) => new Date(ts).getHours() < 5),
+  },
+
+  // --- пасхалки ---
+  {
+    id: 'старая-школа',
+    title: 'Старая школа',
+    desc: 'Введён конами-код: ↑↑↓↓←→←→BA',
+    icon: '🕹️',
+    category: 'пасхалки',
+    rarity: 'редкое',
+    check: (s) => s.easter.konami,
+  },
+  {
+    id: 'археолог',
+    title: 'Археолог',
+    desc: 'Открыто 5 исторических врезок «Как это было»',
+    icon: '📜',
+    category: 'пасхалки',
+    rarity: 'редкое',
+    check: (s) => s.easter.historyOpened.length >= 5,
+  },
+  {
+    id: 'спидраннер',
+    title: 'Спидраннер',
+    desc: 'Экзамен главы сдан быстрее половины лимита времени',
+    icon: '⏱️',
+    category: 'пасхалки',
+    rarity: 'эпическое',
+    check: (s) => s.easter.speedrun,
   },
 ];
 

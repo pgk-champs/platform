@@ -41,6 +41,8 @@ export default function ChapterExam({
     const correct = questions.filter((q, i) => finalAnswers[i] === q.correct).length;
     store.markExamDone(chapterId, { correct, total: questions.length });
     const pct = questions.length > 0 ? (correct / questions.length) * 100 : 0;
+    // Пасхалка «Спидраннер»: экзамен сдан, а времени ушло меньше половины лимита.
+    if (pct >= PASS_PCT && timeLeft * 2 > timeLimitSec) store.easter.markSpeedrun();
     if (pct >= PASS_PCT && !rewardedRef.current) {
       rewardedRef.current = true;
       store.addXp(EXAM_XP, `exam:${chapterId}`);

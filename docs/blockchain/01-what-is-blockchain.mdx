@@ -22,6 +22,7 @@ import HashPlayground from '@site/src/components/HashPlayground';
 import BlockChainDemo from '@site/src/components/BlockChainDemo';
 import PowMiner from '@site/src/components/PowMiner';
 import SignDemo from '@site/src/components/SignDemo';
+import Figure from '@site/src/components/Figure';
 
 # Что такое блокчейн
 
@@ -36,6 +37,10 @@ import SignDemo from '@site/src/components/SignDemo';
 <CollapsibleToc toc={toc} chapterId="what-is-blockchain" />
 
 <SectionAnchor chapterId="what-is-blockchain" sectionId="why" />
+
+import HistoryNote from '@site/src/components/HistoryNote';
+
+<HistoryNote id="satoshi-2008">31 октября 2008 года в рассылке криптографов появилось письмо от некоего Сатоши Накамото со ссылкой на whitepaper «Bitcoin: A Peer-to-Peer Electronic Cash System» — девять страниц, из которых вырос весь мир блокчейна. 3 января 2009-го Сатоши добыл первый, «генезис»-блок. Кто скрывается за псевдонимом — один человек или группа — неизвестно до сих пор: это одна из главных загадок IT.</HistoryNote>
 
 ## Блок и хеш: цепочка, которую нельзя подделать
 
@@ -84,6 +89,8 @@ import SignDemo from '@site/src/components/SignDemo';
 </Block>
 
 Смысл именно в этом устройстве: блок #483 хранит внутри себя хеш блока #482, блок #482 — хеш блока #481, и так до самого первого блока (его называют genesis block — «блок бытия», у него единственного нет предыдущего). Получается цепь, где каждое звено физически держится за соседа своим отпечатком.
+
+<Figure scheme="blockchain-chain" caption="Цепочка блоков: hash каждого блока копируется в поле prevHash следующего — подмена любого блока рвёт все звенья после него." />
 
 ### Почему подмену обнаружат
 

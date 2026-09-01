@@ -16,6 +16,17 @@ const MONO = 'var(--ifm-font-family-monospace)';
 
 /* Каждая иллюстрация рисуется в поле 200x180 (правая часть обложки). */
 const ARTS: Record<string, () => React.ReactNode> = {
+  /* профиль-карточка с зелёной галочкой — «аккаунт создан» */
+  'github-start': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="34" width="172" height="118" rx="14" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <circle cx="58" cy="80" r="20" fill="rgba(255,255,255,0.45)" />
+      <path d="M32 130c4-18 13-26 26-26s22 8 26 26z" fill="rgba(255,255,255,0.45)" />
+      <path d="M104 70h62M104 90h44" stroke="rgba(255,255,255,0.4)" strokeWidth={8} />
+      <circle cx="150" cy="124" r="22" fill={ACCENT} />
+      <path d="M140 124l7 8 14-16" stroke={DARK} strokeWidth={5} fill="none" strokeLinejoin="round" />
+    </g>
+  ),
   typing: () => (
     <g transform="rotate(-3 100 95)" stroke={INK} strokeWidth={3} fill="none" strokeLinecap="round">
       <rect x="8" y="46" width="184" height="96" rx="14" fill={SOFT} />
@@ -213,6 +224,7 @@ const ARTS: Record<string, () => React.ReactNode> = {
 };
 
 const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
+  'github-start': { track: 'foundation', num: '00', title: 'GitHub с нуля' },
   typing: { track: 'foundation', num: '01', title: 'Печать и клавиатура' },
   'it-english': { track: 'foundation', num: '02', title: 'IT-английский: стартовый словарь' },
   'english-practice': { track: 'foundation', num: '03', title: 'Английский на практике' },

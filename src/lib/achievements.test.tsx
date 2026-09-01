@@ -11,9 +11,9 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-test('registry has 40 achievements with unique ids, valid categories and rarities', () => {
-  expect(ACHIEVEMENTS).toHaveLength(40);
-  expect(new Set(ACHIEVEMENTS.map((a) => a.id)).size).toBe(40);
+test('registry has 43 achievements with unique ids, valid categories and rarities', () => {
+  expect(ACHIEVEMENTS).toHaveLength(43);
+  expect(new Set(ACHIEVEMENTS.map((a) => a.id)).size).toBe(43);
   const rarities = new Set(['обычное', 'редкое', 'эпическое']);
   for (const a of ACHIEVEMENTS) {
     expect(ACHIEVEMENT_CATEGORIES).toContain(a.category);

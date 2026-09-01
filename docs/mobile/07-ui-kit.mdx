@@ -22,6 +22,7 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 import ModuleGraph from '@site/src/components/ModuleGraph';
 import ModuleSort from '@site/src/components/ModuleSort';
 import ApiVisToggle from '@site/src/components/ApiVisToggle';
+import Figure from '@site/src/components/Figure';
 
 # Многомодульность и UI Kit
 
@@ -98,6 +99,8 @@ Multi-module Gradle-проект начинается не с кода, а с о
 <Hint id="ui-kit-h1" type="fact">
 Официальная документация Gradle описывает `include(...)` ровно так же — как функцию, принимающую пути проектов, «by default a project path corresponds to the relative physical location of the project directory» («путь проекта по умолчанию соответствует относительному физическому расположению папки проекта»). И там же подтверждается вторая важная деталь: у каждого подпроекта — свой собственный build-файл, `app/build.gradle.kts`, `ui-kit/build.gradle.kts`, `net/build.gradle.kts`, а не один общий на всех.
 </Hint>
+
+<Figure scheme="ui-kit-modules" caption="Три модуля проекта: :app зависит от :ui-kit, :ui-kit — от :net. Каждая стрелка — строка implementation(project(...)) или api(project(...)) в build.gradle.kts." />
 
 ### com.android.application и com.android.library: разница в одно слово
 

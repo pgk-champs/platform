@@ -47,6 +47,11 @@ export type SimRunResult = { score: number; maxScore: number; ts: number; breaks
 export type TrainerResult = { result: unknown; ts: number };
 export type QuizLogEntry = { chapterId: string; quizId: string; correct: number; total: number; ts: number };
 
+// Пасхалки (пакет easter-history): конами-код, спидран экзамена и открытые
+// исторические врезки «Как это было» — по этим флагам работают достижения
+// «Старая школа», «Спидраннер» и «Археолог».
+export type EasterState = { konami: boolean; speedrun: boolean; historyOpened: string[] };
+
 type State = {
   sections: Record<string, string[]>;
   quizzes: Record<string, Record<string, QuizResult>>;
@@ -64,6 +69,7 @@ type State = {
   daily: Record<string, DailyEntry>;
   simRuns: Record<string, SimRunResult[]>;
   customPresets: CustomPreset[];
+  easter: EasterState;
 };
 
 function emptyState(): State {
@@ -84,6 +90,7 @@ function emptyState(): State {
     daily: {},
     simRuns: {},
     customPresets: [],
+    easter: { konami: false, speedrun: false, historyOpened: [] },
   };
 }
 
@@ -392,6 +399,26 @@ function customPresetRemove(id: string): void {
   persist();
 }
 
+// --- пасхалки (пакет easter-history) ---
+function easterMarkKonami(): void {
+  if (state.easter.konami) return;
+  state.easter = { ...state.easter, konami: true };
+  persist();
+}
+
+function easterMarkSpeedrun(): void {
+  if (state.easter.speedrun) return;
+  state.easter = { ...state.easter, speedrun: true };
+  persist();
+}
+
+/** Отмечает открытие исторической врезки; повторное открытие не дублируется. */
+function easterOpenHistory(id: string): void {
+  if (state.easter.historyOpened.includes(id)) return;
+  state.easter = { ...state.easter, historyOpened: [...state.easter.historyOpened, id] };
+  persist();
+}
+
 // --- progress / snapshot ---
 function getProgress() {
   return { sections: state.sections, quizzes: state.quizzes, trainers: state.trainers };
@@ -426,6 +453,7 @@ export const store = {
   dailyState,
   sim: { addRun: addSimRun, stats: getSimStats },
   customPresets: { add: customPresetAdd, list: customPresetList, remove: customPresetRemove },
+  easter: { markKonami: easterMarkKonami, markSpeedrun: easterMarkSpeedrun, openHistory: easterOpenHistory },
   snapshot,
   /** Тестовый хелпер: сбрасывает состояние в памяти и в localStorage. */
   __resetForTests(): void {

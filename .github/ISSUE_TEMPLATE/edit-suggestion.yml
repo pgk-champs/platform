@@ -1,0 +1,33 @@
+name: Предложить правку
+description: Нашли ошибку, опечатку или непонятное место в главе — расскажите, исправим
+title: "Правка: "
+labels: ["правка"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Спасибо, что помогаете делать материалы лучше! Заполните два поля ниже —
+        наставник посмотрит и внесёт правку. Ничего устанавливать и знать про git не нужно.
+  - type: input
+    id: chapter
+    attributes:
+      label: Глава
+      description: Заполняется автоматически, если вы пришли по кнопке «Предложить правку» на странице
+      placeholder: /docs/foundation/05-git-first-commit
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Что не так
+      description: Опишите ошибку, неточность или непонятное место — можно своими словами
+      placeholder: В примере команда написана с опечаткой…
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Как лучше
+      description: Как бы вы это исправили или сформулировали (необязательно)
+    validations:
+      required: false

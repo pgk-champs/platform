@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import ChapterCover, { CHAPTER_IDS, TrackBanner } from './ChapterCover';
 
 test('покрыты все 18 глав', () => {
-  expect(CHAPTER_IDS).toHaveLength(18);
+  expect(CHAPTER_IDS).toHaveLength(19);
 });
 
 test('каждая глава рендерит свою уникальную обложку с названием', () => {

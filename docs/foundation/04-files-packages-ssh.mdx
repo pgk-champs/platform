@@ -91,6 +91,10 @@ bash: ./hello.sh: Permission denied
 
 <SectionAnchor chapterId="files-packages-ssh" sectionId="permissions-rwx" />
 
+import HistoryNote from '@site/src/components/HistoryNote';
+
+<HistoryNote id="unix-1969">Права rwx старше интернета. Их придумали в UNIX — системе, которую Кен Томпсон и Деннис Ритчи начали писать в 1969 году в Bell Labs на почти списанном мини-компьютере PDP-7. Оттуда же родом `ls`, `cd`, `mkdir` и сама идея «всё есть файл». Чтобы переписать UNIX с ассемблера на что-то переносимое, Ритчи создал язык C — и обе эти вещи, UNIX и C, до сих пор фундамент почти всего, чем ты пользуешься.</HistoryNote>
+
 ## chmod: меняем права
 
 `chmod` (change mode) — единственная команда, которая меняет права доступа. У неё есть два независимых способа задать новые права: буквенный (символьный) и числовой. Оба означают одно и то же — просто записаны по-разному, и champoinat-задания используют оба вперемешку, так что нужны оба.
@@ -1027,6 +1031,8 @@ scp: stat local "ghost.txt": No such file or directory
 Дальше по теме:
 - [OpenSSH manual pages](https://www.openssh.org/manual.html) — официальные man-страницы ssh, ssh-keygen, scp и всей семьи инструментов OpenSSH
 - [nano — официальная документация](https://www.nano-editor.org/docs.php) — полный список горячих клавиш, не только те две, что разобраны в этой главе
+
+→ Отдельная тема: [SSH-ключи глубоко](/docs/advanced/ssh-keys-deep) — пара ключей изнутри, ssh-agent, файл `~/.ssh/config` и несколько ключей на одной машине.
 
 </details>
 

@@ -1,11 +1,35 @@
 [
   {
+    "id": "github-start",
+    "title": "GitHub с нуля: регистрация и первые шаги",
+    "audience": "все",
+    "level": "база",
+    "order": 0.5,
+    "path": "foundation/github-start.mdx"
+  },
+  {
+    "id": "grep-regex",
+    "title": "Регулярные выражения для grep",
+    "audience": "все",
+    "level": "углубление",
+    "order": 1,
+    "path": "advanced/grep-regex.mdx"
+  },
+  {
     "id": "typing",
     "title": "Печать и клавиатура",
     "audience": "все",
     "level": "база",
     "order": 1,
     "path": "foundation/typing.mdx"
+  },
+  {
+    "id": "ssh-keys-deep",
+    "title": "SSH-ключи глубоко",
+    "audience": "все",
+    "level": "углубление",
+    "order": 2,
+    "path": "advanced/ssh-keys-deep.mdx"
   },
   {
     "id": "it-english",
@@ -22,6 +46,14 @@
     "level": "база",
     "order": 2.5,
     "path": "foundation/02b-english-practice.mdx"
+  },
+  {
+    "id": "git-rebase",
+    "title": "Rebase мастерски",
+    "audience": "все",
+    "level": "углубление",
+    "order": 3,
+    "path": "advanced/git-rebase.mdx"
   },
   {
     "id": "linux-terminal",

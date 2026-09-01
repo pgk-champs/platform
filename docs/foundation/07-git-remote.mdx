@@ -22,6 +22,7 @@ import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import FetchPullViz from '@site/src/components/FetchPullViz';
 import PRTrainer from '@site/src/components/PRTrainer';
+import Figure from '@site/src/components/Figure';
 
 # Git: push, PR и командная работа
 
@@ -40,6 +41,8 @@ import PRTrainer from '@site/src/components/PRTrainer';
 ## origin: сервер под привычным именем
 
 У локального репозитория может быть несколько удалённых — remote — но чаще всего он один, и по многолетней традиции Git-сообщества его называют `origin` («источник», «откуда пришло»). Это просто имя-ярлык, а не зарезервированное слово: под ним скрывается настоящий адрес сервера, который можно посмотреть в любой момент.
+
+<Figure scheme="git-local-remote" caption="Local и origin: git push отправляет твои коммиты на сервер, git pull / fetch забирает оттуда чужие." />
 
 ```bash
 git remote -v
@@ -322,6 +325,8 @@ Fast-forward
 ## Pull Request: код проверяют до слияния
 
 В командах не принято отправлять коммиты прямо в `main` — один неудачный коммит сломал бы проект сразу всем. Вместо этого работу ведут в отдельной ветке, отправляют её на сервер и открывают pull request (PR) — предложение «влейте мою ветку в main». Это не команда Git, а функция самого GitHub, целиком живущая в браузере.
+
+<Figure img="/img/photos/laptop-code.jpg" alt="Руки над клавиатурой ноутбука, на экране — код" caption="Командная работа — это когда твой код читают другие: PR и ревью до слияния." source="Фото: Pexels, pexels.com/photo/574071 — свободная лицензия Pexels, атрибуция не требуется" />
 
 Продолжим пример: Анна завела ветку `anna-conclusions`, закоммитила в неё и опубликовала на сервере.
 
@@ -825,6 +830,8 @@ Switched to branch 'main'
 Дальше по теме:
 - [git-push: раздел про --force-with-lease](https://git-scm.com/docs/git-push) — официальное описание всех вариантов принудительной отправки
 - [git-rebase: официальная документация](https://git-scm.com/docs/git-rebase) — полный список флагов, включая интерактивный режим `-i`, не затронутый в этой главе
+
+→ Отдельная тема: [Rebase мастерски](/docs/advanced/git-rebase) — золотое правило переписывания истории, интерактивный режим и страховка через reflog.
 
 </details>
 

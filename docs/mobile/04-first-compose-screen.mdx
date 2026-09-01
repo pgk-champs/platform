@@ -22,6 +22,7 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 import ComposePreview from '@site/src/components/ComposePreview';
 import ModifierChain from '@site/src/components/ModifierChain';
 import CodeSketchMatch from '@site/src/components/CodeSketchMatch';
+import Figure from '@site/src/components/Figure';
 
 # Первый экран Compose
 
@@ -38,6 +39,10 @@ import CodeSketchMatch from '@site/src/components/CodeSketchMatch';
 <CollapsibleToc toc={toc} chapterId="first-compose-screen" />
 
 <SectionAnchor chapterId="first-compose-screen" sectionId="why" />
+
+import HistoryNote from '@site/src/components/HistoryNote';
+
+<HistoryNote id="compose-2019">Jetpack Compose анонсировали на конференции Google I/O в мае 2019 года. После десяти лет XML-вёрсток Google решила начать с чистого листа и построить UI декларативно — вдохновившись подходом React и Flutter: описываешь, «что показать», а не «как перестроить экран». До стабильной версии 1.0 дозревали два года — она вышла в июле 2021-го, и с тех пор Compose — рекомендуемый Google способ строить интерфейсы Android.</HistoryNote>
 
 ## Аннотация: что такое @Composable
 
@@ -144,6 +149,8 @@ fun Greeting() {
 ## Column и Row: раскладка элементов
 
 Одного текста мало — экран обычно состоит из нескольких элементов, расположенных друг под другом или в ряд. За это отвечают два контейнера: `Column` (колонка) складывает содержимое сверху вниз, `Row` (ряд) — выстраивает слева направо.
+
+<Figure scheme="compose-layout" caption="Три базовых контейнера Compose: Column складывает сверху вниз, Row — слева направо, Box накладывает элементы слоями (встретится дальше в курсе)." />
 
 ### Как контейнер получает содержимое: trailing lambda
 
