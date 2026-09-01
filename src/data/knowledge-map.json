@@ -86,5 +86,13 @@
     "level": "база",
     "order": 3,
     "path": "mobile/classes-collections.mdx"
+  },
+  {
+    "id": "first-compose-screen",
+    "title": "Первый экран Compose",
+    "audience": "мобилка",
+    "level": "база",
+    "order": 4,
+    "path": "mobile/first-compose-screen.mdx"
   }
 ]
