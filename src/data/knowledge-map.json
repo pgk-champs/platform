@@ -94,5 +94,13 @@
     "level": "база",
     "order": 4,
     "path": "mobile/first-compose-screen.mdx"
+  },
+  {
+    "id": "state-events",
+    "title": "Состояние и события",
+    "audience": "мобилка",
+    "level": "база",
+    "order": 5,
+    "path": "mobile/state-events.mdx"
   }
 ]
