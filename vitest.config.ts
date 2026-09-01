@@ -9,6 +9,7 @@ export default defineConfig({
       // Real Link needs Docusaurus router context, unavailable in vitest's
       // jsdom render. Stub renders the same <a href> markup.
       '@docusaurus/Link': path.resolve(__dirname, './src/test/DocusaurusLinkStub.tsx'),
+      '@theme/TOCInline': path.resolve(__dirname, './src/test/TOCInlineStub.tsx'),
     },
   },
   test: {

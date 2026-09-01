@@ -76,6 +76,16 @@ const config: Config = {
           position: 'left',
         },
         {
+          to: '/favorites',
+          label: 'Избранное',
+          position: 'left',
+        },
+        {
+          to: '/achievements',
+          label: 'Достижения',
+          position: 'left',
+        },
+        {
           to: '/docs/foundation',
           label: 'Фундамент',
           position: 'left',

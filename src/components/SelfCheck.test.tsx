@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import { store } from '../lib/store';
 import SelfCheck from './SelfCheck';
 
 const questions = [
@@ -63,4 +64,46 @@ test('counter updates as questions get answered correctly', () => {
 test('empty questions renders without crashing', () => {
   render(<SelfCheck questions={[]} />);
   expect(screen.getByText('Отвечено верно: 0 из 0')).toBeTruthy();
+});
+
+beforeEach(() => {
+  store.__resetForTests();
+});
+
+test('progress label tracks answered questions regardless of correctness', () => {
+  render(<SelfCheck questions={questions} />);
+  expect(screen.getByText('Отвечено вопросов: 0 из 2')).toBeTruthy();
+  fireEvent.click(screen.getByText('3')); // wrong answer, still counts as answered
+  expect(screen.getByText('Отвечено вопросов: 1 из 2')).toBeTruthy();
+});
+
+test('final result plate appears once every question has been attempted', () => {
+  render(<SelfCheck questions={questions} />);
+  expect(screen.queryByText(/Пройдено:/)).toBeNull();
+  fireEvent.click(screen.getByText('3')); // wrong, but still an attempt
+  expect(screen.queryByText(/Пройдено:/)).toBeNull();
+  fireEvent.click(screen.getByText('Москва')); // correct, second question -> all attempted
+  expect(screen.getByText('Пройдено: 1 из 2')).toBeTruthy();
+  fireEvent.click(screen.getByText('4')); // fix the wrong one -> perfect
+  expect(screen.getByText('Пройдено: 2 из 2')).toBeTruthy();
+});
+
+test('a full run with chapterId/quizId records the quiz in store and awards xp only on a perfect run', () => {
+  render(<SelfCheck questions={questions} chapterId="typing" quizId="basics" />);
+  fireEvent.click(screen.getByText('3')); // wrong
+  fireEvent.click(screen.getByText('Москва')); // correct
+  expect(store.getProgress().quizzes.typing?.basics).toMatchObject({ correct: 1, total: 2 });
+  expect(store.getXp()).toBe(0);
+
+  fireEvent.click(screen.getByText('4')); // fix the wrong one -> perfect run
+  expect(store.getProgress().quizzes.typing?.basics).toMatchObject({ correct: 2, total: 2 });
+  expect(store.getXp()).toBeGreaterThan(0);
+});
+
+test('without chapterId/quizId no store write happens (works as before)', () => {
+  render(<SelfCheck questions={questions} />);
+  fireEvent.click(screen.getByText('4'));
+  fireEvent.click(screen.getByText('Москва'));
+  expect(store.getProgress().quizzes).toEqual({});
+  expect(store.getXp()).toBe(0);
 });
