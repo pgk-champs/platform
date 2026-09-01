@@ -10,9 +10,15 @@ import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import ToolCard from '@site/src/components/ToolCard';
 import SelfCheck from '@site/src/components/SelfCheck';
-import TOCInline from '@theme/TOCInline';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # Файлы, пакеты, SSH
+
+<ChapterProgress chapterId="files-packages-ssh" totalSections={15} totalQuizzes={6} totalTrainers={2} />
 
 ## Зачем это нужно
 
@@ -20,7 +26,9 @@ import TOCInline from '@theme/TOCInline';
 
 Эта глава закрывает все эти ситуации по очереди: что такое права доступа (permission) и как их читать и менять командой `chmod`, что такое `sudo` и когда без него не обойтись, чем `apt update` отличается от `apt upgrade` и `apt install`, как поправить файл прямо в терминале редактором `nano`, и как командой `ssh` оказаться внутри чужого компьютера, не вставая со стула — сначала по паролю, а потом и вовсе без него, по ключу. В конце — `scp`, которая копирует файлы между машинами тем же защищённым каналом. Ничего не считаем очевидным: если символ есть в команде, у него есть причина там быть, и мы её найдём.
 
-<TOCInline toc={toc} />
+<CollapsibleToc toc={toc} chapterId="files-packages-ssh" />
+
+<SectionAnchor chapterId="files-packages-ssh" sectionId="why" />
 
 ## Права доступа: три буквы rwx
 
@@ -42,12 +50,14 @@ ls -l hello.sh
 
 Строка `-rw-r--r--` — это ровно десять символов, и в них зашифрован весь ответ на вопрос «кто и что может». Разберём каждый:
 
+<Block kind="breakdown" title="Строка прав -rw-r--r-- по символам" chapterId="files-packages-ssh" blockId="breakdown-rwx-string">
 <SyntaxBreakdown parts={[
   { text: '-', label: 'тип объекта', note: 'первый символ строки: - значит обычный файл, d (directory) — каталог. Для hello.sh здесь дефис' },
   { text: 'rw-', label: 'права владельца (owner)', note: 'три позиции: r — можно читать, w — можно писать (менять содержимое), третья — прочерк вместо x: выполнять нельзя. Владелец — тот, кто создал файл, здесь student' },
   { text: 'r--', label: 'права группы (group)', note: 'группа файла — тоже student (у личных файлов группа обычно совпадает с владельцем): только чтение, ни записи, ни выполнения' },
   { text: 'r--', label: 'права остальных (other)', note: 'все прочие пользователи системы: тоже только чтение. Это самые слабые права из трёх троек — и обычно самые важные, потому что именно с ними столкнётся чужой процесс' },
 ]} />
+</Block>
 
 Обрати внимание: нигде нет буквы `x`. Значит, файл нельзя запустить как программу — только прочитать или изменить. Проверим:
 
@@ -63,12 +73,16 @@ bash: ./hello.sh: Permission denied
 
 Разница между `r` и `x` у каталога — отдельная тонкость, которую стоит запомнить сразу: `r` на каталоге разрешает посмотреть список имён внутри (`ls`), а `x` — зайти внутрь и работать с содержимым конкретных файлов (`cd`, открыть файл по полному пути). Можно иметь `r` без `x` — тогда видно, что внутри лежит, но реально прочитать эти файлы по одному не получится; а можно иметь `x` без `r` — тогда список файлов `ls` не покажет, но если знаешь точное имя файла внутри, до него можно достучаться. На практике для своих каталогов почти всегда ставят либо оба бита разом, либо ни одного.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Права rwx" chapterId="files-packages-ssh" blockId="quiz-rwx">
+<SelfCheck chapterId="files-packages-ssh" quizId="quiz-rwx" questions={[
   { q: 'Что означает первый символ - в строке прав -rw-r--r--?', options: ['Владелец не может ничего делать с файлом', 'Тип объекта: это обычный файл, а не каталог (для каталога был бы символ d)', 'Ошибку чтения прав', 'То же самое, что r'], correct: 1, why: 'Первый символ строки прав — не право, а тип: - для файла, d (directory) — для каталога.' },
   { q: 'Файл имеет права rw-r--r--. Кто из перечисленных может изменить его содержимое?', options: ['Владелец файла и его группа', 'Только владелец файла', 'Владелец, группа и все остальные', 'Никто, права запрещают запись всем'], correct: 1, why: 'w стоит только в первой тройке (владелец). У группы и у всех остальных — только r, то есть чтение.' },
   { q: 'Почему ./hello.sh отвечает Permission denied, если внутри файла обычный работающий bash-скрипт?', options: ['В скрипте синтаксическая ошибка', 'У файла не установлен бит x — Linux не считает его программой, даже если код внутри корректный', 'Файл повреждён', 'Скрипты на bash вообще нельзя запускать через ./'], correct: 1, why: 'Право на выполнение (x) — отдельный, независимый бит. Без него запустить файл как программу нельзя, что бы внутри ни было написано.' },
   { q: 'Чем отличаются r и x на каталоге?', options: ['Ничем, для каталогов это одно и то же право', 'r разрешает увидеть список файлов внутри (ls), x — зайти внутрь и работать с конкретными файлами (cd)', 'r относится к файлам внутри, а x — к самому каталогу', 'x всегда даёт больше прав, чем r'], correct: 1, why: 'r на каталоге — это видимость списка содержимого, x — возможность реально попасть внутрь и добраться до файлов по имени.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="files-packages-ssh" sectionId="permissions-rwx" />
 
 ## chmod: меняем права
 
@@ -76,6 +90,7 @@ bash: ./hello.sh: Permission denied
 
 ### Буквенная запись: кому, что, как
 
+<Block kind="breakdown" title="chmod u+x по частям" chapterId="files-packages-ssh" blockId="breakdown-chmod-letters">
 <SyntaxBreakdown parts={[
   { text: 'chmod ', label: 'команда', note: 'change mode — изменить режим доступа (права)' },
   { text: 'u', label: 'кому: владелец', note: 'user — буква, обозначающая владельца файла. Другие варианты: g (group — группа), o (other — остальные), a (all — все три сразу)' },
@@ -83,6 +98,7 @@ bash: ./hello.sh: Permission denied
   { text: 'x', label: 'что: выполнение', note: 'право, которое добавляем. Можно и несколько сразу, например rw' },
   { text: ' hello.sh', label: 'аргумент', note: 'файл, права которого меняем' },
 ]} />
+</Block>
 
 Проверим на живом файле — запустим ту же команду, что уже видели во введении к главе, но теперь построчно, с проверкой после каждого шага:
 
@@ -155,11 +171,13 @@ chmod: cannot access 'nope.sh': No such file or directory
 
 Полная команда — три такие цифры подряд, по одной на каждую тройку: владелец, группа, остальные. Разберём ровно ту команду, которая чаще всего звучит на чемпионате, — сделать свежескачанный или свежесозданный скрипт исполняемым и одновременно ограничить права для чужих:
 
+<Block kind="breakdown" title="chmod 755 по частям" chapterId="files-packages-ssh" blockId="breakdown-chmod-755">
 <SyntaxBreakdown parts={[
   { text: 'chmod ', label: 'команда', note: 'change mode' },
   { text: '755', label: 'права одним числом', note: 'три цифры подряд: 7 для владельца, 5 для группы, 5 для остальных — каждая складывается из 4+2+1' },
   { text: ' script.sh', label: 'аргумент', note: 'файл, права которого меняем' },
 ]} />
+</Block>
 
 Две связки чисел встречаются почти в каждом задании — 755 для программ и скриптов, 644 для обычных файлов вроде конфигов и текста. Вот их полная расшифровка бок о бок:
 
@@ -198,12 +216,16 @@ ls -l hello.sh
 
 </details>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Команда chmod" chapterId="files-packages-ssh" blockId="quiz-chmod">
+<SelfCheck chapterId="files-packages-ssh" quizId="quiz-chmod" questions={[
   { q: 'Что сделает chmod u+x hello.sh с файлом, у которого права были rw-r--r--?', options: ['Права станут rwxrwxrwx', 'Права станут rwxr--r-- — x добавится только владельцу, буква u ограничивает изменение', 'Команда завершится ошибкой', 'Ничего не изменится'], correct: 1, why: 'Буква u перед +x ограничивает изменение только владельцем — группа и остальные останутся без x.' },
   { q: 'Чем chmod +x file отличается от chmod u+x file?', options: ['Ничем, это одна и та же команда', 'chmod +x без буквы-цели добавляет x сразу всем трём тройкам (как a+x); u+x — только владельцу', 'chmod +x работает только с каталогами', '+x всегда даёт ошибку без указания u/g/o'], correct: 1, why: 'Отсутствие буквы-цели перед +/-/= означает «применить ко всем трём тройкам сразу» — это то же самое, что явно написать a.' },
   { q: 'Как расшифровывается chmod 755?', options: ['Владелец: rwx, группа: r-x, остальные: r-x', 'Владелец: rw-, группа: rw-, остальные: r--', 'Все три группы получают одинаковые права rwx', 'Цифры относятся к размеру файла в килобайтах'], correct: 0, why: '7 = 4+2+1 = rwx, 5 = 4+1 = r-x. Три цифры — три тройки: владелец, группа, остальные, в этом порядке.' },
   { q: 'Какая числовая запись у стандартного текстового файла без права на выполнение — владелец читает/пишет, все остальные только читают?', options: ['777', '755', '644', '400'], correct: 2, why: '644 = rw-r--r--: 6 (4+2) для владельца, 4 для группы и 4 для остальных — только чтение у всех, кроме владельца.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="files-packages-ssh" sectionId="chmod" />
 
 ## sudo: временный суперпользователь
 
@@ -239,7 +261,11 @@ sudo whoami
 
 **Перевод:** «извините, попробуйте снова». После нескольких неверных попыток подряд `sudo` временно блокирует дальнейшие попытки — это защита от подбора пароля перебором.
 
+<Hint id="files-packages-ssh-h1" type="tip">
 Практическое правило: `sudo` ставят перед командой ровно тогда, когда она меняет что-то общесистемное — устанавливает программу, правит файл в `/etc`, перезапускает службу. Открыть свой собственный файл в `nano` или посмотреть свой каталог `sudo` не нужен вовсе.
+</Hint>
+
+<SectionAnchor chapterId="files-packages-ssh" sectionId="sudo" />
 
 ## apt: пакетный менеджер Ubuntu
 
@@ -299,6 +325,7 @@ The following packages will be upgraded:
 
 ### `apt install` — поставить новое
 
+<Block kind="breakdown" title="sudo apt install -y по частям" chapterId="files-packages-ssh" blockId="breakdown-apt-install">
 <SyntaxBreakdown parts={[
   { text: 'sudo ', label: 'команда', note: 'выполнить от имени администратора — установка меняет систему целиком' },
   { text: 'apt ', label: 'пакетный менеджер', note: 'основная программа управления пакетами в Ubuntu' },
@@ -306,6 +333,7 @@ The following packages will be upgraded:
   { text: '-y ', label: 'флаг', note: 'yes — сразу отвечать «да» на любые вопросы подтверждения, не дожидаясь ручного Y/n. Без -y некоторые операции (например, удаление пакетов) их всё равно зададут' },
   { text: 'htop', label: 'аргумент', note: 'имя пакета, который нужно установить — программа для просмотра нагрузки на систему' },
 ]} />
+</Block>
 
 Установим маленький и полезный пакет `tree`, который рисует дерево каталогов, — и увидим сразу важную тонкость поведения `apt`, которую легко упустить:
 
@@ -384,12 +412,16 @@ E: Unable to locate package nonexistent-pkg-xyz123
 
 </details>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="sudo и apt" chapterId="files-packages-ssh" blockId="quiz-apt">
+<SelfCheck chapterId="files-packages-ssh" quizId="quiz-apt" questions={[
   { q: 'Что реально меняет команда sudo apt update?', options: ['Обновляет все установленные программы до последних версий', 'Обновляет только локальный список того, что есть в репозиториях — ни одна программа при этом не меняется', 'Устанавливает новый пакет', 'Удаляет неиспользуемые пакеты'], correct: 1, why: 'update — это «свериться со списком», а не «поставить обновления». Обновляет программы отдельная команда upgrade.' },
   { q: 'Почему sudo apt update без sudo завершается ошибкой Permission denied?', options: ['Команда update вообще не существует без sudo', 'Список пакетов — общесистемный файл, писать в него может только root; sudo даёт обычному пользователю временный доступ уровня root', 'Ошибка означает, что интернет недоступен', 'Нужно сначала ввести apt install sudo'], correct: 1, why: 'Файл блокировки и сам список пакетов принадлежат root. sudo одалживает права root ровно на одну команду.' },
   { q: 'Пользователь student получил ответ student is not in the sudoers file. Что это значит?', options: ['Пароль введён неверно', 'Пользователю student не выдано право пользоваться sudo — он не значится в списке /etc/sudoers', 'Компьютер выключен', 'sudo сломан и требует переустановки'], correct: 1, why: 'sudoers — список тех, кому вообще разрешено повышать права через sudo. Не каждый пользователь системы в нём есть по умолчанию.' },
   { q: 'При sudo apt install tree команда сразу начала ставить пакет без вопросов, а при sudo apt remove tree — остановилась и спросила Do you want to continue? [Y/n]. Почему по-разному?', options: ['Это случайность, поведение непредсказуемо', 'apt подтверждения спрашивает в первую очередь тогда, когда операция что-то удаляет с диска, а не просто добавляет', 'remove всегда требует sudo, а install — нет', 'Разница зависит только от размера пакета'], correct: 1, why: 'Удаление — потенциально разрушительное действие, поэтому apt останавливается и просит явного подтверждения; для простой установки нового пакета он, как правило, действует сразу.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="files-packages-ssh" sectionId="apt" />
 
 ## nano: редактор в терминале
 
@@ -429,14 +461,22 @@ Save modified buffer?
  N No           ^C Cancel
 ```
 
-Три варианта: `Y` — сохранить и выйти, `N` — выйти, отбросив несохранённые изменения, `Ctrl+C` — вообще передумать и вернуться в редактор. Здесь легко потерять текст по невнимательности, нажав `N` вместо `Y` на автомате, — так что стоит на секунду прочитать вопрос, а не бить `N` рефлекторно.
+Три варианта: `Y` — сохранить и выйти, `N` — выйти, отбросив несохранённые изменения, `Ctrl+C` — вообще передумать и вернуться в редактор.
 
-<SelfCheck questions={[
+<Hint id="files-packages-ssh-h2" type="important">
+Здесь легко потерять текст по невнимательности, нажав `N` вместо `Y` на автомате, — так что стоит на секунду прочитать вопрос, а не бить `N` рефлекторно.
+</Hint>
+
+<Block kind="quiz" title="Редактор nano" chapterId="files-packages-ssh" blockId="quiz-nano">
+<SelfCheck chapterId="files-packages-ssh" quizId="quiz-nano" questions={[
   { q: 'Какая комбинация клавиш сохраняет файл в nano, не закрывая редактор?', options: ['Ctrl+S', 'Ctrl+O (Write Out)', 'Ctrl+X', 'Ctrl+W'], correct: 1, why: 'Ctrl+O — Write Out, «записать»: сохраняет файл на диск и остаётся в редакторе. Ctrl+S в nano ничего не делает.' },
   { q: 'Что сделает Ctrl+X в nano, если после последнего сохранения ты успел дописать ещё текст?', options: ['Молча закроет nano, потеряв несохранённые строки', 'Спросит Save modified buffer? с вариантами Y/N/Ctrl+C, прежде чем закрыться', 'Автоматически сохранит и закроется без вопросов', 'Ничего не сделает, пока файл не сохранён'], correct: 1, why: 'nano всегда предупреждает о несохранённых изменениях перед закрытием — можно сохранить (Y), отбросить (N) или отменить выход (Ctrl+C).' },
   { q: 'Экран показывает File Name to Write: notes.txt. Что происходит?', options: ['nano сообщает об ошибке — файл не найден', 'Это шаг сохранения (после Ctrl+O): nano подтверждает, под каким именем записать файл', 'Так выглядит финальное сообщение об успешном выходе', 'nano просит переименовать файл, иначе не откроет его'], correct: 1, why: 'После Ctrl+O nano всегда переспрашивает имя файла для записи — обычно достаточно просто нажать Enter, оставив имя как есть.' },
   { q: 'Что означает значок ^ в подсказке ^O Write Out внизу экрана nano?', options: ['Клавишу Shift', 'Клавишу Ctrl', 'Клавишу Alt (Meta)', 'Стрелку вверх на клавиатуре'], correct: 1, why: '^ в интерфейсе nano — это Ctrl. Alt/Meta там же обозначается буквой M- перед клавишей, например M-U Undo.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="files-packages-ssh" sectionId="nano" />
 
 ## SSH: подключение к чужому компьютеру
 
@@ -444,6 +484,7 @@ Save modified buffer?
 
 ### Подключение по паролю
 
+<Block kind="breakdown" title="ssh -p 2222 student@192.168.1.10 по частям" chapterId="files-packages-ssh" blockId="breakdown-ssh-connect">
 <SyntaxBreakdown parts={[
   { text: 'ssh ', label: 'команда', note: 'клиент SSH: устанавливает защищённое подключение к удалённой машине' },
   { text: '-p 2222', label: 'флаг порта', note: 'указывает, на каком порту слушает SSH-сервер. По умолчанию (без флага) это 22 — стандартный порт SSH; флаг нужен, только когда сервер слушает нестандартный порт, как здесь' },
@@ -451,6 +492,7 @@ Save modified buffer?
   { text: '@', label: 'разделитель', note: 'читается как «на»: пользователь student на машине 192.168.1.10' },
   { text: '192.168.1.10', label: 'адрес хоста', note: 'IP-адрес или доменное имя машины, к которой подключаемся. Машину, к которой подключаются по сети, по-английски называют хостом (host)' },
 ]} />
+</Block>
 
 Если адрес неверный или машина не отвечает на этом порту, `ssh` откажется сразу, без долгого ожидания:
 
@@ -583,11 +625,13 @@ Load key "/home/student/.ssh/id_ed25519": bad permissions
 student@localhost: Permission denied (publickey,password).
 ```
 
+<Block kind="breakdown" title="Предупреждение о правах ключа по частям" chapterId="files-packages-ssh" blockId="breakdown-key-permissions">
 <SyntaxBreakdown parts={[
   { text: 'Permissions 0644', label: 'какие права сейчас стоят', note: 'текущие права файла в числовой записи — 644, те самые «rw-r--r--» из начала главы: читать может кто угодно в системе' },
   { text: " for '/home/student/.ssh/id_ed25519'", label: 'какой именно файл', note: 'полный путь к закрытому ключу — тому, который никогда не должен покидать компьютер и не должен быть читаем никем, кроме владельца' },
   { text: ' are too open.', label: 'диагноз', note: '«слишком открыты» — SSH сам считает права файла частью защиты и отказывается доверять ключу, который в принципе мог прочитать кто-то ещё' },
 ]} />
+</Block>
 
 Полностью сообщение переводится так: «предупреждение: незащищённый файл закрытого ключа! Права 0644 для файла слишком открыты. Требуется, чтобы файлы закрытых ключей были недоступны другим. Этот ключ будет проигнорирован». SSH рассуждает предельно логично: если файл закрытого ключа мог прочитать кто угодно в системе, то и защита, которую он даёт, ничего не стоит — поэтому он просто отказывается им пользоваться, вообще не пробуя. Чинится ровно той же командой, с которой началась эта глава:
 
@@ -602,17 +646,22 @@ student
 
 Права снова `600` — и ключ снова принят без единого возражения.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="SSH и ключи" chapterId="files-packages-ssh" blockId="quiz-ssh">
+<SelfCheck chapterId="files-packages-ssh" quizId="quiz-ssh" questions={[
   { q: 'Что означает сообщение ssh: connect to host localhost port 2222: Connection refused?', options: ['Неверный пароль', 'На указанном порту никто не слушает — либо ошибка в номере порта, либо SSH-сервер там не запущен', 'Компьютер выключен из сети', 'Ключ отсутствует'], correct: 1, why: 'Connection refused — порт закрыт или пуст. Это ошибка на уровне сети/порта, ещё до всякой аутентификации.' },
   { q: 'При первом подключении к новой машине ssh спрашивает Are you sure you want to continue connecting? Зачем этот вопрос?', options: ['Проверяет, работает ли у тебя интернет', 'Твой компьютер ещё не видел ключ этого сервера и не может подтвердить, что это действительно нужная машина, а не подмена', 'Спрашивает разрешение на использование ssh вообще', 'Это реклама'], correct: 1, why: 'Ключ сервера (host key) при первом подключении ещё не сохранён локально — подтвердить подлинность нечем, поэтому решение отдаётся человеку.' },
   { q: 'Чем вход по SSH-ключу отличается от входа по паролю?', options: ['Ключ вводится так же руками, просто он длиннее пароля', 'Пароль подбираем и вводим каждый раз; ключ — пара файлов (закрытый остаётся у тебя, публичный лежит на сервере), и вход происходит без единого вопроса', 'Ключами нельзя пользоваться без интернета', 'Это одно и то же под разными названиями'], correct: 1, why: 'Ключевая пара доказывает личность математически: сервер проверяет, что у тебя есть закрытый ключ, парный к публичному в authorized_keys, без пересылки самого пароля.' },
   { q: 'ssh отвечает Permissions 0644 ... are too open и отказывается использовать ключ. Что нужно сделать?', options: ['Сгенерировать ключ заново', 'Выполнить chmod 600 на файл закрытого ключа — открытые всем права на закрытый ключ SSH считает угрозой и отказывается его использовать', 'Переустановить ssh', 'Игнорировать сообщение — это просто предупреждение'], correct: 1, why: 'SSH требует, чтобы закрытый ключ был читаем только владельцем (права 600). При более открытых правах он отказывается доверять ключу вовсе.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="files-packages-ssh" sectionId="ssh" />
 
 ## scp: скопировать файл на другую машину
 
 `scp` (secure copy) копирует файлы между машинами тем же зашифрованным каналом, что и `ssh`, — фактически та же команда `cp`, только один (или оба) из путей находится не локально, а на удалённом хосте.
 
+<Block kind="breakdown" title="scp -P 2222 по частям" chapterId="files-packages-ssh" blockId="breakdown-scp">
 <SyntaxBreakdown parts={[
   { text: 'scp ', label: 'команда', note: 'secure copy — копирование файлов через SSH-протокол' },
   { text: '-P 2222 ', label: 'флаг порта', note: 'заглавная P — не путать с флагом -p у ssh (строчная)! У scp порт задаётся именно заглавной буквой; строчная -p в scp означает совсем другое — сохранить время изменения и права исходного файла' },
@@ -620,8 +669,11 @@ student
   { text: 'student@192.168.1.10:', label: 'назначение: машина', note: 'та же запись user@host, что и у ssh; двоеточие после адреса отделяет машину от пути на ней' },
   { text: '/home/student/', label: 'назначение: путь', note: 'куда положить файл на удалённой машине — обычный абсолютный путь' },
 ]} />
+</Block>
 
+<Hint id="files-packages-ssh-h3" type="important">
 Флаг регистра — реальный источник путаницы: `ssh -p 2222` и `scp -P 2222` задают один и тот же порт, но регистр буквы разный. Перепутать легко, а `scp` на маленькую `-p` не пожалуется ошибкой — просто молча применит другое поведение (сохранение времени и прав), что для порта совершенно не то, что нужно.
+</Hint>
 
 Копирование одного файла:
 
@@ -667,6 +719,8 @@ a.txt   100%    0     0.0KB/s   00:00
 ```
 
 Направление копирования можно развернуть — переставить местами локальный и удалённый путь: `scp localhost:/home/student/report.txt .` скачает файл с сервера на локальную машину, в текущий каталог (`.`). `scp` не различает «загрузить» и «скачать» как разные команды — направление задаётся исключительно порядком: что откуда, что куда.
+
+<SectionAnchor chapterId="files-packages-ssh" sectionId="scp" />
 
 ## Практикум: от прав до подключения
 
@@ -728,6 +782,8 @@ scp deploy.conf student@192.168.1.10:/home/student/
 ```bash
 ssh student@192.168.1.10 'ls -l deploy.conf'
 ```
+
+<SectionAnchor chapterId="files-packages-ssh" sectionId="practicum" />
 
 ## Типичные ошибки
 
@@ -806,16 +862,21 @@ scp: stat local "ghost.txt": No such file or directory
 
 **Перевод:** «не удалось получить сведения о локальном файле ghost.txt: нет такого файла или каталога». **Причина:** опечатка в имени или запуск не из того каталога, где лежит файл. **Как починить:** проверить `ls` в текущем каталоге и точное имя файла.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Типичные ошибки" chapterId="files-packages-ssh" blockId="quiz-typical-errors">
+<SelfCheck chapterId="files-packages-ssh" quizId="quiz-typical-errors" questions={[
   { q: 'Permission denied при ./script.sh и Permission denied (publickey,password) при ssh — это одна и та же причина?', options: ['Да, обе всегда означают отсутствие права x', 'Нет: у скрипта не хватает бита x на выполнение; у ssh — не подтверждена личность (неверный пароль или ключ), это разные механизмы', 'Да, обе чинятся командой chmod', 'Нет, это вообще разные слова, просто похожи внешне'], correct: 1, why: 'Локальный Permission denied у скрипта — про биты rwx файла. SSH-вариант — про аутентификацию: доказательство, что ты тот, за кого себя выдаёшь.' },
   { q: 'apt update выдал E: Could not open lock file ... Permission denied. Что делать?', options: ['Переустановить apt', 'Добавить sudo перед командой — список пакетов пишет только root', 'Подождать и повторить позже', 'Удалить файл блокировки вручную'], correct: 1, why: 'Файл блокировки и список пакетов принадлежат root. sudo даёт временный доступ уровня root ровно для этой команды.' },
   { q: 'ssh: connect to host ... port 2222: Connection refused — на каком этапе произошла ошибка?', options: ['После ввода пароля, при проверке личности', 'Ещё до всякой аутентификации — просто никто не слушает на этом порту', 'После успешного входа, при выполнении команды', 'При копировании файла через scp'], correct: 1, why: 'Connection refused — сетевая ошибка на уровне порта, она происходит раньше, чем ssh вообще успевает спросить пароль или ключ.' },
   { q: 'Какая из шести ошибок этой главы решается ролью пользователя, а не редактированием прав или команды?', options: ['Permission denied при запуске скрипта', 'chmod: cannot access', 'student is not in the sudoers file — нужны действия администратора машины, у самого пользователя таких прав нет', 'scp: stat local ... No such file or directory'], correct: 2, why: 'В отличие от остальных пяти ошибок, которые чинит сам пользователь, sudoers — это ограничение, снять которое может только тот, у кого уже есть права администратора.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="files-packages-ssh" sectionId="typical-errors" />
 
 ## Слова главы
 
-<Flashcards cards={[
+<Block kind="vocab" title="Словарь главы" chapterId="files-packages-ssh" blockId="vocab-glossary">
+<Flashcards chapterId="files-packages-ssh" cards={[
   { term: 'permission', translation: 'право доступа', note: 'что можно делать с файлом: read, write, execute' },
   { term: 'executable', translation: 'исполняемый', note: 'файл с правом x — его можно запустить как программу' },
   { term: 'superuser', translation: 'суперпользователь', note: 'учётная запись root с неограниченными правами в системе; sudo даёт их временно' },
@@ -825,16 +886,49 @@ scp: stat local "ghost.txt": No such file or directory
   { term: 'public key', translation: 'открытый (публичный) ключ', note: 'часть пары ключей SSH, которую кладут на сервер в authorized_keys' },
   { term: 'private key', translation: 'закрытый (приватный) ключ', note: 'часть пары ключей SSH, которая никогда не покидает твой компьютер; права на файл — строго 600' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="files-packages-ssh" sectionId="vocab" />
 
 ## Потренируйся печатать
 
 Числовая запись прав — набирается быстрее буквенной, стоит довести до автоматизма:
 
-<CodeTyping snippet={'chmod +x deploy.sh && ./deploy.sh'} />
+<Block kind="trainer" title="Права и пакеты: команды главы" chapterId="files-packages-ssh" blockId="trainer-permissions-apt">
+<CodeTyping keyboard chapterId="files-packages-ssh" trainerId="trainer-permissions-apt" targetCpm={120} targetAccuracy={90} pools={[{
+  label: 'chmod и apt',
+  snippets: [
+    'chmod +x deploy.sh && ./deploy.sh',
+    'chmod 755 script.sh',
+    'chmod 644 hello.sh',
+    'chmod u=rwx,g=rx,o=rx hello.sh',
+    'chmod -R 755 project/',
+    'sudo apt update && sudo apt upgrade',
+    'sudo apt install -y htop',
+    'chmod 600 ~/.ssh/id_ed25519',
+  ],
+}]} />
+</Block>
 
 Подключение по нестандартному порту:
 
-<CodeTyping snippet={'ssh -p 2222 student@192.168.1.10'} />
+<Block kind="trainer" title="SSH и scp: команды главы" chapterId="files-packages-ssh" blockId="trainer-ssh-scp">
+<CodeTyping chapterId="files-packages-ssh" trainerId="trainer-ssh-scp" targetCpm={130} targetAccuracy={90} pools={[{
+  label: 'ssh и scp',
+  snippets: [
+    'ssh -p 2222 student@192.168.1.10',
+    'ssh-keygen -t ed25519',
+    'ssh-copy-id student@localhost',
+    'ssh -i ~/.ssh/id_ed25519 localhost whoami',
+    'scp report.txt localhost:/home/student/report_copy.txt',
+    'scp -P 2222 report.txt student@192.168.1.10:/home/student/',
+    'scp -r mydir localhost:/home/student/mydir_copy',
+    "ssh student@192.168.1.10 'ls -l deploy.conf'",
+  ],
+}]} />
+</Block>
+
+<Block kind="cheatsheet" title="Разбор любой команды" chapterId="files-packages-ssh" blockId="cheatsheet-explainshell">
 
 <ToolCard
   name="explainshell"
@@ -842,9 +936,36 @@ scp: stat local "ghost.txt": No such file or directory
   desc="Вставь любую незнакомую команду целиком — сайт разберёт её по частям и покажет выдержку из документации для каждого флага. Проверь на ssh -p 2222 student@192.168.1.10 или chmod 755 script.sh"
 />
 
+</Block>
+
+<SectionAnchor chapterId="files-packages-ssh" sectionId="practice-typing" />
+
 ## Команды и флаги главы
 
 Шпаргалка по всему, что встретилось в этой главе.
+
+<Block kind="cheatsheet" title="Команды и флаги главы" chapterId="files-packages-ssh" blockId="cheatsheet-commands-flags" favPayload={{
+  kind: 'table',
+  head: ['Команда', 'Флаг / форма', 'Что делает', 'Пример'],
+  rows: [
+    ['chmod', 'буквенная (u/g/o/a + +/-/= + rwx)', 'изменить права конкретной тройке', 'chmod u+x hello.sh'],
+    ['chmod', 'числовая (0–7 на тройку)', 'изменить права все три тройки сразу', 'chmod 755 script.sh'],
+    ['chmod', '-R', 'применить рекурсивно ко всему каталогу', 'chmod -R 755 project/'],
+    ['sudo', '—', 'выполнить одну команду от имени root, подтвердив своим паролем', 'sudo apt update'],
+    ['apt', 'update', 'обновить локальный список пакетов, не устанавливая ничего', 'sudo apt update'],
+    ['apt', 'upgrade', 'обновить уже установленные пакеты до новых версий', 'sudo apt upgrade'],
+    ['apt', 'install', 'поставить новый пакет', 'sudo apt install tree'],
+    ['apt', '-y', 'сразу отвечать «да» на вопросы подтверждения', 'sudo apt install -y tree'],
+    ['nano', 'Ctrl+O', 'Write Out — сохранить файл, не закрывая редактор', '—'],
+    ['nano', 'Ctrl+X', 'Exit — выйти (спросит про сохранение, если есть изменения)', '—'],
+    ['ssh', '-p', 'подключиться на нестандартный порт (строчная p)', 'ssh -p 2222 student@host'],
+    ['ssh', '-i', 'использовать конкретный файл закрытого ключа', 'ssh -i ~/.ssh/id_ed25519 host'],
+    ['ssh-keygen', '-t', 'сгенерировать пару ключей заданного типа', 'ssh-keygen -t ed25519'],
+    ['ssh-copy-id', '—', 'скопировать публичный ключ в authorized_keys на сервере', 'ssh-copy-id student@host'],
+    ['scp', '-P', 'нестандартный порт (заглавная P, не путать с ssh -p)', 'scp -P 2222 f.txt host:'],
+    ['scp', '-r', 'скопировать каталог рекурсивно', 'scp -r mydir host:~/mydir'],
+  ],
+}}>
 
 | Команда | Флаг / форма | Что делает | Пример |
 |---|---|---|---|
@@ -865,6 +986,8 @@ scp: stat local "ghost.txt": No such file or directory
 | `scp` | `-P` | нестандартный порт (заглавная P, не путать с ssh -p) | `scp -P 2222 f.txt host:` |
 | `scp` | `-r` | скопировать каталог рекурсивно | `scp -r mydir host:~/mydir` |
 
+</Block>
+
 <details>
 <summary>Углубиться</summary>
 
@@ -880,7 +1003,11 @@ scp: stat local "ghost.txt": No such file or directory
 
 </details>
 
+<SectionAnchor chapterId="files-packages-ssh" sectionId="cheatsheet-commands" />
+
 ## Куда дальше: проверенные ресурсы
+
+<Block kind="cheatsheet" title="Ресурсы для изучения" chapterId="files-packages-ssh" blockId="cheatsheet-resources">
 
 - [Академия Selectel — команда chmod в Linux](https://selectel.ru/blog/tutorials/what-the-chmod-command-does-and-how-to-use-it-in-linux/) — открывай, чтобы увидеть числовую и буквенную запись прав ещё раз другими словами, с разбором `chmod 700` и других сочетаний, которых не было в этой главе.
 - [Яндекс.Образование — nano: базовые команды, сохранение, выход](https://education.yandex.ru/handbook/linux/article/nano-bazovie-komandi-sokhranenie-vikhod) — открывай, чтобы увидеть полный список команд nano за пределами Ctrl+O/Ctrl+X: поиск, замену, вырезание строк.
@@ -890,6 +1017,8 @@ scp: stat local "ghost.txt": No such file or directory
 - [man-страница chmod](https://manpages.ubuntu.com/manpages/noble/en/man1/chmod.1.html) — официальное руководство: полное описание обоих режимов записи прав, включая биты, которых не было в этой главе.
 - [OpenSSH manual pages](https://www.openssh.org/manual.html) — официальные man-страницы ssh, ssh-keygen и scp: первоисточник, который пересказывают все остальные статьи.
 - [Ubuntu Server — Package management](https://ubuntu.com/server/docs/how-to/software/package-management/) — официальная документация Canonical по apt, dpkg и репозиториям.
+
+</Block>
 
 ## Челлендж ⭐
 
@@ -930,6 +1059,8 @@ ssh -i id_ed25519 teammate@192.168.1.20
 
 </details>
 
+<SectionAnchor chapterId="files-packages-ssh" sectionId="challenge" />
+
 ## Что должен уметь
 
 - Читать строку прав из `ls -l` (`-rwxr-xr-x`) и объяснять, что означает каждая из трёх троек — владелец, группа, остальные.
@@ -940,3 +1071,5 @@ ssh -i id_ed25519 teammate@192.168.1.20
 - Подключаться по SSH и паролем, и ключом: генерировать пару `ssh-keygen`, переносить публичный ключ через `ssh-copy-id`, и объяснять, зачем закрытый ключ должен иметь права `600`.
 - Копировать файлы и каталоги между машинами через `scp`, не путая заглавную `-P` с ssh-шной строчной `-p`.
 - Узнавать по точному тексту сообщения шесть типичных ошибок этой главы — от `Permission denied` до `Connection refused` — и знать, как каждую починить.
+
+<SectionAnchor chapterId="files-packages-ssh" sectionId="what-you-should-know" />

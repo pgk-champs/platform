@@ -10,9 +10,15 @@ import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
 import SelfCheck from '@site/src/components/SelfCheck';
-import TOCInline from '@theme/TOCInline';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # Многомодульность и UI Kit
+
+<ChapterProgress chapterId="ui-kit" totalSections={13} totalQuizzes={6} totalTrainers={2} />
 
 ## Зачем это нужно
 
@@ -27,7 +33,9 @@ import TOCInline from '@theme/TOCInline';
 
 Разберём это не только на словах — вживую: соберём настоящий (пусть и упрощённый) multi-module Gradle-проект, увидим настоящий `BUILD SUCCESSFUL`, настоящие ошибки сборщика и настоящую разницу между `.aar` и `.jar`.
 
-<TOCInline toc={toc} />
+<CollapsibleToc toc={toc} chapterId="ui-kit" />
+
+<SectionAnchor chapterId="ui-kit" sectionId="why" />
 
 ## Дублирование до модуля, переиспользование после
 
@@ -52,17 +60,22 @@ fun main() {
 - **Строки 4–6: `object UiKitFormatting`** — та же логика, но объявлена один раз, в объекте, который в реальном проекте лежал бы в модуле `:ui-kit`.
 - **Строки 9–11** — печать. **Что выведет:** `ДО (ProductCard): -20%`, `ДО (Favorites): -20%`, `ПОСЛЕ (оба экрана): -20% / -20%` — результат одинаковый во всех трёх случаях, разница только в том, откуда экраны берут эту логику: из своей копии или из общего модуля.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Модули и переиспользование" chapterId="ui-kit" blockId="quiz-modules-reuse">
+<SelfCheck chapterId="ui-kit" quizId="q1" questions={[
   { q: 'Что в Gradle физически означает "модуль" (module)?', options: ['Просто папка с файлами', 'Самостоятельная единица сборки со своим build.gradle.kts, своими исходниками и своим местом в графе зависимостей', 'Синоним слова "пакет" (package) в Kotlin', 'Файл настроек IDE'], correct: 1, why: 'Модуль — не папка сама по себе, а единица, которую Gradle компилирует и версионирует отдельно, со своим build.gradle.kts и графом зависимостей.' },
   { q: 'Почему разбиение на :app/:ui-kit/:net помогает параллельной работе команды?', options: ['Модули автоматически распределяют задачи между людьми', 'Разные участники правят код в разных модулях и, как следствие, в разных файлах — меньше git-конфликтов на одном и том же месте', 'В Gradle нет способа работать одному разработчику сразу с двумя модулями', 'Модули ускоряют интернет-соединение при пуше в git'], correct: 1, why: 'Границы модулей — это и границы того, кто какие файлы правит: конфликтов в одной и той же строке одного файла становится меньше.' },
   { q: 'Что демонстрирует демо discountBadgeTextInProductCard / discountBadgeTextInFavoritesScreen ДО объединения в UiKitFormatting?', options: ['Что дублирование логики в разных местах ничем не отличается от одного места', 'Что одна и та же логика скопирована в два места и должна поддерживаться (и синхронизироваться) вручную в обоих сразу', 'Что Kotlin запрещает одинаковые функции в разных файлах', 'Что percent обязан быть Int, а не Double'], correct: 1, why: 'ДО — копия одной и той же формулы в двух функциях: измени формат бейджа в одной, забудь про вторую — и они разойдутся. ПОСЛЕ такой риск устранён: источник один.' },
   { q: 'Что из перечисленного НЕ входит в практическую выгоду от разбиения проекта на модули, разобранную в этом разделе?', options: ['Границы (нельзя случайно дотянуться до чужих деталей)', 'Переиспользование общего кода', 'Инкрементальная сборка — пересобирается только затронутое', 'Автоматическое исправление багов в коде модуля'], correct: 3, why: 'Модули не чинят баги сами — это организационный и структурный инструмент: границы, переиспользование, инкрементальная сборка, параллельная работа. Логику всё ещё пишет и чинит разработчик.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="ui-kit" sectionId="reuse-demo" />
 
 ## Анатомия multi-module проекта
 
 Multi-module Gradle-проект начинается не с кода, а с одного файла в корне проекта — `settings.gradle.kts`. Именно он говорит Gradle, какие папки вообще считать самостоятельными модулями.
 
+<Block kind="breakdown" title="Строка include в settings.gradle.kts" chapterId="ui-kit" blockId="breakdown-include">
 <SyntaxBreakdown parts={[
   { text: 'include', label: 'функция Gradle DSL', note: 'объявлена в settings.gradle.kts; перечисляет, какие подпапки проекта — самостоятельные модули (subprojects), участвующие в сборке. Без include(...) папка с исходниками — просто папка, Gradle её не увидит' },
   { text: '(', label: 'открывающая скобка вызова', note: 'начало списка аргументов — путей к модулям' },
@@ -73,35 +86,48 @@ Multi-module Gradle-проект начинается не с кода, а с о
   { text: '":net"', label: 'путь к модулю net', note: 'третий модуль — то, что могло бы отвечать за сетевые запросы; в этой главе он нужен как пример зависимости, которую :ui-kit решает пробросить дальше или спрятать (см. раздел про api/implementation)' },
   { text: ')', label: 'закрывающая скобка', note: 'порядок путей внутри include(...) ни на что не влияет: реальные связи между модулями задаются позже, через dependencies { } в build.gradle.kts каждого модуля' },
 ]} />
+</Block>
 
+<Hint id="ui-kit-h1" type="fact">
 Официальная документация Gradle описывает `include(...)` ровно так же — как функцию, принимающую пути проектов, «by default a project path corresponds to the relative physical location of the project directory» («путь проекта по умолчанию соответствует относительному физическому расположению папки проекта»). И там же подтверждается вторая важная деталь: у каждого подпроекта — свой собственный build-файл, `app/build.gradle.kts`, `ui-kit/build.gradle.kts`, `net/build.gradle.kts`, а не один общий на всех.
+</Hint>
 
 ### com.android.application и com.android.library: разница в одно слово
 
 У каждого Android-модуля в `build.gradle.kts` есть блок `plugins { }`, и именно id плагина в нём определяет, каким модуль будет — исполняемым приложением или переиспользуемой библиотекой. У модуля `:app` это `com.android.application`, у модулей `:ui-kit` и `:net` — `com.android.library`.
 
+<Block kind="breakdown" title="Плагин com.android.application" chapterId="ui-kit" blockId="breakdown-plugin-application">
 <SyntaxBreakdown parts={[
   { text: 'id', label: 'функция id', note: 'указывает Gradle, какой именно плагин подключить к модулю — по строковому идентификатору, а не по имени класса или пути к jar-файлу напрямую' },
   { text: '(', label: 'скобка вызова', note: '' },
   { text: '"com.android.application"', label: 'id плагина уровня приложения', note: 'подключает Android Gradle Plugin (AGP) в режиме «конечное приложение»: модуль собирается в .apk/.aab, у него обязателен applicationId, и именно такой модуль ставится и запускается на устройстве' },
   { text: ')', label: 'закрывающая скобка', note: '' },
 ]} />
+</Block>
 
+<Block kind="breakdown" title="Плагин com.android.library" chapterId="ui-kit" blockId="breakdown-plugin-library">
 <SyntaxBreakdown parts={[
   { text: 'id', label: 'та же функция id', note: 'синтаксис объявления плагина одинаковый везде — меняется только сам id внутри скобок' },
   { text: '(', label: 'скобка вызова', note: '' },
   { text: '"com.android.library"', label: 'id плагина уровня библиотеки', note: 'тот же AGP, но в режиме «переиспользуемая библиотека»: на выходе — .aar (разберём чуть дальше), applicationId не нужен и не разрешён, а сам модуль нельзя установить и запустить на устройстве напрямую — только подключить как зависимость из другого модуля' },
   { text: ')', label: 'закрывающая скобка', note: '' },
 ]} />
+</Block>
 
+<Hint id="ui-kit-h2" type="important">
 Различие — буквально одно слово, `application` вместо `library`, — но оно меняет весь смысл модуля: в проекте ровно один модуль с `com.android.application` (точка входа, которую запускает пользователь) и сколько угодно модулей с `com.android.library` (переиспользуемые части, из которых эта точка входа собрана).
+</Hint>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Анатомия проекта и плагины" chapterId="ui-kit" blockId="quiz-project-anatomy">
+<SelfCheck chapterId="ui-kit" quizId="q2" questions={[
   { q: 'Что произойдёт, если папка с исходниками лежит в проекте, но её пути нет в include(...) внутри settings.gradle.kts?', options: ['Gradle всё равно найдёт её автоматически по расположению на диске', 'Gradle не будет считать её модулем вообще — просто папка вне сборки', 'Она соберётся, но без зависимостей', 'Начнётся циклическая зависимость'], correct: 1, why: 'include(...) — единственный источник истины о том, какие папки Gradle вообще рассматривает как модули; без записи в нём папка в сборку не попадает (эта ситуация — первая типичная ошибка главы, разберём её дальше).' },
   { q: 'Чем отличаются build.gradle.kts у разных модулей одного multi-module проекта?', options: ['Это один и тот же файл, просто скопированный', 'У каждого модуля — собственный build.gradle.kts со своими плагинами и зависимостями', 'build.gradle.kts вообще есть только у корневого проекта', 'Файл общий, но у каждого модуля своя секция внутри него'], correct: 1, why: 'Официальная документация Gradle подтверждает: у каждого подпроекта в multi-project build — собственный build-файл, а не общий на все модули.' },
   { q: 'В чём разница между com.android.application и com.android.library на уровне итогового артефакта?', options: ['Разницы нет, это два названия одного и того же плагина', 'application собирает .apk/.aab и требует applicationId; library собирает .aar, applicationId не разрешён, а сам модуль нельзя запустить напрямую', 'library всегда быстрее компилируется, чем application', 'application можно подключить как зависимость из другого модуля, library — нельзя'], correct: 1, why: 'application — точка входа, устанавливаемая на устройство; library — переиспользуемая часть, которую подключают как зависимость, но саму по себе на устройство не ставят.' },
   { q: 'Сколько модулей с плагином com.android.application обычно бывает в одном Android-проекте?', options: ['Ровно один — точка входа приложения', 'Ноль — application вообще не нужен для Android', 'Столько же, сколько экранов в приложении', 'Один на каждого участника команды'], correct: 0, why: 'com.android.application отмечает единственную точку входа — модуль, который реально устанавливается и запускается; library-модулей вокруг него может быть сколько угодно.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="ui-kit" sectionId="project-anatomy" />
 
 ## Что живёт в ui-kit: дизайн-система
 
@@ -254,17 +280,22 @@ fun CatalogScreen() {
 
 Ни одного `0xFF...`, ни одного голого `.dp`/`.sp` в `:app` не осталось — `CatalogScreen` вообще не знает, какого цвета фон карточки или какой у неё отступ, он просто просит `ui-kit` нарисовать карточку с конкретными данными о товаре. Это и есть тот самый эффект «границы» из первого раздела: детали дизайн-системы физически не видны экрану, который её использует, — только то, что `ui-kit` явно сделал публичным (сам `ProductCard`).
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Что переехало в ui-kit" chapterId="ui-kit" blockId="quiz-ui-kit-contents">
+<SelfCheck chapterId="ui-kit" quizId="q3" questions={[
   { q: 'Что именно переезжает из :app в :ui-kit по итогам этого раздела?', options: ['Только object Dimens', 'Цвета, типографика (размеры шрифта), Dimens и сам переиспользуемый composable ProductCard', 'Весь модуль :app целиком', 'Только сам текст "В корзину"'], correct: 1, why: 'Всё, что раньше было либо магическими числами внутри ProductCard.kt, либо самим этим файлом — Colors, Typography, Dimens и ProductCard() — теперь живёт в :ui-kit.' },
   { q: 'Что осталось в CatalogScreen (:app) после переноса ProductCard в :ui-kit?', options: ['Копия всего кода ProductCard на всякий случай', 'Только импорт ru.champs.uikit.ProductCard и вызовы этой функции с конкретными данными товара', 'Ничего — CatalogScreen больше не нужен', 'object Dimens, но без Colors и Typography'], correct: 1, why: ':app теперь просто вызывает готовый composable из :ui-kit, передавая только то, что меняется от товара к товару (title, price, discountPercent) — ни цветов, ни отступов там больше нет.' },
   { q: 'Почему рефакторинг describeBadgeBefore/After печатает ОДИНАКОВЫЕ числа до и после выноса в отдельные object?', options: ['Потому что рефакторинг ничего не меняет в поведении — только в том, откуда код берёт значения', 'Это случайное совпадение чисел', 'На самом деле числа отличаются, просто выглядят одинаково', 'Потому что UiKitColors — это не настоящий object'], correct: 0, why: 'Рефакторинг по определению не должен менять результат — он меняет только структуру: где именно объявлено значение и сколько раз оно продублировано.' },
   { q: 'Почему в примере с :ui-kit цвета объявлены как val Colors = Color(0xFF...), а не как const val, аналогично тому, что уже разбиралось для Dimens в прошлой главе?', options: ['Color — это тоже вызов функции-конструктора, а не значение, известное на этапе компиляции, поэтому const val для него, как и для Dp/Sp, не подходит', 'Цвета в Kotlin вообще нельзя объявлять внутри object', 'const val работает только с Int', 'Это опечатка, на самом деле нужен const val'], correct: 0, why: 'Тот же принцип, что и с Dp/Sp в прошлой главе: Color(0xFF...) — вызов конструктора, вычисляемый во время выполнения, а const val требует значения, известного компилятору ещё до запуска программы.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="ui-kit" sectionId="design-system" />
 
 ## implementation(project(":ui-kit")) и разница api vs implementation
 
 Чтобы `:app` мог вызывать `ProductCard()` из `:ui-kit`, одного `include(":ui-kit")` в `settings.gradle.kts` недостаточно — `include` только говорит Gradle «такой модуль существует», но не «этот модуль нужен вот этому». Связь между конкретными модулями объявляется в `dependencies { }` внутри `build.gradle.kts` того модуля, которому эта зависимость нужна.
 
+<Block kind="breakdown" title="Зависимость implementation(project(...))" chapterId="ui-kit" blockId="breakdown-implementation">
 <SyntaxBreakdown parts={[
   { text: 'implementation', label: 'конфигурация зависимости', note: 'говорит Gradle: подключи то, что в скобках, к ЭТОМУ модулю, но не делай это видимым для тех, кто, в свою очередь, зависит от текущего модуля' },
   { text: '(', label: 'скобка вызова', note: '' },
@@ -274,9 +305,11 @@ fun CatalogScreen() {
   { text: ')', label: 'закрывающая скобка project(...)', note: '' },
   { text: ')', label: 'закрывающая скобка implementation(...)', note: '' },
 ]} />
+</Block>
 
 Но у зависимости между модулями, в отличие от `include`, есть выбор: `implementation` или `api`. Разница касается не самого `:ui-kit`, а того, что видно модулям, которые зависят от `:ui-kit` — прежде всего `:app`. Официальная документация Gradle формулирует это предельно чётко: зависимости `implementation` «will not be exposed to consumers, and therefore not leak into the consumers' compile classpath» («не будут раскрыты потребителям и, соответственно, не просочатся в classpath компиляции потребителей»), тогда как зависимости `api` «will be transitively exposed to consumers of the library, and as such will appear on the compile classpath of consumers» («будут транзитивно раскрыты потребителям библиотеки и, соответственно, появятся в classpath компиляции потребителей»).
 
+<Block kind="breakdown" title="Зависимость api(project(...))" chapterId="ui-kit" blockId="breakdown-api">
 <SyntaxBreakdown parts={[
   { text: 'api', label: 'конфигурация — транзитивно раскрывается', note: 'в отличие от implementation, api делает зависимость частью ПУБЛИЧНОГО контракта модуля: она попадёт в classpath не только самого ui-kit, но и всех, кто зависит от ui-kit — то есть :app' },
   { text: '(', label: 'скобка вызова', note: '' },
@@ -285,6 +318,7 @@ fun CatalogScreen() {
   { text: ')', label: 'закрывающая скобка project(...)', note: '' },
   { text: ')', label: 'закрывающая скобка api(...)', note: '' },
 ]} />
+</Block>
 
 Это не абстрактное правило — проверим его вживую на настоящем трёхмодульном проекте (`:app` → `:ui-kit` → `:net`, ровно та структура, что и в `settings.gradle.kts` из первого раздела), собранном и запущенном в этой же сессии на Gradle 9.5.1 и Kotlin 2.4.0. Модельный проект использует не сам Android Gradle Plugin (ему нужен Android SDK, а нас интересует именно механизм Gradle-зависимостей), а его прямые JVM-аналоги: `application` вместо `com.android.application` у `:app` и `java-library` вместо `com.android.library` у `:ui-kit`/`:net` — та же роль (исполняемый модуль против переиспользуемой библиотеки), только без Android-специфики.
 
@@ -347,7 +381,9 @@ fun main() {
 }
 ```
 
+<Hint id="ui-kit-h3" type="important">
 Обрати внимание: `Main.kt` в `:app` импортирует `ru.champs.net.ApiResponse` напрямую, хотя `:app` зависит только от `:ui-kit`, а не от `:net`. Это компилируется и работает только потому, что `:ui-kit` подключил `:net` через `api`, а не `implementation` — зависимость «просочилась» на classpath `:app` транзитивно, ровно как и написано в документации Gradle.
+</Hint>
 
 ```text
 $ gradle build --console=plain
@@ -419,12 +455,16 @@ Cannot access 'fun fetchInternal(): NetResponse': it is private in 'Implementati
 
 **Перевод:** «нет доступа к функции fetchInternal(): NetResponse — она приватная в ImplementationStyleRepository». Это точная механика Kotlin-модификатора `private` (подтверждена официальной документацией Kotlin: «`private` means that the member is visible inside this class only» — «private означает, что член виден только внутри этого класса»), а не Gradle — но результат по духу тот же самый, что и у настоящей `implementation`-зависимости: то, что не решили сделать публичным, снаружи не достать. Разница в механизме важна: `private` — это языковый барьер уровня Kotlin (член существует, но доступ к нему запрещён компилятором); `implementation` — это барьер уровня Gradle (модуль `:net` в случае `:app` физически отсутствует на classpath компиляции, поэтому импорт `ru.champs.net.ApiResponse` в `:app` вообще не найдёт, что импортировать). К этой, второй, разновидности — и к её настоящему сообщению об ошибке — вернёмся в разделе «Типичные ошибки».
 
-<SelfCheck questions={[
+<Block kind="quiz" title="api против implementation" chapterId="ui-kit" blockId="quiz-api-vs-implementation">
+<SelfCheck chapterId="ui-kit" quizId="q4" questions={[
   { q: 'Что означает implementation(project(":ui-kit")) в app/build.gradle.kts?', options: ['Модуль :ui-kit становится доступен и для :app, и для всех, кто зависит от :app', ':app подключает :ui-kit к себе; но если бы от :app что-то ещё зависело, для него :ui-kit остался бы недоступен', 'Это то же самое, что include(":ui-kit") в settings.gradle.kts', 'Зависимость сработает только в debug-сборке'], correct: 1, why: 'implementation подключает зависимость к текущему модулю, но не пробрасывает её дальше по цепочке — потребители :app её не увидят, только сам :app.' },
   { q: 'Почему Main.kt в :app смог написать import ru.champs.net.ApiResponse, хотя app/build.gradle.kts зависит только от :ui-kit, а не от :net?', options: ['Это ошибка, так быть не должно', 'Потому что ui-kit/build.gradle.kts подключил :net через api(...), а не implementation(...) — зависимость транзитивно просочилась в classpath :app', 'Kotlin автоматически ищет классы во всех модулях проекта', 'Потому что ApiResponse — data class, а не обычный class'], correct: 1, why: 'api делает зависимость частью публичного контракта модуля — она появляется на classpath компиляции у всех потребителей этого модуля, в данном случае у :app.' },
   { q: 'В аналоге на чистом Kotlin — чем принципиально отличается ошибка "Cannot access ... it is private" от реальной Gradle-ошибки "Unresolved reference", которая возникла бы у :app при попытке использовать implementation-зависимость :net напрямую?', options: ['Это одна и та же ошибка под разными именами', '"Cannot access... private" — языковый барьер Kotlin: символ существует, но доступ к нему запрещён; "Unresolved reference" в Gradle-сценарии — модуля просто нет на classpath, компилятор его вообще не находит', 'private вообще не связан с видимостью, это про производительность', 'Unresolved reference возникает только при опечатках в имени'], correct: 1, why: 'Два разных механизма с похожим результатом ("не достать чужое"): private — барьер уровня языка Kotlin поверх существующего символа; отсутствие на classpath из-за implementation — барьер уровня Gradle, символа для компилятора попросту не существует.' },
   { q: 'Если бы ui-kit/build.gradle.kts подключал :net через implementation, а не через api, что случилось бы со строкой import ru.champs.net.ApiResponse в Main.kt модуля :app?', options: ['Ничего, всё продолжило бы работать как раньше', 'Компиляция :app упала бы с ошибкой — ApiResponse больше не виден за пределами :ui-kit', 'Изменилась бы только скорость сборки, без ошибок', ':net автоматически добавился бы в зависимости :app'], correct: 1, why: 'implementation не пробрасывает зависимость дальше потребителям — :app потерял бы доступ к типам :net, и компиляция упала бы именно с той ошибкой, что разобрана в разделе "Типичные ошибки" дальше.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="ui-kit" sectionId="api-vs-implementation" />
 
 ## .aar: чем архив библиотеки отличается от .jar
 
@@ -451,20 +491,26 @@ $ find . -name "*.jar" -path "*/build/*"
 
 Команда сборки для реального `.aar` — тот же `./gradlew`, что и во всех предыдущих главах трека, только с другой задачей:
 
+<Block kind="breakdown" title="Команда сборки .aar" chapterId="ui-kit" blockId="breakdown-assemble-release">
 <SyntaxBreakdown parts={[
   { text: './gradlew', label: 'Gradle wrapper', note: 'скрипт-обёртка, который скачивает и запускает именно ту версию Gradle, что зафиксирована в самом проекте (gradle-wrapper.properties), а не случайную системную' },
   { text: ' :ui-kit', label: 'путь к модулю', note: 'то же двоеточие, что и в include(...)/project(...): без него задача assembleRelease выполнилась бы у ВСЕХ модулей проекта сразу, а не только у ui-kit' },
   { text: ':assembleRelease', label: 'имя задачи (task)', note: 'assemble + Release — собрать релизный вариант модуля; для модуля с com.android.library результатом станет .aar, а не .apk/.aab, как у com.android.application' },
 ]} />
+</Block>
 
 Итоговый файл ложится по пути `ui-kit/build/outputs/aar/ui-kit-release.aar` — та же самая логика `<модуль>/build/outputs/…`, что подтверждена и для APK: официальная документация формулирует это как «All APKs you build are saved in `project_name/module_name/build/outputs/apk/`» («Все собранные APK сохраняются в project_name/module_name/build/outputs/apk/»), просто для библиотечного модуля вместо `outputs/apk/` — `outputs/aar/`. Ровно та же структура «результат сборки модуля лежит в его собственной папке build/» видна и в нашей живой JVM-модели — только там она называется `build/libs/`, а не `build/outputs/aar/`, потому что `java-library` — другой плагин с другим соглашением об именах папок, а не потому, что принцип другой.
 
-<SelfCheck questions={[
+<Block kind="quiz" title=".aar и .jar" chapterId="ui-kit" blockId="quiz-aar-vs-jar">
+<SelfCheck chapterId="ui-kit" quizId="q5" questions={[
   { q: 'Что может содержать .aar, чего не может содержать .jar?', options: ['Ничего, это одно и то же с разным расширением', 'Android-ресурсы (res/), AndroidManifest.xml и нативные библиотеки (.so) — .jar ограничен только скомпилированным кодом', 'Только исходный код на Kotlin без компиляции', '.aar вообще не является zip-архивом, в отличие от .jar'], correct: 1, why: 'Официальная документация Android прямо называет это ограничение JAR: он не может включать Android-ресурсы или манифест — именно это и добавляет AAR.' },
   { q: 'Почему для модуля :ui-kit в настоящем Android-проекте выбирают com.android.library (результат — .aar), а не просто java-library (результат — .jar), как в модели этой главы?', options: ['java-library быстрее собирается', 'Настоящему ui-kit почти всегда нужны Android-ресурсы (иконки, строки, разметка) и манифест — а java-library в принципе не умеет их упаковывать, только скомпилированный код', 'Разницы нет, это два имени одного плагина', '.jar нельзя подключить как зависимость к другому модулю'], correct: 1, why: 'java-library — универсальный JVM-плагин без понятия "Android-ресурс"; для дизайн-системы, где почти наверняка есть не только Kotlin-код, реальный проект берёт com.android.library именно ради .aar.' },
   { q: 'По какому пути в живой JVM-модели этой главы реально лежит собранный артефакт модуля :net?', options: ['net/build/outputs/aar/net-release.aar', 'net/build/libs/net.jar', 'net.jar в корне проекта', 'net/src/main/net.jar'], correct: 1, why: 'Это путь, снятый вживую в этой сессии командой find по результатам gradle build: net/build/libs/net.jar — соглашение об именах папок у java-library, а не у com.android.library.' },
   { q: 'Какая задача (Gradle task) собирает релизный .aar для модуля :ui-kit?', options: [':ui-kit:build', ':ui-kit:assembleRelease', ':ui-kit:run', ':ui-kit:test'], correct: 1, why: 'assembleRelease — задача сборки релизного варианта конкретного модуля; для com.android.library результат — .aar, для com.android.application — .apk/.aab.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="ui-kit" sectionId="aar-vs-jar" />
 
 ## Типичные ошибки
 
@@ -551,16 +597,21 @@ e: Main.kt:8:13 Cannot access class 'ru.champs.net.ApiResponse'. Check your modu
 
 **Как починить:** вернуть `:ui-kit` на `api(project(":net"))`, если тип `ApiResponse` действительно должен быть виден потребителям `:ui-kit`, — либо, если наружу он торчать не должен, оставить `implementation`, но убрать прямое использование `ApiResponse` из `:app` и работать только с тем, что `:ui-kit` явно решил показать (ровно так, как `ImplementationStyleRepository.fetch()` в разделе про `api`/`implementation` отдавал `String`, а не сам `NetResponse`).
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Типичные ошибки" chapterId="ui-kit" blockId="quiz-typical-errors">
+<SelfCheck chapterId="ui-kit" quizId="q6" questions={[
   { q: 'Модуль :payments есть на диске, у него есть свой build.gradle.kts и код, но при сборке Gradle пишет "Project with path \':payments\' could not be found." Что нужно проверить в первую очередь?', options: ['Правильность кода внутри payments/src', 'Есть ли include(":payments") в settings.gradle.kts', 'Версию Kotlin-плагина', 'Название файла build.gradle.kts'], correct: 1, why: 'Gradle узнаёт о модулях только из include(...) в settings.gradle.kts — само наличие папки с кодом на диске для этого не имеет значения.' },
   { q: 'Чем циклическая зависимость между :net и :ui-kit отличается от простой ошибки компиляции вроде опечатки в имени?', options: ['Ничем, это одна и та же категория ошибок', 'Циклическая зависимость — это ошибка ГРАФА зависимостей между модулями (Gradle не может выбрать порядок сборки), а не ошибка внутри кода одного файла', 'Циклические зависимости — это предупреждение, а не ошибка', 'Она возникает только при использовании api, но не implementation'], correct: 1, why: 'Опечатка ломает компиляцию одного файла; циклическая зависимость ломает сам план сборки — Gradle не может решить, какой из двух взаимозависимых модулей собирать первым.' },
   { q: 'Сообщение "Plugin [id: \'com.android.library\'] was not found in any of the following sources" — какая из типичных причин НЕ подходит под это сообщение?', options: ['Опечатка в id плагина', 'Версия Android Gradle Plugin нигде не объявлена в проекте', 'В классе есть незакрытая скобка', 'AGP в принципе не подключён к проекту (например, в чисто JVM-проекте)'], correct: 2, why: 'Незакрытая скобка — это синтаксическая ошибка компилятора Kotlin, она выдаёт совсем другое сообщение (Syntax error: Expecting ...); "plugin was not found" — исключительно про то, что Gradle не смог разрешить сам плагин по его id.' },
   { q: 'После смены api(project(":net")) на implementation(project(":net")) в ui-kit/build.gradle.kts компиляция :app падает на строке import ru.champs.net.ApiResponse. Что именно при этом происходит на уровне classpath, а не просто "где-то ошибка"?', options: ['ApiResponse переименовался автоматически', ':net целиком пропадает с classpath компиляции :app — компилятор не видит даже сам пакет ru.champs.net', 'Ошибка только в том, что забыли пересобрать проект', 'implementation вообще не влияет на classpath, только на скорость сборки'], correct: 1, why: 'implementation намеренно не пробрасывает зависимость потребителям текущего модуля — с точки зрения :app, модуль :net просто отсутствует на classpath, поэтому падает уже сам импорт, а не что-то дальше в коде.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="ui-kit" sectionId="typical-errors" />
 
 ## Слова главы
 
-<Flashcards cards={[
+<Block kind="vocab" title="Словарь главы" chapterId="ui-kit" blockId="vocab-glossary">
+<Flashcards chapterId="ui-kit" cards={[
   { term: 'module', translation: 'модуль', note: 'самостоятельная единица сборки Gradle со своим build.gradle.kts, исходниками и местом в графе зависимостей' },
   { term: 'dependency', translation: 'зависимость', note: 'то, что один модуль подключает от другого — через implementation(...) или api(...)' },
   { term: 'library', translation: 'библиотека', note: 'модуль, который нельзя запустить напрямую, только подключить как зависимость к другому модулю (com.android.library / java-library)' },
@@ -570,18 +621,52 @@ e: Main.kt:8:13 Cannot access class 'ru.champs.net.ApiResponse'. Check your modu
   { term: 'transitive', translation: 'транзитивный', note: 'зависимость, которая передаётся дальше по цепочке — то, что делает api(...) и НЕ делает implementation(...)' },
   { term: 'classpath', translation: 'путь классов', note: 'список мест (jar-файлов, скомпилированных модулей), где компилятор ищет классы во время компиляции или выполнения' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="ui-kit" sectionId="vocab" />
 
 ## Потренируйся печатать
 
 Строка подключения модуля в settings.gradle.kts — с неё начинается любой multi-module проект:
 
-<CodeTyping snippet={'include(":app", ":ui-kit", ":net")'} />
+<Block kind="trainer" title="Строки Gradle этой главы" chapterId="ui-kit" blockId="trainer-gradle-lines">
+<CodeTyping pools={[
+  { label: 'Gradle-строки главы', snippets: [
+    'include(":app", ":ui-kit", ":net")',
+    'id("com.android.library")',
+    'id("com.android.application")',
+    'api(project(":net"))',
+    './gradlew :ui-kit:assembleRelease',
+    'dependencies { api(project(":net")) }',
+    'kotlin("jvm") version "2.4.0" apply false',
+  ] },
+]} keyboard chapterId="ui-kit" trainerId="trainer-gradle-lines" targetCpm={100} targetAccuracy={90} />
+</Block>
 
 Объявление зависимости, которую видит только сам модуль, но не его потребители:
 
-<CodeTyping snippet={'implementation(project(":ui-kit"))'} />
+<Block kind="trainer" title="Зависимость только для себя" chapterId="ui-kit" blockId="trainer-implementation-line">
+<CodeTyping snippet={'implementation(project(":ui-kit"))'} chapterId="ui-kit" trainerId="trainer-implementation-line" targetCpm={110} targetAccuracy={90} />
+</Block>
+
+<SectionAnchor chapterId="ui-kit" sectionId="practice-typing" />
 
 ## Символы и приёмы главы
+
+<Block kind="cheatsheet" title="Символы и приёмы главы" chapterId="ui-kit" blockId="cheatsheet-symbols-commands" favPayload={{
+  kind: 'table',
+  head: ['Символ / приём', 'Как называется', 'Что делает', 'Пример'],
+  rows: [
+    ['include(...)', 'объявление модулей', 'говорит Gradle, какие папки — самостоятельные модули проекта', 'include(":app", ":ui-kit")'],
+    ['id("...")', 'подключение плагина', 'указывает Gradle, какой плагин применить к модулю, по строковому идентификатору', 'id("com.android.library")'],
+    ['project(":x")', 'ссылка на модуль проекта', 'указывает на другой модуль внутри этого же multi-module проекта, а не на внешнюю библиотеку', 'implementation(project(":ui-kit"))'],
+    ['implementation(...)', 'конфигурация зависимости', 'подключает зависимость к текущему модулю, не пробрасывая её потребителям', 'implementation(project(":net"))'],
+    ['api(...)', 'конфигурация зависимости', 'подключает зависимость и транзитивно раскрывает её потребителям модуля', 'api(project(":net"))'],
+    [':module', 'путь модуля', 'двоеточие перед именем — обозначение конкретного модуля в командах и зависимостях', './gradlew :ui-kit:assembleRelease'],
+    ['.aar', 'Android-архив', 'артефакт библиотечного Android-модуля: код + ресурсы + манифест', 'ui-kit-release.aar'],
+    ['.jar', 'Java-архив', 'артефакт обычного JVM-модуля: только скомпилированный код, без ресурсов', 'net.jar'],
+  ],
+}}>
 
 | Символ / приём | Как называется | Что делает | Пример |
 |---|---|---|---|
@@ -594,6 +679,8 @@ e: Main.kt:8:13 Cannot access class 'ru.champs.net.ApiResponse'. Check your modu
 | `.aar` | Android-архив | артефакт библиотечного Android-модуля: код + ресурсы + манифест | `ui-kit-release.aar` |
 | `.jar` | Java-архив | артефакт обычного JVM-модуля: только скомпилированный код, без ресурсов | `net.jar` |
 
+</Block>
+
 <details>
 <summary>Углубиться</summary>
 
@@ -603,22 +690,34 @@ e: Main.kt:8:13 Cannot access class 'ru.champs.net.ApiResponse'. Check your modu
 
 </details>
 
+<SectionAnchor chapterId="ui-kit" sectionId="cheatsheet-symbols" />
+
 ## Куда дальше: проверенные ресурсы
 
 ### Русские материалы
+
+<Block kind="cheatsheet" title="Русские материалы" chapterId="ui-kit" blockId="cheatsheet-resources-ru">
 
 - [Многомодульный BDSM: стоит ли внедрять Gradle модули и какие типы модулей бывают?](https://habr.com/ru/company/cian/blog/667776) — открой за развёрнутым разбором мотивации: инкапсуляция, снижение связности, параллельная работа команды и модульность как «статический анализатор», удерживающий архитектуру.
 - [Gradle: Api vs Implementation на Kotlin](https://sysout.ru/gradle-api-vs-implementation-na-kotlin/) — открой за отдельной статьёй именно про разницу api/implementation, с собственными примерами из нескольких библиотек.
 - [Своя библиотека под Android за один вечер](https://habr.com/ru/articles/739332/) — открой, чтобы увидеть вживую, как создаётся Android Library модуль через мастер New Module в Android Studio (тема не входит в эту главу — здесь весь упор на Gradle-механику, а не на клики по IDE).
 - [Принципы построения многомодульных Android-приложений](https://habr.com/ru/articles/687882/) — открой за более глубоким разбором типов модулей (feature/data/core) и направления зависимостей между ними.
 
+</Block>
+
 ### Официальная документация (на английском)
+
+<Block kind="cheatsheet" title="Официальная документация" chapterId="ui-kit" blockId="cheatsheet-resources-official">
 
 - [Create an Android library](https://developer.android.com/studio/projects/android-library) — первоисточник про `.aar`: чем отличается от `.jar`, что внутри архива, зачем вообще нужен библиотечный модуль.
 - [The Java Library Plugin](https://docs.gradle.org/current/userguide/java_library_plugin.html) — официальное определение `api` и `implementation`, источник цитат из этой главы.
 - [Structuring and building a software project](https://docs.gradle.org/current/userguide/multi_project_builds.html) — официальное описание `settings.gradle.kts`, `include(...)` и того, что у каждого подпроекта свой build-файл.
 - [Build your app from the command line](https://developer.android.com/build/building-cmdline) — команда `./gradlew assembleDebug` и путь, куда Gradle кладёт собранные артефакты.
 - [Visibility modifiers | Kotlin](https://kotlinlang.org/docs/visibility-modifiers.html) — официальное описание `private` и остальных модификаторов видимости, задействованных в аналоге api/implementation на чистом Kotlin.
+
+</Block>
+
+<SectionAnchor chapterId="ui-kit" sectionId="resources" />
 
 ## Челлендж ⭐
 
@@ -672,6 +771,8 @@ e: Main.kt:3:18 Unresolved reference 'net'.
 
 </details>
 
+<SectionAnchor chapterId="ui-kit" sectionId="challenge" />
+
 ## Что должен уметь
 
 - Объяснять, зачем проект дробят на модули: границы, переиспользование, инкрементальная сборка, параллельная работа команды.
@@ -681,3 +782,5 @@ e: Main.kt:3:18 Unresolved reference 'net'.
 - Объяснять, что живёт в `:ui-kit` (цвета, типографика, `Dimens`, переиспользуемые `@Composable`-функции) и почему это выносится из `:app` отдельным модулем, а не остаётся файлом внутри экрана.
 - Формулировать, чем `.aar` отличается от `.jar`, что внутри `.aar` и какой командой (`./gradlew :module:assembleRelease`) и куда (`module/build/outputs/aar/`) он собирается.
 - Узнавать по сообщению сборщика четыре типичные ошибки этой главы — модуль не в `settings.gradle.kts`, циклическую зависимость, неверный id плагина, `Unresolved reference` из-за `implementation`-видимости — и знать, как каждую починить.
+
+<SectionAnchor chapterId="ui-kit" sectionId="what-you-should-know" />

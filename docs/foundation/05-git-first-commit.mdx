@@ -10,9 +10,15 @@ import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import ToolCard from '@site/src/components/ToolCard';
 import SelfCheck from '@site/src/components/SelfCheck';
-import TOCInline from '@theme/TOCInline';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # Git: первый коммит
+
+<ChapterProgress chapterId="git-first-commit" totalSections={15} totalQuizzes={6} totalTrainers={3} />
 
 ## Зачем это нужно
 
@@ -20,7 +26,9 @@ import TOCInline from '@theme/TOCInline';
 
 На чемпионате «Профессионалы» без этого никуда: работу сдают через git-репозиторий, и эксперты видят историю коммитов — по ней понятно, как ты шёл к результату, а не только что получилось в конце. Один гигантский коммит «всё сразу» в конце дня выглядит подозрительно: непонятно, что ты вообще делал первые три часа. А ровная цепочка маленьких осмысленных шагов — как рабочий журнал профессионала. Поэтому привычку коммитить понемногу и часто ставим с первого дня, и в этой главе разберём весь путь от пустой папки до первой такой цепочки буквально по молекулам: что именно происходит на диске после каждой команды и что означает каждое слово в ответе терминала.
 
-<TOCInline toc={toc} />
+<CollapsibleToc toc={toc} chapterId="git-first-commit" />
+
+<SectionAnchor chapterId="git-first-commit" sectionId="why" />
 
 ## Сквозной пример: репозиторий шаг за шагом
 
@@ -56,11 +64,13 @@ Initialized empty Git repository in /home/student/my-app/.git/
 
 Разберём финальную строку — ту, что реально сообщает результат:
 
+<Block kind="breakdown" title="Разбор по строке: ответ git init" chapterId="git-first-commit" blockId="breakdown-init-output">
 <SyntaxBreakdown parts={[
   { text: 'Initialized empty Git repository in ', label: 'что произошло', note: 'именно так git init докладывает об успехе: создан пустой репозиторий — то есть служебный каталог готов, но ни одного коммита внутри ещё нет' },
   { text: '/home/student/my-app', label: 'путь к проекту', note: 'та самая папка, в которой мы стояли, когда набирали git init — репозиторий создаётся всегда в текущем каталоге' },
   { text: '/.git/', label: 'сам репозиторий', note: 'сюда физически легла вся будущая история проекта. Это и есть репозиторий (repository) — просто спрятанный внутри своего же проекта' },
 ]} />
+</Block>
 
 Внешне в проекте как будто ничего не изменилось — но появилась скрытая папка `.git` (имя, начинающееся с точки, `ls` без флагов не показывает). Проверим:
 
@@ -100,14 +110,20 @@ refs
 - **`config`** — настройки конкретно этого репозитория (не путать с глобальными настройками пользователя, о них — в разделе про коммит).
 - **`hooks`**, **`info`**, **`description`**, **`branches`** — служебные вещи для продвинутых сценариев, в этой главе не понадобятся.
 
+<Hint id="git-first-commit-h1" type="important">
 Трогать `.git` руками не нужно никогда — вся работа с ним идёт только через команды `git ...`. Если эту папку удалить, репозиторий исчезнет насовсем, а сами файлы проекта (`main.py` и другие) останутся на месте, просто без истории.
+</Hint>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="git init" chapterId="git-first-commit" blockId="quiz-init">
+<SelfCheck chapterId="git-first-commit" quizId="q1" questions={[
   { q: 'Что делает команда git init?', options: ['Создаёт файл с историей проекта', 'Превращает обычную папку в репозиторий, добавляя внутрь скрытую папку .git', 'Отправляет проект на GitHub', 'Удаляет все файлы в папке'], correct: 1, why: 'git init ничего не удаляет и никуда не отправляет — он лишь создаёт внутри текущей папки скрытый каталог .git, где будет храниться история.' },
   { q: 'Где физически хранится история коммитов после git init?', options: ['В отдельном файле history.txt рядом с проектом', 'В скрытой папке .git внутри самого проекта', 'На сервере GitHub', 'В оперативной памяти, до перезагрузки компьютера'], correct: 1, why: '.git — обычная папка на диске, просто скрытая (имя начинается с точки). Всё, что делает Git, происходит внутри неё.' },
   { q: 'git init выводит подсказку про имя ветки master/main с текстом hint:. О чём она?', options: ['Об ошибке, которую нужно немедленно исправить', 'О том, что имя первой ветки по умолчанию зависит от настройки и его можно задать через git config --global init.defaultBranch', 'О том, что репозиторий не создался', 'О версии установленного Git'], correct: 1, why: 'Это информационная подсказка (hint), не ошибка: разные версии и настройки Git по-разному называют первую ветку, и имя можно выбрать самому.' },
   { q: 'Что покажет ls -la в только что созданной папке my-app сразу после git init, если до этого папка была пустой?', options: ['Список всех прошлых коммитов', 'Только служебную папку .git — больше в свежесозданном репозитории ничего нет', 'Файл main.py', 'Сообщение об ошибке'], correct: 1, why: 'git init не создаёт никаких файлов проекта — только служебную папку .git. Всё остальное появляется, когда добавляешь свои файлы.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="git-first-commit" sectionId="git-init" />
 
 ### git status: читаем построчно
 
@@ -146,26 +162,34 @@ nothing added to commit but untracked files present (use "git add" to track)
 
 Разберём блок про сам файл — почему он выглядит именно так:
 
+<Block kind="breakdown" title="Разбор по строкам: Untracked files" chapterId="git-first-commit" blockId="breakdown-status-untracked">
 <SyntaxBreakdown parts={[
   { text: 'Untracked files:', label: 'заголовок раздела', note: 'неотслеживаемые файлы (untracked) — файлы, которые лежат в папке, но Git о них ещё официально не уведомили. Не ошибка, а просто факт: файл существует, а в историю пока не попал' },
   { text: '\n  (use "git add <file>..." to include in what will be committed)', label: 'подсказка Git', note: 'дословно: «используй git add <файл>..., чтобы включить в то, что будет закоммичено». Git почти всегда подсказывает следующую логичную команду прямо в своём выводе — это не сообщение об ошибке' },
   { text: '\n\tmain.py', label: 'имя untracked-файла', note: 'конкретный файл из списка. Отступ табуляцией (не пробелами) — это не опечатка, а формат вывода git status: так он визуально выделяет имена файлов от текста подсказки' },
 ]} />
+</Block>
 
 И последняя строка блока — короткое резюме всего вывода:
 
+<Block kind="breakdown" title="Разбор по словам: резюме git status" chapterId="git-first-commit" blockId="breakdown-status-summary">
 <SyntaxBreakdown parts={[
   { text: 'nothing added to commit', label: 'коммитить пока нечего', note: 'индекс (stage) — промежуточное место перед коммитом, про него следующий раздел — сейчас абсолютно пуст, никакой git commit прямо сейчас ничего не создаст' },
   { text: ' but untracked files present', label: 'но кое-что в папке есть', note: 'файлы существуют на диске, просто Git ещё не в курсе, что их нужно отслеживать' },
   { text: ' (use "git add" to track)', label: 'и снова подсказка', note: 'ровно то действие, которое сделаем в следующем разделе — git add' },
 ]} />
+</Block>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Читаем git status" chapterId="git-first-commit" blockId="quiz-status">
+<SelfCheck chapterId="git-first-commit" quizId="q2" questions={[
   { q: 'Что означает untracked в выводе git status?', options: ['Файл повреждён и его нельзя открыть', 'Git видит файл, но ещё не следит за его изменениями — про него ничего не решено', 'Файл уже закоммичен', 'Файл нужно немедленно удалить'], correct: 1, why: 'Untracked — «неотслеживаемый»: Git знает, что файл лежит в папке, но пока не включил его в свою историю.' },
   { q: 'В самом низу вывода git status стоит строка вида (use "git add <file>..." to include in what will be committed). Зачем Git её печатает?', options: ['Это просто украшение вывода', 'Git подсказывает следующую команду, которая логично следует в этой ситуации', 'Это скрытое сообщение об ошибке', 'Так Git требует ввести пароль'], correct: 1, why: 'Git старается быть дружелюбным: почти при каждом status он подсказывает, какая команда обычно следует дальше — специально для тех, кто ещё не выучил порядок наизусть.' },
   { q: 'Табуляция перед именем файла в выводе git status (\\tmain.py) — что это?', options: ['Ошибка форматирования терминала', 'Часть формата вывода: так git визуально отделяет имя файла от текста подсказки над ним', 'Знак, что файл повреждён', 'Признак того, что файл исполняемый'], correct: 1, why: 'Это осознанное форматирование git status — имена файлов в списках всегда идут с табуляцией, а не с обычными пробелами.' },
   { q: 'Пустой репозиторий сразу после git init — что покажет git status в разделе про коммиты?', options: ['Полную историю всех прошлых проектов', 'No commits yet — коммитов ещё нет ни одного', 'Ошибку, потому что коммитов нет', 'Список файлов на диске без разбора'], correct: 1, why: 'git init создаёт пустой репозиторий: строка No commits yet — это не ошибка, а честная констатация того, что снимков пока не сделано.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="git-first-commit" sectionId="git-status" />
 
 ### git add: коробка для посылки
 
@@ -173,11 +197,13 @@ Git не коммитит всё подряд автоматически — и 
 
 Смысл в том, что можно поправить сразу пять файлов, а закоммитить только два связанных между собой, — остальные подождут своего, отдельного коммита. Положим `main.py` в коробку:
 
+<Block kind="breakdown" title="Разбор по составу: git add main.py" chapterId="git-first-commit" blockId="breakdown-add-command">
 <SyntaxBreakdown parts={[
   { text: 'git ', label: 'программа', note: 'сама система контроля версий; все её команды начинаются с этого слова' },
   { text: 'add ', label: 'подкоманда', note: 'add — «добавить»: переносит файл из рабочей папки в индекс (staging area), в коробку для следующего коммита' },
   { text: 'main.py', label: 'аргумент', note: 'какой именно файл кладём в коробку. Можно перечислить несколько через пробел, а можно каждый отдельной командой' },
 ]} />
+</Block>
 
 ```bash
 git add main.py
@@ -194,22 +220,30 @@ Changes to be committed:
 	new file:   main.py
 ```
 
+<Block kind="breakdown" title="Разбор по строкам: Changes to be committed" chapterId="git-first-commit" blockId="breakdown-add-status">
 <SyntaxBreakdown parts={[
   { text: 'Changes to be committed:', label: 'новый заголовок раздела', note: '«изменения, готовые к коммиту» — файл только что переместился из Untracked files сюда: теперь он в индексе' },
   { text: '\n  (use "git rm --cached <file>..." to unstage)', label: 'подсказка: как отменить', note: '«используй git rm --cached <файл>..., чтобы убрать из индекса» — если положил в коробку не то, эта команда вынимает файл обратно, не трогая его содержимое на диске' },
   { text: '\n\tnew file:   main.py', label: 'статус файла', note: 'new file — «новый файл»: main.py ещё ни разу не попадал в историю, поэтому статус именно такой. У уже отслеживаемого, но изменённого файла здесь было бы modified' },
 ]} />
+</Block>
 
 Обрати внимание: `main.py` переехал из раздела `Untracked files` в раздел `Changes to be committed` — сам файл на диске никак не изменился, поменялось только то, что о нём знает Git.
 
-<CodeTyping snippet={'git add main.py'} />
+<Block kind="trainer" title="Команда git add" chapterId="git-first-commit" blockId="trainer-add-command">
+<CodeTyping snippet={'git add main.py'} chapterId="git-first-commit" trainerId="trainer-add-command" targetCpm={100} targetAccuracy={90} />
+</Block>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Индекс и git add" chapterId="git-first-commit" blockId="quiz-add">
+<SelfCheck chapterId="git-first-commit" quizId="q3" questions={[
   { q: 'В метафоре с посылкой — чему соответствует «коробка» (staging area, индекс)?', options: ['Всему столу со всеми вещами разом', 'Тому, что ты уже сам отобрал и положил внутрь — не всё сразу, а осознанный выбор', 'Курьерской службе', 'Адресу получателя'], correct: 1, why: 'Staging area — это именно отобранное для отправки: git add кладёт туда конкретные файлы, а не всё содержимое папки автоматически.' },
   { q: 'Что реально меняется на диске в момент git add main.py?', options: ['Содержимое main.py переписывается', 'Ничего в содержимом файла — меняется только то, что Git знает о нём: файл попадает в индекс', 'Файл переименовывается', 'Файл сразу попадает в git log'], correct: 1, why: 'git add — это учёт, а не редактирование: содержимое main.py остаётся прежним, меняется лишь статус файла в глазах Git.' },
   { q: 'Как git rm --cached main.py отличается от обычного удаления файла?', options: ['Ничем, оба стирают main.py с диска', 'Убирает файл только из индекса (коробки), а сам файл на диске остаётся нетронутым', 'Удаляет весь репозиторий', 'Откатывает последний коммит'], correct: 1, why: 'Это как вынуть вещь обратно из коробки, не выбрасывая её вообще — файл остаётся в рабочей папке, просто снова становится untracked.' },
   { q: 'После git add main.py файл появился в разделе Changes to be committed со статусом new file. Что означает new file именно здесь?', options: ['Файл повреждён', 'Файл ни разу не попадал в историю коммитов раньше — это будет его первое появление там', 'Файл слишком большой', 'Файл нужно переименовать'], correct: 1, why: 'new file отличает «первое появление файла в истории» от modified — статуса уже отслеживаемого, но изменённого файла.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="git-first-commit" sectionId="git-add" />
 
 ### git commit: что внутри коммита
 
@@ -222,12 +256,14 @@ git config --global user.email "ivan@example.com"
 
 `--global` значит «на этом компьютере для всех репозиториев», а не только для `my-app`; без флага настройка подействовала бы только на текущий проект. Теперь можно сделать сам коммит:
 
+<Block kind="breakdown" title="Разбор по составу: git commit -m" chapterId="git-first-commit" blockId="breakdown-commit-command">
 <SyntaxBreakdown parts={[
   { text: 'git ', label: 'программа', note: 'сама система контроля версий' },
   { text: 'commit ', label: 'подкоманда', note: 'что сделать: создать снимок (коммит) из того, что сейчас лежит в индексе — коробке, которую собрали git add' },
   { text: '-m ', label: 'флаг message', note: 'сокращение от message — «сообщение задам прямо здесь, в кавычках». Без этого флага Git откроет текстовый редактор по умолчанию и попросит написать сообщение там' },
   { text: '"add main screen"', label: 'сообщение коммита', note: 'короткое описание снимка; кавычки нужны, потому что внутри есть пробелы — без них терминал воспринял бы add, main и screen как три разных аргумента' },
 ]} />
+</Block>
 
 ```bash
 git commit -m "add main screen"
@@ -239,12 +275,14 @@ git commit -m "add main screen"
  create mode 100644 main.py
 ```
 
+<Block kind="breakdown" title="Разбор по строке: ответ git commit" chapterId="git-first-commit" blockId="breakdown-commit-output">
 <SyntaxBreakdown parts={[
   { text: '[master ', label: 'ветка', note: 'на какую ветку (branch) лёг коммит; квадратная скобка здесь — просто оформление строки вывода, не часть команды' },
   { text: '(root-commit) ', label: 'пометка первого коммита', note: 'root-commit — «корневой коммит»: у него нет родителя, это самое начало истории. У всех следующих коммитов этой пометки уже не будет' },
   { text: '5ecfe79', label: 'сокращённый hash', note: 'первые семь символов настоящего 40-символьного отпечатка коммита — на практике их почти всегда достаточно, чтобы однозначно найти нужный снимок' },
   { text: '] add main screen', label: 'сообщение коммита', note: 'закрывающая скобка и следом — ровно тот текст, что был передан после -m' },
 ]} />
+</Block>
 
 Коммит готов — но что внутри него на самом деле, кроме файла? Спросим Git напрямую:
 
@@ -262,21 +300,29 @@ Date:   Mon Aug 31 19:22:49 2026 +0000
 
 Вот и ответ на вопрос «что внутри коммита» — ровно четыре вещи, и три из них программист не пишет руками:
 
+<Block kind="breakdown" title="Разбор по строкам: git log -1" chapterId="git-first-commit" blockId="breakdown-log-entry">
 <SyntaxBreakdown parts={[
   { text: 'commit 5ecfe795b9c92b2285b6869710e7e54f0b7f52a8', label: 'полный hash', note: '40-символьный отпечаток SHA-1 всего содержимого коммита разом: файлов, автора, даты и сообщения. Git вычисляет его сам в момент коммита — изменится хоть один байт любой из этих частей, изменится и весь hash' },
   { text: '\nAuthor: Ivan Petrov <ivan@example.com>', label: 'автор', note: 'имя и почта — ровно те, что были заданы один раз через git config --global user.name / user.email; руками при каждом коммите их вводить не нужно' },
   { text: '\nDate:   Mon Aug 31 19:22:49 2026 +0000', label: 'дата и время', note: 'момент создания коммита с часовым поясом (здесь +0000, то есть UTC) — Git проставляет это тоже сам, по системным часам' },
   { text: '\n\n    add main screen', label: 'сообщение', note: 'пустая строка-разделитель, затем — с отступом в четыре пробела — единственное, что программист написал вручную: текст после -m' },
 ]} />
+</Block>
 
+<Hint id="git-first-commit-h2" type="fact">
 Так что из «hash, author, date, message» руками пишется только последнее — сообщение. Остальное Git берёт из настроек и системных часов и вычисляет сам.
+</Hint>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Что внутри коммита" chapterId="git-first-commit" blockId="quiz-commit">
+<SelfCheck chapterId="git-first-commit" quizId="q4" questions={[
   { q: 'Что делает флаг -m у git commit?', options: ['Указывает имя ветки', 'Позволяет задать сообщение коммита прямо в команде, без открытия текстового редактора', 'Удаляет файл из индекса', 'Показывает историю коммитов'], correct: 1, why: '-m — от message: сообщение пишется сразу в кавычках после флага. Без -m Git откроет редактор по умолчанию и попросит написать сообщение там.' },
   { q: 'В выводе git log -1 есть строка commit 5ecfe795b9c92b2285b6869710e7e54f0b7f52a8. Что это?', options: ['Номер версии Git', 'Полный hash — 40-символьный отпечаток SHA-1 именно этого коммита', 'Дата коммита в другом формате', 'Имя ветки'], correct: 1, why: 'Hash — уникальный отпечаток содержимого коммита. Изменится хоть один байт — изменится и hash, поэтому по нему можно точно найти нужный снимок.' },
   { q: 'Коммит содержит hash, author, date и message. Что из этого программист задаёт руками при самом коммите?', options: ['Всё целиком, включая hash', 'Только сообщение (через -m); hash Git вычисляет сам, author берёт из git config, date проставляет по системным часам', 'Только hash', 'Ничего — все поля Git генерирует сам без участия человека'], correct: 1, why: 'Единственное, что пишешь руками, — сообщение коммита. Автора Git один раз узнаёт из git config, дату и hash вычисляет сам в момент коммита.' },
   { q: 'Зачем git config --global user.name/user.email настраивают один раз, а не при каждом коммите?', options: ['Иначе Git будет работать медленнее', 'Флаг --global сохраняет identity на уровне всего компьютера — она подставляется во все коммиты во всех репозиториях автоматически', 'Это требование только для чемпионата', 'Без этого git status не работает'], correct: 1, why: '--global пишет настройку в общий конфиг пользователя (не репозитория), поэтому вводить имя и почту заново для каждого нового проекта не нужно.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="git-first-commit" sectionId="git-commit" />
 
 ### git log --oneline: история одной строкой
 
@@ -327,11 +373,13 @@ git commit -m "add welcome message"
 
 Обрати внимание — у этого коммита в квадратных скобках уже нет пометки `(root-commit)`: она бывает только у самого первого коммита в истории. Теперь посмотрим на всю цепочку сразу:
 
+<Block kind="breakdown" title="Разбор по составу: git log --oneline" chapterId="git-first-commit" blockId="breakdown-log-command">
 <SyntaxBreakdown parts={[
   { text: 'git ', label: 'программа', note: 'сама система контроля версий' },
   { text: 'log ', label: 'подкоманда', note: 'показать историю (history) — все коммиты от самого свежего к самому первому' },
   { text: '--oneline', label: 'флаг', note: 'сжимает каждый коммит до одной строки: сокращённый hash плюс сообщение, без author и date — удобно охватить взглядом всю историю разом' },
 ]} />
+</Block>
 
 ```bash
 git log --oneline
@@ -348,16 +396,26 @@ git log --oneline
 
 А `git log --oneline` — команда, к которой возвращаются в любой момент, чтобы охватить взглядом весь пройденный путь.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="История и цикл Git" chapterId="git-first-commit" blockId="quiz-log">
+<SelfCheck chapterId="git-first-commit" quizId="q5" questions={[
   { q: 'Чем git log --oneline отличается от обычного git log?', options: ['Показывает только самый последний коммит', 'Сжимает каждый коммит до одной строки: сокращённый hash плюс сообщение — удобно охватить всю историю разом', 'Показывает коммиты в обратном порядке по сравнению с обычным log', 'Требует дополнительной настройки перед использованием'], correct: 1, why: '--oneline — флаг сжатого вывода: вместо hash/author/date/message на несколько строк каждый коммит помещается в одну строку.' },
   { q: 'git log --oneline печатает коммиты сверху вниз. В каком порядке?', options: ['От первого коммита к последнему', 'От самого свежего коммита к самому старому', 'В случайном порядке', 'По алфавиту сообщений'], correct: 1, why: 'История печатается от текущего состояния назад в прошлое: самый новый коммит — первая строка вывода.' },
   { q: 'В каком порядке идёт базовый цикл работы с Git?', options: ['commit → add → status → изменить файлы', 'изменить файлы → status → add → commit', 'add → commit → status → изменить файлы', 'status → commit → add → изменить файлы'], correct: 1, why: 'Именно в этом порядке: сначала меняешь файлы, смотришь status, что изменилось, добавляешь нужное в индекс через add, и только потом фиксируешь снимок commit.' },
   { q: 'Нужно ли запускать git init перед каждым новым коммитом?', options: ['Да, перед каждым коммитом', 'Нет: git init выполняется один раз на весь проект при его создании — дальше репозиторий просто существует', 'Только если изменился файл main.py', 'Да, но лишь при первом коммите за неделю'], correct: 1, why: 'git init создаёт репозиторий один раз. Все следующие коммиты добавляются в уже существующую историю без повторного init.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="git-first-commit" sectionId="git-log" />
 
 ## Хорошие сообщения коммитов
 
-Сообщение — это письмо себе и команде: через неделю по `git log` нужно понять, что происходило, не открывая сами файлы. Мировая привычка — писать по-английски, по формуле **глагол в начальной форме + что сделано**, как будто отдаёшь команду: `add main screen`, `fix score reset`, `remove unused file`, `update readme`. Плохие сообщения — `fix`, `asdf`, `изменения 2`, `последняя версия точно` — через неделю не скажут вообще ничего ни тебе, ни эксперту на чемпионате. Хватает трёх-шести слов, зато честных и по делу.
+Сообщение — это письмо себе и команде: через неделю по `git log` нужно понять, что происходило, не открывая сами файлы. Мировая привычка — писать по-английски, по формуле **глагол в начальной форме + что сделано**, как будто отдаёшь команду: `add main screen`, `fix score reset`, `remove unused file`, `update readme`.
+
+<Hint id="git-first-commit-h3" type="tip">
+Плохие сообщения — `fix`, `asdf`, `изменения 2`, `последняя версия точно` — через неделю не скажут вообще ничего ни тебе, ни эксперту на чемпионате. Хватает трёх-шести слов, зато честных и по делу.
+</Hint>
+
+<SectionAnchor chapterId="git-first-commit" sectionId="commit-messages" />
 
 ## .gitignore: что в историю не берём
 
@@ -418,6 +476,8 @@ __pycache__/
 *.log
 draft.txt
 ```
+
+<SectionAnchor chapterId="git-first-commit" sectionId="gitignore" />
 
 ## Типичные ошибки
 
@@ -495,16 +555,39 @@ fatal: unable to auto-detect email address (got 'root@d5508f32bf9c.(none)')
 
 **Перевод:** «личность автора неизвестна... расскажи мне, кто ты... не удалось автоматически определить почтовый адрес». Часть после `got` — то, что Git попытался подобрать сам по имени пользователя и имени компьютера (здесь это техническое имя контейнера, где проверялась эта глава; на реальной машине там будет твой логин и hostname) — и не смог. **Причина:** Git подписывает каждый коммит автором, а без `user.name`/`user.email` подписывать попросту нечем. **Как починить:** ровно то, что уже делали в разделе про `git commit`, — `git config --global user.name "Имя Фамилия"` и `git config --global user.email "почта@пример.ру"`, один раз на весь компьютер.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Типичные ошибки" chapterId="git-first-commit" blockId="quiz-errors">
+<SelfCheck chapterId="git-first-commit" quizId="q6" questions={[
   { q: 'git commit -m "..." ничего не закоммитил и снова показал вывод, похожий на git status. В чём частая причина?', options: ['Забыли git add — индекс пуст, коммитить нечего', 'Слишком длинное сообщение коммита', 'Пропало подключение к интернету', 'Файл main.py повреждён'], correct: 0, why: 'Commit фиксирует только то, что уже в индексе (staging area). Если забыл git add, индекс пуст — Git и печатает тот же status вместо коммита.' },
   { q: 'Команда git commit -m "" отвечает Aborting commit due to empty commit message. Что произошло с коммитом?', options: ['Коммит создался, но без сообщения', 'Коммит НЕ создался вообще — нужно повторить команду с непустым сообщением', 'Удалился весь репозиторий', 'Ничего, это просто предупреждение, можно игнорировать'], correct: 1, why: 'Git специально запрещает пустое сообщение — коммит без единого слова о том, что изменилось, бесполезен для истории. Коммит не создаётся до повторной попытки.' },
   { q: 'git status отвечает fatal: not a git repository (or any of the parent directories): .git. Что произошло?', options: ['Git сломан и требует переустановки', 'Команда выполнена не внутри репозитория — ни в текущей папке, ни в одной из родительских нет .git', 'Файл main.py был удалён', 'Забыли git add'], correct: 1, why: 'Git ищет папку .git в текущем каталоге и поднимается вверх по родительским, пока не найдёт. Если нигде нет — это вообще не репозиторий.' },
   { q: 'При первом коммите на новой машине Git отвечает Author identity unknown ... fatal: unable to auto-detect email address. Как починить?', options: ['Переустановить Git', 'Задать имя и почту один раз через git config --global user.name и git config --global user.email', 'Использовать флаг -m дважды подряд', 'Создать новый пустой файл в проекте'], correct: 1, why: 'Git не может подписать коммит, если не знает, кто ты. Команды git config --global user.name/user.email задают identity один раз на весь компьютер — дальше коммитить можно без вопросов.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="git-first-commit" sectionId="typical-errors" />
 
 ## Символы и команды главы
 
 Шпаргалка по всему, что встретилось в этой главе. Вернись сюда, если забудешь, что делает та или иная команда или флаг.
+
+<Block kind="cheatsheet" title="Символы и команды главы" chapterId="git-first-commit" blockId="cheatsheet-commands" favPayload={{
+  kind: 'table',
+  head: ['Команда / символ', 'Что делает', 'Пример'],
+  rows: [
+    ['git init', 'создаёт репозиторий: пустую папку .git внутри текущего каталога', 'git init'],
+    ['.git', 'скрытая служебная папка — само хранилище истории проекта', 'ls -la'],
+    ['git status', 'показывает состояние файлов: untracked / modified / уже в индексе', 'git status'],
+    ['git add <file>', 'кладёт файл в индекс (staging area) — готовит к коммиту', 'git add main.py'],
+    ['git commit -m "..."', 'создаёт коммит — снимок из того, что лежит в индексе', 'git commit -m "add main screen"'],
+    ['-m', 'флаг message: сообщение коммита прямо в команде, без редактора', 'git commit -m "fix bug"'],
+    ['git config --global', 'задаёт имя и почту автора для всех репозиториев на компьютере', 'git config --global user.name "..."'],
+    ['git log', 'показывает историю коммитов от нового к старому', 'git log -1'],
+    ['--oneline', 'флаг: каждый коммит — одна строка (сокращённый hash + сообщение)', 'git log --oneline'],
+    ['hash', 'уникальный SHA-1-отпечаток коммита; для чтения сокращают до 7 символов', '5ecfe79'],
+    ['(root-commit)', 'пометка первого коммита в истории — у него нет родителя', '[master (root-commit) 5ecfe79]'],
+    ['.gitignore', 'файл со списком шаблонов, которые Git должен игнорировать', '*.log'],
+  ],
+}}>
 
 | Команда / символ | Что делает | Пример |
 |---|---|---|
@@ -521,9 +604,14 @@ fatal: unable to auto-detect email address (got 'root@d5508f32bf9c.(none)')
 | `(root-commit)` | пометка первого коммита в истории — у него нет родителя | `[master (root-commit) 5ecfe79]` |
 | `.gitignore` | файл со списком шаблонов, которые Git должен игнорировать | `*.log` |
 
+</Block>
+
+<SectionAnchor chapterId="git-first-commit" sectionId="cheatsheet-commands" />
+
 ## Слова главы
 
-<Flashcards cards={[
+<Block kind="vocab" title="Словарь главы" chapterId="git-first-commit" blockId="vocab-glossary">
+<Flashcards chapterId="git-first-commit" cards={[
   { term: 'repository', translation: 'репозиторий', note: 'папка проекта вместе со всей историей — создаётся командой git init' },
   { term: 'commit', translation: 'коммит', note: 'снимок состояния проекта: hash, автор, дата и сообщение' },
   { term: 'stage', translation: 'индекс, staging area', note: 'промежуточное место: git add отбирает сюда файлы для следующего коммита' },
@@ -533,22 +621,42 @@ fatal: unable to auto-detect email address (got 'root@d5508f32bf9c.(none)')
   { term: 'history', translation: 'история', note: 'вся цепочка коммитов, видна через git log' },
   { term: 'message', translation: 'сообщение коммита', note: 'краткое описание снимка, задаётся флагом -m' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="git-first-commit" sectionId="vocab" />
 
 ## Потренируйся печатать
 
 Команды Git ты будешь набирать десятки раз в день — пусть пальцы запомнят их раньше головы.
 
-<CodeTyping snippet={'git status'} />
+<Block kind="trainer" title="Команды главы связками" chapterId="git-first-commit" blockId="trainer-git-cycle">
+<CodeTyping pools={[{ label: 'git', snippets: [
+  'git status',
+  'git init',
+  'git add main.py',
+  'git commit -m "add main screen"',
+  'git log --oneline',
+  'git add .gitignore',
+  'git commit -m "add welcome message"',
+  'git config --global user.name "Ivan Petrov"',
+] }]} keyboard chapterId="git-first-commit" trainerId="trainer-git-cycle" targetCpm={110} targetAccuracy={90} />
+</Block>
 
 Теперь связка подлиннее — ровно то, что происходит после каждого маленького изменения в файле:
 
-<CodeTyping snippet={'git add main.py && git commit -m "add welcome message"'} />
+<Block kind="trainer" title="Связка add и commit" chapterId="git-first-commit" blockId="trainer-add-commit-combo">
+<CodeTyping snippet={'git add main.py && git commit -m "add welcome message"'} chapterId="git-first-commit" trainerId="trainer-add-commit-combo" targetCpm={130} targetAccuracy={90} />
+</Block>
+
+<Block kind="cheatsheet" title="Визуальный тренажёр Git" chapterId="git-first-commit" blockId="cheatsheet-learn-git-branching">
 
 <ToolCard
   name="Learn Git Branching"
   url="https://learngitbranching.js.org/?locale=ru_RU"
   desc="Визуальный тренажёр Git прямо в браузере: вводишь команды — видишь, как растёт дерево коммитов по-настоящему, а не только текстом. Есть русский язык, начни с первого уровня."
 />
+
+</Block>
 
 <details>
 <summary>Углубиться</summary>
@@ -565,23 +673,33 @@ fatal: unable to auto-detect email address (got 'root@d5508f32bf9c.(none)')
 
 </details>
 
+<SectionAnchor chapterId="git-first-commit" sectionId="practice-typing" />
+
 ## Куда дальше: проверенные ресурсы
 
-### Русские материалы
+<Block kind="cheatsheet" title="Русские материалы" chapterId="git-first-commit" blockId="cheatsheet-resources-ru">
 
 - [Pro Git: запись изменений в репозиторий](https://git-scm.com/book/ru/v2/Основы-Git-Запись-изменений-в-репозиторий) — главный учебник по Git, официально переведён на русский; эта глава разбирала ровно тот же цикл status/add/commit, здесь — то же самое другими словами и чуть шире.
 - [Хабр: Git для самых маленьких — от первой команды до настройки SSH](https://habr.com/ru/articles/891050/) — свежий разбор именно с init/add/commit, доведён дальше, до подключения к серверу.
 - [Хабр: гайд по Git для начинающих — команды, ветки, типичные ошибки](https://habr.com/ru/companies/netologyru/articles/1012264/) — отдельная секция про типичные ошибки новичков, хорошо дополняет эту главу.
 - [Индекс Git (staging area): полное объяснение](https://zzet.org/ru/git/git-index/) — если метафора с коробкой понятна, но хочется увидеть индекс изнутри: как устроен файл `.git/index` и что умеет `git add -p`.
 
-### Официальная документация (на английском)
+</Block>
+
+<Block kind="cheatsheet" title="Официальная документация (на английском)" chapterId="git-first-commit" blockId="cheatsheet-resources-official">
 
 - [git-init](https://git-scm.com/docs/git-init) — man-страница команды init: все флаги и режимы из первых рук.
 - [git-commit](https://git-scm.com/docs/git-commit) — man-страница команды commit: `-m`, `-a`, `--amend` и остальные флаги.
 
-### Полезное
+</Block>
+
+<Block kind="cheatsheet" title="Полезное" chapterId="git-first-commit" blockId="cheatsheet-resources-utils">
 
 - [github/gitignore](https://github.com/github/gitignore) — готовые шаблоны `.gitignore` под любой язык и инструмент: скопируй нужный вместо того, чтобы выдумывать свой с нуля.
+
+</Block>
+
+<SectionAnchor chapterId="git-first-commit" sectionId="resources" />
 
 ## Челлендж ⭐
 
@@ -623,6 +741,8 @@ git log --oneline         # пять строк
 
 </details>
 
+<SectionAnchor chapterId="git-first-commit" sectionId="challenge" />
+
 ## Что должен уметь
 
 - Объяснять своими словами, что такое репозиторий (repository), коммит (commit) и зачем проекту вообще нужна история изменений.
@@ -633,3 +753,5 @@ git log --oneline         # пять строк
 - Писать сообщение коммита по-английски по формуле «глагол + что сделано» — коротким и честным.
 - Прятать мусорные файлы от Git через `.gitignore` и объяснять, почему сам `.gitignore` при этом коммитят.
 - Узнавать по точному тексту четыре типичные ошибки — забытый `git add`, пустой `-m`, `not a git repository`, неизвестного автора (`git config`) — и знать, как чинить каждую.
+
+<SectionAnchor chapterId="git-first-commit" sectionId="what-you-should-know" />

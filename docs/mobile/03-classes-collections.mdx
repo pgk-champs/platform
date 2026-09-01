@@ -10,9 +10,15 @@ import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
 import SelfCheck from '@site/src/components/SelfCheck';
-import TOCInline from '@theme/TOCInline';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # Классы и коллекции
+
+<ChapterProgress chapterId="classes-collections" totalSections={15} totalQuizzes={6} totalTrainers={2} />
 
 ## Зачем это нужно
 
@@ -24,7 +30,9 @@ import TOCInline from '@theme/TOCInline';
 
 В этой главе разберём: как объявить класс и создать объект, чем `data class` отличается от обычного класса и что именно генерирует слово `data` — увидим это не на словах, а в реальном выводе `toString()` и `equals()` — затем пройдём три основные коллекции и закончим `when`.
 
-<TOCInline toc={toc} />
+<CollapsibleToc toc={toc} chapterId="classes-collections" />
+
+<SectionAnchor chapterId="classes-collections" sectionId="why" />
 
 ## Класс и объект: чертёж и вещь по чертежу
 
@@ -42,6 +50,7 @@ import TOCInline from '@theme/TOCInline';
 
 Вот минимальное объявление класса участника чемпионата. Разберём сигнатуру по символам.
 
+<Block kind="breakdown" title="Разбор по символам: объявление класса" chapterId="classes-collections" blockId="breakdown-class-declaration">
 <SyntaxBreakdown parts={[
   { text: 'class ', label: 'ключевое слово', note: 'объявляет класс (class). Как fun объявляет функцию, class объявляет тип. Пробел после него обязателен' },
   { text: 'Competitor', label: 'имя класса', note: 'придумываешь сам. По соглашению имена классов в Kotlin пишут с ЗАГЛАВНОЙ буквы (в отличие от имён переменных и функций) — так их легко отличить в коде' },
@@ -51,6 +60,7 @@ import TOCInline from '@theme/TOCInline';
   { text: 'var score: Int', label: 'изменяемое свойство-параметр', note: 'var вместо val — то же самое, но значение можно будет менять после создания объекта: bogdan.score = 96' },
   { text: ')', label: 'закрывающая скобка', note: 'конструктор закончился' },
 ]} />
+</Block>
 
 ### Что означает каждый символ
 
@@ -95,16 +105,23 @@ class Competitor(val name: String, var score: Int)`} />
 ### Разбор по строкам
 
 - **Строка 3: `bogdan.score += 5`** — тот же оператор `+=` из главы 1 («прибавь к текущему значению»), только слева от него теперь не голая переменная, а свойство объекта через точку. Работает это только потому, что `score` — `var`: попробуй так же изменить `bogdan.name` — получишь ошибку компиляции, разберём её в разделе «Типичные ошибки».
-- Заметь: сама переменная `bogdan` объявлена как `val` — и это не противоречие. `val bogdan` означает «ссылка на объект не поменяется» (мы не положим в `bogdan` другой объект), а не «объект нельзя менять изнутри». `val` фиксирует ссылку, а свойства внутри объекта живут своей жизнью, по своим правилам `val`/`var`.
+
+<Hint id="classes-collections-h1" type="tip">
+Заметь: сама переменная `bogdan` объявлена как `val` — и это не противоречие. `val bogdan` означает «ссылка на объект не поменяется» (мы не положим в `bogdan` другой объект), а не «объект нельзя менять изнутри». `val` фиксирует ссылку, а свойства внутри объекта живут своей жизнью, по своим правилам `val`/`var`.
+</Hint>
 
 **Что выведет:** `96` — потому что 91 + 5 = 96.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Класс и объект" chapterId="classes-collections" blockId="quiz-class-object">
+<SelfCheck chapterId="classes-collections" quizId="q1" questions={[
   { q: 'Что делает val перед параметром в class Competitor(val name: String, var score: Int)?', options: ['Ничего не меняет по сравнению с обычным параметром', 'Превращает параметр конструктора в свойство объекта, доступное снаружи через точку', 'Запрещает создавать объекты этого класса', 'Делает name типом класса'], correct: 1, why: 'val/var в скобках основного конструктора — не просто параметр, а объявление свойства: к нему можно обратиться как alice.name у любого созданного объекта.' },
   { q: 'Почему можно написать val bogdan = Competitor(...), а потом bogdan.score += 5, если bogdan — val?', options: ['Это ошибка, так писать нельзя', 'val bogdan фиксирует ссылку на объект, а не запрещает менять var-свойства внутри него', '+= работает только с val', 'score на самом деле не свойство, а отдельная переменная'], correct: 1, why: 'val у переменной bogdan означает «нельзя положить в bogdan другой объект». Свойства внутри объекта подчиняются своим собственным val/var, объявленным в классе.' },
   { q: 'Что выведет println(alice.name), если alice = Competitor("Алиса", 82)?', options: ['Competitor', 'Алиса', 'name', 'Ошибку компиляции'], correct: 1, why: 'Точка после объекта читает его свойство. alice.name — это значение, переданное первым аргументом при создании объекта, — строка "Алиса".' },
   { q: 'Почему имя класса Competitor пишут с заглавной буквы, а имя переменной alice — с маленькой?', options: ['Это требование компилятора, иначе ошибка', 'Это соглашение об именовании: типы (классы) — с заглавной, переменные и функции — с маленькой', 'Заглавная буква ускоряет компиляцию', 'Так работает только в Kotlin, в других языках наоборот'], correct: 1, why: 'Это конвенция (code convention), а не правило синтаксиса — код скомпилируется и без неё, но так код читается предсказуемо: сразу видно, где тип, а где значение.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="classes-collections" sectionId="first-class" />
 
 ## Метод внутри класса и значение по умолчанию
 
@@ -133,16 +150,22 @@ class Competitor(val name: String, var score: Int = 0) {
 
 **Что выведет:** `Соня: 20` — начали с `score = 0` (по умолчанию), прибавили 12, потом 8: 0 + 12 + 8 = 20.
 
+<SectionAnchor chapterId="classes-collections" sectionId="method-default" />
+
 ## data class: что генерирует ключевое слово `data`
 
 У обычного класса `Competitor` есть неудобство: если попробовать напечатать объект напрямую или сравнить два объекта с одинаковыми полями, результат окажется не таким, как ожидаешь. Слово `data` перед `class` чинит это — компилятор автоматически дописывает за нас несколько методов. Разберём каждый по отдельности, с реальным выводом.
 
+<Block kind="breakdown" title="Разбор по символам: слово data" chapterId="classes-collections" blockId="breakdown-data-keyword">
 <SyntaxBreakdown parts={[
   { text: 'data ', label: 'ключевое слово', note: 'ставится перед class. Говорит компилятору: «сгенерируй для этого класса toString(), equals(), hashCode(), copy() и componentN() на основе свойств из основного конструктора»' },
   { text: 'class Competitor(val name: String, var score: Int)', label: 'обычное объявление класса', note: 'всё, что мы уже разобрали выше, не меняется — data только добавляет сгенерированный код, ничего не убирает' },
 ]} />
+</Block>
 
+<Hint id="classes-collections-h2" type="important">
 Правило, о котором легко забыть: у `data class` в основном конструкторе должен быть хотя бы один параметр, и каждый параметр обязан быть `val` или `var` — иначе он не станет свойством и не попадёт ни в один из сгенерированных методов.
+</Hint>
 
 ### toString(): как объект печатает себя
 
@@ -232,17 +255,22 @@ data class Competitor(val name: String, var score: Int)`} />
 
 **Что выведет:** `Богдан -> 91`. `val (name, score) = bogdan` — деструктуризация (destructuring declaration): `name` берётся из `component1()` (первое свойство, `name`), `score` — из `component2()` (второе свойство, `score`). Работает это только благодаря `data`: у обычного класса `component1()`/`component2()` не сгенерированы, и такая запись не скомпилируется.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="data class" chapterId="classes-collections" blockId="quiz-data-class">
+<SelfCheck chapterId="classes-collections" quizId="q2" questions={[
   { q: 'Что печатает println(bogdan) для обычного (не data) класса?', options: ['Все свойства объекта в виде текста', 'Имя класса, @ и адрес объекта в памяти вроде Competitor@2c7b84de', 'Пустую строку', 'Ошибку компиляции — println нельзя вызывать для объектов'], correct: 1, why: 'Обычный класс наследует стандартный toString() от Any, который не знает содержимого объекта и печатает только служебную метку с адресом.' },
   { q: 'Почему a == b выводит false для обычного класса, даже если у a и b одинаковые name и score?', options: ['== вообще не работает для классов', 'У обычного класса == по умолчанию сравнивает ссылки: это разные объекты в памяти, даже с одинаковым содержимым', 'Kotlin сравнивает только первое свойство', 'Это баг компилятора'], correct: 1, why: 'Без data == проверяет referential equality — «один и тот же объект?». a и b — два разных объекта, значит false, независимо от содержимого полей.' },
   { q: 'Что делает bogdan.copy(score = 96)?', options: ['Меняет score у самого bogdan на 96', 'Создаёт новый объект с тем же name, но score = 96; bogdan не меняется', 'Удаляет bogdan и заменяет его новым объектом', 'Работает только у обычных классов, не у data class'], correct: 1, why: 'copy() — сгенерированный метод data class: возвращает новый объект, копируя все свойства, кроме явно переданных именованных аргументов.' },
   { q: 'Что обязательно должно быть верно для параметров основного конструктора data class?', options: ['Все они должны быть типа String', 'Каждый параметр должен быть val или var, и конструктор не может быть пустым', 'У них не может быть значений по умолчанию', 'Их не может быть больше двух'], correct: 1, why: 'Параметр без val/var не становится свойством и не попадёт в toString/equals/copy; пустой конструктор у data class запрещён компилятором.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="classes-collections" sectionId="data-class" />
 
 ## Списки: `List` и `MutableList`
 
 Теперь, когда есть тип для одного участника, соберём их в команду. `List` — упорядоченная коллекция элементов одного типа: у каждого элемента есть индекс (номер позиции), начиная с `0`.
 
+<Block kind="breakdown" title="Разбор по символам: цикл for" chapterId="classes-collections" blockId="breakdown-for-loop">
 <SyntaxBreakdown parts={[
   { text: 'for ', label: 'ключевое слово', note: 'начинает цикл (loop) — блок кода, который выполняется многократно, по одному разу на каждый элемент' },
   { text: '(', label: 'открывающая скобка', note: 'начинает заголовок цикла' },
@@ -252,6 +280,7 @@ data class Competitor(val name: String, var score: Int)`} />
   { text: ')', label: 'закрывающая скобка', note: 'заголовок цикла закончился' },
   { text: ' {', label: 'начало тела цикла', note: 'фигурные скобки — то же самое, что тело функции: блок кода, который выполнится на каждой итерации' },
 ]} />
+</Block>
 
 <KotlinPlay code={`fun main() {
     val names = listOf("Алиса", "Богдан", "Соня")
@@ -318,17 +347,22 @@ data class Competitor(val name: String, var score: Int)`} />
 
 **Что выведет:** `[Богдан, Соня]` — «Соня» добавилась в конец, «Алиса» удалилась, порядок остальных элементов сохранился.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Списки" chapterId="classes-collections" blockId="quiz-lists">
+<SelfCheck chapterId="classes-collections" quizId="q3" questions={[
   { q: 'Что означает for (name in names)?', options: ['Проверяет, есть ли name внутри names', 'Присваивает name каждый элемент коллекции names по очереди и выполняет тело цикла для каждого', 'Создаёт новую переменную names', 'Удаляет name из списка names'], correct: 1, why: 'in в заголовке цикла перебирает коллекцию: на каждой итерации name получает следующий элемент names.' },
   { q: 'Чем names[1] отличается от «второго элемента» в обычной речи?', options: ['Ничем, это одно и то же', 'Индексация начинается с 0, поэтому names[1] — это элемент под номером два по счёту, а не первый', 'names[1] всегда возвращает первый элемент', '[ ] используется только для строк, не для списков'], correct: 1, why: 'Индексы в Kotlin (как и в большинстве языков) начинаются с 0: names[0] — первый элемент, names[1] — второй.' },
   { q: 'Чем listOf(...) отличается от mutableListOf(...)?', options: ['listOf быстрее работает', 'У списка из listOf нет методов add/remove — он только для чтения, mutableListOf добавляет их', 'mutableListOf нельзя перебрать циклом for', 'Это два названия одной и той же функции'], correct: 1, why: 'List — интерфейс только для чтения, MutableList расширяет его методами изменения содержимого: add, remove и другими.' },
   { q: 'Что выведет team.map { it.score }.sum(), если team — список из трёх объектов Competitor?', options: ['Список из трёх объектов Competitor', 'Список из трёх чисел score', 'Одно число — сумму всех score', 'Ошибку компиляции: у it нет свойства score'], correct: 2, why: 'map { it.score } достаёт из каждого объекта поле score и собирает список чисел, а sum() складывает их в одно число.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="classes-collections" sectionId="lists" />
 
 ## Map: пары ключ — значение
 
 `Map` хранит не просто значения, а пары «ключ → значение» (key-value pair): вместо доступа по номеру позиции, как у `List`, доступ идёт по ключу — например, по имени участника.
 
+<Block kind="breakdown" title="Разбор по символам: mapOf и пара to" chapterId="classes-collections" blockId="breakdown-mapof">
 <SyntaxBreakdown parts={[
   { text: 'mapOf', label: 'функция-фабрика карты', note: 'создаёт Map — коллекцию пар «ключ → значение». Как listOf для списков и setOf для множеств дальше в главе' },
   { text: '(', label: 'открывающая скобка', note: 'начало списка пар' },
@@ -337,6 +371,7 @@ data class Competitor(val name: String, var score: Int)`} />
   { text: '"Богдан" to 91', label: 'ещё одна пара', note: 'то же самое: строка слева от to — ключ, число справа — значение' },
   { text: ')', label: 'закрывающая скобка', note: 'список пар закончился, mapOf собирает из них Map' },
 ]} />
+</Block>
 
 <KotlinPlay code={`fun main() {
     val scores = mapOf("Алиса" to 82, "Богдан" to 91, "Соня" to 77)
@@ -385,6 +420,8 @@ data class Competitor(val name: String, var score: Int)`} />
 ```
 Карта печатается в фигурных скобках, пары через запятую в формате `ключ=значение`. `"Алиса"` теперь `85`, а не `82` — значение заменилось. Для несуществующего ключа `"Дима"` вернулся запасной `0`.
 
+<SectionAnchor chapterId="classes-collections" sectionId="map" />
+
 ## Set: только уникальные значения
 
 `Set` — коллекция без повторов: если добавить значение, которое уже есть, ничего не произойдёт — набор просто не станет длиннее.
@@ -407,19 +444,26 @@ data class Competitor(val name: String, var score: Int)`} />
 ```
 Из пяти переданных чисел осталось три уникальных: `82` и `91` каждое учтено один раз, несмотря на то что были указаны дважды. Как и у списков и карт, есть `mutableSetOf` с методами `add`/`remove` — работает по тем же правилам, что и `mutableListOf`.
 
+<Hint id="classes-collections-h3" type="important">
 Именно здесь особенно важна связка `equals()`/`hashCode()` из раздела про `data class`: `Set` и ключи `Map` определяют уникальность через них. У `data class` она согласована автоматически — два структурно одинаковых объекта `Competitor` в `Set` схлопнутся в один, как схлопнулись одинаковые числа выше. У обычного класса это не сработает: два объекта с одинаковыми полями будут считаться разными, потому что сравниваются по ссылке.
+</Hint>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Map и Set" chapterId="classes-collections" blockId="quiz-map-set">
+<SelfCheck chapterId="classes-collections" quizId="q4" questions={[
   { q: 'Что делает "Алиса" to 82 в mapOf("Алиса" to 82)?', options: ['Складывает строку и число', 'Создаёт пару ключ-значение (Pair): "Алиса" — ключ, 82 — значение', 'Сравнивает "Алиса" с 82', 'Это ошибка синтаксиса'], correct: 1, why: 'to — инфиксная функция, создающая Pair. В mapOf такие пары становятся записями карты: слева ключ, справа значение.' },
   { q: 'Что делает scores["Соня"] = 77 для MutableMap?', options: ['Читает значение по ключу "Соня"', 'Добавляет новую запись или заменяет значение для ключа "Соня" на 77', 'Удаляет ключ "Соня"', 'Работает только для MutableList, не для карт'], correct: 1, why: 'Индексация слева от = — запись в карту: если ключа не было, добавляется новая пара, если был — старое значение заменяется.' },
   { q: 'Что выведет setOf(82, 91, 82, 77, 91)?', options: ['[82, 91, 82, 77, 91] — все пять чисел', '[82, 91, 77] — только уникальные значения', 'Ошибку компиляции: Set не принимает повторы', '82 — только первое число'], correct: 1, why: 'Set хранит уникальные значения: повторяющиеся 82 и 91 схлопываются, остаётся три уникальных числа в порядке первого появления.' },
   { q: 'Почему getOrDefault("Дима", 0) безопаснее, чем scores["Дима"], если ключа "Дима" нет?', options: ['getOrDefault работает быстрее', 'scores["Дима"] вернёт null, а getOrDefault сразу даёт запасное значение вместо null', 'getOrDefault добавляет "Дима" в карту автоматически', 'Разницы нет, это синонимы'], correct: 1, why: 'Доступ по отсутствующему ключу через [ ] возвращает null («ничего»); getOrDefault сразу подставляет второй аргумент как безопасную замену.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="classes-collections" sectionId="set" />
 
 ## when: замена цепочке if / else if
 
 Когда вариантов больше двух, цепочка `if / else if / else` быстро становится длинной и трудночитаемой. `when` — конструкция Kotlin для точно такой задачи: выбрать один вариант из нескольких.
 
+<Block kind="breakdown" title="Разбор по символам: when без аргумента" chapterId="classes-collections" blockId="breakdown-when-conditions">
 <SyntaxBreakdown parts={[
   { text: 'when ', label: 'ключевое слово', note: 'начинает многоветвевую проверку условий (multi-branch conditional). Здесь — без аргумента в скобках, поэтому каждая ветка сама по себе — независимое условие' },
   { text: '{', label: 'открывающая фигурная скобка', note: 'начинает список веток. Та же роль, что у тела функции или лямбды — блок, ограниченный { }' },
@@ -428,6 +472,7 @@ data class Competitor(val name: String, var score: Int)`} />
   { text: 'else -> ', label: 'ветка по умолчанию', note: 'сработает, если ни одно из условий выше не подошло. Когда when используется как выражение (присваивается переменной), else обязателен — иначе компилятор не может гарантировать результат на все случаи' },
   { text: '}', label: 'закрывающая фигурная скобка', note: 'список веток закончился' },
 ]} />
+</Block>
 
 <KotlinPlay code={`fun main() {
     val score = 91
@@ -450,12 +495,14 @@ data class Competitor(val name: String, var score: Int)`} />
 
 Когда сравнивают одно значение с набором конкретных вариантов, а не с диапазонами, `when` можно писать с аргументом в скобках — тогда каждая ветка сравнивается с этим значением напрямую, а не пишет своё условие заново.
 
+<Block kind="breakdown" title="Разбор по символам: when с аргументом" chapterId="classes-collections" blockId="breakdown-when-subject">
 <SyntaxBreakdown parts={[
   { text: 'when (place) ', label: 'when с аргументом', note: 'place — значение, которое будет сравниваться с каждой веткой. В скобках после when — то, что мы разбираем, как разбирали x в главе 1' },
   { text: '1 -> "Золото"', label: 'ветка с одним значением', note: 'сработает, если place равно 1' },
   { text: '2, 3 -> "Призёр"', label: 'ветка с несколькими значениями', note: 'запятая между значениями — ветка срабатывает, если place равно ЛЮБОМУ из перечисленных: 2 или 3' },
   { text: 'in 4..10 -> "Финалист"', label: 'проверка диапазона', note: 'in здесь — тот же самый in, что мы видели в for (name in names), но в новой роли: «place входит в диапазон 4..10?». 4..10 — диапазон (range) из главы 1, только теперь используется не в цикле, а в проверке' },
 ]} />
+</Block>
 
 <KotlinPlay code={`fun main() {
     val place = 2
@@ -476,12 +523,16 @@ data class Competitor(val name: String, var score: Int)`} />
 
 **Что выведет:** `Призёр`.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="when" chapterId="classes-collections" blockId="quiz-when">
+<SelfCheck chapterId="classes-collections" quizId="q5" questions={[
   { q: 'Чем when { score >= 90 -> ... } (без скобок после when) отличается от when (place) { 1 -> ... }?', options: ['Ничем, это одна и та же конструкция', 'Без аргумента каждая ветка — своё независимое условие; с аргументом каждая ветка сравнивается с этим значением', 'Без аргумента when нельзя использовать как выражение', 'Версия с аргументом работает только с числами'], correct: 1, why: 'when без скобок — список произвольных булевых условий. when (значение) — сравнение одного значения с каждой веткой по очереди.' },
   { q: 'Что делает ветка 2, 3 -> "Призёр" в when (place) { ... }?', options: ['Сработает, только если place равно и 2, и 3 одновременно', 'Сработает, если place равно 2 ИЛИ 3', 'Это синтаксическая ошибка — нельзя перечислять значения через запятую', 'Сработает для любого числа от 2 до 3 с шагом 0.5'], correct: 1, why: 'Запятая между значениями в одной ветке — это «любое из перечисленных»: ветка выполнится, если значение совпало хотя бы с одним.' },
   { q: 'Зачем нужна ветка else, если when используется как выражение (val x = when { ... })?', options: ['Не нужна никогда, это стиль', 'Компилятор должен гарантировать, что when вернёт значение при любых условиях — else покрывает все случаи, не описанные явно', 'else ускоряет выполнение', 'else обязателен только для чисел'], correct: 1, why: 'Когда результат when кладётся в переменную, у выражения должно быть значение на любой вход. Без else компилятор не может это гарантировать.' },
   { q: 'Что проверяет in 4..10 в ветке when?', options: ['Есть ли переменная 4..10', 'Входит ли сравниваемое значение в диапазон от 4 до 10 включительно', 'Равно ли значение строке "4..10"', 'Это ошибка — in работает только в for'], correct: 1, why: 'in переиспользуется и для циклов (перебор коллекции), и для проверки диапазона: «значение принадлежит range 4..10?».' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="classes-collections" sectionId="when" />
 
 ## Типичные ошибки
 
@@ -571,16 +622,41 @@ Initializer type mismatch: expected 'Int', actual 'Int?'.
 
 **Как починить:** либо изменить тип переменной на `Int?` — `val aliceScore: Int? = scores["Алиса"]`, — либо использовать `getOrDefault("Алиса", 0)` или оператор `!!` (разберём в будущей главе про null-безопасность), если ты точно уверен, что ключ есть.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Типичные ошибки" chapterId="classes-collections" blockId="quiz-typical-errors">
+<SelfCheck chapterId="classes-collections" quizId="q6" questions={[
   { q: 'Почему Competitor("Дима") выдаёт "No value passed for parameter \'score\'."?', options: ['Класс Competitor вообще нельзя создавать с одним аргументом', 'У score нет значения по умолчанию, а конструктор требует оба аргумента', 'Дима — недопустимое имя', 'Это предупреждение, а не ошибка'], correct: 1, why: 'score объявлен без = значение по умолчанию, значит он обязателен при каждом вызове конструктора.' },
   { q: 'Почему bogdan.name = "Николай" не компилируется для class Competitor(val name: String, ...)?', options: ['name — зарезервированное слово', 'name объявлен через val — у val-свойства нет сеттера, переприсвоить его нельзя', 'Строки в Kotlin вообще нельзя менять', 'Нужно сначала вызвать bogdan.unlock()'], correct: 1, why: 'val в конструкторе создаёт свойство без сеттера — то же самое правило val, что и для обычных переменных, просто применённое к свойству объекта.' },
   { q: 'Почему names.add("Соня") не работает, если names: List<String> = listOf(...)?', options: ['add — устаревший метод', 'У List нет метода add: он есть только у MutableList', 'add работает только для чисел', 'Нужно писать names.add("Соня", 0)'], correct: 1, why: 'List — интерфейс только для чтения, без методов изменения. add появляется только у MutableList/mutableListOf.' },
   { q: 'Почему scores["Алиса"] нельзя напрямую положить в val x: Int?', options: ['Синтаксис [ ] запрещён для Map', 'Доступ по ключу возвращает Int? (может быть значение, а может — ничего), а не гарантированный Int', 'scores — не Map, а List', 'Нужно писать scores.get("Алиса") вместо [ ]'], correct: 1, why: 'Тип результата [ ] у Map — всегда nullable (Int?), потому что ключа могло не быть. Компилятор требует явно решить, что делать с этой неопределённостью.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="classes-collections" sectionId="typical-errors" />
 
 ## Символы главы
 
 Шпаргалка по всем новым знакам и конструкциям этой главы.
+
+<Block kind="cheatsheet" title="Символы главы" chapterId="classes-collections" blockId="cheatsheet-symbols" favPayload={{
+  kind: 'table',
+  head: ['Символ / конструкция', 'Как называется', 'Что делает', 'Пример'],
+  rows: [
+    ['class', 'ключевое слово', 'объявляет класс — чертёж для создания объектов', 'class Competitor(...)'],
+    ['val/var в скобках конструктора', 'свойство-параметр', 'параметр конструктора сразу становится свойством объекта, доступным через точку', 'class Competitor(val name: String)'],
+    ['. после объекта', 'доступ к свойству/методу', 'читает свойство или вызывает метод конкретного объекта', 'bogdan.score'],
+    ['data', 'ключевое слово', 'помечает класс данных: генерирует toString/equals/hashCode/copy/componentN', 'data class Competitor(...)'],
+    ['==', 'оператор равенства', 'у data class — по содержимому полей, у обычного класса — по ссылке', 'a == b'],
+    ['.copy(поле = значение)', 'метод data class', 'создаёт новый объект на основе старого с изменёнными полями', 'bogdan.copy(score = 96)'],
+    ['val (a, b) = obj', 'деструктуризация', 'раскладывает свойства объекта по переменным через componentN()', 'val (name, score) = bogdan'],
+    ['for (x in coll) { }', 'цикл по коллекции', 'присваивает x каждый элемент коллекции по очереди', 'for (name in names)'],
+    ['[индекс] / [ключ]', 'оператор индексации', 'достаёт элемент списка по позиции или значение карты по ключу', 'names[1], scores["Алиса"]'],
+    ['to', 'инфиксная функция', 'создаёт пару ключ-значение (Pair) для mapOf', '"Алиса" to 82'],
+    ['[ключ] = значение', 'индексация со присваиванием', 'добавляет или заменяет значение в MutableMap по ключу', 'scores["Соня"] = 77'],
+    ['when', 'ключевое слово', 'выбирает одну ветку из нескольких — замена цепочке if/else if', 'when (place) { ... }'],
+    [', в ветке when', 'группировка значений', 'одна ветка срабатывает для нескольких перечисленных значений', '2, 3 -> "Призёр"'],
+    ['in a..b в ветке when', 'проверка диапазона', 'ветка срабатывает, если значение входит в диапазон', 'in 4..10 -> "Финалист"'],
+  ],
+}}>
 
 | Символ / конструкция | Как называется | Что делает | Пример |
 |---|---|---|---|
@@ -599,6 +675,8 @@ Initializer type mismatch: expected 'Int', actual 'Int?'.
 | `,` в ветке when | группировка значений | одна ветка срабатывает для нескольких перечисленных значений | `2, 3 -> "Призёр"` |
 | `in a..b` в ветке when | проверка диапазона | ветка срабатывает, если значение входит в диапазон | `in 4..10 -> "Финалист"` |
 
+</Block>
+
 <details>
 <summary>Углубиться</summary>
 
@@ -613,9 +691,12 @@ Initializer type mismatch: expected 'Int', actual 'Int?'.
 
 </details>
 
+<SectionAnchor chapterId="classes-collections" sectionId="cheatsheet-symbols" />
+
 ## Слова главы
 
-<Flashcards cards={[
+<Block kind="vocab" title="Словарь главы" chapterId="classes-collections" blockId="vocab-glossary">
+<Flashcards chapterId="classes-collections" cards={[
   { term: 'class', translation: 'класс', note: 'чертёж для создания объектов с общими свойствами и методами' },
   { term: 'instance', translation: 'экземпляр', note: 'конкретный объект, созданный по чертежу класса — alice является экземпляром Competitor' },
   { term: 'property', translation: 'свойство', note: 'значение, которое хранится в объекте класса и объявляется через val/var' },
@@ -627,20 +708,51 @@ Initializer type mismatch: expected 'Int', actual 'Int?'.
   { term: 'iteration', translation: 'обход коллекции', note: 'последовательный проход по всем элементам списка, множества или карты, например через for' },
   { term: 'exhaustive', translation: 'исчерпывающий', note: 'свойство when-выражения: должны быть учтены все возможные варианты, иначе нужна ветка else' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="classes-collections" sectionId="vocab" />
 
 ## Потренируйся печатать
 
 Сначала объявление класса с двумя свойствами в конструкторе:
 
-<CodeTyping snippet={'class Competitor(val name: String, var score: Int)'} />
+<Block kind="trainer" title="Классы: объявления и методы" chapterId="classes-collections" blockId="trainer-classes">
+<CodeTyping keyboard chapterId="classes-collections" trainerId="trainer-classes" targetCpm={110} targetAccuracy={90} pools={[
+  { label: 'Классы', snippets: [
+    'class Competitor(val name: String, var score: Int)',
+    'data class Competitor(val name: String, var score: Int)',
+    'fun addPoints(points: Int) { score += points }',
+    'val bogdanNextRound = bogdan.copy(score = 96)',
+    'val (name, score) = bogdan',
+    'val totalScore = team.map { it.score }.sum()',
+    'val qualified = team.filter { it.score >= 75 }.map { it.name }',
+  ] },
+]} />
+</Block>
 
 Теперь карта с инфиксной функцией to:
 
-<CodeTyping snippet={'val scores = mapOf("Алиса" to 82, "Богдан" to 91)'} />
+<Block kind="trainer" title="Коллекции: списки, карты, множества" chapterId="classes-collections" blockId="trainer-collections">
+<CodeTyping chapterId="classes-collections" trainerId="trainer-collections" targetCpm={120} targetAccuracy={90} pools={[
+  { label: 'Коллекции', snippets: [
+    'val scores = mapOf("Алиса" to 82, "Богдан" to 91)',
+    'val roster = mutableListOf("Алиса", "Богдан")',
+    'scores["Соня"] = 77',
+    'println(scores.getOrDefault("Дима", 0))',
+    'val uniqueScores = setOf(82, 91, 82, 77, 91)',
+    'for (name in names) { println(name) }',
+    'for ((name, score) in scores) { println("$name: $score") }',
+  ] },
+]} />
+</Block>
+
+<SectionAnchor chapterId="classes-collections" sectionId="practice-typing" />
 
 ## Куда дальше: проверенные ресурсы
 
 ### Русские материалы с нуля
+
+<Block kind="cheatsheet" title="Русские материалы с нуля" chapterId="classes-collections" blockId="cheatsheet-resources-ru">
 
 - [kotlinlang.ru — Классы](https://kotlinlang.ru/docs/classes.html) — официальная документация в переводе: конструкторы, свойства, наследование — читай раздел про основной конструктор и свойства.
 - [kotlinlang.ru — Классы данных](https://kotlinlang.ru/docs/data-classes.html) — тот же перевод про data class: что именно генерируется и какие есть ограничения на параметры конструктора.
@@ -649,15 +761,27 @@ Initializer type mismatch: expected 'Int', actual 'Int?'.
 - [Урок 11: ООП. Классы и объекты в Kotlin](https://ievetrov.ru/kotlin-s-nulya-uroki/urok-11-klassy-i-obekty/) — продолжение курса с уроков 1 и 10: классы объясняются через бытовые аналогии, с видео.
 - [Урок 9: Списки в Kotlin, функции для работы с коллекциями](https://ievetrov.ru/kotlin-s-nulya-uroki/urok-9-spiski-i-funkczii-dlya-kollekczij/) — тот же курс: List и операции над коллекциями отдельным уроком, с видео.
 
+</Block>
+
 ### Официальный тур Kotlin (на английском)
+
+<Block kind="cheatsheet" title="Официальный тур Kotlin" chapterId="classes-collections" blockId="cheatsheet-resources-tour">
 
 - [Kotlin tour: Classes](https://kotlinlang.org/docs/kotlin-tour-classes.html) — официальный тур: конструкторы, свойства и методы со встроенными упражнениями.
 - [Kotlin tour: Collections](https://kotlinlang.org/docs/kotlin-tour-collections.html) — официальный тур: List, Set, Map и их изменяемые версии на практических примерах.
 
+</Block>
+
 ### Потренироваться
+
+<Block kind="cheatsheet" title="Потренироваться" chapterId="classes-collections" blockId="cheatsheet-resources-practice">
 
 - [play.kotlinlang.org](https://play.kotlinlang.org) — та же песочница, что работает в кнопках Run этой главы, но во весь экран.
 - [Kotlin Koans: Classes / Collections](https://play.kotlinlang.org/koans/overview) — в общем списке разделов Koans есть отдельные категории Classes и Collections — задачи с автопроверкой именно на темы этой главы.
+
+</Block>
+
+<SectionAnchor chapterId="classes-collections" sectionId="resources" />
 
 ## Челлендж ⭐
 
@@ -730,6 +854,8 @@ data class Competitor(val name: String, var score: Int)
 
 </details>
 
+<SectionAnchor chapterId="classes-collections" sectionId="challenge" />
+
 ## Что должен уметь
 
 - Объявлять класс с основным конструктором и свойствами `val`/`var`, объясняя, что делает каждый символ, включая `val`/`var` внутри скобок.
@@ -742,3 +868,5 @@ data class Competitor(val name: String, var score: Int)
 - Писать `when` и как список независимых условий, и как сравнение одного значения с ветками через запятую и диапазоны `in a..b`.
 - Объяснять, почему `when`-выражение требует ветку `else` для исчерпывающести (exhaustiveness), когда его результат кладётся в переменную.
 - Узнавать по сообщению компилятора пять типичных ошибок этой главы — непереданный аргумент конструктора, переприсваивание `val`-свойства, вызов `.add()` у `List`, неисчерпывающий `when`, обращение к `Map` без учёта `null` — и чинить каждую.
+
+<SectionAnchor chapterId="classes-collections" sectionId="what-you-should-know" />

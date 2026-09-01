@@ -10,9 +10,15 @@ import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import ToolCard from '@site/src/components/ToolCard';
 import SelfCheck from '@site/src/components/SelfCheck';
-import TOCInline from '@theme/TOCInline';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # IT-английский: стартовый словарь
+
+<ChapterProgress chapterId="it-english" totalSections={12} totalQuizzes={5} totalTrainers={2} />
 
 ## Зачем это нужно
 
@@ -20,14 +26,21 @@ import TOCInline from '@theme/TOCInline';
 
 Хорошая новость: для старта не нужен «свободный английский». Технические тексты специально пишут ограниченным набором слов — пара сотен терминов покрывает почти всё, что ты встретишь в первый год. В этой главе — стартовый словарь из четырёх десятков слов, разбор реальных сообщений об ошибках буквально по словам и главный практический навык, без которого ни один список слов не поможет: как читать сообщение об ошибке и как искать решение по-английски, а не закрывать записку в панике.
 
-<TOCInline toc={toc} />
+<CollapsibleToc toc={toc} chapterId="it-english" />
+
+<SectionAnchor chapterId="it-english" sectionId="why" />
 
 ## Анатомия сообщения об ошибке
 
-Когда программа ломается, она не ругается — она оставляет записку: что пыталась сделать и что пошло не так. Новички закрывают эту записку не читая, а зря: в ней почти всегда написано, как всё починить. У записки есть строение, и в разных инструментах оно чуть отличается — но принцип общий: **источник** (кто говорит), **виновник** (к чему относится проблема) и **суть** (что именно случилось), разделённые двоеточиями.
+Когда программа ломается, она не ругается — она оставляет записку: что пыталась сделать и что пошло не так. У записки есть строение, и в разных инструментах оно чуть отличается — но принцип общий: **источник** (кто говорит), **виновник** (к чему относится проблема) и **суть** (что именно случилось), разделённые двоеточиями.
+
+<Hint id="it-english-h1" type="tip">
+Новички закрывают эту записку не читая, а зря: в ней почти всегда написано, как всё починить.
+</Hint>
 
 Возьмём настоящее сообщение — такое действительно печатает Linux-команда `cat`, если попросить её показать несуществующий файл. Наведи курсор на каждую часть:
 
+<Block kind="breakdown" title="Разбор по частям: cat: report.txt" chapterId="it-english" blockId="breakdown-error-anatomy">
 <SyntaxBreakdown parts={[
   { text: 'cat', label: 'источник', note: 'имя программы, которая сообщает об ошибке. Полезная привычка: гугли не только текст ошибки, но и это имя рядом с ним — тогда результаты поиска будут про ту же программу, а не про случайное совпадение слов' },
   { text: ': ', label: 'разделитель', note: 'двоеточие отделяет части сообщения друг от друга — читается как «а именно:»' },
@@ -35,17 +48,22 @@ import TOCInline from '@theme/TOCInline';
   { text: ': ', label: 'разделитель', note: 'ещё одно двоеточие — сейчас будет суть проблемы' },
   { text: 'No such file or directory', label: 'суть проблемы', note: 'устойчивая англоязычная фраза — разберём её по словам чуть ниже, отдельным блоком' },
 ]} />
+</Block>
 
 Читаем целиком: «cat: report.txt: нет такого файла или каталога». Не «ты плохой программист», а конкретный факт — команде `cat` не удалось найти файл с таким именем. У этого сообщения нет отдельного слова `error` — и это не упрощение, а особенность стиля: многие Linux-утилиты (`cat`, `ls`, `rm` и десятки других) вообще не пишут слово «error», они просто называют себя, называют виновника и объясняют суть. Уровень серьёзности здесь виден по-другому — по факту, что команда остановилась и ничего не сделала.
 
 Другой распространённый стиль — у git и у компиляторов — явно называет уровень словом в начале строки: `fatal:` (фатально — операция полностью прервана), `error:` (ошибка) или `warning:` (предупреждение — программа продолжает работать). С таким сообщением мы тоже встретимся дальше в этой главе. Что общее у обоих стилей: если сообщение непонятно, скопируй его в поиск целиком, убрав только свои имена файлов и пути — по строке в кавычках найдутся сотни людей с той же проблемой. Подробный алгоритм такого поиска — в отдельном разделе ниже.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Анатомия сообщения" chapterId="it-english" blockId="quiz-error-anatomy">
+<SelfCheck chapterId="it-english" quizId="quiz-error-anatomy" questions={[
   { q: 'Из каких трёх частей обычно состоит сообщение вида cat: report.txt: No such file or directory?', options: ['Дата, время, номер строки', 'Источник (кто сообщает), виновник (к чему относится) и суть проблемы', 'Только текст ошибки, без структуры', 'Имя пользователя, пароль, IP-адрес'], correct: 1, why: 'Источник cat, виновник report.txt и суть No such file or directory — части одного сообщения, разделённые двоеточиями.' },
   { q: 'Почему в сообщении cat: report.txt: No such file or directory нет слова error?', options: ['Это опечатка разработчиков cat', 'Многие Linux-утилиты вообще не пишут слово error — они называют себя, виновника и суть, а серьёзность видна по тому, что команда остановилась', 'error здесь просто не поместилось', 'Слово error пишут только программы на Kotlin'], correct: 1, why: 'Это устоявшийся стиль многих Unix-утилит: без явной метки уровня, но со строгой структурой источник: виновник: суть.' },
   { q: 'Чем отличается стиль сообщений git и компиляторов от стиля cat?', options: ['Ничем, все сообщения одинаковые', 'git и компиляторы обычно явно называют уровень словом в начале — fatal:, error: или warning:', 'git вообще не выводит сообщений об ошибках', 'У компиляторов сообщения никогда не бывают на английском'], correct: 1, why: 'fatal:, error:, warning: — явные метки уровня в начале строки. У cat и похожих утилит такой метки обычно нет вовсе.' },
   { q: 'Что стоит гуглить вместе с текстом ошибки, а не только сам текст?', options: ['Ничего дополнительного не нужно', 'Имя программы-источника (например cat или git) — так результаты будут именно про неё', 'Имя своего компьютера', 'Версию операционной системы Windows'], correct: 1, why: 'Источник ошибки сужает поиск: результаты по «cat file not found» относятся именно к этой команде, а не к случайному совпадению слов.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="it-english" sectionId="error-anatomy" />
 
 ## Три реальных ошибки — разбор по словам
 
@@ -55,6 +73,7 @@ import TOCInline from '@theme/TOCInline';
 
 Полное сообщение — то самое, что уже встретилось в разделе про анатомию: `cat: report.txt: No such file or directory`. Разберём саму фразу-идиому по словам:
 
+<Block kind="breakdown" title="Разбор по словам: No such file or directory" chapterId="it-english" blockId="breakdown-no-such-file">
 <SyntaxBreakdown parts={[
   { text: 'No', label: '«нет, никакого»', note: 'отрицание. Само по себе No значит просто «нет» — но здесь оно относится не к вопросу, а к следующему слову' },
   { text: ' such ', label: '«такой, подобный»', note: 'указательное слово. Идиома no such X целиком значит «такого X попросту не существует» — устойчивое канцелярское сочетание, отдельно such почти не употребляют в этом смысле' },
@@ -62,8 +81,13 @@ import TOCInline from '@theme/TOCInline';
   { text: ' or ', label: '«или»', note: 'союз-перечисление. Система не знает заранее, был ли это файл или папка, поэтому подстраховывается и называет оба варианта' },
   { text: 'directory', label: '«каталог, папка»', note: 'существительное, синоним слова folder. Именно так называют папки в Unix-системах и в текстах ошибок — folder встретишь в основном в графическом интерфейсе' },
 ]} />
+</Block>
 
-Дословно: «нет такого файла или каталога». Мысль целиком — «искомого объекта с таким именем и по такому пути просто не существует», а не «файл повреждён» или «файл занят». Это разница на практике: чинить нужно опечатку в имени или путь, а не восстанавливать файл из бэкапа.
+Дословно: «нет такого файла или каталога». Мысль целиком — «искомого объекта с таким именем и по такому пути просто не существует», а не «файл повреждён» или «файл занят».
+
+<Hint id="it-english-h2" type="tip">
+Это разница на практике: чинить нужно опечатку в имени или путь, а не восстанавливать файл из бэкапа.
+</Hint>
 
 ### 2. «В доступе отказано»: `Permission denied`
 
@@ -73,6 +97,7 @@ import TOCInline from '@theme/TOCInline';
 bash: ./run_tests.sh: Permission denied
 ```
 
+<Block kind="breakdown" title="Разбор по словам: Permission denied" chapterId="it-english" blockId="breakdown-permission-denied">
 <SyntaxBreakdown parts={[
   { text: 'bash', label: 'источник', note: 'имя командной оболочки (shell) — программы, которая читает и выполняет твои команды в терминале' },
   { text: ': ', label: 'разделитель', note: 'двоеточие между источником и виновником' },
@@ -81,6 +106,7 @@ bash: ./run_tests.sh: Permission denied
   { text: 'Permission', label: '«разрешение»', note: 'существительное от глагола to permit — «разрешать». Здесь имеется в виду право доступа к файлу' },
   { text: ' denied', label: '«отказано»', note: 'причастие прошедшего времени от глагола to deny — «отказывать, отклонять». Тот же канцелярский оборот, что в фразе «в доступе отказано» на русском — не совпадение, а прямая калька с этого самого выражения' },
 ]} />
+</Block>
 
 Дословно: «bash: ./run_tests.sh: в разрешении отказано». Смысл — не «файла нет» (он есть, `bash` его нашёл и назвал по имени), а «у файла нет права быть запущенным» — конкретно бита на исполнение (execute). Про биты прав `rwx` подробно будет отдельная глава — сейчас достаточно узнавать фразу и понимать, что дело в правах, а не в содержимом файла.
 
@@ -92,6 +118,7 @@ bash: ./run_tests.sh: Permission denied
 bash: gti: command not found
 ```
 
+<Block kind="breakdown" title="Разбор по словам: command not found" chapterId="it-english" blockId="breakdown-command-not-found">
 <SyntaxBreakdown parts={[
   { text: 'bash', label: 'источник', note: 'та же оболочка, что и выше — именно bash искал команду по введённому имени' },
   { text: ': ', label: 'разделитель', note: 'двоеточие перед виновником' },
@@ -101,15 +128,24 @@ bash: gti: command not found
   { text: ' not ', label: '«не»', note: 'отрицание глагола, стоящего дальше' },
   { text: 'found', label: '«найдена»', note: 'причастие прошедшего времени от неправильного глагола to find — find, found, found. В школьной грамматике — третья форма' },
 ]} />
+</Block>
 
-Дословно: «команда не найдена». Bash не оценивает, правильная это команда или нет, — он просто ищет точное совпадение имени среди всех известных ему программ. `gti` для него — это не «git с опечаткой», а совсем другое, никому не известное слово. Отсюда и практический вывод: если видишь `command not found`, в 9 случаях из 10 дело в опечатке, а не в том, что программа не установлена, — сперва перечитай, что напечатал.
+Дословно: «команда не найдена». Bash не оценивает, правильная это команда или нет, — он просто ищет точное совпадение имени среди всех известных ему программ. `gti` для него — это не «git с опечаткой», а совсем другое, никому не известное слово.
 
-<SelfCheck questions={[
+<Hint id="it-english-h3" type="important">
+Отсюда и практический вывод: если видишь `command not found`, в 9 случаях из 10 дело в опечатке, а не в том, что программа не установлена, — сперва перечитай, что напечатал.
+</Hint>
+
+<Block kind="quiz" title="Три ошибки по словам" chapterId="it-english" blockId="quiz-errors-by-words">
+<SelfCheck chapterId="it-english" quizId="quiz-errors-by-words" questions={[
   { q: 'Что означает идиома no such file целиком, а не по отдельным словам?', options: ['Файл повреждён и требует восстановления', 'Файла с таким именем/путём попросту не существует', 'Файл занят другой программой', 'Файл слишком большой для открытия'], correct: 1, why: 'No such X — устойчивое сочетание «такого X не существует», а не «X сломан» или «X занят».' },
   { q: 'От какого глагола образовано слово denied в Permission denied и что он значит?', options: ['От to deny — «отказывать»; в доступе отказано', 'От to define — «определять»', 'От to deliver — «доставлять»', 'Это самостоятельное слово без родственного глагола'], correct: 0, why: 'denied — причастие прошедшего времени от to deny («отказывать, отклонять»); Permission denied дословно «в разрешении отказано».' },
   { q: 'Почему bash пишет command not found на gti, хотя ты имел в виду git?', options: ['Потому что git не установлен', 'Потому что bash ищет точное совпадение имени, а gti для него — совсем другое, никому не известное слово', 'Потому что не хватает прав доступа', 'Потому что не закрыта кавычка'], correct: 1, why: 'bash не угадывает опечатки — он ищет точное имя. gti и git для него два разных, никак не связанных слова.' },
   { q: 'Какая форма глагола find использована в found?', options: ['Первая форма (инфинитив)', 'Вторая форма (простое прошедшее время)', 'Третья форма (причастие прошедшего времени) — find, found, found, неправильный глагол', 'Форма будущего времени'], correct: 2, why: 'find — неправильный глагол: find (инфинитив), found (прошедшее время), found (причастие). Все три формы в этом случае совпадают.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="it-english" sectionId="errors-by-words" />
 
 ## Как гуглить ошибку по-английски
 
@@ -123,6 +159,7 @@ bash: gti: command not found
 
 Разберём готовый запрос по кусочкам — именно так стоит искать git-ошибку `fatal: not a git repository`:
 
+<Block kind="breakdown" title="Разбор по кусочкам: поисковый запрос" chapterId="it-english" blockId="breakdown-search-query">
 <SyntaxBreakdown parts={[
   { text: '"', label: 'открывающая кавычка', note: 'команда поисковику: дальше — точная фраза, искать слово в слово, в этом порядке' },
   { text: 'not a git repository', label: 'устойчивая часть сообщения', note: 'осознанно взята без своего пути и без слова fatal: — это самая узнаваемая и общая часть, которая повторится у всех с этой ошибкой' },
@@ -131,17 +168,24 @@ bash: gti: command not found
   { text: 'site:', label: 'оператор поиска', note: 'без пробела перед доменом; ограничивает результаты одним сайтом' },
   { text: 'stackoverflow.com', label: 'домен', note: 'сайт вопросов и ответов, где почти наверняка уже разбирали именно эту ошибку' },
 ]} />
+</Block>
 
 Потренируйся печатать такой запрос — в реальном поиске лишний пробел после `site:` испортит результат, поэтому важна точность:
 
-<CodeTyping snippet={'"not a git repository" site:stackoverflow.com'} />
+<Block kind="trainer" title="Поисковый запрос с site:" chapterId="it-english" blockId="trainer-search-query">
+<CodeTyping snippet={'"not a git repository" site:stackoverflow.com'} chapterId="it-english" trainerId="trainer-search-query" targetCpm={100} targetAccuracy={90} />
+</Block>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Как гуглить ошибку" chapterId="it-english" blockId="quiz-google-error">
+<SelfCheck chapterId="it-english" quizId="quiz-google-error" questions={[
   { q: 'Зачем брать фразу ошибки в кавычки при поиске?', options: ['Кавычки ничего не меняют', 'Кавычки просят искать точную фразу целиком, слово в слово, а не страницы, где слова просто где-то встречаются', 'Кавычки нужны только для русского текста', 'Кавычки ускоряют загрузку страницы результатов'], correct: 1, why: 'Без кавычек поиск может найти страницы, где слова разбросаны по разным местам текста. С кавычками — только точное совпадение фразы.' },
   { q: 'Что нужно убрать из сообщения об ошибке перед тем, как его гуглить?', options: ['Ничего убирать не нужно, копируй всё как есть', 'Свои личные данные: имя файла, логин, абсолютный путь вроде /home/ivanov/...', 'Слово error или fatal', 'Название языка программирования'], correct: 1, why: 'Личные и специфичные для твоего компьютера детали не встретятся у других людей с той же проблемой — их стоит убрать, оставив общую часть.' },
   { q: 'Что делает оператор site:stackoverflow.com в поисковом запросе?', options: ['Открывает сайт Stack Overflow напрямую', 'Ограничивает результаты поиска только этим одним сайтом', 'Ищет слово site в тексте', 'Это не настоящий оператор, просто текст'], correct: 1, why: 'site: — оператор поисковика: показывает только страницы указанного домена, отфильтровывая всё остальное.' },
   { q: 'Сообщение Permission denied само по себе даёт мало результатов по теме. Что стоит сделать?', options: ['Ничего не менять, фраза и так достаточно точная', 'Добавить к запросу имя инструмента, который напечатал сообщение — например git или bash', 'Убрать слово denied', 'Перевести фразу на русский перед поиском'], correct: 1, why: 'Permission denied — общая фраза, которую печатают десятки разных программ. Имя инструмента сужает поиск до релевантных результатов.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="it-english" sectionId="google-error" />
 
 ## Слова главы
 
@@ -151,7 +195,8 @@ bash: gti: command not found
 
 Половина IT-английского — глаголы. Файл можно создать (create), открыть (open), сохранить (save) и удалить (delete). Программу — запустить (run); проект — собрать (build) из исходников в готовое приложение, а потом проверить (test), что всё работает. Если проверка не прошла, говорят, что она провалилась (fail). Результат неудачи ты уже знаешь: ошибка (error), а её младшая сестра — предупреждение (warning): программа работает, но что-то ей не нравится.
 
-<Flashcards cards={[
+<Block kind="vocab" title="Словарь: действия программ" chapterId="it-english" blockId="vocab-actions">
+<Flashcards chapterId="it-english" cards={[
   { term: 'create', translation: 'создать', note: 'create a new project — создать новый проект' },
   { term: 'open', translation: 'открыть', note: 'open the file — открой файл' },
   { term: 'save', translation: 'сохранить', note: 'save changes — сохранить изменения' },
@@ -163,12 +208,14 @@ bash: gti: command not found
   { term: 'error', translation: 'ошибка', note: 'fatal error — фатальная ошибка' },
   { term: 'warning', translation: 'предупреждение', note: 'it is just a warning — это всего лишь предупреждение' },
 ]} />
+</Block>
 
 ### Файлы и система
 
 Всё в компьютере крутится вокруг файла (file). Файлы лежат в папках (folder), которые в мире Linux чаще называют каталогами (directory) — это синонимы, пугаться не надо, оба слова уже встречались в разборе ошибок выше. Дорога до файла через все вложенные папки — путь (path), например `/home/student/docs/report.txt`. Команды системе отдают через терминал (terminal) — текстовое окно, с которым мы подружимся в следующей главе. Программы в Ubuntu ставятся пакетами (package): пакет можно установить (install) или обновить (update) до свежей версии (version). А поведение почти любой программы меняется в настройках (settings).
 
-<Flashcards cards={[
+<Block kind="vocab" title="Словарь: файлы и система" chapterId="it-english" blockId="vocab-files-system">
+<Flashcards chapterId="it-english" cards={[
   { term: 'file', translation: 'файл', note: 'save the file — сохрани файл' },
   { term: 'folder', translation: 'папка', note: 'create a new folder — создай новую папку' },
   { term: 'directory', translation: 'каталог', note: 'no such file or directory — нет такого файла или каталога' },
@@ -180,12 +227,14 @@ bash: gti: command not found
   { term: 'settings', translation: 'настройки', note: 'open the settings — открой настройки' },
   { term: 'terminal', translation: 'терминал', note: 'type it in the terminal — набери это в терминале' },
 ]} />
+</Block>
 
 ### Слова из кода
 
 Эти термины подробно разберём в главах про программирование, но встречать их в текстах и ошибках ты начнёшь раньше. Переменная (variable) хранит значение (value), у которого есть тип (type): текст называется строкой (string), целое или дробное — числом (number), а набор элементов — списком (list). Функция (function) — именованный кусок кода, который можно вызывать. Цикл (loop) повторяет действия, условие (condition) выбирает, по какой ветке пойти. А комментарий (comment) — заметка для людей, которую компьютер не выполняет.
 
-<Flashcards cards={[
+<Block kind="vocab" title="Словарь: слова из кода" chapterId="it-english" blockId="vocab-code-words">
+<Flashcards chapterId="it-english" cards={[
   { term: 'variable', translation: 'переменная', note: 'declare a variable — объяви переменную' },
   { term: 'function', translation: 'функция', note: 'call the function — вызови функцию' },
   { term: 'value', translation: 'значение', note: 'the value is empty — значение пустое' },
@@ -197,12 +246,14 @@ bash: gti: command not found
   { term: 'condition', translation: 'условие', note: 'if the condition is true — если условие истинно' },
   { term: 'comment', translation: 'комментарий', note: 'leave a comment — оставь комментарий в коде' },
 ]} />
+</Block>
 
 ### Глаголы git и терминала
 
 Отдельный блок — потому что эти десять слов будут звучать на каждом занятии про git, начиная со следующих глав. Изменения фиксируют коммитом (commit) и отправляют (push) на сервер; чужие изменения забирают (pull) себе. Параллельную линию разработки называют веткой (branch), а объединение веток — слиянием (merge). Весь репозиторий целиком копируют командой «клонировать» (clone), а посмотреть, что изменилось на сервере, не вливая это в свою ветку, можно командой «скачать» (fetch). Файл перед коммитом кладут в индекс командой «добавить» (add), текущее состояние проекта показывает статус (status), а всю историю коммитов — журнал (log).
 
-<Flashcards cards={[
+<Block kind="vocab" title="Словарь: глаголы git и терминала" chapterId="it-english" blockId="vocab-git-verbs">
+<Flashcards chapterId="it-english" cards={[
   { term: 'commit', translation: 'зафиксировать (изменения); коммит', note: 'commit your changes — зафиксируй изменения' },
   { term: 'push', translation: 'отправить', note: 'push to origin — отправь изменения на сервер' },
   { term: 'pull', translation: 'забрать', note: 'pull the latest changes — забери последние изменения' },
@@ -214,19 +265,28 @@ bash: gti: command not found
   { term: 'status', translation: 'состояние, статус', note: 'check the status — проверь состояние проекта' },
   { term: 'log', translation: 'журнал (истории коммитов)', note: 'view the log — посмотри журнал коммитов' },
 ]} />
+</Block>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Слова главы" chapterId="it-english" blockId="quiz-vocab">
+<SelfCheck chapterId="it-english" quizId="quiz-vocab" questions={[
   { q: 'Чем directory отличается от folder?', options: ['Это совершенно разные вещи', 'Это синонимы: directory чаще звучит в Unix-системах и текстах ошибок, folder — в графическом интерфейсе', 'directory — это файл, а folder — папка', 'folder используется только в Windows, а directory — только в Kotlin'], correct: 1, why: 'Оба слова означают папку. directory — более «системное», характерно для терминала и текстов ошибок; folder чаще в интерфейсах.' },
   { q: 'Какая разница между pull и fetch в git?', options: ['Это два названия одной и той же команды', 'pull скачивает чужие изменения и сразу вливает их в твою ветку, fetch только скачивает, не вливая', 'fetch работает только с ветками, а pull — с файлами', 'pull используется для отправки, а fetch — для скачивания'], correct: 1, why: 'fetch — только скачать и посмотреть; pull — скачать и сразу слить с текущей веткой. Подробно эту разницу разберут главы про git.' },
   { q: 'Чем отличаются value и variable?', options: ['Ничем, это одно и то же слово', 'variable — переменная, именованное место для хранения; value — значение, которое в ней лежит', 'value — это тип данных, а variable — само число', 'variable используется только в терминале, value — только в коде'], correct: 1, why: 'variable — контейнер (переменная), value — то, что в нём хранится (значение). declare a variable, но the value is empty.' },
   { q: 'Что из перечисленного — глагол про git, а не про файловую систему?', options: ['install', 'commit', 'update', 'path'], correct: 1, why: 'commit — «зафиксировать изменения», специфичный git-термин. install, update и path относятся к файлам и пакетам.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="it-english" sectionId="vocab" />
 
 ## Потренируйся печатать
 
 Сообщения об ошибках придётся не только читать, но и перепечатывать в поиск. Набери без опечаток — это ровно та фраза, что уже разобрана по словам выше:
 
-<CodeTyping snippet={'cat: report.txt: No such file or directory'} />
+<Block kind="trainer" title="Фраза об ошибке целиком" chapterId="it-english" blockId="trainer-error-phrase">
+<CodeTyping snippet={'cat: report.txt: No such file or directory'} keyboard chapterId="it-english" trainerId="trainer-error-phrase" targetCpm={110} targetAccuracy={90} />
+</Block>
+
+<SectionAnchor chapterId="it-english" sectionId="practice-typing" />
 
 ## Типичные ошибки
 
@@ -288,20 +348,28 @@ fatal: not a git repository (or any of the parent directories): .git
 
 **Как починить:** проверить, в той ли папке ты находишься (`pwd`), и либо перейти в правильную (`cd имя-проекта`), либо, если репозиторий действительно должен появиться здесь впервые, — выполнить `git init`.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Типичные ошибки" chapterId="it-english" blockId="quiz-typical-errors">
+<SelfCheck chapterId="it-english" quizId="quiz-typical-errors" questions={[
   { q: 'Чем отличается причина ошибки No such file or directory от причины Permission denied?', options: ['Это одна и та же причина, просто разные слова', 'No such file — файла нет вообще; Permission denied — файл есть, но не хватает прав на действие с ним', 'Permission denied бывает только у папок, а No such file — только у файлов', 'No such file всегда чинится через chmod'], correct: 1, why: 'No such file or directory — объекта не существует. Permission denied — объект существует, но действие с ним запрещено правами доступа.' },
   { q: 'Какой командой чинят Permission denied у скрипта из-за отсутствия права на запуск?', options: ['rm run_tests.sh', 'chmod +x run_tests.sh', 'git init', 'cat run_tests.sh'], correct: 1, why: 'chmod +x выдаёт файлу право на исполнение (execute) — именно этого бита не хватало для запуска скрипта.' },
   { q: 'Что делает git, перед тем как написать fatal: not a git repository?', options: ['Сразу выводит ошибку, ничего не проверяя', 'Ищет скрытую папку .git в текущей папке, а если не находит — поднимается вверх по родительским папкам и проверяет каждую', 'Создаёт .git автоматически', 'Спрашивает пароль'], correct: 1, why: 'Именно поэтому в сообщении есть уточнение «or any of the parent directories» — git проверил не только текущую папку, но и весь путь наверх.' },
   { q: 'В 9 случаях из 10 ошибка command not found на знакомую команду (например git) вызвана чем?', options: ['Тем, что программа никогда не была установлена', 'Опечаткой в наборе имени команды', 'Отсутствием интернета', 'Слишком старой версией Linux'], correct: 1, why: 'bash ищет точное совпадение имени. Если команда точно установлена и раньше работала, первым делом стоит перечитать, что именно напечатано.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="it-english" sectionId="typical-errors" />
 
 ## Где тренировать словарь
+
+<Block kind="cheatsheet" title="Курс для тренировки словаря" chapterId="it-english" blockId="cheatsheet-train-vocab">
 
 <ToolCard
   name="A2 English for Developers"
   url="https://www.freecodecamp.org/learn/a2-english-for-developers"
   desc="Бесплатный курс английского от freeCodeCamp: уровень — с нуля, все диалоги и примеры — из жизни программистов"
 />
+
+</Block>
 
 <details>
 <summary>Углубиться</summary>
@@ -321,7 +389,11 @@ fatal: not a git repository (or any of the parent directories): .git
 
 </details>
 
+<SectionAnchor chapterId="it-english" sectionId="train-vocab" />
+
 ## Куда дальше: проверенные ресурсы
+
+<Block kind="cheatsheet" title="Ресурсы главы" chapterId="it-english" blockId="cheatsheet-resources">
 
 - [Инглекс — английский для IT-специалистов](https://englex.ru/english-for-it-specialists/) — базовый словарь программиста и подборка из 84 ресурсов (словари, подкасты, курсы). Открывай, если нужен один большой список источников на все случаи.
 - [Skyeng — английский для программистов](https://skyeng.ru/articles/anglijskij-dlya-programmistov-i-drugih-kompyuternyh-spetsialnostej-poleznye-slova-i-frazy-iz-mira-it/) — 75 терминов и готовые фразы для рабочей переписки и код-ревью. Открывай, если словарь этой главы захотелось расширить сразу дальше.
@@ -329,6 +401,10 @@ fatal: not a git repository (or any of the parent directories): .git
 - [kata.academy — как правильно гуглить программисту](https://kata.academy/article/kak-pravilno-guglit-programmistu) — практические приёмы поиска: операторы, формулировки запросов, работа с фильтрами. Открывай сразу после раздела «Как гуглить ошибку» этой главы — материал прямо продолжает тему.
 - [Tproger — как искать и исправлять ошибки в коде](https://tproger.ru/translations/how-to-fix-bugs) — переводной пошаговый гайд из десяти шагов для новичка. Открывай, если хочется не только читать сообщение об ошибке, но и понять весь путь от «что-то сломалось» до «починил».
 - [errno(3) — Linux manual page](https://man7.org/linux/man-pages/man3/errno.3.html) — тот же официальный справочник, что и в «Углубиться» — но стоит вернуться к нему отдельно, когда встретишь новый код ошибки и захочешь понять его дословно.
+
+</Block>
+
+<SectionAnchor chapterId="it-english" sectionId="resources" />
 
 ## Челлендж ⭐
 
@@ -369,9 +445,28 @@ fatal: not a git repository (or any of the parent directories): .git
 
 </details>
 
+<SectionAnchor chapterId="it-english" sectionId="challenge" />
+
 ## Слова и конструкции главы
 
 Шпаргалка по всему, что встретилось в этой главе. Вернись сюда, если забудешь, «что означает этот кусок сообщения».
+
+<Block kind="cheatsheet" title="Слова и конструкции главы" chapterId="it-english" blockId="cheatsheet-constructions" favPayload={{
+  kind: 'table',
+  head: ['Конструкция', 'Как называется', 'Что означает', 'Пример'],
+  rows: [
+    ['имя:', 'источник (в начале строки)', 'называет программу, которая печатает сообщение', 'cat: ..., bash: ...'],
+    ['error:', 'явная метка уровня', 'ошибка — операция остановлена', 'error: ...'],
+    ['fatal:', 'явная метка уровня (git)', 'фатально — операция прервана полностью', 'fatal: not a git repository...'],
+    ['warning:', 'явная метка уровня', 'предупреждение — программа продолжает работать', 'warning: ...'],
+    ['No such file or directory', 'устойчивая фраза', 'искомого файла или каталога не существует', 'cat: x: No such file or directory'],
+    ['Permission denied', 'устойчивая фраза', 'не хватает прав на действие с файлом', 'bash: ./x.sh: Permission denied'],
+    ['command not found', 'устойчивая фраза', 'команда с таким именем не существует в системе', 'bash: gti: command not found'],
+    ["'...'", 'одинарные кавычки в сообщении', 'выделяют конкретное имя внутри текста ошибки', "pathspec 'the'"],
+    ['"..."', 'двойные кавычки в поисковом запросе', 'оператор точного совпадения фразы целиком', '"not a git repository"'],
+    ['site:', 'оператор поиска', 'ограничивает выдачу одним сайтом', 'site:stackoverflow.com'],
+  ],
+}}>
 
 | Конструкция | Как называется | Что означает | Пример |
 |---|---|---|---|
@@ -386,6 +481,10 @@ fatal: not a git repository (or any of the parent directories): .git
 | `"..."` | двойные кавычки в поисковом запросе | оператор точного совпадения фразы целиком | `"not a git repository"` |
 | `site:` | оператор поиска | ограничивает выдачу одним сайтом | `site:stackoverflow.com` |
 
+</Block>
+
+<SectionAnchor chapterId="it-english" sectionId="cheatsheet-words" />
+
 ## Что должен уметь
 
 - Разбирать сообщение об ошибке на источник, виновника и суть — и узнавать, что у одних инструментов есть явная метка уровня (`error:`, `fatal:`, `warning:`), а у других (`cat` и похожих) её нет вовсе.
@@ -394,3 +493,5 @@ fatal: not a git repository (or any of the parent directories): .git
 - Узнавать в тексте ошибки слова `file`, `directory`, `path`, `version` и понимать, о чём речь.
 - Составлять поисковый запрос по правилам: фраза в кавычках, без личных путей, при необходимости — с именем инструмента или оператором `site:`.
 - Отличать по тексту сообщения ошибку «объекта не существует» от ошибки «не хватает прав» — и называть, какой командой чинится каждая.
+
+<SectionAnchor chapterId="it-english" sectionId="what-you-should-know" />

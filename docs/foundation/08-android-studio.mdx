@@ -11,9 +11,16 @@ import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
 import ToolCard from '@site/src/components/ToolCard';
 import SelfCheck from '@site/src/components/SelfCheck';
-import TOCInline from '@theme/TOCInline';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import KeysTabs from '@site/src/components/KeysTabs';
 
 # Android Studio: знакомство с IDE
+
+<ChapterProgress chapterId="android-studio" totalSections={14} totalQuizzes={5} totalTrainers={2} />
 
 ## Зачем это нужно
 
@@ -21,7 +28,9 @@ import TOCInline from '@theme/TOCInline';
 
 Для Android официальная IDE — Android Studio от Google, построенная на движке IntelliJ IDEA. В ней работают и профессиональные разработчики, и участники чемпионата «Профессионалы»: на площадке тебя будет ждать именно она, а не какой-то упрощённый онлайн-редактор. В этой главе мы пройдём весь путь по шагам: поставим Android Studio на Ubuntu официальным способом, разберём каждую панель окна по отдельности, создадим первый проект с объяснением каждого поля мастера, соберём виртуальный телефон и запустим на нём приложение — а в конце научимся узнавать по симптомам три самые частые беды новичка: неудавшуюся синхронизацию Gradle, эмулятор, который отказывается стартовать, и SDK, требующий принять лицензии. Ничего не считаем очевидным: если на экране появилась кнопка, поле или сообщение — разберём, что оно значит и откуда взялось.
 
-<TOCInline toc={toc} />
+<CollapsibleToc toc={toc} chapterId="android-studio" />
+
+<SectionAnchor chapterId="android-studio" sectionId="why" />
 
 ## Чем IDE лучше блокнота
 
@@ -34,13 +43,19 @@ IDE понимает язык, на котором ты пишешь. Пока �
 
 Всё это не магия, а работа нескольких инструментов под одной крышей — дальше в главе мы познакомимся с каждым из них по отдельности: панелью проекта, встроенным терминалом, системой сборки Gradle и монитором логов Logcat.
 
+<SectionAnchor chapterId="android-studio" sectionId="ide-vs-notepad" />
+
 ## Установка на Ubuntu: официальный способ
+
+<Block kind="cheatsheet" title="Официальная загрузка" chapterId="android-studio" blockId="cheatsheet-download">
 
 <ToolCard
   name="Android Studio — официальная загрузка"
   url="https://developer.android.com/studio/install"
   desc="Официальная страница установки Google с системными требованиями и инструкциями для каждой ОС. Качай отсюда и только отсюда — версии с других сайтов могут быть устаревшими или изменёнными."
 />
+
+</Block>
 
 ### Системные требования для Linux
 
@@ -67,6 +82,7 @@ cd /opt/android-studio/bin
 ./studio.sh
 ```
 
+<Block kind="breakdown" title="Разбор по символам: tar -xzf … -C /opt/" chapterId="android-studio" blockId="breakdown-tar-command">
 <SyntaxBreakdown parts={[
   { text: 'sudo ', label: 'от имени администратора', note: 'от superuser do — «сделай от имени суперпользователя». Нужен, потому что /opt/ по умолчанию недоступен для записи обычному пользователю — это общая папка для всей системы, а не личная' },
   { text: 'tar ', label: 'программа-архиватор', note: 'стандартная утилита Linux для работы с архивами .tar (и вариантами вроде .tar.gz)' },
@@ -75,6 +91,7 @@ cd /opt/android-studio/bin
   { text: '-C ', label: 'флаг change directory', note: 'говорит tar: перед распаковкой перейти в указанную папку — то есть распаковать не в текущую директорию, а в /opt/' },
   { text: '/opt/', label: 'куда распаковать', note: 'официально рекомендованное место для программ, которыми может пользоваться любой аккаунт на компьютере' },
 ]} />
+</Block>
 
 Скрипт называется `studio.sh` — это и есть тот самый `studio`, который просит выполнить официальная инструкция: «перейдите в каталог `android-studio/bin/` и выполните `studio`».
 
@@ -82,14 +99,20 @@ cd /opt/android-studio/bin
 
 При первом запуске `studio.sh` открывается мастер настройки. Он предложит импортировать настройки из предыдущей установки (если это первая установка — просто жми **OK**), а затем сам докачает Android SDK — набор инструментов и библиотек, без которых Android Studio не умеет собирать приложения под Android. Это несколько гигабайт, так что понадобятся стабильный интернет и терпение: первая загрузка идёт минут десять-двадцать в зависимости от скорости сети.
 
+<Hint id="android-studio-h1" type="tip">
 Официальная документация даёт полезный совет напоследок: чтобы Android Studio появилась в общем списке приложений рабочего стола (а не только запускалась вручную через терминал), выбери в меню самой программы **Tools → Create Desktop Entry**.
+</Hint>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Установка на Ubuntu" chapterId="android-studio" blockId="quiz-install">
+<SelfCheck chapterId="android-studio" quizId="quiz-install" questions={[
   { q: 'Зачем в команде sudo apt-get install libc6:i386 ... нужны именно 32-битные библиотеки на 64-битном Ubuntu?', options: ['Это ошибка в документации, флаг лишний', 'Часть инструментов Android SDK — 32-битные программы, и без 32-битных версий системных библиотек они не запустятся, даже на 64-битной системе', 'Библиотеки нужны только для эмулятора, не для самой Studio', ':i386 — опечатка, должно быть :amd64'], correct: 1, why: 'Официальная инструкция явно требует эти библиотеки «для 64-битной версии Linux» — 64-битная ОС умеет запускать и 32-битные программы, но только если для них тоже установлены нужные библиотеки.' },
   { q: 'В команде sudo tar -xzf android-studio-*-linux.tar.gz -C /opt/ что делает флаг -C?', options: ['Указывает, что архив сжат (compressed)', 'Говорит tar перейти в указанную папку перед распаковкой, то есть куда положить результат', 'Проверяет архив на ошибки (check)', 'Копирует архив (copy) в новое место, не распаковывая'], correct: 1, why: '-C — «change directory»: без него tar распаковал бы архив в текущую папку, откуда была запущена команда, а не в /opt/.' },
   { q: 'Почему архив распаковывают именно в /opt/, а не, например, в папку Загрузки?', options: ['Технически без разницы, это просто традиция без причины', '/opt/ — официально рекомендованное место для программ, доступных всем аккаунтам на компьютере, в отличие от личных папок конкретного пользователя', '/opt/ работает быстрее, чем остальные разделы диска', 'Скрипт studio.sh физически не может запуститься из других папок'], correct: 1, why: 'Официальная инструкция прямо разводит два случая: /usr/local/ — для своего профиля, /opt/ — если компьютером пользуются несколько человек и программа должна быть доступна всем.' },
   { q: 'Что произойдёт, если пропустить мастер настройки SDK при самом первом запуске Android Studio?', options: ['Ничего страшного, SDK можно докачать позже вручную, но без него ни один проект не соберётся', 'Android Studio откажется запускаться вообще', 'SDK не нужен, если писать код только на Kotlin без Android-специфики', 'Мастер нельзя пропустить, кнопки «Отмена» не существует'], correct: 0, why: 'Android SDK — обязательный набор инструментов и библиотек для сборки под Android; без него компилятор просто не найдёт нужные классы платформы, и Gradle sync позже завершится ошибкой.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="android-studio" sectionId="install-ubuntu" />
 
 ## Окно Android Studio: что где
 
@@ -122,12 +145,16 @@ cd /opt/android-studio/bin
 
 Справа — узкая вертикальная вкладка **Gradle**. Разворачиваешь её — видишь дерево задач (task) сборки: `build`, `assembleDebug`, `test` и десятки других, каждую из которых можно запустить кликом в обход кнопки Run. Здесь же — кнопка обновления (иконка двух круговых стрелок или слон-логотип Gradle), которой можно вручную запустить синхронизацию проекта, не дожидаясь, пока IDE попросит об этом сама.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Окно Android Studio" chapterId="android-studio" blockId="quiz-ide-window">
+<SelfCheck chapterId="android-studio" quizId="quiz-ide-window" questions={[
   { q: 'В какой панели окажется сообщение об ошибке, если приложение запустилось на эмуляторе и сразу закрылось (упало)?', options: ['В редакторе, подчёркнутое красным', 'В Logcat — журнале запущенного приложения, куда падают в том числе трассировки крашей', 'В панели Project', 'В панели Gradle'], correct: 1, why: 'Logcat — это лог именно работающего приложения, а не статического кода; там видно, что происходило в момент, когда всё сломалось.' },
   { q: 'Чем режим Project отличается от режима Android в панели файлов слева?', options: ['Это одно и то же, просто два названия', 'Project показывает настоящую структуру папок на диске, Android — удобную группировку по смыслу (manifests, kotlin+java, res и т.д.)', 'Project — только для чтения, Android — для редактирования', 'Android доступен только в платных версиях IDE'], correct: 1, why: 'Android view — не то, что реально лежит на диске, а логическая группировка для быстрого доступа к ключевым файлам; реальную структуру папок видно только в режиме Project.' },
   { q: 'Что физически находится внутри AndroidManifest.xml, который панель Project показывает в разделе manifests?', options: ['Весь код приложения', 'Файл-паспорт приложения: какие у него экраны и какие разрешения ему нужны', 'Только картинки и строки интерфейса', 'Список горячих клавиш'], correct: 1, why: 'AndroidManifest.xml — декларация того, из чего состоит приложение и что ему разрешено делать в системе, а не сам код.' },
   { q: 'Зачем нужен встроенный Terminal, если у Android Studio и так есть панель Project и редактор?', options: ['Он не нужен, это просто дублирующая панель', 'В нём работает обычный терминал Linux (git, ls, ./gradlew) — не нужно переключаться в отдельное окно ради консольных команд', 'Terminal нужен только для запуска эмулятора', 'Через Terminal нельзя редактировать файлы, только просматривать'], correct: 1, why: 'Terminal — полноценная оболочка внутри IDE: команды из глав про Linux и Git выполняются ровно в этой панели, без переключения окон.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="android-studio" sectionId="ide-window" />
 
 ## Создаём первый проект: Empty Activity
 
@@ -145,6 +172,7 @@ cd /opt/android-studio/bin
 - **Language** — язык для генерации кода-заготовки: **Kotlin** (рекомендуется, и обязателен для современных инструментов вроде Jetpack Compose) или Java (поддерживается, но для новых проектов не рекомендуется).
 - **Minimum SDK** — минимальный уровень API (API level) Android, на котором приложение вообще согласится запуститься. У каждой версии Android свой номер API: например, API 24 — это Android 7.0 (Nougat). Чем ниже это число, тем на большем числе устройств, включая старые, заработает приложение, — но тем меньше новых системных возможностей доступно в коде. Рядом есть ссылка **Help me choose**, которая показывает актуальную статистику: сколько живых устройств в мире имеют версию Android не ниже выбранной.
 
+<Block kind="breakdown" title="Разбор по символам: com.pgkchamps.champ" chapterId="android-studio" blockId="breakdown-package-name">
 <SyntaxBreakdown parts={[
   { text: 'com', label: 'домен верхнего уровня, задом наперёд', note: 'обратная доменная нотация (reverse domain name notation): реальный домен читают справа налево. Часто здесь просто com, org или ru — то, чем обычно заканчивается сайт компании' },
   { text: '.', label: 'точка-разделитель', note: 'отделяет один уровень доменного имени от другого; в package name точка всегда значит «следующий уровень вложенности»' },
@@ -152,6 +180,7 @@ cd /opt/android-studio/bin
   { text: '.', label: 'точка-разделитель', note: 'снова отделяет уровень — на этот раз организацию от конкретного приложения' },
   { text: 'champ', label: 'имя конкретного приложения', note: 'последний сегмент — то, что отличает это приложение от других, выпущенных той же организацией' },
 ]} />
+</Block>
 
 Ниже есть ещё флажок **Use legacy android.support libraries** — по умолчанию он снят, и трогать его не нужно: современные проекты используют библиотеки AndroidX, а старые Support-библиотеки официально не поддерживаются.
 
@@ -171,7 +200,11 @@ cd /opt/android-studio/bin
 
 ### Что происходит после Finish: Gradle sync
 
-Жми **Finish**. Дальше внизу побегут полоски прогресса — это работает Gradle, система сборки. Она читает описание проекта из файлов `build.gradle.kts`, докачивает нужные библиотеки и готовит всё к сборке. Этот процесс называется синхронизацией (sync). Первая синхронизация в новом проекте занимает от одной до нескольких минут в зависимости от скорости интернета — не пугайся и ничего не нажимай, дождись сообщения об успехе внизу экрана или зелёной галочки рядом с иконкой Gradle.
+Жми **Finish**. Дальше внизу побегут полоски прогресса — это работает Gradle, система сборки. Она читает описание проекта из файлов `build.gradle.kts`, докачивает нужные библиотеки и готовит всё к сборке. Этот процесс называется синхронизацией (sync).
+
+<Hint id="android-studio-h2" type="important">
+Первая синхронизация в новом проекте занимает от одной до нескольких минут в зависимости от скорости интернета — не пугайся и ничего не нажимай, дождись сообщения об успехе внизу экрана или зелёной галочки рядом с иконкой Gradle.
+</Hint>
 
 ### Экран проекта: Code / Design / Split, разбор MainActivity.kt
 
@@ -212,6 +245,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 - **`setContent { ... }`** — здесь описывается интерфейс через функции, помеченные аннотацией `@Composable`: они и рисуют то, что окажется на экране.
 - **`Greeting("Android")`** — вызов той самой функции `Greeting`, определённой чуть ниже, с аргументом `"Android"`.
 
+<Block kind="breakdown" title="Разбор по символам: Text(…)" chapterId="android-studio" blockId="breakdown-compose-text">
 <SyntaxBreakdown parts={[
   { text: 'Text(', label: 'вызов функции', note: 'Text — готовая composable-функция из Jetpack Compose, которая рисует текст на экране приложения' },
   { text: '\n        text = ', label: 'именованный параметр', note: 'говорим функции, какое именно значение мы передаём — параметр text. Перенос строки и отступ здесь — только для читаемости, компилятору они безразличны' },
@@ -219,15 +253,20 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
   { text: ',\n        modifier = modifier\n    ', label: 'второй параметр', note: 'modifier управляет тем, как элемент выглядит и ведёт себя на экране — например, отступы или размер; здесь просто передан дальше без изменений' },
   { text: ')', label: 'закрывающая скобка', note: 'конец вызова функции — всё, что она должна знать, уже передано' },
 ]} />
+</Block>
 
 Пересобери и посмотри на панель **Design** — там появится текстовый блок с надписью `Hello Android!`. Именно эта строка окажется на экране эмулятора, когда мы его запустим.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Первый проект" chapterId="android-studio" blockId="quiz-first-project">
+<SelfCheck chapterId="android-studio" quizId="quiz-first-project" questions={[
   { q: 'В экране Configure your project поле Package name задано как com.pgkchamps.champ. Зачем нужен именно такой формат?', options: ['Это просто традиция без технического смысла', 'Package name служит и пространством имён для доступа к ресурсам, и уникальным application ID приложения при публикации — обратная доменная нотация почти гарантирует, что имя не совпадёт с чужим', 'Формат нужен только для показа в интерфейсе телефона', 'com. в начале обязательно означает коммерческое приложение'], correct: 1, why: 'Официальная документация прямо называет две роли package name: пространство имён проекта и application ID для публикации — и обратная доменная нотация исторически выбрана именно для уникальности имён по всему миру.' },
   { q: 'Ты выбрал Minimum SDK = API 24 (Android 7.0). Что это значит для владельца телефона с Android 5.0 (API 21)?', options: ['Приложение установится, но будет работать медленнее', 'Приложение не предложат к установке — устройство ниже заявленного минимума', 'minSdk влияет только на скорость сборки, не на установку', 'Ничего, minSdk — просто информационная пометка'], correct: 1, why: 'minSdk — это именно порог совместимости: устройство с версией Android ниже заявленной не сможет установить приложение, что и показал runnable-пример в главе.' },
   { q: 'После нажатия Finish внизу экрана долго бегут полоски прогресса без видимого результата. Это зависшая программа?', options: ['Да, нужно принудительно закрывать Android Studio', 'Нет — идёт первая синхронизация Gradle: она читает build.gradle.kts и докачивает библиотеки, и может занимать несколько минут', 'Да, но это нормально для медленных компьютеров, надо переустановить IDE', 'Нет, но продолжать работу можно сразу же, полоски ни на что не влияют'], correct: 1, why: 'Первый sync — самый долгий: Gradle с нуля выясняет, какие библиотеки нужны проекту, и скачивает их; трогать проект в этот момент не стоит, хотя это не зависание.' },
   { q: 'В коде Greeting("Android") напечатает текст "Hello Android!" — откуда взялось восклицание и слово Android именно в такой форме?', options: ['Android жёстко записан внутри функции Text', 'Строка шаблона "Hello $name!" внутри Greeting подставляет значение параметра name (здесь — "Android") на место $name, а "!" — обычный символ текста рядом', 'Это подставляется автоматически системой Android при каждом запуске', 'Слово Android Android Studio добавляет само как водяной знак'], correct: 1, why: 'Тот же принцип строковых шаблонов $, что в главе про переменные Kotlin: $name внутри двойных кавычек подставляет значение аргумента, а всё остальное в строке — обычный текст.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="android-studio" sectionId="first-project" />
 
 ## Эмулятор: создаём AVD
 
@@ -251,31 +290,54 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 
 Выбери свежесозданный AVD в выпадающем списке устройств наверху и жми зелёный треугольник ▶ **Run** (или **Shift+F10**). Android Studio соберёт проект, запустит эмулятор — он откроется отдельным окном и какое-то время грузится, как настоящий телефон при включении, — и установит туда приложение. Через минуту-другую на виртуальном экране появится надпись «Hello Android!». Поздравляю — ты только что собрал и запустил своё первое Android-приложение.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Эмулятор и AVD" chapterId="android-studio" blockId="quiz-emulator">
+<SelfCheck chapterId="android-studio" quizId="quiz-emulator" questions={[
   { q: 'Чем AVD отличается от эмулятора как программы?', options: ['Это два названия одного и того же', 'Эмулятор — это сама программа, которая умеет запускать виртуальные Android-устройства; AVD (Android Virtual Device) — конкретная настроенная «модель» такого устройства с выбранным железом и версией системы', 'AVD работает только на Windows', 'Эмулятор нельзя запустить без физического телефона рядом'], correct: 1, why: 'Эмулятор — инструмент; AVD — результат его настройки под конкретную комбинацию «модель телефона + версия Android», которую и запускает эмулятор.' },
   { q: 'На экране System Image рядом с нужной версией Android стоит иконка загрузки (стрелка вниз). Что это значит?', options: ['Версия устарела и недоступна', 'Этот образ системы ещё не скачан на компьютер — нужно кликнуть по иконке и подождать загрузки, прежде чем продолжить', 'Это просто декоративная иконка без функции', 'Так помечены только платные образы'], correct: 1, why: 'System image — это несколько гигабайт данных, которые скачиваются по требованию; иконка загрузки — явный сигнал, что образ ещё не на диске.' },
   { q: 'Ты создал AVD, но перед нажатием Run забыл выбрать его в выпадающем списке устройств наверху. Что произойдёт при нажатии ▶?', options: ['Android Studio запустит первый попавшийся AVD автоматически', 'Приложение некуда будет устанавливать — нужно выбрать целевое устройство до запуска', 'Приложение установится на все существующие AVD сразу', 'Android Studio создаст новый AVD с настройками по умолчанию'], correct: 1, why: 'Выпадающий список устройств — это явное указание, куда именно ставить и запускать сборку; без выбранной цели Run не может понять, что запускать.' },
   { q: 'На виртуальном экране появилась надпись «Hello Android!». Откуда взялся именно этот текст?', options: ['Android Studio генерирует случайную надпись при первом запуске', 'Это результат работы кода из MainActivity.kt: composable-функция Greeting("Android") печатает "Hello $name!", подставляя name = "Android"', 'Надпись жёстко зашита в сам эмулятор и не связана с кодом проекта', 'Это заглушка, которая исчезнет после повторного запуска'], correct: 1, why: 'Это прямое следствие разобранного ранее кода: вызов Greeting("Android") подставляет "Android" в строковый шаблон "Hello $name!".' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="android-studio" sectionId="emulator-avd" />
 
 ## Топ-10 горячих клавиш
 
-Горячая клавиша (shortcut) — комбинация, которая делает то же, что несколько кликов мышью, но мгновенно. Таблица ниже — по официальной документации Android Studio для Linux и Windows (на macOS часть комбинаций другая, обычно `Ctrl` заменяется на `Cmd`, а `Alt` — на `Option`).
+Горячая клавиша (shortcut) — комбинация, которая делает то же, что несколько кликов мышью, но мгновенно. Таблица ниже — по официальной документации Android Studio для Linux и Windows (на macOS часть комбинаций другая, обычно `Ctrl` заменяется на `Cmd`, а `Alt` — на `Option`). Переключай вкладку под свою систему — платформа запомнит выбор для всех глав:
 
-| Комбинация | Что делает |
-|---|---|
-| **Alt+1** | Показать/скрыть панель Project |
-| **Shift**, дважды подряд | Search Everywhere: найти файл, класс, действие или настройку — что угодно |
-| **Ctrl+Space** | Базовое автодополнение кода |
-| **Alt+Enter** | Быстрое исправление: показать intention actions — варианты того, как починить подчёркнутое место |
-| **Ctrl+/** | Закомментировать/раскомментировать текущую строку |
-| **Ctrl+Alt+L** | Переформатировать код: расставить отступы и пробелы по стилю проекта |
-| **Shift+F10** | Build & Run: собрать и запустить приложение на выбранном устройстве |
-| **Shift+F9** | Запустить в режиме отладки (Debug) |
-| **Alt+6** | Открыть панель Logcat |
-| **Shift+F6** | Переименовать (Rename) — переименует символ везде, где он используется в проекте |
+<Block kind="cheatsheet" title="Топ-10 горячих клавиш Android Studio" chapterId="android-studio" blockId="cheatsheet-hotkeys" favPayload={{
+  kind: 'table',
+  head: ['Действие', 'macOS', 'Windows', 'Linux'],
+  rows: [
+    ['Показать/скрыть панель Project', '⌘1', 'Alt+1', 'Alt+1'],
+    ['Search Everywhere: найти что угодно', 'Shift, дважды', 'Shift, дважды', 'Shift, дважды'],
+    ['Базовое автодополнение кода', '⌃Space', 'Ctrl+Space', 'Ctrl+Space'],
+    ['Быстрое исправление (intention actions)', '⌥Enter', 'Alt+Enter', 'Alt+Enter'],
+    ['Закомментировать/раскомментировать строку', '⌘/', 'Ctrl+/', 'Ctrl+/'],
+    ['Переформатировать код', '⌥⌘L', 'Ctrl+Alt+L', 'Ctrl+Alt+L'],
+    ['Build & Run: собрать и запустить', '⌃R', 'Shift+F10', 'Shift+F10'],
+    ['Запустить в режиме отладки (Debug)', '⌃D', 'Shift+F9', 'Shift+F9'],
+    ['Открыть панель Logcat', '⌘6', 'Alt+6', 'Alt+6'],
+    ['Переименовать (Rename) везде в проекте', '⇧F6', 'Shift+F6', 'Shift+F6'],
+  ],
+}}>
+<KeysTabs items={[
+  { combo: { mac: '⌘1', win: 'Alt+1', linux: 'Alt+1' }, action: 'Показать/скрыть панель Project' },
+  { combo: { mac: 'Shift, дважды', win: 'Shift, дважды', linux: 'Shift, дважды' }, action: 'Search Everywhere: найти файл, класс, действие или настройку — что угодно' },
+  { combo: { mac: '⌃Space', win: 'Ctrl+Space', linux: 'Ctrl+Space' }, action: 'Базовое автодополнение кода' },
+  { combo: { mac: '⌥Enter', win: 'Alt+Enter', linux: 'Alt+Enter' }, action: 'Быстрое исправление: показать intention actions — варианты того, как починить подчёркнутое место' },
+  { combo: { mac: '⌘/', win: 'Ctrl+/', linux: 'Ctrl+/' }, action: 'Закомментировать/раскомментировать текущую строку' },
+  { combo: { mac: '⌥⌘L', win: 'Ctrl+Alt+L', linux: 'Ctrl+Alt+L' }, action: 'Переформатировать код: расставить отступы и пробелы по стилю проекта' },
+  { combo: { mac: '⌃R', win: 'Shift+F10', linux: 'Shift+F10' }, action: 'Build & Run: собрать и запустить приложение на выбранном устройстве' },
+  { combo: { mac: '⌃D', win: 'Shift+F9', linux: 'Shift+F9' }, action: 'Запустить в режиме отладки (Debug)' },
+  { combo: { mac: '⌘6', win: 'Alt+6', linux: 'Alt+6' }, action: 'Открыть панель Logcat' },
+  { combo: { mac: '⇧F6', win: 'Shift+F6', linux: 'Shift+F6' }, action: 'Переименовать (Rename) — переименует символ везде, где он используется в проекте' },
+]} />
+</Block>
 
 Не заучивай список — повесь на него глаза и пробуй по одной в день. Через неделю рука будет тянуться сама.
+
+<SectionAnchor chapterId="android-studio" sectionId="hotkeys" />
 
 ## Типичные ошибки
 
@@ -289,6 +351,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 Minimum supported Gradle version is 8.9. Current version is 7.6. If using the gradle wrapper, try editing the distribution url in gradle/wrapper/gradle-wrapper.properties to gradle-8.9-all.zip and re-import the project.
 ```
 
+<Block kind="breakdown" title="Разбор по словам: Minimum supported Gradle version" chapterId="android-studio" blockId="breakdown-gradle-version">
 <SyntaxBreakdown parts={[
   { text: 'Minimum supported Gradle version is 8.9. ', label: 'требуемая версия', note: 'какую минимальную версию Gradle ожидает установленный в проекте плагин Android (Android Gradle Plugin)' },
   { text: 'Current version is 7.6. ', label: 'фактическая версия', note: 'какая версия Gradle реально прописана в проекте сейчас — именно расхождение этих двух чисел и есть причина ошибки' },
@@ -296,6 +359,7 @@ Minimum supported Gradle version is 8.9. Current version is 7.6. If using the gr
   { text: 'to gradle-8.9-all.zip ', label: 'на что поменять', note: 'нужно заменить номер версии в имени файла дистрибутива Gradle внутри distributionUrl на требуемый' },
   { text: 'and re-import the project.', label: 'что сделать дальше', note: 'после правки файла нужно заново запустить синхронизацию — сама Android Studio правку не подхватит автоматически без повторного sync' },
 ]} />
+</Block>
 
 **Перевод:** «минимальная поддерживаемая версия Gradle — 8.9. Текущая версия — 7.6. Если используется gradle wrapper, попробуй отредактировать distribution url в `gradle/wrapper/gradle-wrapper.properties` на `gradle-8.9-all.zip` и заново импортировать проект». **Причина:** каждая версия плагина Android Gradle Plugin требует минимальную версию самого Gradle — если проект и IDE не совпадают по этим числам, синхронизация физически не может продолжиться. **Как починить:** открыть файл `gradle/wrapper/gradle-wrapper.properties`, найти строку `distributionUrl` и поменять номер версии на указанный в сообщении, затем запустить sync заново кнопкой на панели Gradle.
 
@@ -360,11 +424,13 @@ egrep -c '(vmx|svm)' /proc/cpuinfo
 sudo kvm-ok
 ```
 
+<Block kind="breakdown" title="Разбор по символам: egrep -c '(vmx|svm)'" chapterId="android-studio" blockId="breakdown-egrep-kvm">
 <SyntaxBreakdown parts={[
   { text: 'egrep -c ', label: 'подсчёт совпадений', note: 'egrep — поиск по регулярному выражению; флаг -c (count) выводит не сами строки, а их количество' },
   { text: "'(vmx|svm)' ", label: 'что ищем', note: 'vmx — метка поддержки виртуализации у процессоров Intel, svm — у процессоров AMD; вертикальная черта | здесь значит «или»' },
   { text: '/proc/cpuinfo', label: 'где ищем', note: 'файл-псевдоустройство в Linux, через который ядро отдаёт полную информацию обо всех процессорах системы' },
 ]} />
+</Block>
 
 Если процессор поддерживает виртуализацию, `egrep` выведет число `1` или больше. Дальше `sudo kvm-ok` даёт окончательный вердикт. Если всё хорошо:
 
@@ -375,10 +441,12 @@ KVM acceleration can be used
 
 Если процессор не поддерживает нужные расширения:
 
+<Block kind="breakdown" title="Разбор по словам: CPU does not support KVM" chapterId="android-studio" blockId="breakdown-kvm-no-support">
 <SyntaxBreakdown parts={[
   { text: 'INFO: Your CPU does not support KVM extensions\n', label: 'диагноз', note: 'kvm-ok прямо называет причину: у процессора физически нет нужных инструкций виртуализации (или они выключены в BIOS)' },
   { text: 'KVM acceleration can NOT be used', label: 'вывод', note: 'без KVM виртуальные машины на этом компьютере всё ещё запускаются, но программно и заметно медленнее' },
 ]} />
+</Block>
 
 **Как починить, если поддержка есть, но не включена.** Чаще всего дело не в процессоре, а в том, что виртуализацию нужно включить в BIOS/UEFI (пункт обычно называется Intel VT-x или AMD-V), либо KVM ещё не установлен:
 
@@ -388,10 +456,12 @@ sudo apt-get install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
 
 **Отдельный частый случай — KVM установлен, но эмулятор всё равно падает** с сообщением прямо в диалоге запуска:
 
+<Block kind="breakdown" title="Разбор по словам: /dev/kvm permission denied" chapterId="android-studio" blockId="breakdown-kvm-permission">
 <SyntaxBreakdown parts={[
   { text: '/dev/kvm device: permission denied\n', label: 'что не получилось', note: '/dev/kvm — файл-устройство, через которое программы обращаются к модулю ядра KVM; текущему пользователю не хватает прав на запись в этот файл' },
   { text: 'Grant current user access to /dev/kvm.', label: 'подсказка', note: 'сам эмулятор honestly говорит, что нужно сделать — выдать текущему пользователю доступ' },
 ]} />
+</Block>
 
 **Перевод:** «устройство /dev/kvm: доступ запрещён. Выдай текущему пользователю доступ к /dev/kvm». **Причина:** доступ к `/dev/kvm` разрешён только пользователям из группы `kvm`, а свежеустановленный аккаунт в неё не входит. **Как починить:**
 
@@ -399,16 +469,41 @@ sudo apt-get install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
 sudo adduser $USER kvm
 ```
 
-и затем выйти из системы и зайти заново (или перезагрузиться) — членство в группах применяется только к новым сессиям входа, поэтому одной команды в уже открытом терминале недостаточно.
+<Hint id="android-studio-h3" type="important">
+После этой команды нужно выйти из системы и зайти заново (или перезагрузиться) — членство в группах применяется только к новым сессиям входа, поэтому одной команды в уже открытом терминале недостаточно.
+</Hint>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Типичные ошибки" chapterId="android-studio" blockId="quiz-typical-errors">
+<SelfCheck chapterId="android-studio" quizId="quiz-typical-errors" questions={[
   { q: 'Сообщение Gradle гласит: Minimum supported Gradle version is 8.9. Current version is 7.6. Что нужно изменить, чтобы починить это?', options: ['Версию Android Studio', 'Номер версии в distributionUrl файла gradle/wrapper/gradle-wrapper.properties, заменив его на требуемый (например, 8.9), и заново запустить sync', 'minSdk проекта', 'Версию Kotlin в build.gradle.kts'], correct: 1, why: 'Сообщение прямо указывает файл и поле: gradle-wrapper.properties фиксирует версию Gradle для проекта, её и нужно поднять до минимально требуемой.' },
   { q: 'Чем ошибка SDK location not found отличается от Gradle sync failed про версию Gradle?', options: ['Это одна и та же ошибка под разными именами', 'SDK location not found означает, что Android Studio не знает, где на диске лежит Android SDK (обычно после клонирования чужого проекта на новый компьютер) — это не про версии, а про путь к файлам', 'SDK location not found бывает только на Windows', 'Она возникает исключительно при первом запуске самой Android Studio'], correct: 1, why: 'Файл local.properties с путём к SDK — локальный для каждого компьютера и не хранится в git; на новой машине его физически ещё нет.' },
   { q: 'Вывод sdkmanager --licenses показывает: 5 of 7 SDK package licenses not accepted. Review licenses that have not been accepted (y/N)? Что нужно сделать, чтобы продолжить?', options: ['Нажать Ctrl+C и переустановить SDK', 'Ответить y на каждый вопрос по очереди, пока счётчик не дойдёт до 0 of 7', 'Удалить папку SDK и скачать заново', 'Перезапустить компьютер'], correct: 1, why: 'sdkmanager --licenses последовательно показывает текст каждой непринятой лицензии и ждёт согласия y на каждую — именно так лицензии переходят в состояние «приняты».' },
   { q: 'kvm-ok вывел: INFO: Your CPU does not support KVM extensions. Поможет ли команда sudo adduser $USER kvm в этом случае?', options: ['Да, эта команда решает любые проблемы с KVM', 'Нет — это сообщение про физическое отсутствие поддержки виртуализации у процессора (или выключенную в BIOS), а не про права доступа; adduser чинит другую, отдельную проблему — permission denied при уже включённой виртуализации', 'Да, но только после перезагрузки', 'Нет, в этом случае поможет только переустановка Ubuntu'], correct: 1, why: 'Это два разных диагноза: «CPU does not support KVM extensions» — про отсутствие или выключенную в BIOS виртуализацию, а /dev/kvm device: permission denied — про права уже включённой виртуализации. Команды для их починки разные.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="android-studio" sectionId="typical-errors" />
 
 ## Символы и элементы главы
+
+<Block kind="cheatsheet" title="Символы и элементы главы" chapterId="android-studio" blockId="cheatsheet-symbols-commands" favPayload={{
+  kind: 'table',
+  head: ['Элемент / команда', 'Что делает', 'Пример'],
+  rows: [
+    ['.tar.gz', 'архив, сжатый tar и gzip — формат дистрибутива Android Studio для Linux', 'android-studio-*-linux.tar.gz'],
+    ['studio.sh', 'скрипт запуска Android Studio внутри распакованного архива, в папке bin/', './studio.sh'],
+    ['Project (Android view)', 'группировка файлов по смыслу: manifests, kotlin+java, res, Gradle Scripts', 'панель слева'],
+    ['Logcat', 'журнал работающего приложения, включая трассировки крашей', 'панель внизу'],
+    ['Gradle sync', 'Gradle читает build.gradle.kts и готовит проект к сборке', 'после Finish и после правок сборки'],
+    ['Text(text = "...")', 'composable-функция Jetpack Compose, рисующая текст на экране', 'Text(text = "Hello!")'],
+    ['Package name', 'обратная доменная нотация: пространство имён и application ID', 'com.pgkchamps.champ'],
+    ['Minimum SDK', 'порог совместимости: минимальный API level Android для установки', 'API 24'],
+    ['AVD', 'Android Virtual Device — настроенный виртуальный телефон для эмулятора', 'Device Manager → Create Virtual Device'],
+    ['emulator -accel-check', 'проверяет, доступно ли аппаратное ускорение (KVM на Linux)', 'вывод: KVM ... is installed and usable.'],
+    ['sudo kvm-ok', 'вердикт: можно ли использовать KVM-ускорение на этой машине', 'KVM acceleration can be used'],
+    ['sdkmanager --licenses', 'принимает лицензии на компоненты Android SDK по одной', 'ответ y на каждый вопрос'],
+  ],
+}}>
 
 | Элемент / команда | Что делает | Пример |
 |---|---|---|
@@ -425,9 +520,14 @@ sudo adduser $USER kvm
 | `sudo kvm-ok` | вердикт: можно ли использовать KVM-ускорение на этой машине | `KVM acceleration can be used` |
 | `sdkmanager --licenses` | принимает лицензии на компоненты Android SDK по одной | ответ `y` на каждый вопрос |
 
+</Block>
+
+<SectionAnchor chapterId="android-studio" sectionId="cheatsheet-symbols" />
+
 ## Слова главы
 
-<Flashcards cards={[
+<Block kind="vocab" title="Словарь главы" chapterId="android-studio" blockId="vocab-glossary">
+<Flashcards chapterId="android-studio" cards={[
   { term: 'IDE', translation: 'интегрированная среда разработки', note: 'редактор, сборка, запуск и отладка в одной программе' },
   { term: 'project', translation: 'проект', note: 'все файлы приложения вместе: код, картинки, настройки сборки' },
   { term: 'package name', translation: 'имя пакета', note: 'обратная доменная нотация: пространство имён и application ID приложения' },
@@ -439,14 +539,35 @@ sudo adduser $USER kvm
   { term: 'virtualization', translation: 'виртуализация', note: 'аппаратная возможность процессора эффективно запускать виртуальные машины; на Linux реализована через KVM' },
   { term: 'shortcut', translation: 'горячая клавиша', note: 'комбинация клавиш вместо нескольких кликов мышью, например Ctrl+Space' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="android-studio" sectionId="vocab" />
 
 ## Потренируйся печатать
 
-<CodeTyping snippet={'tar -xzf android-studio-*-linux.tar.gz -C /opt/'} />
+Команды этой главы — установка, проверка KVM, лицензии SDK — набери их руками, связка за связкой:
+
+<Block kind="trainer" title="Команды главы" chapterId="android-studio" blockId="trainer-chapter-commands">
+<CodeTyping pools={[{
+  label: 'Команды главы',
+  snippets: [
+    'sudo tar -xzf android-studio-*-linux.tar.gz -C /opt/',
+    'cd /opt/android-studio/bin',
+    './studio.sh',
+    'sdkmanager --licenses',
+    './Sdk/emulator/emulator -accel-check',
+    "egrep -c '(vmx|svm)' /proc/cpuinfo",
+    'sudo kvm-ok',
+    'sudo adduser $USER kvm',
+  ],
+}]} keyboard chapterId="android-studio" trainerId="trainer-chapter-commands" targetCpm={100} targetAccuracy={90} />
+</Block>
 
 Команда, которая чаще всего чинит зависшую лицензию:
 
-<CodeTyping snippet={'sdkmanager --licenses'} />
+<Block kind="trainer" title="Команда sdkmanager --licenses" chapterId="android-studio" blockId="trainer-sdk-licenses">
+<CodeTyping snippet={'sdkmanager --licenses'} chapterId="android-studio" trainerId="trainer-sdk-licenses" targetCpm={120} targetAccuracy={90} />
+</Block>
 
 <details>
 <summary>Углубиться</summary>
@@ -464,21 +585,33 @@ sudo adduser $USER kvm
 
 </details>
 
+<SectionAnchor chapterId="android-studio" sectionId="practice-typing" />
+
 ## Куда дальше: проверенные ресурсы
 
 ### Русские материалы
+
+<Block kind="cheatsheet" title="Русские материалы" chapterId="android-studio" blockId="cheatsheet-resources-ru">
 
 - [Losst: установка Android Studio в Ubuntu](https://losst.pro/ustanovka-android-studio-v-ubuntu) — четыре разных способа установки на Ubuntu (snap, центр приложений, официальный сайт, JetBrains Toolbox) с системными требованиями и разбором каждого варианта.
 - [Android Tools: как установить Android Studio на Linux](https://android-tools.ru/coding/kak-ustanovit-android-studio-na-linux/) — ещё один пошаговый разбор установки специально под Linux, полезен как второе прочтение раздела про установку другими словами.
 - [ievetrov.ru — Урок 1: Android Studio, установка и настройка эмулятора](https://ievetrov.ru/android-s-nulya-uroki/urok-1-android-studio-ustanovka-nastrojka-emulyator/) — видеоурок и текстовый конспект первого занятия курса по Android на Kotlin с нуля: установка, первый проект, настройка эмулятора — от автора, чей курс по переменным Kotlin уже встречался в этой платформе.
 - [Яндекс Практикум: как пользоваться Android Studio](https://practicum.yandex.ru/blog/kak-polzovatsya-android-studio/) — обзорная статья про интерфейс IDE и первые шаги разработки, хорошо ложится поверх этой главы как более короткий пересказ.
 
+</Block>
+
 ### Официальная документация Google
+
+<Block kind="cheatsheet" title="Официальная документация Google" chapterId="android-studio" blockId="cheatsheet-resources-official">
 
 - [Install Android Studio](https://developer.android.com/studio/install) — официальная страница с системными требованиями и инструкциями по установке для каждой ОС (открывается с автопереводом на русский).
 - [Meet Android Studio](https://developer.android.com/studio/intro) — официальный обзор структуры проекта, системы сборки Gradle и инструментов отладки.
 - [Managing AVDs](https://developer.android.com/studio/run/managing-avds) — полное руководство по Device Manager: создание, редактирование и удаление виртуальных устройств.
 - [Create your first Android app](https://developer.android.com/codelabs/basic-android-kotlin-compose-first-app) — официальный интерактивный курс: та же заготовка Empty Activity, но с заданиями по шагам, на английском.
+
+</Block>
+
+<SectionAnchor chapterId="android-studio" sectionId="resources" />
 
 ## Челлендж ⭐
 
@@ -518,6 +651,8 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 
 </details>
 
+<SectionAnchor chapterId="android-studio" sectionId="challenge" />
+
 ## Что должен уметь
 
 - Ставить Android Studio на Ubuntu официальным способом: скачать с developer.android.com, распаковать `.tar.gz`, доустановить 32-битные библиотеки, запустить `studio.sh`, пройти мастер настройки SDK.
@@ -528,3 +663,5 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 - Создавать AVD по шагам Select Hardware → System Image → Verify Configuration и запускать на нём приложение.
 - Пользоваться минимум пятью горячими клавишами из таблицы главы, не подглядывая в неё.
 - Узнавать по точному сообщению четыре типичные проблемы — несовместимую версию Gradle, ненайденный SDK location, непринятые лицензии SDK и неработающую виртуализацию (KVM) — и знать, какая команда или какое действие каждую из них чинит.
+
+<SectionAnchor chapterId="android-studio" sectionId="what-you-should-know" />

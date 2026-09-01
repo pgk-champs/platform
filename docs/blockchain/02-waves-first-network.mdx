@@ -9,9 +9,15 @@ import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
 import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import SelfCheck from '@site/src/components/SelfCheck';
-import TOCInline from '@theme/TOCInline';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # Первая сеть на Waves Enterprise
+
+<ChapterProgress chapterId="waves-first-network" totalSections={13} totalQuizzes={4} totalTrainers={5} />
 
 ## Зачем это нужно
 
@@ -19,7 +25,9 @@ import TOCInline from '@theme/TOCInline';
 
 Эта глава — про запуск локальной сети из трёх нод у себя на компьютере через Docker, и про то, что вообще происходит, когда в такую сеть разворачивают первый смарт-контракт. Все команды здесь — настоящие терминальные и Docker-команды: в браузере их не исполнить, поэтому вместо запускаемых песочниц (playground) в этой главе — точные посимвольные разборы (SyntaxBreakdown) и тренировка печати (CodeTyping), а все сообщения об ошибках ниже — реальные, снятые вживую с настоящего Docker в этой же сессии. Ничего не считаем очевидным: если в команде есть флаг, у него есть объяснение, зачем он там стоит.
 
-<TOCInline toc={toc} />
+<CollapsibleToc toc={toc} chapterId="waves-first-network" />
+
+<SectionAnchor chapterId="waves-first-network" sectionId="why" />
 
 ## Что такое нода в Waves Enterprise
 
@@ -30,22 +38,30 @@ import TOCInline from '@theme/TOCInline';
 - обменивается новыми блоками с соседними нодами по сети;
 - открывает наружу несколько сетевых портов, через которые с ней можно разговаривать: один — REST API (обычный HTTP, через него приложения отправляют транзакции и читают состояние сети), и ещё несколько — для служебного общения нод друг с другом и с работающими на ней смарт-контрактами.
 
+<Block kind="breakdown" title="Разбор по частям: нода и её порты" chapterId="waves-first-network" blockId="breakdown-node-ports">
 <SyntaxBreakdown parts={[
   { text: 'node-0', label: 'имя ноды', note: 'служебное имя контейнера внутри локальной сети; ноды принято нумеровать node-0, node-1, node-2 — с нуля, как индексы в большинстве языков программирования' },
   { text: ' → REST API :6862', label: 'порт HTTP-интерфейса', note: 'по этому порту нода принимает обычные HTTP-запросы: отправить транзакцию, посмотреть баланс, прочитать состояние смарт-контракта' },
   { text: ', P2P :6864', label: 'порт для обмена между нодами', note: 'peer-to-peer — по этому порту ноды сети находят друг друга и рассылают новые блоки и транзакции' },
   { text: ', gRPC :6865', label: 'порт для потоковой передачи', note: 'gRPC — протокол, по которому нода общается со смарт-контрактами, работающими рядом с ней в отдельных контейнерах (подробнее — в разделе про контракты)' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="waves-first-network" sectionId="node" />
 
 ## Зачем именно три ноды, а не одна
 
 Одна-единственная нода ничем не отличается от обычной базы данных на одном сервере: если она единственный источник правды, распределённость из прошлой главы попросту не работает — некому сверять хеши и обнаруживать подмену. Минимальное число нод, на котором вообще имеет смысл понятие «согласие большинства» (consensus), — три: тогда большинство — это две ноды из трёх, и сеть продолжает работать и договариваться, даже если одна нода на время отключилась или ведёт себя неправильно. Поэтому все официальные обучающие и демонстрационные окружения Waves Enterprise по умолчанию поднимают именно три ноды — этого достаточно, чтобы вживую увидеть согласование блоков между независимыми участниками, и при этом не тратить лишние ресурсы компьютера.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Нода и три участника" chapterId="waves-first-network" blockId="quiz-three-nodes">
+<SelfCheck chapterId="waves-first-network" quizId="q1" questions={[
   { q: 'Что открывает нода наружу, чтобы приложения могли отправлять транзакции?', options: ['Только доступ по SSH', 'REST API — порт для обычных HTTP-запросов', 'Файл на диске, который нужно читать напрямую', 'Ничего, ноды закрыты для внешних обращений'], correct: 1, why: 'REST API — стандартный способ общения приложения с нодой: отправить транзакцию, прочитать состояние.' },
   { q: 'Почему одной ноды недостаточно, чтобы продемонстрировать идею блокчейна?', options: ['Одна нода работает медленнее трёх', 'Одна нода — единственный источник правды, сверять хеши не с кем, распределённость теряет смысл', 'Одна нода не умеет считать хеши', 'Технически невозможно запустить меньше трёх нод'], correct: 1, why: 'Смысл распределённой сети — в независимых участниках, которые проверяют друг друга. С одним участником проверять некого.' },
   { q: 'Почему минимум для демонстрации согласия — именно три ноды, а не две?', options: ['Три — просто традиционное круглое число', 'При трёх нодах большинство (две из трёх) может продолжить работу, даже если одна нода отключилась', 'Две ноды физически нельзя связать сетью', 'Три ноды работают втрое быстрее одной'], correct: 1, why: 'С тремя участниками впервые появляется понятие «большинства», устойчивого к отказу одного из них — на двух нодах ничья при разногласии неразрешима.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="waves-first-network" sectionId="three-nodes" />
 
 ## docker-compose: поднимаем сеть по шагам
 
@@ -55,14 +71,20 @@ Docker Compose — инструмент, который описывает не�
 
 Вот как выглядит описание одной ноды внутри такого файла — фрагмент в духе официального образа Waves Enterprise.
 
+<Block kind="breakdown" title="Разбор по частям: сервис ноды в docker-compose.yml" chapterId="waves-first-network" blockId="breakdown-compose-service">
 <SyntaxBreakdown parts={[
   { text: 'node-0:', label: 'имя сервиса', note: 'двоеточие после имени — стандартный синтаксис YAML: начинается описание вложенных настроек этого сервиса, они идут ниже с отступом' },
   { text: '\n  image: wavesenterprise/node:v1.16.0', label: 'какой образ запускать', note: 'image — ключ, указывающий Docker, какой готовый образ использовать для контейнера; после двоеточия — имя образа и версия (тег) через двоеточие' },
   { text: '\n  ports:', label: 'список портов', note: 'ports — ключ, начинающий список пробрасываемых портов; сами порты перечисляются ниже с отступом, как элементы списка' },
   { text: '\n    - "6862:6862"', label: 'проброс порта', note: 'дефис — элемент YAML-списка. Запись host:container означает «порт 6862 на компьютере направить на порт 6862 внутри контейнера»: два числа не обязаны совпадать, но для первой ноды в этой сети совпадают' },
 ]} />
+</Block>
 
-Отступы в YAML — не просто оформление, а часть синтаксиса: они показывают, что вложено во что. Ниже — реальная ошибка, которую покажет `docker compose`, если один из отступов сбит хотя бы на пробел (снята вживую в этой сессии):
+<Hint id="waves-first-network-h1" type="tip">
+Отступы в YAML — не просто оформление, а часть синтаксиса: они показывают, что вложено во что. Сбитый хотя бы на пробел отступ ломает разбор всего файла.
+</Hint>
+
+Ниже — реальная ошибка, которую покажет `docker compose`, если один из отступов сбит хотя бы на пробел (снята вживую в этой сессии):
 
 ```text
 yaml: while parsing a block mapping at line 2, column 5: line 5, column 6: did not find expected key
@@ -72,7 +94,11 @@ yaml: while parsing a block mapping at line 2, column 5: line 5, column 6: did n
 
 Прежде чем запускать сеть, у каждой ноды должен появиться файл настроек (`node.conf`) и собственная пара криптографических ключей — тех самых, которыми нода будет подписывать и проверять транзакции (вспомни цифровую подпись из прошлой главы). Для этого используют отдельный, одноразовый служебный контейнер-генератор: он один раз запускается, создаёт папку с конфигами и ключами для всех трёх нод и завершает работу — сам в сети не участвует.
 
-Вместе с конфигами генератор создаёт файл с учётными данными каждой ноды: её адрес в сети, пароль от связки ключей, ключ доступа к REST API. Этот файл — как связка паролей: он должен появиться на диске один раз локально, никогда не попадать в git-репозиторий и не публиковаться никуда. Если он всё же случайно засветился — правильное действие одно: перегенерировать ключи заново, а не «просто удалить файл» — старые ключи к этому моменту уже нельзя считать секретом.
+Вместе с конфигами генератор создаёт файл с учётными данными каждой ноды: её адрес в сети, пароль от связки ключей, ключ доступа к REST API.
+
+<Hint id="waves-first-network-h2" type="important">
+Файл с учётными данными нод — как связка паролей: он должен появиться на диске один раз локально, никогда не попадать в git-репозиторий и не публиковаться никуда. Если он всё же случайно засветился — правильное действие одно: перегенерировать ключи заново, а не «просто удалить файл» — старые ключи к этому моменту уже нельзя считать секретом.
+</Hint>
 
 ### Шаг 3. Проверить активацию нужных возможностей сети
 
@@ -82,31 +108,43 @@ yaml: while parsing a block mapping at line 2, column 5: line 5, column 6: did n
 
 Когда файл сети и конфиги готовы, саму сеть поднимают и останавливают двумя короткими командами.
 
+<Block kind="breakdown" title="Разбор по символам: docker compose up -d" chapterId="waves-first-network" blockId="breakdown-compose-up">
 <SyntaxBreakdown parts={[
   { text: 'docker', label: 'программа', note: 'сам Docker — движок, который умеет собирать, скачивать и запускать контейнеры' },
   { text: ' compose', label: 'подкоманда', note: 'работа с многоконтейнерными приложениями, описанными в docker-compose.yml — противоположность одиночному docker run' },
   { text: ' up', label: 'действие', note: 'по официальной документации Docker — «строит образы, (пере)создаёт, запускает контейнеры сервиса и подключается к ним», то есть поднимает всю сеть целиком одной командой' },
   { text: ' -d', label: 'флаг фонового режима', note: 'detached — «запустить контейнеры в фоне»: терминал не блокируется выводом логов и сразу возвращает управление' },
 ]} />
+</Block>
 
-<CodeTyping snippet={'docker compose up -d'} />
+<Block kind="trainer" title="Команда запуска сети" chapterId="waves-first-network" blockId="trainer-compose-up">
+<CodeTyping snippet={'docker compose up -d'} chapterId="waves-first-network" trainerId="trainer-compose-up" targetCpm={100} targetAccuracy={90} />
+</Block>
 
 Для полной остановки и очистки — например, чтобы начать сеть заново с чистого состояния, — используют вторую команду с другим флагом.
 
+<Block kind="breakdown" title="Разбор по символам: docker compose down -v" chapterId="waves-first-network" blockId="breakdown-compose-down">
 <SyntaxBreakdown parts={[
   { text: 'docker compose', label: 'программа и подкоманда', note: 'та же пара, что и в docker compose up — работа с многоконтейнерным приложением из docker-compose.yml' },
   { text: ' down', label: 'действие', note: 'по официальной документации Docker — «останавливает контейнеры и удаляет контейнеры, сети, тома и образы, созданные командой up»' },
   { text: ' -v', label: 'флаг удаления томов', note: 'по документации Docker — «удалить именованные тома, объявленные в разделе volumes файла Compose, и анонимные тома, привязанные к контейнерам». Именно тома хранят накопленные данные блокчейна — без -v данные нод останутся на диске и после следующего up сеть продолжит жить со старой историей вместо чистого старта' },
 ]} />
+</Block>
 
-<CodeTyping snippet={'docker compose down -v'} />
+<Block kind="trainer" title="Команда остановки с очисткой" chapterId="waves-first-network" blockId="trainer-compose-down">
+<CodeTyping snippet={'docker compose down -v'} chapterId="waves-first-network" trainerId="trainer-compose-down" targetCpm={100} targetAccuracy={90} />
+</Block>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="docker-compose и конфиги" chapterId="waves-first-network" blockId="quiz-compose">
+<SelfCheck chapterId="waves-first-network" quizId="q2" questions={[
   { q: 'Что делает отступ в YAML-файле docker-compose.yml?', options: ['Ничего не значит, просто для красоты', 'Показывает вложенность: что относится к какому ключу — это часть синтаксиса', 'Задаёт отступ текста в логах контейнера', 'Определяет порядок запуска сервисов'], correct: 1, why: 'В YAML отступы — не оформление, а синтаксис: они определяют структуру вложенных настроек. Сбитый отступ ломает разбор файла.' },
   { q: 'Что означает запись "6862:6862" в разделе ports?', options: ['Диапазон портов от 6862 до 6862', 'Порт 6862 на компьютере направлен на порт 6862 внутри контейнера (host:container)', 'Порт нужно открыть дважды', 'Два разных протокола на одном порту'], correct: 1, why: 'Формат host:container пробрасывает порт снаружи внутрь контейнера; два числа не обязаны совпадать.' },
   { q: 'Зачем нужен флаг -v у команды docker compose down?', options: ['Включает подробный (verbose) вывод команды', 'Удаляет тома с накопленными данными — без него старые данные останутся на диске', 'Ускоряет остановку контейнеров', 'Переключает сеть в тестовый режим'], correct: 1, why: 'Флаг -v удаляет тома, где хранится состояние блокчейна. Без него следующий up продолжит работу со старыми данными вместо чистого старта.' },
   { q: 'Почему учётные данные, которые создаёт генератор конфигов, нельзя класть в git?', options: ['git не умеет хранить текстовые файлы', 'Это пароли и ключи доступа нод — попадание в публичный или чужой репозиторий равносильно их утечке', 'Файл слишком большой для git', 'Такого файла вообще не существует'], correct: 1, why: 'Файл с учётными данными нод — это фактически связка паролей. Утечка требует немедленной перегенерации ключей, а не удаления файла постфактум.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="waves-first-network" sectionId="compose" />
 
 ## Локальный Docker registry: зачем он нужен
 
@@ -114,6 +152,7 @@ yaml: while parsing a block mapping at line 2, column 5: line 5, column 6: did n
 
 Для локальной сети, которая ни с кем в интернете не связана, публичный Docker Hub для собственных учебных образов не подходит — нужен свой, локальный реестр образов (registry). Он поднимается как ещё один обычный контейнер, официальный образ `registry` c Docker Hub:
 
+<Block kind="breakdown" title="Разбор по частям: запуск локального registry" chapterId="waves-first-network" blockId="breakdown-registry-run">
 <SyntaxBreakdown parts={[
   { text: 'docker run', label: 'команда запуска контейнера', note: 'в отличие от docker compose up, запускает ровно один контейнер напрямую по имени образа' },
   { text: ' -d', label: 'фоновый режим', note: 'тот же смысл, что и у docker compose up -d — не занимать терминал' },
@@ -122,8 +161,13 @@ yaml: while parsing a block mapping at line 2, column 5: line 5, column 6: did n
   { text: ' --name registry', label: 'имя контейнера', note: 'человекочитаемое имя, по которому дальше можно ссылаться на этот контейнер: остановить, посмотреть логи, удалить' },
   { text: ' registry:3', label: 'образ и версия', note: 'официальный образ реестра образов от Docker с Docker Hub, третья версия — актуальная на сегодня' },
 ]} />
+</Block>
 
-**Важно не перепутать термины.** В прошлой главе слово «реестр» (ledger) означало учётную книгу всех транзакций блокчейна. Docker registry — это совсем другое: обычное хранилище Docker-образов, к блокчейн-реестру прямого отношения не имеющее. Совпадение перевода — случайность, но в разговоре лучше уточнять: «блокчейн-реестр» или «Docker-реестр образов».
+<Hint id="waves-first-network-h3" type="important">
+Важно не перепутать термины. В прошлой главе слово «реестр» (ledger) означало учётную книгу всех транзакций блокчейна. Docker registry — это совсем другое: обычное хранилище Docker-образов, к блокчейн-реестру прямого отношения не имеющее. Совпадение перевода — случайность, но в разговоре лучше уточнять: «блокчейн-реестр» или «Docker-реестр образов».
+</Hint>
+
+<SectionAnchor chapterId="waves-first-network" sectionId="registry" />
 
 ## Первый смарт-контракт: как это устроено концептуально
 
@@ -162,12 +206,16 @@ class ScoreCounter {
 - **CreateContractTx** — «создать контракт»: транзакция, которая упаковывает код контракта в образ, регистрирует его в сети и один раз выполняет действие с `onInit: true`. С этого момента у контракта есть свой идентификатор (contract id) в сети.
 - **CallContractTx** — «вызвать контракт»: транзакция, которая называет уже существующий контракт по его идентификатору, конкретное действие (например, `increment`) и параметры для него. Такую транзакцию, как и обычный перевод из прошлой главы, подписывает отправитель — без действительной подписи нода её не примет.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Смарт-контракты и registry" chapterId="waves-first-network" blockId="quiz-smart-contract">
+<SelfCheck chapterId="waves-first-network" quizId="q3" questions={[
   { q: 'Как Waves Enterprise выполняет код смарт-контракта?', options: ['Прямо внутри процесса ноды', 'Как отдельный Docker-контейнер рядом с нодой, с которым нода общается по сети', 'Контракт выполняется на компьютере пользователя, а не в сети', 'Контракты не выполняются, только хранятся как текст'], correct: 1, why: 'Контракт упаковывается в собственный Docker-образ и запускается отдельным контейнером — отсюда и нужда в локальном registry, откуда ноды скачивают образы контрактов.' },
   { q: 'Чем отличаются CreateContractTx и CallContractTx?', options: ['Ничем, это синонимы', 'CreateContractTx разворачивает контракт в сеть, CallContractTx вызывает уже существующий контракт', 'CreateContractTx работает только для чтения данных', 'CallContractTx нужен только для удаления контракта'], correct: 1, why: 'Create — разовое разворачивание нового контракта в сеть, Call — обращение к уже развёрнутому контракту по его идентификатору.' },
   { q: 'Что делает декоратор @Action({ onInit: true }) в примере контракта?', options: ['Помечает действие, которое можно вызывать бесконечно много раз', 'Помечает действие, которое выполнится один раз в момент создания контракта', 'Удаляет состояние контракта', 'Ничего не делает, это просто комментарий'], correct: 1, why: 'onInit: true запускает это действие ровно один раз — при разворачивании контракта в сеть, обычно для значений по умолчанию.' },
   { q: 'Зачем локальной сети из трёх нод собственный Docker registry?', options: ['Чтобы ускорить работу REST API', 'Чтобы ноды могли скачать образ смарт-контракта, ведь публичный Docker Hub недоступен изолированной локальной сети', 'Registry заменяет собой одну из трёх нод', 'Это требование только для продуктивных, а не учебных сетей'], correct: 1, why: 'Контракт запускается как отдельный образ, и нодам нужно откуда-то его скачать — локальный registry решает эту задачу для изолированной сети.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="waves-first-network" sectionId="smart-contract" />
 
 ## Типичные ошибки
 
@@ -213,16 +261,21 @@ Error response from daemon: pull access denied for wavesenterprise/nonexistent-d
 
 **Как починить:** свериться с точным названием и тегом образа в официальной документации проекта, исправить опечатку в `docker-compose.yml`; если образ приватный — выполнить `docker login` с доступом, который действительно есть.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Типичные ошибки" chapterId="waves-first-network" blockId="quiz-typical-errors">
+<SelfCheck chapterId="waves-first-network" quizId="q4" questions={[
   { q: 'Что означает сообщение "no configuration file provided: not found"?', options: ['Docker не установлен', 'Команда запущена не в папке с docker-compose.yml, либо файла ещё нет', 'В файле ошибка синтаксиса', 'Не хватает прав администратора'], correct: 1, why: 'docker compose ищет docker-compose.yml в текущей директории по умолчанию — и сообщает об этой самой распространённой причине первым делом.' },
   { q: 'Из-за чего возникает ошибка "did not find expected key" в YAML-файле?', options: ['Файл слишком длинный', 'Несовпадающие отступы у элементов одного уровня вложенности', 'Отсутствует расширение .yml у файла', 'Использован неподдерживаемый образ'], correct: 1, why: 'YAML определяет структуру исключительно отступами; малейшее несовпадение ломает разбор блока.' },
   { q: 'Как починить ошибку "port is already allocated"?', options: ['Переустановить Docker', 'Остановить контейнер, уже занявший порт, либо сменить первое число в host:container на свободный порт', 'Игнорировать её, сеть всё равно запустится', 'Добавить флаг --force к docker compose up'], correct: 1, why: 'Порт на хост-машине не может слушать сразу два процесса — нужно либо освободить его, либо перепривязать сервис на другой.' },
   { q: 'Что вероятнее всего вызывает "pull access denied ... repository does not exist"?', options: ['Слишком слабый интернет', 'Опечатка в имени или теге образа, либо образ приватный без авторизации', 'Нехватка места на диске', 'Неправильно указан порт в ports'], correct: 1, why: 'Docker честно разделяет две причины в одном сообщении: либо имени такого не существует (опечатка), либо нужен docker login.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="waves-first-network" sectionId="typical-errors" />
 
 ## Слова главы
 
-<Flashcards cards={[
+<Block kind="vocab" title="Словарь главы" chapterId="waves-first-network" blockId="vocab-glossary">
+<Flashcards chapterId="waves-first-network" cards={[
   { term: 'container', translation: 'контейнер', note: 'изолированный запущенный процесс со всем нужным для работы; лёгкая альтернатива виртуальной машине' },
   { term: 'image', translation: 'образ', note: 'готовый шаблон, из которого Docker создаёт контейнер: код, зависимости, настройки по умолчанию' },
   { term: 'docker-compose', translation: 'композиция контейнеров', note: 'инструмент и YAML-файл для описания и одновременного запуска нескольких связанных контейнеров' },
@@ -232,18 +285,61 @@ Error response from daemon: pull access denied for wavesenterprise/nonexistent-d
   { term: 'smart contract', translation: 'смарт-контракт', note: 'код, разворачиваемый в блокчейн-сеть, чьё состояние и вызовы проверяются теми же правилами, что и обычные транзакции' },
   { term: 'consensus', translation: 'консенсус', note: 'способ, которым независимые ноды соглашаются об одной и той же версии цепочки блоков' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="waves-first-network" sectionId="vocab" />
 
 ## Проверь себя руками
 
 Команду запуска сети — до автоматизма:
 
-<CodeTyping snippet={'docker compose up -d'} />
+<Block kind="trainer" title="Запуск сети до автоматизма" chapterId="waves-first-network" blockId="trainer-practice-up">
+<CodeTyping snippet={'docker compose up -d'} chapterId="waves-first-network" trainerId="trainer-practice-up" targetCpm={120} targetAccuracy={90} />
+</Block>
 
 И полную очистку с удалением томов:
 
-<CodeTyping snippet={'docker compose down -v'} />
+<Block kind="trainer" title="Полная очистка сети" chapterId="waves-first-network" blockId="trainer-practice-down">
+<CodeTyping snippet={'docker compose down -v'} chapterId="waves-first-network" trainerId="trainer-practice-down" targetCpm={120} targetAccuracy={90} />
+</Block>
+
+А теперь — все команды и строки этой главы вперемешку, с живой клавиатурой:
+
+<Block kind="trainer" title="Команды главы вперемешку" chapterId="waves-first-network" blockId="trainer-practice-pool">
+<CodeTyping pools={[{
+  label: 'Команды главы',
+  snippets: [
+    'docker compose up -d',
+    'docker compose down -v',
+    'docker compose down',
+    'docker run -d -p 5000:5000 --restart always --name registry registry:3',
+    'docker ps',
+    'docker stop registry',
+    'docker login',
+    'image: wavesenterprise/node:v1.16.0',
+  ],
+}]} keyboard chapterId="waves-first-network" trainerId="trainer-practice-pool" targetCpm={140} targetAccuracy={90} />
+</Block>
+
+<SectionAnchor chapterId="waves-first-network" sectionId="practice" />
 
 ## Символы и команды главы
+
+<Block kind="cheatsheet" title="Символы и команды главы" chapterId="waves-first-network" blockId="cheatsheet-commands" favPayload={{
+  kind: 'table',
+  head: ['Команда / флаг', 'Что делает', 'Пример'],
+  rows: [
+    ['docker compose up', 'строит и запускает все сервисы из docker-compose.yml', 'docker compose up -d'],
+    ['docker compose down', 'останавливает и удаляет контейнеры, сети и (с -v) тома', 'docker compose down -v'],
+    ['-d', 'detached: запустить контейнер(ы) в фоне, не занимая терминал', 'docker run -d ...'],
+    ['-v (у down)', 'удалить тома с данными вместе с контейнерами', 'docker compose down -v'],
+    ['-p host:container', 'пробросить порт с компьютера внутрь контейнера', '-p 5000:5000'],
+    ['--name', 'задать контейнеру человекочитаемое имя', '--name registry'],
+    ['--restart always', 'перезапускать контейнер автоматически при падении или перезагрузке', 'docker run --restart always ...'],
+    ['image: (в YAML)', 'ключ docker-compose.yml — какой образ использовать для сервиса', 'image: wavesenterprise/node:v1.16.0'],
+    ['ports: (в YAML)', 'ключ docker-compose.yml — список пробрасываемых портов сервиса', 'ports:'],
+  ],
+}}>
 
 | Команда / флаг | Что делает | Пример |
 |---|---|---|
@@ -256,6 +352,8 @@ Error response from daemon: pull access denied for wavesenterprise/nonexistent-d
 | `--restart always` | перезапускать контейнер автоматически при падении или перезагрузке | `docker run --restart always ...` |
 | `image:` (в YAML) | ключ docker-compose.yml — какой образ использовать для сервиса | `image: wavesenterprise/node:v1.16.0` |
 | `ports:` (в YAML) | ключ docker-compose.yml — список пробрасываемых портов сервиса | `ports:` |
+
+</Block>
 
 <details>
 <summary>Углубиться</summary>
@@ -270,7 +368,11 @@ Error response from daemon: pull access denied for wavesenterprise/nonexistent-d
 
 </details>
 
+<SectionAnchor chapterId="waves-first-network" sectionId="cheatsheet" />
+
 ## Куда дальше: проверенные ресурсы
+
+<Block kind="cheatsheet" title="Ресурсы для продолжения" chapterId="waves-first-network" blockId="cheatsheet-resources">
 
 - [waves-enterprise/we-node — GitHub](https://github.com/waves-enterprise/we-node) — официальный репозиторий ноды: Docker-образ, шаблоны конфигурации, файл docker-compose.yml для сети из трёх нод.
 - [waves-enterprise/js-contract-sdk — GitHub](https://github.com/waves-enterprise/js-contract-sdk) — набор инструментов для разработки контрактов на TypeScript: декораторы `@Contract`, `@State`, `@Action`, готовый пример и CLI для нового проекта.
@@ -279,6 +381,10 @@ Error response from daemon: pull access denied for wavesenterprise/nonexistent-d
 - [Docker Compose overview](https://docs.docker.com/compose/) — что такое docker-compose.yml и зачем он нужен, официальными словами.
 - [docker compose up — CLI reference](https://docs.docker.com/reference/cli/docker/compose/up/) — все флаги команды up, включая -d, из первоисточника.
 - [docker compose down — CLI reference](https://docs.docker.com/reference/cli/docker/compose/down/) — все флаги команды down, включая -v, из первоисточника.
+
+</Block>
+
+<SectionAnchor chapterId="waves-first-network" sectionId="resources" />
 
 ## Челлендж ⭐
 
@@ -308,6 +414,8 @@ ports:
 
 </details>
 
+<SectionAnchor chapterId="waves-first-network" sectionId="challenge" />
+
 ## Что должен уметь
 
 - Объяснять, что физически представляет собой нода Waves Enterprise, и какие сетевые порты она открывает и зачем.
@@ -317,3 +425,5 @@ ports:
 - Объяснять, зачем локальной сети собственный Docker registry и чем он отличается от блокчейн-реестра (ledger) из прошлой главы.
 - Описывать концептуально, как устроен смарт-контракт на Waves Enterprise: назначение декораторов `@Contract`, `@State`, `@Action`, и разницу между CreateContractTx и CallContractTx.
 - Узнавать по тексту четыре типичные ошибки Docker — отсутствие конфигурационного файла, сбитый отступ YAML, занятый порт, опечатку в имени образа — и знать, как каждую починить.
+
+<SectionAnchor chapterId="waves-first-network" sectionId="what-you-should-know" />

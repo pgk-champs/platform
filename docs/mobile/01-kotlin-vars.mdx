@@ -10,9 +10,15 @@ import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
 import SelfCheck from '@site/src/components/SelfCheck';
-import TOCInline from '@theme/TOCInline';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # Переменные и типы
+
+<ChapterProgress chapterId="kotlin-vars" totalSections={13} totalQuizzes={3} totalTrainers={2} />
 
 ## Зачем это нужно
 
@@ -22,18 +28,22 @@ import TOCInline from '@theme/TOCInline';
 
 В этой главе мы разберём объявление переменной буквально по символам: что значит каждый знак, почему он стоит именно там и что произойдёт, если его убрать. Ничего не считаем очевидным — если знак есть на экране, у него есть причина там быть.
 
-<TOCInline toc={toc} />
+<CollapsibleToc toc={toc} chapterId="kotlin-vars" />
+
+<SectionAnchor chapterId="kotlin-vars" sectionId="why" />
 
 ## Первое объявление: `val x = 5`
 
 Вот самая короткая осмысленная строка кода с переменной. Наведи курсор (или пройдись Tab с клавиатуры) на каждую часть — появится подсказка.
 
+<Block kind="breakdown" title="Разбор по символам: val x = 5" chapterId="kotlin-vars" blockId="breakdown-val-x">
 <SyntaxBreakdown parts={[
   { text: 'val ', label: 'ключевое слово', note: 'объявляет переменную, которую нельзя переприсвоить; от английского value — «значение». Пробел после него обязателен: он отделяет одно слово от другого' },
   { text: 'x', label: 'имя переменной', note: 'ты придумываешь его сам; по этому имени к значению обращаются дальше в коде. Имя пишут латиницей, начиная с буквы' },
   { text: ' = ', label: 'оператор присваивания', note: 'знак «равно» здесь НЕ сравнение из математики, а команда: «вычисли правую часть и положи в имя слева». Пробелы вокруг = необязательны, но так принято — код легче читать' },
   { text: '5', label: 'литерал', note: 'значение, записанное прямо в коде (literal). Цифра 5 без кавычек — это целое число' },
 ]} />
+</Block>
 
 ### Что означает каждый символ
 
@@ -61,11 +71,15 @@ import TOCInline from '@theme/TOCInline';
 
 **Что выведет:** `5` — и ничего больше. Не `x` и не `val x = 5`: `println` печатает значение, которое лежит за именем, а не само имя.
 
+<SectionAnchor chapterId="kotlin-vars" sectionId="first-val" />
+
 ## val и var: что можно менять
 
 `val` (от value) объявляет неизменяемую (immutable) переменную: значение задаётся один раз, и переприсвоить его нельзя — попытка не пройдёт компиляцию. `var` (от variable) объявляет изменяемую: перезаписывай сколько угодно.
 
+<Hint id="kotlin-vars-h1" type="tip">
 Хорошее правило для новичка: по умолчанию бери `val` и переключайся на `var` только тогда, когда точно знаешь, что значение будет меняться. Так меньше шанс случайно испортить данные, на которые полагается остальной код.
+</Hint>
 
 <KotlinPlay code={`fun main() {
     val name: String = "Соня"
@@ -84,12 +98,16 @@ import TOCInline from '@theme/TOCInline';
 
 **Что выведет:** `Соня набрала 42 очков` — потому что 0 + 15 + 27 = 42, а `$name` и `$score` подставили значения переменных прямо в текст.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="val, var и первые символы" chapterId="kotlin-vars" blockId="quiz-val-var">
+<SelfCheck chapterId="kotlin-vars" quizId="quiz-val-var" questions={[
   { q: 'Что делает знак = в строке val x = 5?', options: ['Проверяет, равны ли x и 5', 'Вычисляет правую часть и кладёт результат в переменную x', 'Объявляет тип переменной', 'Печатает x на экран'], correct: 1, why: 'В Kotlin = — присваивание, а не сравнение из математики: сначала вычисляется правая часть, потом результат сохраняется в имя слева.' },
   { q: 'Чем val отличается от var?', options: ['val — для чисел, var — для строк', 'val нельзя переприсвоить после первого значения, var — можно', 'val работает быстрее var', 'Ничем, это синонимы'], correct: 1, why: 'val — неизменяемая (immutable) переменная, var — изменяемая. По умолчанию бери val.' },
   { q: 'Что выведет код: var a = 2; a += 3; println(a)', options: ['2', '3', '5', 'Ошибку компиляции'], correct: 2, why: '+= прибавляет к текущему значению: 2 + 3 = 5. Переменная a — var, поэтому менять её можно.' },
   { q: 'Зачем в коде две косые черты //?', options: ['Делят число нацело', 'Начинают комментарий: всё до конца строки компилятор пропускает', 'Объявляют сразу две переменные', 'Это ошибка синтаксиса'], correct: 1, why: 'Комментарий (comment) — заметка для людей. Компилятор её не читает.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="kotlin-vars" sectionId="val-var" />
 
 ## Тип: метка на коробке
 
@@ -97,6 +115,7 @@ import TOCInline from '@theme/TOCInline';
 
 Тип можно указать вручную — через двоеточие после имени. Разбираем по частям.
 
+<Block kind="breakdown" title="Разбор по символам: аннотация типа" chapterId="kotlin-vars" blockId="breakdown-type-annotation">
 <SyntaxBreakdown parts={[
   { text: 'val ', label: 'ключевое слово', note: 'знакомое объявление неизменяемой переменной' },
   { text: 'name', label: 'имя переменной', note: 'по нему будем обращаться к значению' },
@@ -105,6 +124,7 @@ import TOCInline from '@theme/TOCInline';
   { text: ' = ', label: 'оператор присваивания', note: 'кладёт значение справа в переменную слева' },
   { text: '"Олег"', label: 'строковый литерал', note: 'текст в двойных кавычках. Кавычки — граница строки: компилятор понимает, где текст начинается и где заканчивается. Сами кавычки в значение не входят' },
 ]} />
+</Block>
 
 Новые символы:
 
@@ -147,12 +167,19 @@ import TOCInline from '@theme/TOCInline';
 
 ### Вывод типов: почему тип можно не писать
 
-Если справа от `=` уже стоит значение, Kotlin определит тип сам: увидел `0` — значит `Int`, увидел `"Олег"` — значит `String`. Это называется выводом типов (type inference). Важно: это не «отсутствие типа» — тип есть всегда, он фиксируется при компиляции раз и навсегда, просто писать его руками не обязательно. Явную аннотацию оставляют, когда без неё код непонятен или когда нужен не тот тип, который выводится по умолчанию.
+Если справа от `=` уже стоит значение, Kotlin определит тип сам: увидел `0` — значит `Int`, увидел `"Олег"` — значит `String`. Это называется выводом типов (type inference).
+
+<Hint id="kotlin-vars-h2" type="important">
+Важно: это не «отсутствие типа» — тип есть всегда, он фиксируется при компиляции раз и навсегда, просто писать его руками не обязательно. Явную аннотацию оставляют, когда без неё код непонятен или когда нужен не тот тип, который выводится по умолчанию.
+</Hint>
+
+<SectionAnchor chapterId="kotlin-vars" sectionId="types" />
 
 ## Строковые шаблоны: `$` внутри кавычек
 
 Чтобы подставить значение переменной внутрь текста, не нужно ничего склеивать — достаточно знака доллара.
 
+<Block kind="breakdown" title="Разбор по символам: строковый шаблон" chapterId="kotlin-vars" blockId="breakdown-string-template">
 <SyntaxBreakdown parts={[
   { text: 'println', label: 'функция печати', note: 'печатает то, что передали в скобках, и переводит курсор на новую строку' },
   { text: '(', label: 'открывающая круглая скобка', note: 'начало списка аргументов — того, что мы передаём функции' },
@@ -161,6 +188,7 @@ import TOCInline from '@theme/TOCInline';
   { text: '!"', label: 'конец строки', note: 'восклицательный знак — просто текст, а закрывающая кавычка завершает строковый литерал' },
   { text: ')', label: 'закрывающая круглая скобка', note: 'конец списка аргументов; каждой открывающей скобке соответствует закрывающая' },
 ]} />
+</Block>
 
 Новый символ — **`$`** (знак доллара): внутри двойных кавычек он означает «вставь сюда значение». После `$` пишут имя переменной, а если нужно целое выражение — берут его в фигурные скобки: `${...}`.
 
@@ -179,17 +207,22 @@ import TOCInline from '@theme/TOCInline';
 - **Строка 5: `println("Тебе $age лет")`** — печатает `Тебе 16 лет`: шаблон работает с любым типом, число превратилось в текст автоматически.
 - **Строка 6: `println("Через год будет ${age + 1}")`** — печатает `Через год будет 17`. Здесь после `$` стоят фигурные скобки: внутри них — целое выражение `age + 1`, которое сначала вычисляется, и только потом результат подставляется в строку. Без скобок Kotlin решил бы, что переменная называется `age`, а ` + 1` — просто текст.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Типы и строковые шаблоны" chapterId="kotlin-vars" blockId="quiz-types-templates">
+<SelfCheck chapterId="kotlin-vars" quizId="quiz-types-templates" questions={[
   { q: 'Что означает двоеточие в записи val name: String?', options: ['Конец объявления переменной', 'После него указан тип переменной: name имеет тип String', 'Начало списка значений', 'Операцию деления'], correct: 1, why: 'Двоеточие после имени — аннотация типа: «name имеет тип String».' },
   { q: 'Чем 5 отличается от "5"?', options: ['Ничем, компилятор сам разберётся', '5 — число типа Int, а "5" — текст типа String из одного символа', '"5" занимает меньше памяти', '5 нельзя напечатать через println'], correct: 1, why: 'Кавычки превращают запись в строку. Числа складываются, строки — склеиваются: это разные типы с разными операциями.' },
   { q: 'Что выведет println("Итог: $score"), если score = 42?', options: ['Итог: $score', 'Итог: 42', 'Итог: score', 'Ошибку компиляции'], correct: 1, why: '$ внутри двойных кавычек — строковый шаблон: на его место подставляется значение переменной.' },
   { q: 'Почему в var score = 0 можно не писать тип?', options: ['Тип здесь вообще не нужен', 'Kotlin выведет Int сам по значению 0 — это вывод типов (type inference)', 'score всегда имеет тип Int по умолчанию', 'Потому что var, а с val тип обязателен'], correct: 1, why: 'Тип есть всегда и фиксируется при компиляции — просто компилятор определил его по правой части сам.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="kotlin-vars" sectionId="string-templates" />
 
 ## Цепочка вызовов: точка за точкой
 
 Сила Kotlin — в том, что операции можно нанизывать одну за другой. Разберём цепочку, которая удваивает числа в списке и складывает результат.
 
+<Block kind="breakdown" title="Разбор по символам: цепочка map и sum" chapterId="kotlin-vars" blockId="breakdown-chain-map-sum">
 <SyntaxBreakdown parts={[
   { text: 'listOf', label: 'функция-фабрика списка', note: 'создаёт список (list) — упорядоченный набор элементов одного типа' },
   { text: '(1, 2)', label: 'аргументы в круглых скобках', note: 'элементы будущего списка; запятая разделяет аргументы, пробел после неё — для читаемости' },
@@ -204,6 +237,7 @@ import TOCInline from '@theme/TOCInline';
   { text: 'sum', label: 'итоговая операция', note: 'складывает все элементы списка в одно число' },
   { text: '()', label: 'пустые скобки вызова', note: 'у sum нет аргументов, но скобки обязательны: именно они превращают имя метода в его вызов' },
 ]} />
+</Block>
 
 Новые символы:
 
@@ -238,9 +272,15 @@ import TOCInline from '@theme/TOCInline';
 - **Строка 2** — здесь стрелка встречается дважды в разных ролях. В типе `(Int) -> Int` она описывает функцию: «принимает Int, возвращает Int». В лямбде `{ score -> score * 2 + 10 }` она отделяет имя параметра от тела: «взять score и посчитать score * 2 + 10».
 - **Строка 3** — вызываем лямбду как обычную функцию. **Что выведет:** `40`, потому что 15 × 2 + 10 = 40.
 
+<SectionAnchor chapterId="kotlin-vars" sectionId="call-chain" />
+
 ## Типичные ошибки
 
-Ошибки компиляции — не провал, а подсказки. Компилятор всегда пишет, что не так и где. Ниже — четыре ошибки, которые делает каждый новичок. Каждый пример можно запустить и увидеть настоящее сообщение — тексты здесь приведены ровно такими, какими их показывает компилятор.
+<Hint id="kotlin-vars-h3" type="tip">
+Ошибки компиляции — не провал, а подсказки. Компилятор всегда пишет, что не так и где.
+</Hint>
+
+Ниже — четыре ошибки, которые делает каждый новичок. Каждый пример можно запустить и увидеть настоящее сообщение — тексты здесь приведены ровно такими, какими их показывает компилятор.
 
 ### 1. Переприсваивание val
 
@@ -306,16 +346,21 @@ Unresolved reference 'scre'.
 
 **Как починить:** исправить имя на существующее — `println(score)`. Компилятор различает каждую букву и даже регистр: `Score` и `score` — разные имена.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Цепочки и типичные ошибки" chapterId="kotlin-vars" blockId="quiz-chain-errors">
+<SelfCheck chapterId="kotlin-vars" quizId="quiz-chain-errors" questions={[
   { q: 'Что делает точка в listOf(1, 2).sum()?', options: ['Завершает выражение, как точка в предложении', 'Вызывает метод sum у списка слева от неё', 'Отделяет дробную часть числа', 'Объявляет новую переменную'], correct: 1, why: 'Точка перед методом читается «у того, что слева, вызови то, что справа»: у списка вызвали sum.' },
   { q: 'Что такое it в map { it * 2 }?', options: ['Специальный счётчик цикла', 'Неявное имя единственного параметра лямбды — очередной элемент списка', 'Сокращение от Int', 'Название метода'], correct: 1, why: 'Когда у лямбды один параметр, Kotlin даёт ему имя it автоматически — писать своё не обязательно.' },
   { q: 'Какую ошибку покажет компилятор на код: val x = 1, а затем x = 2?', options: ["'val' cannot be reassigned.", "Unresolved reference 'x'.", "Syntax error: Expecting '\"'.", "Initializer type mismatch: expected 'Int', actual 'String'."], correct: 0, why: 'val — неизменяемая переменная: положить в неё второе значение нельзя, нужен var или новая переменная.' },
   { q: 'Как починить val points: Int = "5"?', options: ['Убрать слово val', 'Написать 5 без кавычек — или поменять тип на String, если это текст', 'Добавить точку с запятой в конце', 'Заменить Int на int с маленькой буквы'], correct: 1, why: '"5" в кавычках — строка, а обещан Int. Либо значение делаем числом, либо тип — строкой.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="kotlin-vars" sectionId="typical-errors" />
 
 ## Слова главы
 
-<Flashcards cards={[
+<Block kind="vocab" title="Словарь главы" chapterId="kotlin-vars" blockId="vocab-glossary">
+<Flashcards chapterId="kotlin-vars" cards={[
   { term: 'variable', translation: 'переменная', note: 'именованная ячейка памяти, где хранится значение' },
   { term: 'immutable', translation: 'неизменяемый', note: 'значение нельзя переприсвоить после первого присваивания — так объявлен val' },
   { term: 'type', translation: 'тип', note: 'определяет, какие данные хранит переменная и какие операции с ней допустимы' },
@@ -323,20 +368,61 @@ Unresolved reference 'scre'.
   { term: 'lambda', translation: 'лямбда-выражение', note: 'безымянный блок кода, который можно передать как значение, например в map' },
   { term: 'function', translation: 'функция', note: 'именованный блок кода, который можно вызвать с аргументами и получить результат' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="kotlin-vars" sectionId="vocab" />
 
 ## Потренируйся печатать
 
 Сначала короткое объявление — до автоматизма:
 
-<CodeTyping snippet={'val name: String = "Олег"'} />
+<Block kind="trainer" title="Объявления из этой главы" chapterId="kotlin-vars" blockId="trainer-declarations">
+<CodeTyping pools={[{
+  label: 'Объявления',
+  snippets: [
+    'val x = 5',
+    'var score = 0',
+    'score += 15',
+    'val age: Int = 16',
+    'val height: Double = 1.75',
+    'val isChampion: Boolean = true',
+    'val numbers = listOf(1, 2)',
+    'val doubled = numbers.map { it * 2 }',
+  ],
+}]} keyboard chapterId="kotlin-vars" trainerId="trainer-declarations" targetCpm={90} targetAccuracy={90} />
+</Block>
 
 Теперь цепочка посложнее — со скобками, стрелкой и лямбдой:
 
-<CodeTyping snippet={'val calculateBonus: (Int) -> Int = { score -> score * 2 + 10 }'} />
+<Block kind="trainer" title="Цепочка с лямбдой" chapterId="kotlin-vars" blockId="trainer-lambda-chain">
+<CodeTyping snippet={'val calculateBonus: (Int) -> Int = { score -> score * 2 + 10 }'} chapterId="kotlin-vars" trainerId="trainer-lambda-chain" targetCpm={110} targetAccuracy={90} />
+</Block>
+
+<SectionAnchor chapterId="kotlin-vars" sectionId="practice-typing" />
 
 ## Символы главы
 
 Шпаргалка по всем знакам, которые встретились. Вернись сюда, если забудешь, «что это за закорючка».
+
+<Block kind="cheatsheet" title="Символы главы" chapterId="kotlin-vars" blockId="cheatsheet-symbols" favPayload={{
+  kind: 'table',
+  head: ['Символ', 'Как называется', 'Что делает', 'Пример'],
+  rows: [
+    ['=', 'оператор присваивания', 'вычисляет правую часть и кладёт в переменную слева', 'val x = 5'],
+    [':', 'двоеточие (аннотация типа)', 'после имени переменной указывает её тип', 'val name: String'],
+    ['"', 'двойные кавычки', 'ограничивают строку — текст любой длины', '"Олег"'],
+    ["'", 'одинарные кавычки', 'ограничивают ровно один символ (Char)', "'ф'"],
+    ['$', 'знак шаблона', 'внутри кавычек подставляет значение переменной', '"Привет, $name"'],
+    ['${ }', 'шаблон с выражением', 'подставляет результат целого выражения', '"будет ${age + 1}"'],
+    ['( )', 'круглые скобки', 'вызов функции и передача аргументов', 'println(x)'],
+    ['{ }', 'фигурные скобки', 'ограничивают блок кода: тело функции или лямбду', '{ it * 2 }'],
+    ['.', 'точка', 'вызывает метод у значения слева от неё', 'listOf(1, 2).sum()'],
+    ['//', 'двойная косая черта', 'начинает комментарий до конца строки', '// заметка'],
+    ['+=', 'присваивание с прибавлением', 'прибавляет к текущему значению переменной', 'score += 15'],
+    ['*', 'звёздочка', 'умножение', 'it * 2'],
+    ['->', 'стрелка', 'отделяет параметры лямбды от её тела', '{ score -> score * 2 }'],
+  ],
+}}>
 
 | Символ | Как называется | Что делает | Пример |
 |---|---|---|---|
@@ -354,6 +440,8 @@ Unresolved reference 'scre'.
 | `*` | звёздочка | умножение | `it * 2` |
 | `->` | стрелка | отделяет параметры лямбды от её тела | `{ score -> score * 2 }` |
 
+</Block>
+
 <details>
 <summary>Углубиться</summary>
 
@@ -368,26 +456,36 @@ Unresolved reference 'scre'.
 
 </details>
 
+<SectionAnchor chapterId="kotlin-vars" sectionId="cheatsheet-symbols" />
+
 ## Куда дальше: проверенные ресурсы
 
-### Русские материалы с нуля
+<Block kind="cheatsheet" title="Русские материалы с нуля" chapterId="kotlin-vars" blockId="cheatsheet-resources-ru">
 
 - [kotlinlang.ru — Основной синтаксис](https://kotlinlang.ru/docs/basic-syntax.html) — официальная документация в переводе: тот же материал, что у авторов языка, но по-русски.
 - [Урок 1: переменные в Kotlin](https://ievetrov.ru/kotlin-s-nulya-uroki/urok-1-peremennye-v-kotlin/) — пошаговый разбор val/var и типов, идеален как второе прочтение этой главы другими словами.
 - [Хабр: переменные и типы данных в Kotlin](https://habr.com/ru/companies/otus/articles/1008352/) — свежая статья с таблицей типов, toInt и чтением ввода через readln — чуть шире нашей главы.
 - [Гоша Дударь — видеоурок по переменным](https://www.youtube.com/watch?v=Ke_TKZaZGSI) — если проще воспринимать на слух и глазами, чем текстом.
 
-### Официальный тур Kotlin (на английском)
+</Block>
+
+<Block kind="cheatsheet" title="Официальный тур Kotlin (на английском)" chapterId="kotlin-vars" blockId="cheatsheet-resources-tour">
 
 - [Kotlin tour: Hello world](https://kotlinlang.org/docs/kotlin-tour-hello-world.html) — тур для тех, кто начинает с нуля: маленькие шаги и встроенные упражнения после каждой темы.
 - [Kotlin tour: Basic types](https://kotlinlang.org/docs/kotlin-tour-basic-types.html) — продолжение тура про типы: закрепишь Int, Double, String, Boolean на упражнениях.
 - [Basic syntax](https://kotlinlang.org/docs/basic-syntax.html) — компактная шпаргалка по всему синтаксису, к которой удобно возвращаться.
 
-### Потренироваться
+</Block>
+
+<Block kind="cheatsheet" title="Потренироваться" chapterId="kotlin-vars" blockId="cheatsheet-resources-practice">
 
 - [play.kotlinlang.org](https://play.kotlinlang.org) — та же песочница, что встроена в эту главу, но во весь экран: экспериментируй без установки чего-либо.
 - [Kotlin Koans](https://kotlinlang.org/docs/koans.html) — интерактивные задачи; новичку стоит брать точечно только Introduction: Hello world и String templates, остальное рассчитано на переходящих с Java.
 - [Hyperskill: Kotlin variables](https://hyperskill.org/university/kotlin/kotlin-variables) — бесплатные упражнения именно на переменные с автопроверкой.
+
+</Block>
+
+<SectionAnchor chapterId="kotlin-vars" sectionId="resources" />
 
 ## Челлендж ⭐
 
@@ -425,6 +523,8 @@ println("В среднем $averageKm км за тренировку")
 
 </details>
 
+<SectionAnchor chapterId="kotlin-vars" sectionId="challenge" />
+
 ## Что должен уметь
 
 - Объяснять разницу между `val` и `var` и обосновывать, какой из них выбрать в конкретной ситуации.
@@ -435,3 +535,5 @@ println("В среднем $averageKm км за тренировку")
 - Читать и строить цепочку `listOf(...).map { ... }.sum()`, объясняя, что делает каждое звено и каждая точка.
 - Использовать в лямбде как неявный параметр `it`, так и явно названный параметр со стрелкой `->`.
 - Узнавать по сообщению компилятора четыре типичные ошибки — переприсваивание `val`, незакрытую кавычку, несовпадение типов, опечатку в имени — и чинить каждую.
+
+<SectionAnchor chapterId="kotlin-vars" sectionId="what-you-should-know" />

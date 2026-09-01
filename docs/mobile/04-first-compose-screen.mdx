@@ -10,9 +10,15 @@ import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
 import SelfCheck from '@site/src/components/SelfCheck';
-import TOCInline from '@theme/TOCInline';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # Первый экран Compose
+
+<ChapterProgress chapterId="first-compose-screen" totalSections={15} totalQuizzes={5} totalTrainers={2} />
 
 ## Зачем это нужно
 
@@ -22,7 +28,9 @@ import TOCInline from '@theme/TOCInline';
 
 Здесь же — важное техническое предупреждение. Compose — это не просто Kotlin: чтобы его код заработал, нужен Android-компилятор, эмулятор или телефон, ни того ни другого в браузере нет. Поэтому весь Compose-код в этой главе — статичные блоки с разбором построчно, без кнопки Run: это тот же принцип, что и с `MainActivity.kt` в прошлой главе про Android Studio. Зато там, где под капотом Compose скрывается обычный Kotlin — аннотации, лямбды-параметры, цепочки вызовов, — глава даёт исполняемые мини-примеры на чистом Kotlin: их можно запускать прямо здесь и видеть настоящий результат.
 
-<TOCInline toc={toc} />
+<CollapsibleToc toc={toc} chapterId="first-compose-screen" />
+
+<SectionAnchor chapterId="first-compose-screen" sectionId="why" />
 
 ## Аннотация: что такое @Composable
 
@@ -32,12 +40,14 @@ import TOCInline from '@theme/TOCInline';
 
 Разберём самую важную для этой главы аннотацию по знакам.
 
+<Block kind="breakdown" title="Разбор по знакам: @Composable" chapterId="first-compose-screen" blockId="breakdown-composable">
 <SyntaxBreakdown parts={[
   { text: '@', label: 'собака — начало аннотации', note: 'значок @ перед именем говорит компилятору: дальше идёт не вызов функции и не тип, а аннотация — метаданные, прикреплённые к следующему объявлению' },
   { text: 'Composable', label: 'имя аннотации', note: 'имя пишут с заглавной буквы, как и имена классов — аннотация в Kotlin технически и есть особый класс, объявленный через annotation class' },
   { text: '\nfun ', label: 'к чему прикреплена', note: 'аннотация всегда стоит перед тем объявлением, к которому относится — здесь это объявление функции. Перенос строки между ними — просто для читаемости кода' },
   { text: 'Greeting(name: String)', label: 'сама функция', note: 'обычная сигнатура: имя, параметры — ровно так же, как в главе про функции. Аннотация не меняет то, как функция объявлена, она добавляется поверх' },
 ]} />
+</Block>
 
 Новый символ — **`@`** (собака, at-sign): открывает аннотацию. После неё сразу идёт имя аннотации без пробела, а сама аннотация ставится строго перед тем, что помечает.
 
@@ -76,12 +86,16 @@ fun main() {
 - **Ничего не возвращает** — composable-функция не строит виджет и не отдаёт его как результат через `return`; вместо этого она сама, по ходу выполнения, описывает, что должно появиться на экране.
 - **Может звать только другие composable-функции** — обычная функция вызвать `Text` или `Button` не может: отсюда и первая типичная ошибка этой главы, разберём её ниже.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Аннотации и @Composable" chapterId="first-compose-screen" blockId="quiz-annotation">
+<SelfCheck chapterId="first-compose-screen" quizId="q1" questions={[
   { q: 'Что такое аннотация (annotation) сама по себе, без какого-либо инструмента, который её читает?', options: ['Функция, которая выполняется автоматически перед основным кодом', 'Пассивная метка-метаданные над объявлением; сама по себе она ничего не делает', 'Специальный тип переменной для хранения текста', 'Синоним ключевого слова fun'], correct: 1, why: 'Демо с @Important показало это напрямую: аннотация никак не изменила поведение программы — она стала активной только тогда, когда появился бы код, который её читает.' },
   { q: 'Почему @Composable вообще на что-то влияет, если аннотации сами по себе инертны?', options: ['Потому что @Composable — не аннотация, а отдельное ключевое слово Kotlin', 'Потому что её обрабатывает специальный плагин компилятора Compose, который переписывает помеченную функцию', 'Потому что Android Studio каждую секунду сканирует код на такие слова', 'Аннотация @Composable действительно ни на что не влияет'], correct: 1, why: 'Compose compiler plugin — часть инструментов Compose — видит @Composable и добавляет функции скрытую логику отслеживания изменений данных.' },
   { q: 'Какое из требований НЕ относится к тому, что Compose ждёт от composable-функции?', options: ['Она должна вести себя одинаково при одинаковых входных данных', 'Она не должна иметь побочных эффектов вроде изменения глобальных переменных', 'Она обязана возвращать готовый объект интерфейса через return', 'Она может вызывать только другие composable-функции'], correct: 2, why: 'Composable-функция ничего не возвращает — она описывает экран, вызывая другие composable-функции внутри себя, а не строит и не отдаёт объект как результат.' },
   { q: 'Можно ли вызвать функцию, помеченную @Important из демо-примера, вообще без слова @Important перед ней?', options: ['Нет, аннотация обязательна для вызова любой функции', 'Да — аннотация никак не связана с тем, можно ли функцию вызвать; это просто метка сверху', 'Да, но тогда функция ничего не выведет', 'Нет, без аннотации код не скомпилируется'], correct: 1, why: 'Аннотация — не часть механизма вызова функции. criticalTask() вызывается точно так же, как и любая другая функция; @Important просто добавляет метаданные, не меняя правила вызова.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="first-compose-screen" sectionId="composable" />
 
 ## Text: простейший composable
 
@@ -107,6 +121,7 @@ fun Greeting() {
 
 Разберём вызов `Text` по частям — обрати внимание, что здесь ровно тот же принцип именованного аргумента `text = ...`, что уже встречался в лямбдах со стрелкой в первой главе.
 
+<Block kind="breakdown" title="Разбор по частям: вызов Text" chapterId="first-compose-screen" blockId="breakdown-text-call">
 <SyntaxBreakdown parts={[
   { text: 'Text', label: 'имя composable-функции', note: 'встроена в Compose; рисует текст на экране. Имя с заглавной буквы — сигнал, что это composable, а не обычная функция вроде println' },
   { text: '(', label: 'открывающая скобка вызова', note: 'начало списка аргументов — то же самое (), что и у любой функции в Kotlin' },
@@ -115,6 +130,9 @@ fun Greeting() {
   { text: '"Привет, Android!"', label: 'строковый литерал', note: 'тот же тип String, что и в главе про переменные — текст в двойных кавычках' },
   { text: ')', label: 'закрывающая скобка', note: 'конец вызова: всё, что нужно функции Text, уже передано' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="first-compose-screen" sectionId="text-composable" />
 
 ## Column и Row: раскладка элементов
 
@@ -172,12 +190,16 @@ fun StatsRow(wins: Int, losses: Int) {
 
 Заметь: `Column` и `Row` сами по себе не рисуют ничего, кроме порядка — они контейнеры-организаторы. Всё видимое содержимое всегда рисуют элементы внутри них, как `Text`.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Column и Row" chapterId="first-compose-screen" blockId="quiz-column-row">
+<SelfCheck chapterId="first-compose-screen" quizId="q2" questions={[
   { q: 'Что стоит внутри фигурных скобок после Column в примере Column { Text(...); Text(...) }?', options: ['Список строковых аргументов через запятую', 'Трейлинг-лямбда: код, который Column выполнит сама, когда решит расположить содержимое', 'Обязательный блок инициализации, как в конструкторе класса', 'Комментарий, который Compose игнорирует'], correct: 1, why: 'Это тот же приём trailing lambda, что и в myColumn { ... }: фигурные скобки после вызова — лямбда-аргумент, вынесенная за круглые скобки.' },
   { q: 'В демо myColumn { println("Текст 1"); println("Текст 2") } — почему строки "Колонка началась" и "Колонка закончилась" в принципе появляются в выводе?', options: ['Compose добавляет их автоматически для любого контейнера', 'Потому что это часть тела самой функции myColumn — она печатает их до и после вызова content()', 'Это ошибка в примере, их быть не должно', 'Потому что println всегда печатает по две служебные строки'], correct: 1, why: 'myColumn — обычная функция, которая сама решает, что делать до и после выполнения переданной лямбды content(); в этом и есть идея «контейнер управляет содержимым».' },
   { q: 'Чем Row отличается от Column?', options: ['Row работает только с числами, Column — с текстом', 'Row располагает элементы в ряд (горизонтально), Column — друг под другом (вертикально)', 'Row можно использовать только внутри Column', 'Между ними нет разницы, это синонимы'], correct: 1, why: 'Row — горизонтальная раскладка (слева направо), Column — вертикальная (сверху вниз); имя каждой функции буквально описывает направление.' },
   { q: 'Что выведет println("Победы: $wins"), если wins = 7?', options: ['Победы: $wins', 'Победы: 7', 'Ошибку компиляции, потому что это внутри Row', 'wins: Победы'], correct: 1, why: 'Строковый шаблон $wins подставляет значение переменной в текст — этот механизм из первой главы работает одинаково что в println, что в тексте для Text.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="first-compose-screen" sectionId="column-row" />
 
 ## Button и обработчик нажатия
 
@@ -219,6 +241,7 @@ fun StartButton(onStartClick: () -> Unit) {
 }
 ```
 
+<Block kind="breakdown" title="Разбор по частям: Button" chapterId="first-compose-screen" blockId="breakdown-button">
 <SyntaxBreakdown parts={[
   { text: 'Button', label: 'composable-функция кнопки', note: 'встроена в Compose; рисует нажимаемый элемент интерфейса с эффектом нажатия' },
   { text: '(onClick = onStartClick)', label: 'именованный аргумент-лямбда', note: 'onClick — обязательный параметр Button; сюда передают код, который выполнится по нажатию. Здесь это уже готовая лямбда onStartClick, переданная функции StartButton снаружи' },
@@ -226,15 +249,22 @@ fun StartButton(onStartClick: () -> Unit) {
   { text: '\n    Text(text = "Начать")\n', label: 'содержимое кнопки', note: 'то же самое, что было бы внутри Column или Row — сюда можно поместить Text, Icon или несколько элементов сразу' },
   { text: '}', label: 'закрывающая скобка', note: 'конец трейлинг-лямбды содержимого; кнопка на экране покажет надпись "Начать"' },
 ]} />
+</Block>
 
+<Hint id="first-compose-screen-h1" type="important">
 Обрати внимание: у `Button` фактически два места для кода — именованный аргумент `onClick = { ... }` внутри скобок (что делать при нажатии) и трейлинг-лямбда после скобок (что нарисовать внутри самой кнопки). Спутать их — частая путаница у новичков: `onClick` никогда не рисует ничего на экране, он только реагирует на клик.
+</Hint>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Button и onClick" chapterId="first-compose-screen" blockId="quiz-button">
+<SelfCheck chapterId="first-compose-screen" quizId="q3" questions={[
   { q: 'В myButton(label: String, onClick: () -> Unit) — какой тип у параметра onClick?', options: ['String', 'Int', '() -> Unit — функция без аргументов, ничего не возвращающая', 'Boolean'], correct: 2, why: 'onClick — лямбда-параметр того же типа () -> Unit, что и content в myColumn: функция без входных данных и без результата.' },
   { q: 'Чем именованный аргумент onClick = onStartClick отличается от трейлинг-лямбды после Button(...)  { Text("Начать") }?', options: ['Это одно и то же место в коде', 'onClick определяет реакцию на нажатие, а трейлинг-лямбда после скобок — что нарисовано внутри кнопки', 'onClick рисует кнопку, а трейлинг-лямбда обрабатывает клик', 'Трейлинг-лямбда обязательна, а onClick — нет'], correct: 1, why: 'У Button два разных места для кода: именованный параметр onClick (реакция на клик) и отдельная трейлинг-лямбда содержимого кнопки (что видно на экране).' },
   { q: 'В демо myButton("Нажми меня") { count++; println("Нажатий: $count") } — когда именно выполнится count++?', options: ['Сразу при объявлении переменной count', 'Внутри myButton, в момент вызова onClick()', 'Никогда, потому что это лямбда', 'До вызова myButton'], correct: 1, why: 'Лямбда — это код, который выполнится не в момент объявления, а в момент вызова: onClick() внутри myButton вызывает именно эту переданную лямбду.' },
   { q: 'Почему в реальном Compose Button(onClick = { ... }) не печатает результат сразу же, как это делает myButton в демо-примере?', options: ['Потому что Button вообще не поддерживает onClick', 'Потому что настоящий Button откладывает вызов onClick до момента реального нажатия пользователем, а не выполняет его сразу при отрисовке', 'Потому что println не работает в Android', 'Потому что onClick вызывается автоматически раз в секунду'], correct: 1, why: 'Упрощённый myButton в демо вызывает onClick() сразу для наглядности; настоящая кнопка ждёт физического клика — принцип передачи лямбды-обработчика при этом одинаковый.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="first-compose-screen" sectionId="button-onclick" />
 
 ## Modifier: цепочка вызовов
 
@@ -269,6 +299,7 @@ fun main() {
 
 Теперь настоящая цепочка модификаторов — именно та, что чаще всего открывает первый экран Compose: заполнить весь экран и отступить от края.
 
+<Block kind="breakdown" title="Разбор по символам: цепочка Modifier" chapterId="first-compose-screen" blockId="breakdown-modifier-chain">
 <SyntaxBreakdown parts={[
   { text: 'Modifier', label: 'пустой модификатор', note: 'объект-отправная точка: сам по себе не меняет вообще ничего, это «чистый лист», на который дальше через точку навешивают поведение' },
   { text: '.', label: 'точка — первый вызов в цепочке', note: 'то же самое «у значения слева вызови то, что справа», что и в listOf(...).map{...} из первой главы' },
@@ -281,6 +312,7 @@ fun main() {
   { text: '.dp', label: 'свойство-расширение', note: 'превращает Int в специальный тип Dp (density-independent pixels — «пиксели, независимые от плотности экрана»): один и тот же .dp выглядит одинаково по размеру что на дешёвом, что на дорогом экране с другой плотностью точек' },
   { text: ')', label: 'закрывающая скобка padding', note: 'конец вызова: цепочка готова и как единый Modifier передаётся дальше, обычно в параметр modifier composable-функции' },
 ]} />
+</Block>
 
 Новый символ — **`.dp`**: точка здесь работает не как вызов метода у объекта, а как обращение к свойству-расширению (extension property) числа `16` — специальному механизму Kotlin, который позволяет «пристроить» новое свойство к уже существующему типу (`Int`), не переписывая его исходный код. Отсюда и типичная ошибка ниже: если `.dp` забыть, `16` останется обычным `Int`, а `padding` ждёт именно `Dp`.
 
@@ -291,14 +323,20 @@ fun main() {
 - если `.clickable(...)` стоит **перед** `.padding(...)` — кликабельной становится вся область, включая отступ;
 - если `.clickable(...)` стоит **после** `.padding(...)` — область отступа в клик не попадает, реагирует только внутренняя часть.
 
+<Hint id="first-compose-screen-h2" type="important">
 Каждый модификатор «оборачивает» результат предыдущего, как слои: `Modifier.a().b()` значит «сначала оберни элемент в `a`, потом результат — в `b`», и от этого порядка меняется итоговая форма и поведение, совсем как в цепочке `.withPadding(...)` из демо выше, где порядок вызовов определял, какой объект получится на выходе.
+</Hint>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Цепочка Modifier" chapterId="first-compose-screen" blockId="quiz-modifier">
+<SelfCheck chapterId="first-compose-screen" quizId="q4" questions={[
   { q: 'В демо с Box — почему println(original) после вызова original.withPadding(16) всё ещё печатает padding=0?', options: ['Это баг в примере', 'withPadding не меняет original «на месте», а возвращает совершенно новый Box; original остаётся прежним', 'padding по умолчанию нельзя изменить', 'println всегда печатает исходные значения конструктора'], correct: 1, why: 'val padding: Int = 0 в конструкторе Box — значение по умолчанию для НОВОГО объекта; withPadding создаёт новый Box(width, height, dp), а не трогает существующий.' },
   { q: 'Что означает точка между fillMaxSize() и padding(16.dp) в цепочке Modifier.fillMaxSize().padding(16.dp)?', options: ['Разделитель между двумя независимыми модификаторами, применёнными к разным элементам', 'Вызов padding у нового объекта, который вернул fillMaxSize() — тот же принцип, что и метод, вызванный на результате withPadding в примере выше', 'Оператор деления', 'Синтаксическая ошибка, точку можно убрать'], correct: 1, why: 'Каждый вызов в цепочке модификаторов возвращает новый Modifier с добавленным поведением; следующая точка вызывает метод уже у этого нового объекта.' },
   { q: 'Почему Modifier.padding(16) (без .dp) — ошибка, а Modifier.padding(16.dp) — нет?', options: ['16 и 16.dp — это одно и то же для компилятора', 'padding ждёт значение типа Dp, а 16 без .dp — это обычный Int; .dp превращает число в нужный тип', 'padding вообще не принимает чисел', 'Дело в количестве цифр — 16 слишком маленькое число'], correct: 1, why: '.dp — свойство-расширение, которое оборачивает Int в специальный тип Dp; без него компилятор видит несовпадение типов, разобранное в разделе типичных ошибок.' },
   { q: 'Если поменять местами .clickable(onClick = ...) и .padding(...) в цепочке — что изменится?', options: ['Ничего, порядок модификаторов не имеет значения', 'Изменится область экрана, которая реагирует на клик: будет ли отступ входить в кликабельную зону', 'Приложение перестанет компилироваться', 'Изменится только цвет текста'], correct: 1, why: 'Модификаторы применяются по порядку слева направо и оборачивают элемент слоями; порядок clickable относительно padding решает, реагирует ли зона отступа на нажатие.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="first-compose-screen" sectionId="modifier-chain" />
 
 ## Preview: экран без эмулятора
 
@@ -317,11 +355,13 @@ fun GreetingPreview() {
 }
 ```
 
+<Block kind="breakdown" title="Разбор по частям: @Preview" chapterId="first-compose-screen" blockId="breakdown-preview">
 <SyntaxBreakdown parts={[
   { text: '@Preview', label: 'аннотация предпросмотра', note: 'та же природа, что и у @Composable: метка, которую читает не компилятор, а инструменты Android Studio, — команда «нарисуй это в панели Preview»' },
   { text: '(showBackground = true)', label: 'именованный Boolean-аргумент', note: 'по умолчанию Preview рисует элемент на прозрачном фоне; showBackground = true подставляет обычный белый (или тёмный, по теме) фон, чтобы был виден текст без цвета' },
   { text: '\n@Composable\nfun GreetingPreview()', label: 'функция-обёртка для предпросмотра', note: 'отдельная маленькая composable-функция БЕЗ параметров, которая вызывает настоящую Greeting с конкретными, заранее заданными данными — здесь именем "Олег"' },
 ]} />
+</Block>
 
 ### Разбор по строкам
 
@@ -330,6 +370,8 @@ fun GreetingPreview() {
 - **Строки 8–10: `fun GreetingPreview() { Greeting(name = "Олег") }`** — важная деталь: у `GreetingPreview` **нет параметров**. Preview-функции вызывают настоящую composable-функцию с конкретными «тестовыми» данными изнутри, а не принимают их снаружи — иначе Android Studio просто неоткуда взять эти данные для рисования.
 
 Это правило — не параметров у самой Preview-функции — специально проверяется инструментами Compose, и нарушение даёт реальную ошибку, разобранную в следующем разделе.
+
+<SectionAnchor chapterId="first-compose-screen" sectionId="preview" />
 
 ## Собираем первый экран целиком
 
@@ -359,7 +401,9 @@ fun WelcomeScreenPreview() {
 }
 ```
 
+<Hint id="first-compose-screen-h3" type="tip">
 Импорты (например, `androidx.compose.material3.Button` или `androidx.compose.ui.Modifier`) здесь не показаны — Android Studio добавляет их сама через автодополнение, ровно как это уже было с `MainActivity.kt` в прошлой главе.
+</Hint>
 
 ### Разбор по строкам
 
@@ -372,6 +416,8 @@ fun WelcomeScreenPreview() {
 - **Строки 19–21: `WelcomeScreenPreview`** — вызывает `WelcomeScreen` с конкретными данными: именем `"Олег"` и пустой лямбдой `{}` для клика (в Preview нажать всё равно нельзя, поэтому реальная логика клика не нужна).
 
 **Что должно появиться в Preview:** экран на весь белый фон предпросмотра, с отступом от края в 16dp, посередине по горизонтали — строка `Привет, Олег!`, под ней `Готов к тренировке?`, под ними кнопка с надписью `Начать`.
+
+<SectionAnchor chapterId="first-compose-screen" sectionId="first-screen" />
 
 ## Типичные ошибки
 
@@ -469,16 +515,21 @@ Syntax error: Expecting '}'.
 
 **Как починить:** досчитать скобки и закрыть обе: сначала лямбду, потом `main`. В реальном Compose эта же ошибка чаще всего вылезает, когда в глубоко вложенных `Column { Row { Button { ... } } }` теряется одна из скобок где-то в середине.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Типичные ошибки" chapterId="first-compose-screen" blockId="quiz-typical-errors">
+<SelfCheck chapterId="first-compose-screen" quizId="q5" questions={[
   { q: 'Какая из пяти ошибок этой главы связана именно с правилом «composable вызывает только composable»?', options: ['No value passed for parameter (ошибка 2)', '@Composable invocations can only happen from the context of a @Composable function (ошибка 1)', 'Syntax error: Expecting \'}\'. (ошибка 5)', 'Argument type mismatch (ошибка 3)'], correct: 1, why: 'Ошибка 1 — прямое следствие требования из раздела про @Composable: обычная функция без этой аннотации не может вызвать Text, Button или любую другую composable-функцию.' },
   { q: 'Modifier.padding(16) без .dp — какую именно ошибку это вызовет?', options: ['No value passed for parameter', 'Argument type mismatch: actual type is \'Int\', but \'Dp\' was expected.', 'Unresolved reference', 'Syntax error: Expecting \')\'.'], correct: 1, why: '16 без .dp остаётся типом Int, а padding ждёт Dp — несовпадение типов аргумента, а не отсутствующее значение или синтаксическая ошибка.' },
   { q: 'Почему у @Preview-функции нельзя оставить параметр без значения по умолчанию (без @PreviewParameter)?', options: ['Потому что Preview вообще не поддерживает параметры никаким способом', 'Потому что Android Studio должна сама нарисовать функцию, а взять значение для параметра ей неоткуда', 'Потому что это только стилистическая рекомендация, а не реальная ошибка', 'Потому что параметры разрешены только у Composable без @Preview'], correct: 1, why: 'Preview-функция должна быть самодостаточной — вызывать нужный composable с уже готовыми, «зашитыми» данными, а не ждать их снаружи.' },
   { q: 'Что общего у ошибок 2, 3 и 5 из этого раздела, в отличие от ошибок 1 и 4?', options: ['Их вообще невозможно исправить', 'Их можно воспроизвести и проверить формулировку прямо в браузерной песочнице на чистом Kotlin, потому что механизм ошибки не завязан именно на Compose', 'Они относятся только к Android Studio старых версий', 'Они возникают исключительно на эмуляторе'], correct: 1, why: 'No value passed for parameter, type mismatch и Expecting \'}\' — это диагностика самого компилятора Kotlin, не требующая плагина Compose; ошибки 1 и 4 специфичны именно для Compose и Android Studio.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="first-compose-screen" sectionId="typical-errors" />
 
 ## Слова главы
 
-<Flashcards cards={[
+<Block kind="vocab" title="Словарь главы" chapterId="first-compose-screen" blockId="vocab-glossary">
+<Flashcards chapterId="first-compose-screen" cards={[
   { term: 'composable', translation: 'компонуемая функция (composable)', note: 'функция, помеченная @Composable, которая описывает часть интерфейса, а не строит его вручную' },
   { term: 'annotation', translation: 'аннотация', note: 'пассивная метка-метаданные над объявлением, начинается со знака @' },
   { term: 'modifier', translation: 'модификатор', note: 'неизменяемый объект-цепочка, которым настраивают размер, отступы и поведение composable-функции' },
@@ -488,18 +539,46 @@ Syntax error: Expecting '}'.
   { term: 'preview', translation: 'предпросмотр', note: 'отрисовка composable-функции прямо в редакторе, без сборки приложения и без эмулятора' },
   { term: 'container', translation: 'контейнер', note: 'composable-функция вроде Column или Row, которая не рисует содержимое сама, а расставляет то, что передано внутрь' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="first-compose-screen" sectionId="vocab" />
 
 ## Потренируйся печатать
 
 Сигнатура composable-функции с аннотацией — то, что придётся набирать перед каждым экраном:
 
-<CodeTyping snippet={'@Composable\nfun Greeting(name: String) {'} />
+<Block kind="trainer" title="Сигнатура composable-функции" chapterId="first-compose-screen" blockId="trainer-composable-signature">
+<CodeTyping snippet={'@Composable\nfun Greeting(name: String) {'} chapterId="first-compose-screen" trainerId="trainer-composable-signature" targetCpm={100} targetAccuracy={90} />
+</Block>
 
 Цепочка модификаторов — самая частая связка символов на первом экране:
 
-<CodeTyping snippet={'Modifier.fillMaxSize().padding(16.dp)'} />
+<Block kind="trainer" title="Цепочки Modifier" chapterId="first-compose-screen" blockId="trainer-modifier-chain">
+<CodeTyping pools={[{ label: 'Цепочки Modifier', snippets: [
+  'Modifier.fillMaxSize().padding(16.dp)',
+  'Modifier.clickable(onClick = onStartClick).fillMaxSize().padding(16.dp)',
+  'Modifier.fillMaxSize().padding(16.dp).clickable(onClick = onStartClick)',
+] }]} keyboard chapterId="first-compose-screen" trainerId="trainer-modifier-chain" targetCpm={120} targetAccuracy={90} />
+</Block>
+
+<SectionAnchor chapterId="first-compose-screen" sectionId="practice-typing" />
 
 ## Символы и приёмы главы
+
+<Block kind="cheatsheet" title="Символы и приёмы главы" chapterId="first-compose-screen" blockId="cheatsheet-symbols-tricks" favPayload={{
+  kind: 'table',
+  head: ['Символ / приём', 'Как называется', 'Что делает', 'Пример'],
+  rows: [
+    ['@', 'аннотация (собака)', 'помечает объявление метаданными для компилятора или инструментов IDE', '@Composable'],
+    ['.dp', 'свойство-расширение', 'превращает число в единицу измерения Dp, не зависящую от плотности экрана', '16.dp'],
+    ['Modifier.a().b()', 'цепочка модификаторов', 'каждый вызов оборачивает результат предыдущего в новый неизменяемый Modifier', 'Modifier.fillMaxSize().padding(16.dp)'],
+    ['param = value', 'именованный аргумент', 'передаёт значение в параметр функции по имени, а не по позиции', 'Text(text = "Привет")'],
+    ['{ ... } после скобок', 'трейлинг-лямбда', 'передаёт код как последний аргумент функции — так контейнеры получают содержимое', 'Column { Text("A") }'],
+    ['onClick = { ... }', 'лямбда-обработчик события', 'код, который выполнится при нажатии — вызывается не сразу, а по клику', 'Button(onClick = { count++ })'],
+    ['showBackground = true', 'именованный Boolean-аргумент', 'включает непрозрачный фон в панели Preview', '@Preview(showBackground = true)'],
+    ['() -> Unit', 'тип функции без результата', 'тип лямбды-параметра вроде content или onClick — ничего не принимает и не возвращает', 'content: () -> Unit'],
+  ],
+}}>
 
 | Символ / приём | Как называется | Что делает | Пример |
 |---|---|---|---|
@@ -511,6 +590,8 @@ Syntax error: Expecting '}'.
 | `onClick = { ... }` | лямбда-обработчик события | код, который выполнится при нажатии — вызывается не сразу, а по клику | `Button(onClick = { count++ })` |
 | `showBackground = true` | именованный Boolean-аргумент | включает непрозрачный фон в панели Preview | `@Preview(showBackground = true)` |
 | `() -> Unit` | тип функции без результата | тип лямбды-параметра вроде content или onClick — ничего не принимает и не возвращает | `content: () -> Unit` |
+
+</Block>
 
 <details>
 <summary>Углубиться</summary>
@@ -525,20 +606,28 @@ Syntax error: Expecting '}'.
 
 </details>
 
+<SectionAnchor chapterId="first-compose-screen" sectionId="cheatsheet-symbols" />
+
 ## Куда дальше: проверенные ресурсы
 
-### Русские материалы
+<Block kind="cheatsheet" title="Русские материалы" chapterId="first-compose-screen" blockId="cheatsheet-resources-ru">
 
 - [Хабр — Библиотека «Jetpack Compose» для начинающего Android-разработчика](https://habr.com/ru/articles/757572/) — открой, если хочется того же материала другими словами: аннотация, Modifier, базовые элементы и раскладки разобраны с нуля на русском.
 - [Jetpack Compose: быстрый старт и пример первого экрана](https://ivankornev.com/articles/android/setup/jetpack-compose-kak-nachat-i-sobrat-perviy-ekran/) — открой, чтобы увидеть первый экран целиком в контексте настоящего проекта: с настройкой Gradle и более сложными элементами вроде списка и плавающей кнопки.
 - [Урок 5: Column & Row — позиционирование](https://ievetrov.ru/android-jetpack-compose-uroki/urok-5-column-row-pozicionirovanie/) — открой для более подробного разбора выравнивания внутри Column и Row на практическом примере шапки приложения.
 
-### Официальная документация (на английском)
+</Block>
+
+<Block kind="cheatsheet" title="Официальная документация (на английском)" chapterId="first-compose-screen" blockId="cheatsheet-resources-official">
 
 - [Layouts basics — Column, Row, Box](https://developer.android.com/develop/ui/compose/layouts/basics) — открой за исходным источником примеров этой главы и разделом про Box — третий контейнер, который здесь не разбирался.
 - [Compose modifiers](https://developer.android.com/develop/ui/compose/modifiers) — открой за полным списком готовых модификаторов и более подробным объяснением, почему их порядок важен.
 - [Preview your UI with composable previews](https://developer.android.com/develop/ui/compose/tooling/previews) — открой за подробностями про `@PreviewParameter` и предпросмотр в разных темах и размерах экрана.
 - [Jetpack Compose basics (codelab)](https://developer.android.com/codelabs/jetpack-compose-basics) — открой для пошагового практикума с заданиями: тот же материал, но с реальным проектом, анимацией и списком из тысячи элементов.
+
+</Block>
+
+<SectionAnchor chapterId="first-compose-screen" sectionId="resources" />
 
 ## Челлендж ⭐
 
@@ -579,6 +668,8 @@ Column(
 
 </details>
 
+<SectionAnchor chapterId="first-compose-screen" sectionId="challenge" />
+
 ## Что должен уметь
 
 - Объяснять, что такое аннотация вообще, и почему `@Composable` сама по себе ничего не делает без плагина компилятора Compose.
@@ -589,3 +680,5 @@ Column(
 - Собирать простой экран из `Column` + `Text` + `Button` + цепочки `Modifier` и читать его построчно.
 - Узнавать по сообщению компилятора или панели Preview пять типичных ошибок этой темы — вызов composable вне контекста, отсутствующий `onClick`, число вместо `Dp`, параметр у Preview-функции, незакрытую скобку — и чинить каждую.
 - Объяснять разницу между Kotlin-кодом, который можно запустить прямо в браузере (KotlinPlay), и Compose-кодом, для которого нужен полноценный Android-проект.
+
+<SectionAnchor chapterId="first-compose-screen" sectionId="what-you-should-know" />

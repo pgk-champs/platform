@@ -10,9 +10,15 @@ import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
 import SelfCheck from '@site/src/components/SelfCheck';
-import TOCInline from '@theme/TOCInline';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # Функции и лямбды
+
+<ChapterProgress chapterId="functions-lambdas" totalSections={14} totalQuizzes={4} totalTrainers={2} />
 
 ## Зачем это нужно
 
@@ -22,12 +28,15 @@ import TOCInline from '@theme/TOCInline';
 
 В этой главе разберём объявление функции по символам — что значит каждый знак сигнатуры, — научимся задавать параметры по умолчанию (default arguments) и именованные аргументы (named arguments), напишем собственные лямбды разных форм и разберёмся, что такое функция высшего порядка (higher-order function) на примере `map` и `filter`, которые уже видели в главе 1.
 
-<TOCInline toc={toc} />
+<CollapsibleToc toc={toc} chapterId="functions-lambdas" />
+
+<SectionAnchor chapterId="functions-lambdas" sectionId="why" />
 
 ## Функция по кусочкам: `fun square(x: Int): Int`
 
 Вот функция, которая возводит число в квадрат. Разберём сигнатуру — первую строку, где объявлены имя, параметры и тип возврата, — по символам.
 
+<Block kind="breakdown" title="Разбор по символам: сигнатура fun square" chapterId="functions-lambdas" blockId="breakdown-square-signature">
 <SyntaxBreakdown parts={[
   { text: 'fun ', label: 'ключевое слово', note: 'объявляет функцию (function); от английского fun — сокращение того же слова. Пробел после него обязателен, как и после val' },
   { text: 'square', label: 'имя функции', note: 'придумываешь сам; по нему функцию вызывают дальше в коде. Правила именования те же, что у переменных: латиница, без пробелов' },
@@ -37,6 +46,7 @@ import TOCInline from '@theme/TOCInline';
   { text: ': ', label: 'двоеточие — тип возврата', note: 'то же двоеточие, что и у переменной, но теперь после скобок функции: означает «эта функция возвращает значение такого типа»' },
   { text: 'Int', label: 'тип возврата', note: 'тип значения, которое функция отдаёт наружу через return. Здесь — целое число' },
 ]} />
+</Block>
 
 ### Что означает каждый символ
 
@@ -61,14 +71,20 @@ fun square(x: Int): Int {
 - **Строка 5: `fun square(x: Int): Int {`** — объявление функции `square`: принимает один параметр `x` типа `Int`, возвращает `Int`. Открывающая `{` начинает тело — список команд, которые выполнятся при вызове.
 - **Строка 6: `return x * x`** — новое ключевое слово `return`: «немедленно закончи функцию и отдай наружу то, что справа». Здесь отдаётся `x * x` — квадрат переданного числа.
 - **Строка 7: `}`** — конец тела функции.
-- Функцию можно объявить и до, и после места, где её вызывают: в отличие от переменных, порядок объявления функций в файле не важен — компилятор сначала видит все объявления, а потом проверяет тела.
+
+<Hint id="functions-lambdas-h1" type="fact">
+Функцию можно объявить и до, и после места, где её вызывают: в отличие от переменных, порядок объявления функций в файле не важен — компилятор сначала видит все объявления, а потом проверяет тела.
+</Hint>
 
 **Что выведет:** `16` — потому что `square(4)` вычислил `4 * 4` и вернул это значение в `println`.
+
+<SectionAnchor chapterId="functions-lambdas" sectionId="function-anatomy" />
 
 ## Тело-выражение: одна строка вместо блока
 
 Если тело функции — это ровно одно выражение, фигурные скобки и `return` можно убрать, заменив их знаком `=`. Это называется телом-выражением (expression body) — в противовес телу-блоку (block body), которое мы только что видели.
 
+<Block kind="breakdown" title="Разбор по символам: тело-выражение" chapterId="functions-lambdas" blockId="breakdown-expression-body">
 <SyntaxBreakdown parts={[
   { text: 'fun ', label: 'ключевое слово', note: 'то же самое объявление функции' },
   { text: 'square', label: 'имя функции', note: 'функция называется так же — это может быть даже другая перегрузка той же операции' },
@@ -77,6 +93,7 @@ fun square(x: Int): Int {
   { text: ' = ', label: 'оператор тела-выражения', note: 'это НЕ присваивание, как в val x = 5: здесь = говорит «результат функции — это значение выражения справа». Пробелы вокруг него, как и у val/var, для читаемости' },
   { text: 'x * x', label: 'единственное выражение', note: 'то, что раньше отдавали через return, теперь просто пишут после =. Ни фигурных скобок, ни return не нужно' },
 ]} />
+</Block>
 
 <KotlinPlay code={`fun main() {
     println(square(4))
@@ -96,7 +113,9 @@ fun square(x: Int) = x * x`} />
 
 **Что выведет:** `16` — компилятор сам понял, что `x * x` — это `Int`, раз `x` типа `Int`, и присвоил такой же тип возврата функции. Это тот же вывод типов (type inference), что и у переменных, только применённый к функции.
 
+<Hint id="functions-lambdas-h2" type="important">
 Важно: **этот трюк работает только для тела-выражения.** У тела-блока (в фигурных скобках) тип возврата выводить неоткуда — Kotlin не станет анализировать все `return` внутри блока в поисках общего типа. Про это — отдельная ошибка в разделе «Типичные ошибки» ниже.
+</Hint>
 
 А что, если функции нечего возвращать — она просто что-то делает, например печатает текст? Тогда тип возврата вообще не пишут, и Kotlin считает его равным `Unit` — специальному типу «ничего не возвращаю».
 
@@ -115,17 +134,22 @@ fun greet(name: String) {
 
 **Что выведет:** `Привет, Соня!` — функция выполнила действие, но значения не вернула.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Сигнатура и тело функции" chapterId="functions-lambdas" blockId="quiz-signature-body">
+<SelfCheck chapterId="functions-lambdas" quizId="q1" questions={[
   { q: 'Что означает : Int после скобок в fun square(x: Int): Int?', options: ['Тип параметра x', 'Тип значения, которое функция возвращает (return type)', 'Имя переменной внутри функции', 'Количество параметров'], correct: 1, why: 'Двоеточие после скобок параметров — аннотация типа возврата: что именно функция отдаёт наружу через return.' },
   { q: 'Чем тело-выражение (= x * x) отличается от тела-блока ({ return x * x })?', options: ['Ничем, это синонимы', 'Тело-выражение — одна строка без фигурных скобок и return; тело-блок — полноценный блок кода с явным return', 'Тело-выражение работает медленнее', 'Тело-блок нельзя использовать с параметрами'], correct: 1, why: 'Это два способа описать тело функции. Тело-выражение годится, когда функция — это одна формула; тело-блок — когда нужно несколько шагов.' },
   { q: 'Можно ли не писать : Int в fun square(x: Int) = x * x?', options: ['Нет, это ошибка компиляции', 'Да — при теле-выражении Kotlin выводит тип возврата сам по значению справа от =', 'Можно, но тогда функция всегда будет возвращать Unit', 'Можно только для функций без параметров'], correct: 1, why: 'Вывод типов работает и для тела-выражения: Kotlin смотрит на x * x, видит Int и присваивает такой же тип возврата функции.' },
   { q: 'Что вернёт fun greet(name: String) { println("Привет, $name!") }, если тип возврата не указан?', options: ['String, потому что внутри печатается строка', 'Unit — функция ничего не возвращает, только выполняет действие', 'Int, потому что это тип по умолчанию', 'Ошибку компиляции — тип возврата обязателен'], correct: 1, why: 'Если после скобок нет : Тип, Kotlin подставляет Unit — специальный тип «ничего не возвращаю». Это не ошибка, а нормальный случай для функций-действий.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="functions-lambdas" sectionId="expression-body" />
 
 ## Параметры по умолчанию: необязательные аргументы
 
 Параметру можно задать значение по умолчанию (default argument) прямо в объявлении. Тогда при вызове его можно не передавать — Kotlin подставит значение сам.
 
+<Block kind="breakdown" title="Разбор по символам: параметр по умолчанию" chapterId="functions-lambdas" blockId="breakdown-default-argument">
 <SyntaxBreakdown parts={[
   { text: 'fun ', label: 'ключевое слово', note: 'объявление функции' },
   { text: 'greet', label: 'имя функции', note: 'по нему будем вызывать функцию' },
@@ -138,6 +162,7 @@ fun greet(name: String) {
   { text: ')', label: 'закрывающая скобка параметров', note: 'список параметров закончился' },
   { text: ' {', label: 'начало тела', note: 'тело-блок функции' },
 ]} />
+</Block>
 
 <KotlinPlay code={`fun main() {
     greet("Олег")
@@ -163,10 +188,13 @@ fun greet(name: String, greeting: String = "Привет") {
 
 Обязательные параметры (без `=`) всегда идут первыми, необязательные (со значением по умолчанию) — после них. У параметра, который не в конце списка, тоже может быть значение по умолчанию — но тогда, чтобы пропустить его и задать следующий, понадобятся именованные аргументы, о которых дальше.
 
+<SectionAnchor chapterId="functions-lambdas" sectionId="default-arguments" />
+
 ## Именованные аргументы: вызов по имени, а не по порядку
 
 Аргументы можно передавать не только по порядку, но и по имени параметра — тогда порядок вызова не важен, а из кода сразу видно, что чему соответствует.
 
+<Block kind="breakdown" title="Разбор по символам: именованные аргументы" chapterId="functions-lambdas" blockId="breakdown-named-arguments">
 <SyntaxBreakdown parts={[
   { text: 'describe', label: 'имя функции', note: 'вызываем функцию describe' },
   { text: '(', label: 'открывающая скобка', note: 'начало списка аргументов вызова' },
@@ -177,6 +205,7 @@ fun greet(name: String, greeting: String = "Привет") {
   { text: 'isChampion = true', label: 'именованный аргумент', note: 'этот параметр в объявлении имеет значение по умолчанию, но здесь мы его переопределяем явно' },
   { text: ')', label: 'закрывающая скобка', note: 'конец списка аргументов' },
 ]} />
+</Block>
 
 <KotlinPlay code={`fun main() {
     describe(name = "ПГК", score = 100, isChampion = true)
@@ -199,14 +228,20 @@ fun describe(name: String, score: Int, isChampion: Boolean = false) {
 Соня: 42 очков, чемпион: false
 ```
 
+<Hint id="functions-lambdas-h3" type="tip">
 Заметь: `name = "ПГК"` при вызове и `greeting: String = "Привет"` при объявлении выглядят похоже, но это разные вещи. В объявлении `имя: Тип = значение` задаёт значение по умолчанию. При вызове `имя = значение` — это именованный аргумент, у него нет двоеточия и типа, потому что тип параметр уже получил при объявлении.
+</Hint>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Параметры по умолчанию и именованные аргументы" chapterId="functions-lambdas" blockId="quiz-default-named">
+<SelfCheck chapterId="functions-lambdas" quizId="q2" questions={[
   { q: 'Что делает greeting: String = "Привет" в объявлении параметра?', options: ['Присваивает переменной greeting значение "Привет" один раз', 'Делает параметр необязательным: если его не передать при вызове, используется "Привет"', 'Меняет тип параметра на String', 'Ничего — это просто комментарий'], correct: 1, why: 'Значение по умолчанию (default argument) используется, только если вызывающий код не передал свой аргумент для этого параметра.' },
   { q: 'Что выведет greet("Олег"), если объявление — fun greet(name: String, greeting: String = "Привет")?', options: ['Олег, Привет!', 'Привет, Олег!', 'Ошибку компиляции: не хватает аргумента', 'null, Олег!'], correct: 1, why: 'greeting не передан, поэтому берётся значение по умолчанию "Привет"; строка собирается как "$greeting, $name!".' },
   { q: 'Зачем нужны именованные аргументы, если можно передавать значения просто по порядку?', options: ['Они работают быстрее позиционных', 'Делают вызов понятным без взгляда в объявление функции и позволяют менять порядок или пропускать параметры со значением по умолчанию', 'Без них нельзя вызвать функцию с более чем одним параметром', 'Именованные аргументы обязательны для всех функций Kotlin'], correct: 1, why: 'describe(score = 42, name = "Соня") сразу понятно без документации, а порядок аргументов можно менять местами.' },
   { q: 'Что выведет describe(score = 42, name = "Соня") для fun describe(name: String, score: Int, isChampion: Boolean = false)?', options: ['Соня: 42 очков, чемпион: false', '42: Соня очков, чемпион: false', 'Ошибку: isChampion не передан', 'Соня: 42 очков, чемпион: true'], correct: 0, why: 'Именованные аргументы расставляют значения по именам параметров независимо от порядка вызова; isChampion не передан — берётся значение по умолчанию false.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="functions-lambdas" sectionId="named-arguments" />
 
 ## Лямбды: с `it` и с именованными параметрами
 
@@ -237,6 +272,8 @@ fun describe(name: String, score: Int, isChampion: Boolean = false) {
 
 **Что выведет:** `7` — потому что `3 + 4 = 7`.
 
+<SectionAnchor chapterId="functions-lambdas" sectionId="lambdas" />
+
 ## Функции высшего порядка: `map`, `filter` и свои
 
 Функция высшего порядка (higher-order function) — это функция, которая принимает другую функцию как параметр или возвращает функцию. `map` и `filter` из главы 1 — как раз такие: они принимают лямбду и решают, что с ней делать для каждого элемента.
@@ -251,6 +288,7 @@ fun describe(name: String, score: Int, isChampion: Boolean = false) {
 
 Теперь напишем свою функцию высшего порядка — такую же, как `filter`/`map` внутри устроены сами.
 
+<Block kind="breakdown" title="Разбор по символам: функция calculate" chapterId="functions-lambdas" blockId="breakdown-calculate-signature">
 <SyntaxBreakdown parts={[
   { text: 'fun ', label: 'ключевое слово', note: 'объявляем функцию' },
   { text: 'calculate', label: 'имя функции', note: 'считает результат операции над двумя числами' },
@@ -260,6 +298,7 @@ fun describe(name: String, score: Int, isChampion: Boolean = false) {
   { text: ': Int', label: 'тип возврата', note: 'сама calculate тоже возвращает Int' },
   { text: ' {', label: 'начало тела', note: 'тело-блок' },
 ]} />
+</Block>
 
 <KotlinPlay code={`fun main() {
     println(calculate(6, 3, { a, b -> a + b }))
@@ -277,12 +316,14 @@ fun calculate(a: Int, b: Int, operation: (Int, Int) -> Int): Int {
 - **Строка 2: `calculate(6, 3, { a, b -> a + b })`** — лямбда передана третьим аргументом обычным способом, в скобках через запятую.
 - **Строка 3: `calculate(6, 3) { a, b -> a - b }`** — то же самое, но лямбда вынесена за скобки вызова. Такая запись называется трейлинг-лямбдой (trailing lambda): если лямбда — последний параметр функции, её можно писать не внутри `( )`, а сразу после них.
 
+<Block kind="breakdown" title="Разбор по символам: трейлинг-лямбда" chapterId="functions-lambdas" blockId="breakdown-trailing-lambda">
 <SyntaxBreakdown parts={[
   { text: 'calculate', label: 'имя функции', note: 'та же функция, что и выше' },
   { text: '(6, 3)', label: 'обычные аргументы', note: 'a и b передаются как всегда, в скобках через запятую' },
   { text: ' ', label: 'пробел', note: 'отделяет скобки вызова от лямбды — они больше не одно целое' },
   { text: '{ a, b -> a - b }', label: 'трейлинг-лямбда', note: 'третий аргумент — лямбда для operation, — вынесенный за круглые скобки. Это ровно то же значение, что и { a, b -> a - b }, переданное третьим параметром внутри скобок' },
 ]} />
+</Block>
 
 **Что выведет:**
 ```text
@@ -291,12 +332,16 @@ fun calculate(a: Int, b: Int, operation: (Int, Int) -> Int): Int {
 ```
 Первый вызов сложил (6 + 3 = 9), второй вычел (6 − 3 = 3) — потому что мы передали разные лямбды одной и той же функции `calculate`.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Лямбды и функции высшего порядка" chapterId="functions-lambdas" blockId="quiz-lambdas-hof">
+<SelfCheck chapterId="functions-lambdas" quizId="q3" questions={[
   { q: 'Что такое функция высшего порядка (higher-order function)?', options: ['Функция, которая вызывает сама себя', 'Функция, которая принимает другую функцию как параметр или возвращает функцию', 'Любая функция с более чем одним параметром', 'Функция без тела'], correct: 1, why: 'map, filter и наша calculate — функции высшего порядка именно потому, что принимают лямбду (функцию) как один из параметров.' },
   { q: 'Что означает тип (Int, Int) -> Int?', options: ['Список из трёх целых чисел', 'Функция, принимающая два Int и возвращающая Int', 'Массив типа Int размером 2', 'Функция без параметров, возвращающая Int дважды'], correct: 1, why: 'Слева от стрелки в скобках — типы параметров, справа от стрелки — тип возврата. Это тип самой функции как значения.' },
   { q: 'Чем calculate(6, 3) { a, b -> a - b } отличается от calculate(6, 3, { a, b -> a - b })?', options: ['Это две разные функции', 'Ничем по результату — это два способа записать один и тот же вызов; лямбду-последний-параметр можно вынести за скобки', 'Первый вариант работает быстрее', 'Второй вариант — ошибка компиляции'], correct: 1, why: 'Это трейлинг-лямбда (trailing lambda): синтаксический вариант записи, а не другая функция.' },
   { q: 'Что делает numbers.filter { it > 4 }?', options: ['Заменяет каждый элемент на it > 4', 'Оставляет в новом списке только те элементы, для которых лямбда вернула true', 'Считает количество элементов больше 4', 'Сортирует список по возрастанию'], correct: 1, why: 'filter — функция высшего порядка: пропускает каждый элемент через лямбду-предикат и оставляет только те, где результат true.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="functions-lambdas" sectionId="higher-order" />
 
 ## Типичные ошибки
 
@@ -372,16 +417,39 @@ Return type mismatch: expected 'Boolean', actual 'Int'.
 
 **Как починить:** написать настоящее условие, дающее `Boolean`, например `filter { it > 0 }`.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Типичные ошибки" chapterId="functions-lambdas" blockId="quiz-typical-errors">
+<SelfCheck chapterId="functions-lambdas" quizId="q4" questions={[
   { q: 'Почему fun square(x: Int) { return x * x } не компилируется?', options: ['Забыта точка с запятой', 'Тип возврата не указан → неявно Unit, а return пытается вернуть Int', 'Параметр x не используется', 'В Kotlin нельзя использовать return внутри функций'], correct: 1, why: 'Без явного : Int тип возврата — Unit. Возврат значения через return x * x конфликтует с этим неявным Unit.' },
   { q: 'Почему fun square(x: Int): Int { x * x } выдаёт "Missing return statement."?', options: ['x * x — недопустимое выражение', 'Тело-блок не возвращает последнее выражение автоматически — нужен явный return', 'Тип Int нельзя использовать как тип возврата', 'Забыта точка с запятой после x * x'], correct: 1, why: 'В отличие от тела-выражения, блок в фигурных скобках требует явного return для каждого пути возврата значения.' },
   { q: 'Какую ошибку покажет компилятор для greet("Олег"), если оба параметра greet обязательны?', options: ["Missing return statement.", "No value passed for parameter 'greeting'.", "Return type mismatch: expected 'Unit', actual 'Int'.", "Unresolved reference 'greeting'."], correct: 1, why: 'Второй параметр без значения по умолчанию обязателен — вызов с одним аргументом не может его заполнить.' },
   { q: 'Почему numbers.filter { it } не компилируется для List<Int>?', options: ['it нельзя использовать в filter', 'Лямбда filter должна возвращать Boolean, а it здесь имеет тип Int', 'filter работает только со списками строк', 'Нужно писать it() вместо it'], correct: 1, why: 'filter решает, оставить элемент или нет, — то есть его лямбда обязана возвращать true/false (Boolean), а не сам элемент.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="functions-lambdas" sectionId="typical-errors" />
 
 ## Символы главы
 
 Шпаргалка по всем новым знакам и конструкциям этой главы.
+
+<Block kind="cheatsheet" title="Символы главы" chapterId="functions-lambdas" blockId="cheatsheet-symbols" favPayload={{
+  kind: 'table',
+  head: ['Символ / конструкция', 'Как называется', 'Что делает', 'Пример'],
+  rows: [
+    ['fun', 'ключевое слово', 'объявляет функцию', 'fun square(x: Int): Int'],
+    ['( ) после имени функции', 'список параметров', 'объявляет входные данные функции', 'square(x: Int)'],
+    [': после скобок функции', 'аннотация типа возврата', 'указывает, что функция возвращает', '): Int {'],
+    ['return', 'ключевое слово', 'возвращает значение из тела-блока и завершает функцию', 'return x * x'],
+    ['Unit', 'тип «ничего»', 'возвращаемый тип функций, которые не возвращают значение; пишется неявно, если : Тип пропущен', 'fun greet(name: String) { ... }'],
+    ['= после сигнатуры функции', 'тело-выражение', 'заменяет { return ... } на одну строку; тип возврата можно вывести', 'fun square(x: Int) = x * x'],
+    ['= значение внутри скобок параметра', 'параметр по умолчанию', 'делает аргумент необязательным при вызове', 'greeting: String = "Привет"'],
+    ['имя = значение при вызове', 'именованный аргумент', 'явно указывает, какому параметру передаётся значение, независимо от порядка', 'describe(score = 42, name = "Соня")'],
+    ['{ a, b -> ... }', 'лямбда с именованными параметрами', 'стрелка отделяет параметры лямбды от тела', '{ a, b -> a + b }'],
+    ['it', 'неявный параметр лямбды', 'имя единственного параметра, если его не назвали явно', 'filter { it > 4 }'],
+    ['(Тип, Тип) -> Тип', 'тип функции', 'описывает сигнатуру лямбды/функции как значения', '(Int, Int) -> Int'],
+    ['fn(a, b) { ... }', 'трейлинг-лямбда', 'лямбда-последний-параметр выносится за круглые скобки вызова', 'calculate(6, 3) { a, b -> a - b }'],
+  ],
+}}>
 
 | Символ / конструкция | Как называется | Что делает | Пример |
 |---|---|---|---|
@@ -398,6 +466,8 @@ Return type mismatch: expected 'Boolean', actual 'Int'.
 | `(Тип, Тип) -> Тип` | тип функции | описывает сигнатуру лямбды/функции как значения | `(Int, Int) -> Int` |
 | `fn(a, b) { ... }` | трейлинг-лямбда | лямбда-последний-параметр выносится за круглые скобки вызова | `calculate(6, 3) { a, b -> a - b }` |
 
+</Block>
+
 <details>
 <summary>Углубиться</summary>
 
@@ -411,9 +481,12 @@ Return type mismatch: expected 'Boolean', actual 'Int'.
 
 </details>
 
+<SectionAnchor chapterId="functions-lambdas" sectionId="cheatsheet-symbols" />
+
 ## Слова главы
 
-<Flashcards cards={[
+<Block kind="vocab" title="Словарь главы" chapterId="functions-lambdas" blockId="vocab-glossary">
+<Flashcards chapterId="functions-lambdas" cards={[
   { term: 'parameter', translation: 'параметр', note: 'имя во входных данных функции, объявленное в её сигнатуре' },
   { term: 'argument', translation: 'аргумент', note: 'конкретное значение, переданное параметру при вызове функции' },
   { term: 'return type', translation: 'тип возврата', note: 'тип значения, которое функция отдаёт наружу через return' },
@@ -425,20 +498,44 @@ Return type mismatch: expected 'Boolean', actual 'Int'.
   { term: 'closure', translation: 'замыкание', note: 'способность лямбды видеть и использовать переменные из окружающего кода' },
   { term: 'trailing lambda', translation: 'трейлинг-лямбда', note: 'синтаксис, когда лямбда-параметр выносится за круглые скобки вызова' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="functions-lambdas" sectionId="vocab" />
 
 ## Потренируйся печатать
 
 Сначала однострочная функция — тело-выражение:
 
-<CodeTyping snippet={'fun square(x: Int): Int = x * x'} />
+<Block kind="trainer" title="Сигнатуры и однострочные функции" chapterId="functions-lambdas" blockId="trainer-functions">
+<CodeTyping pools={[{ label: 'Функции', snippets: [
+  'fun square(x: Int): Int = x * x',
+  'fun square(x: Int) = x * x',
+  'fun square(x: Int): Int { return x * x }',
+  'fun calculate(a: Int, b: Int, operation: (Int, Int) -> Int): Int',
+  'fun totalLong(distances: List<Int>, threshold: Int = 4): Int',
+  'fun countBy(distances: List<Int>, predicate: (Int) -> Boolean): Int',
+] }]} keyboard chapterId="functions-lambdas" trainerId="trainer-functions" targetCpm={110} targetAccuracy={90} />
+</Block>
 
 Теперь лямбда с типом функции и двумя именованными параметрами:
 
-<CodeTyping snippet={'val add: (Int, Int) -> Int = { a, b -> a + b }'} />
+<Block kind="trainer" title="Лямбды и цепочки вызовов" chapterId="functions-lambdas" blockId="trainer-lambdas">
+<CodeTyping pools={[{ label: 'Лямбды', snippets: [
+  'val add: (Int, Int) -> Int = { a, b -> a + b }',
+  'distances.filter { it > 4 }.map { it * 1000 }',
+  'calculate(6, 3) { a, b -> a - b }',
+  'numbers.filter { it > 0 }',
+  'distances.filter { it > threshold }.map { it * 1000 }.sum()',
+] }]} chapterId="functions-lambdas" trainerId="trainer-lambdas" targetCpm={120} targetAccuracy={90} />
+</Block>
+
+<SectionAnchor chapterId="functions-lambdas" sectionId="practice-typing" />
 
 ## Куда дальше: проверенные ресурсы
 
-### Русские материалы с нуля
+<Block kind="cheatsheet" title="Проверенные ресурсы" chapterId="functions-lambdas" blockId="cheatsheet-resources">
+
+**Русские материалы с нуля**
 
 - [kotlinlang.ru — Функции](https://kotlinlang.ru/docs/functions.html) — официальная документация в переводе: параметры по умолчанию, именованные аргументы, тело-выражение разобраны с примерами.
 - [kotlinlang.ru — Лямбда-выражения и функции высшего порядка](https://kotlinlang.ru/docs/lambdas.html) — тот же официальный перевод про лямбды, `it`, функциональные типы и трейлинг-лямбды.
@@ -446,14 +543,18 @@ Return type mismatch: expected 'Boolean', actual 'Int'.
 - [Урок 10: функции в Kotlin](https://ievetrov.ru/kotlin-s-nulya-uroki/urok-10-funkczii-v-kotlin/) — продолжение курса с урока 1: `fun`, параметры, возвращаемый тип на практических примерах.
 - [Hyperskill: Kotlin Functions](https://hyperskill.org/university/kotlin/kotlin-functions) — та же площадка, что и в главе 1, теперь тема — функции, именованные аргументы и значения по умолчанию.
 
-### Официальный тур Kotlin (на английском)
+**Официальный тур Kotlin (на английском)**
 
 - [Kotlin tour: Functions](https://kotlinlang.org/docs/kotlin-tour-functions.html) — официальный тур: сигнатура, именованные аргументы, значения по умолчанию, однострочные функции и лямбды со встроенными упражнениями и готовыми решениями.
 
-### Потренироваться
+**Потренироваться**
 
 - [play.kotlinlang.org](https://play.kotlinlang.org) — та же песочница, что работает в кнопках Run этой главы, но во весь экран.
 - [Kotlin Koans: Named arguments / Default arguments / Lambdas](https://play.kotlinlang.org/koans/overview) — в разделе Introduction есть три задачи именно на темы этой главы, с автопроверкой.
+
+</Block>
+
+<SectionAnchor chapterId="functions-lambdas" sectionId="resources" />
 
 ## Челлендж ⭐
 
@@ -511,6 +612,8 @@ fun main() {
 
 </details>
 
+<SectionAnchor chapterId="functions-lambdas" sectionId="challenge" />
+
 ## Что должен уметь
 
 - Объявлять функцию с `fun`, параметрами и типом возврата, объясняя, что делает каждый символ сигнатуры.
@@ -522,3 +625,5 @@ fun main() {
 - Объяснять, что такое функция высшего порядка, и приводить пример на `filter`/`map`.
 - Писать свою функцию, принимающую лямбду как параметр через функциональный тип `(Тип, Тип) -> Тип`, и вызывать её через трейлинг-лямбду.
 - Узнавать по сообщению компилятора четыре типичные ошибки функций и лямбд — значение из Unit-функции, забытый `return`, непереданный обязательный аргумент, неверный тип результата лямбды — и чинить каждую.
+
+<SectionAnchor chapterId="functions-lambdas" sectionId="what-you-should-know" />

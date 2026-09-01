@@ -10,9 +10,15 @@ import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
 import SelfCheck from '@site/src/components/SelfCheck';
-import TOCInline from '@theme/TOCInline';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # Состояние и события
+
+<ChapterProgress chapterId="state-events" totalSections={15} totalQuizzes={5} totalTrainers={2} />
 
 ## Зачем это нужно
 
@@ -22,7 +28,9 @@ import TOCInline from '@theme/TOCInline';
 
 Как и в прошлой главе: сам Jetpack Compose (`Text`, `Column`, `Button`, `TextField`, `@Composable`) в браузере не запускается — для него нужен настоящий Android-проект. Compose-код здесь снова даётся статичными блоками с построчным разбором. А там, где под капотом Compose скрывается обычный Kotlin — делегаты, лямбды, замыкания, — глава впервые в этом курсе даёт исполняемые примеры буквально для каждой идеи, включая типичные ошибки: все они собраны так, что запускаются прямо здесь, в песочнице.
 
-<TOCInline toc={toc} />
+<CollapsibleToc toc={toc} chapterId="state-events" />
+
+<SectionAnchor chapterId="state-events" sectionId="why" />
 
 ## var, который не переживает вызов
 
@@ -46,6 +54,8 @@ fun main() {
 - **Строки 7–9: `println(renderScreen())` × 3** — три отдельных, независимых вызова одной и той же функции.
 
 **Что выведет:** `1`, `1`, `1` — три одинаковые строки, а не `1`, `2`, `3`, как можно было бы ожидать от «счётчика». Причина в том, что `var count = 0` внутри тела функции — это не одна переменная, которая живёт между вызовами, а новая переменная при **каждом** вызове: она создаётся, увеличивается на единицу и тут же исчезает вместе с завершением функции. Ровно так же вела бы себя composable-функция, если бы попыталась хранить счётчик нажатий в обычном `var` внутри своего тела: при каждой рекомпозиции счётчик обнулялся бы заново, и нажатия как будто не считались бы.
+
+<SectionAnchor chapterId="state-events" sectionId="var-lifetime" />
 
 ## remember: место, которое переживает пересборку
 
@@ -73,7 +83,9 @@ fun main() {
 
 **Что выведет:** `1`, `2`, `3` — теперь значение растёт от вызова к вызову, потому что оно живёт не внутри функции, а вне её.
 
+<Hint id="state-events-h1" type="important">
 Важная оговорка на честность: настоящий `remember` устроен не через глобальную переменную файла — он хранит значение в специальной внутренней структуре Compose (композиции, composition), привязанной к конкретному месту вызова composable-функции в дереве экрана, а не ко всему файлу целиком. Если бы это была обычная глобальная переменная, два разных счётчика на экране делили бы одно и то же значение — а `remember` в двух разных местах хранит для каждого своё. Но сама *суть* — «место снаружи тела функции, которое не создаётся заново при повторном вызове» — у обоих одинаковая, и для первого знакомства с идеей этого достаточно; более точный механизм — в разделе «Углубиться» в конце главы.
+</Hint>
 
 Настоящий `remember` в Compose выглядит так — обёрнутый вокруг ещё одной новой функции, `mutableStateOf`, к которой глава переходит в следующем разделе:
 
@@ -81,12 +93,16 @@ fun main() {
 val countState = remember { mutableStateOf(0) }
 ```
 
+<Block kind="breakdown" title="Разбор по частям: remember { mutableStateOf(0) }" chapterId="state-events" blockId="breakdown-remember">
 <SyntaxBreakdown parts={[
   { text: 'remember', label: 'функция-хранилище', note: 'composable-функция из Compose runtime: при первом вызове выполняет переданную лямбду и запоминает результат; при каждом следующем вызове (на той же рекомпозиции того же места в дереве экрана) просто отдаёт уже сохранённый результат, не трогая лямбду заново' },
   { text: ' {', label: 'открывающая скобка трейлинг-лямбды', note: 'тот же приём trailing lambda из прошлой главы — код внутри выполнится максимум один раз за всё время жизни этого места на экране' },
   { text: ' mutableStateOf(0)', label: 'тело лямбды — что именно запоминаем', note: 'вызов другой функции, mutableStateOf, с начальным значением 0; результат этого вызова remember и сохранит' },
   { text: ' }', label: 'закрывающая скобка', note: 'конец тела лямбды remember' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="state-events" sectionId="remember" />
 
 ## mutableStateOf и делегат by
 
@@ -114,6 +130,7 @@ count++
 
 Слово `by` (по-английски дословно «посредством», «через») — это делегирование свойства (property delegation): вместо того чтобы `count` был обычной переменной со своим местом в памяти, компилятор перенаправляет КАЖДОЕ чтение и КАЖДУЮ запись `count` объекту справа от `by` — в данном случае тому самому `MutableState`, что вернул `remember { mutableStateOf(0) }`. Разберём объявление по частям:
 
+<Block kind="breakdown" title="Разбор по частям: var count by remember" chapterId="state-events" blockId="breakdown-by-remember">
 <SyntaxBreakdown parts={[
   { text: 'var', label: 'ключевое слово var', note: 'объявляет изменяемую переменную. Здесь это обязательно именно var, а не val: делегату нужно не только читать значение, но и записывать новое при count++ — про то, что бывает, если написать val, глава расскажет в разделе «Типичные ошибки»' },
   { text: ' count', label: 'имя свойства', note: 'имя, под которым переменная доступна в остальном коде — читается и пишется как обычная переменная типа Int, хотя на самом деле каждое обращение уходит через делегат' },
@@ -124,6 +141,7 @@ count++
   { text: '(0)', label: 'начальное значение', note: '0 — стартовое значение счётчика; заодно по этому числу компилятор выводит тип всего выражения как MutableState<Int>, а значит и count будет иметь тип Int на всё время жизни переменной' },
   { text: ' }', label: 'закрывающая скобка лямбды', note: 'конец тела remember' },
 ]} />
+</Block>
 
 ### Как работает delegate на самом деле: свой класс без единой строчки Compose
 
@@ -161,6 +179,7 @@ fun main() {
 
 Разберём сигнатуру `getValue` по частям — здесь ни один символ не случаен, каждый нужен компилятору, чтобы найти именно эту функцию как подходящий делегат:
 
+<Block kind="breakdown" title="Разбор по частям: сигнатура getValue" chapterId="state-events" blockId="breakdown-getvalue-signature">
 <SyntaxBreakdown parts={[
   { text: 'operator', label: 'ключевое слово operator', note: 'без этого модификатора функция была бы обычным методом с любым именем; operator сообщает компилятору «эту функцию можно вызывать неявно через специальный синтаксис» — здесь через by' },
   { text: ' fun ', label: 'объявление функции', note: 'обычное ключевое слово fun, как у любой другой функции' },
@@ -172,17 +191,22 @@ fun main() {
   { text: ')', label: 'закрывающая скобка параметров', note: 'конец списка параметров' },
   { text: ': Int', label: 'тип возврата', note: 'то, что фактически получит код, читающий count, — в этой главе всегда Int, тот же тип, что хранит делегат внутри' },
 ]} />
+</Block>
 
 **Что выведет:** `Старт`, затем `Читаю count: 0`, `Пишу в count: 0 -> 1`, `Читаю count: 1`, и наконец `Итог: 1`. Обрати внимание: слово `count` нигде явно не вызывает `getValue` или `setValue` — Kotlin сам подставляет эти вызовы на месте каждого чтения и каждой записи, потому что `count` объявлен через `by`.
 
 Именно так устроен и настоящий `by remember { mutableStateOf(0) }` — только вместо самодельного `Loud` делегатом выступает `MutableState`, а функции `getValue`/`setValue` для него определены не как методы самого класса, а как отдельные функции-расширения (extension functions — механизм Kotlin, который «пристраивает» новые функции к уже существующему типу) в библиотеке `androidx.compose.runtime`. Чтобы `by` заработал с `mutableStateOf`, эти функции-расширения должны быть в области видимости — обычно за это отвечают `import androidx.compose.runtime.getValue` и `import androidx.compose.runtime.setValue`, которые Android Studio почти всегда добавляет сама через автодополнение. Что происходит, если их всё-таки нет, — отдельная типичная ошибка этой главы, разобранная дальше.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="remember, mutableStateOf и делегат by" chapterId="state-events" blockId="quiz-delegate-by">
+<SelfCheck chapterId="state-events" quizId="quiz-delegate-by" questions={[
   { q: 'В демо с renderScreen() и локальным var count — почему println выводит 1, 1, 1, а не 1, 2, 3?', options: ['Это баг компилятора', 'var count объявлен ВНУТРИ тела функции — при каждом новом вызове создаётся заново, а не переиспользуется', 'println всегда округляет числа до 1', 'renderScreen на самом деле вызывается только один раз'], correct: 1, why: 'Локальная переменная живёт ровно столько, сколько выполняется функция; при следующем вызове она создаётся с нуля — ровно то же самое случилось бы с несохранённым счётчиком нажатий внутри composable-функции при рекомпозиции.' },
   { q: 'Что конкретно решает remember, а что — mutableStateOf, если использовать их по отдельности?', options: ['Это два названия одной и той же функции', 'remember сохраняет результат вычисления между повторными вызовами; mutableStateOf делает значение наблюдаемым, чтобы Compose знал о его изменении и перерисовал экран', 'remember создаёт observable-объект, а mutableStateOf просто хранит значение между вызовами', 'Оба нужны только для текста, для чисел работает любой один'], correct: 1, why: 'Это две разные задачи: remember — «не пересчитывать заново», mutableStateOf — «сообщить Compose об изменении». Вместе, вложенные друг в друга, remember { mutableStateOf(0) } решают обе.' },
   { q: 'В демо с классом Loud — что именно вызывает Kotlin, когда в коде написано count++?', options: ['Только setValue, потому что нужна только запись', 'Сначала getValue (прочитать текущее значение), затем setValue с увеличенным значением', 'Ни то ни другое — count++ работает напрямую с private var current', 'Компилятор вызывает toString()'], correct: 1, why: 'count++ равносильно count = count + 1: сначала нужно ПРОЧИТАТЬ текущее значение через getValue, потом ЗАПИСАТЬ новое через setValue — вывод "Читаю..." и следом "Пишу..." в консоли демо это подтверждает.' },
   { q: 'Зачем у getValue второй параметр имеет тип KProperty<*>, а не просто отсутствует?', options: ['Это обязательный параметр для любой функции в Kotlin, даже без делегатов', 'Через него делегат может узнать метаданные о свойстве, которое он обслуживает, — например, его имя через property.name', 'KProperty<*> — это тип самого значения, которое хранит делегат', 'Он нужен только для совместимости со старыми версиями Kotlin'], correct: 1, why: 'property: KProperty<*> — способ делегата "заглянуть" в то свойство, к которому он подключён, не зная заранее его имени; в демо это использовано для печати property.name.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="state-events" sectionId="delegate-by" />
 
 ## Рекомпозиция: что перерисуется и почему
 
@@ -230,14 +254,20 @@ fun main() {
 ```
 `renderName` не вызывается второй раз — и это специально сделано в примере руками, чтобы показать сам принцип. В настоящем Compose это происходит автоматически: тот же плагин компилятора, что распознаёт `@Composable` (из прошлой главы), встраивает в каждую composable-функцию скрытый код, который отслеживает, к каким именно объектам `State` она обращалась во время выполнения, — и при изменении конкретного `State` перерисовывает только те функции, что реально его читали.
 
+<Hint id="state-events-h2" type="tip">
 Отсюда и требование из прошлой главы, что composable-функция должна быть быстрой и идемпотентной (при одинаковых входных данных вести себя одинаково, сколько бы раз её ни вызвали): раз Compose решает сам, когда и сколько раз перевызвать функцию, внутри неё нельзя полагаться на побочные эффекты, которые ломаются от повторного выполнения, — печать в лог для отладки безопасна, а, например, отправка сетевого запроса «на каждый вызов функции» — нет.
+</Hint>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Рекомпозиция" chapterId="state-events" blockId="quiz-recomposition">
+<SelfCheck chapterId="state-events" quizId="quiz-recomposition" questions={[
   { q: 'Что в реальном Compose играет роль setValue из прошлого раздела — что именно запускает рекомпозицию?', options: ['Каждый вызов composable-функции', 'Запись нового значения в MutableState (то есть setValue делегата) — она сообщает Compose, что состояние изменилось', 'Нажатие любой клавиши на клавиатуре', 'Полная перезагрузка приложения'], correct: 1, why: 'Именно запись через setValue — а не чтение через getValue — запускает механизм оповещения Compose о том, что состояние устарело и нужна рекомпозиция.' },
   { q: 'В демо с renderName/renderCounter — почему renderName ни разу не печатается заново после count++?', options: ['Потому что renderName() написана с ошибкой', 'Потому что она читает name, а не count, — то состояние, которое изменилось, её не касается', 'Потому что вложенные функции в Kotlin можно вызвать только один раз', 'Порядок вызовов в коде случаен'], correct: 1, why: 'Демо руками показывает то, что Compose делает автоматически: перевызывается только тот код, который реально читал именно изменившееся состояние.' },
   { q: 'Почему composable-функция должна быть идемпотентной, если разговор зашёл именно про рекомпозицию?', options: ['Это требование никак не связано с рекомпозицией', 'Потому что Compose сам решает, когда и сколько раз перевызвать функцию — при одинаковых входных данных результат обязан быть одинаковым', 'Потому что иначе Kotlin не скомпилирует код', 'Идемпотентность нужна только для сетевых запросов'], correct: 1, why: 'Раз рекомпозиция может произойти в любой момент и сколько угодно раз, побочные эффекты, зависящие от количества вызовов, дали бы разный результат при каждой перерисовке — это и запрещает требование идемпотентности из прошлой главы.' },
   { q: 'Если на экране Text читает и count, и name, а изменился только count — что произойдёт с этим Text?', options: ['Он не перерисуется, потому что name не менялся', 'Он перерисуется, потому что он читает count, а count изменился — неважно, что там же читается и не изменившийся name', 'Compose выдаст ошибку из-за смешивания двух состояний в одном Text', 'Перерисуется только та часть строки, что относится к count'], correct: 1, why: 'Recomposition решает по принципу "функция читала это состояние?" — если да, перевызов происходит целиком для всей функции, даже если внутри есть и другие, не изменившиеся значения.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="state-events" sectionId="recomposition" />
 
 ## onClick и обработчики: событие как лямбда, ещё раз
 
@@ -249,6 +279,7 @@ Button(onClick = { count++ }) {
 }
 ```
 
+<Block kind="breakdown" title="Разбор по частям: Button(onClick = { count++ })" chapterId="state-events" blockId="breakdown-button-onclick">
 <SyntaxBreakdown parts={[
   { text: 'Button', label: 'composable-кнопка', note: 'та же функция из прошлой главы' },
   { text: '(', label: 'открывающая скобка', note: 'начало списка аргументов' },
@@ -256,6 +287,7 @@ Button(onClick = { count++ }) {
   { text: '{ count++ }', label: 'тело лямбды', note: 'теперь это не пустая лямбда {} и не внешняя ссылка на функцию, а лямбда прямо здесь, внутри которой count — та самая делегированная переменная. За кадром компилятор превращает count++ в getValue (прочитать), затем setValue (записать увеличенное); setValue, в свою очередь, сообщает Compose "запланируй рекомпозицию всех, кто меня читает"' },
   { text: ')', label: 'закрывающая скобка вызова Button', note: 'конец аргументов Button; дальше идёт отдельная трейлинг-лямбда содержимого кнопки, как и в прошлой главе' },
 ]} />
+</Block>
 
 ### TextField и onValueChange: обработчик с параметром
 
@@ -265,6 +297,7 @@ Button(onClick = { count++ }) {
 TextField(value = text, onValueChange = { text = it })
 ```
 
+<Block kind="breakdown" title="Разбор по частям: TextField с onValueChange" chapterId="state-events" blockId="breakdown-textfield">
 <SyntaxBreakdown parts={[
   { text: 'TextField', label: 'composable-функция поля ввода', note: 'встроена в Compose Material; рисует однострочное поле, куда пользователь может печатать текст' },
   { text: '(', label: 'открывающая скобка вызова', note: 'начало списка аргументов' },
@@ -274,9 +307,11 @@ TextField(value = text, onValueChange = { text = it })
   { text: '{ text = it }', label: 'тело обработчика', note: 'it — implicit-параметр лямбды с единственным аргументом (та же техника из главы про функции и лямбды): здесь it — это новая строка текста ПОСЛЕ очередного нажатия клавиши; text = it записывает её в делегированное состояние' },
   { text: ')', label: 'закрывающая скобка вызова', note: 'у TextField, в отличие от Button, нет отдельной трейлинг-лямбды содержимого — весь текст внутри поля рисует сам TextField по параметру value' },
 ]} />
+</Block>
 
 Тип `onValueChange`, если написать его явно, — `(String) -> Unit`: функция, принимающая один аргумент типа `String` и ничего не возвращающая. Сравним его с уже знакомым `() -> Unit` у `onClick`:
 
+<Block kind="breakdown" title="Разбор по частям: тип (String) -> Unit" chapterId="state-events" blockId="breakdown-string-unit">
 <SyntaxBreakdown parts={[
   { text: 'onNicknameChange', label: 'имя параметра-обработчика', note: 'по соглашению обработчики "изменения значения" называют on-Что-Change — так же по смыслу, как onClick называют по названию самого события' },
   { text: ': ', label: 'двоеточие типа', note: 'та же роль, что у любой переменной с указанным типом — дальше идёт тип параметра' },
@@ -284,13 +319,18 @@ TextField(value = text, onValueChange = { text = it })
   { text: ' -> ', label: 'стрелка типа функции', note: 'разделяет "что лямбда принимает" (слева) и "что она возвращает" (справа) — тот же символ стрелки лямбды, что уже встречался в первых главах курса' },
   { text: 'Unit', label: 'тип возврата', note: 'обработчик ничего не возвращает, просто выполняет действие — ровно как у onClick' },
 ]} />
+</Block>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Обработчики событий" chapterId="state-events" blockId="quiz-event-handlers">
+<SelfCheck chapterId="state-events" quizId="quiz-event-handlers" questions={[
   { q: 'Чем принципиально отличается тип onClick от типа onValueChange?', options: ['Ничем, это одно и то же в другой обёртке', 'onClick — () -> Unit (без аргументов), onValueChange — (String) -> Unit (с одним аргументом: новым текстом)', 'onClick принимает String, а onValueChange — Int', 'onValueChange не принимает никаких аргументов, в отличие от onClick'], correct: 1, why: 'Клик — это просто факт "нажали", ему нечего передавать. Изменение текста обязано сообщить, ЧТО теперь написано в поле, — отсюда и параметр String у onValueChange.' },
   { q: 'В { text = it } внутри onValueChange — что представляет собой it?', options: ['Ссылку на сам TextField', 'implicit-параметр лямбды: новое значение текста, введённое пользователем только что', 'Предыдущее значение text до изменения', 'Индекс символа в строке'], correct: 1, why: 'it — та же implicit-техника из главы про функции и лямбды: единственный параметр лямбды, который можно не называть явно. Здесь Compose передаёт в него именно новую строку.' },
   { q: 'Почему TextField(value = text, ...) не запоминает введённый текст сам по себе?', options: ['Потому что это баг в библиотеке', 'Потому что TextField — composable-функция, которая только рисует то значение, что ей передали параметром value, а не хранит своё собственное', 'Потому что value — необязательный параметр', 'TextField действительно запоминает текст сам, value ему не нужен'], correct: 1, why: 'Тот же принцип, что и у Text(text = ...): composable-функция описывает, что показать, но не хранит данные внутри себя — источник данных всегда снаружи, через параметр.' },
   { q: 'Что произойдёт, если в Button(onClick = { count++ }) написать вместо этого пустую лямбду Button(onClick = {})?', options: ['Программа не скомпилируется', 'Кнопка будет нажиматься, но count не изменится и рекомпозиция для счётчика не запустится', 'Compose автоматически подставит count++ сам', 'Кнопка перестанет отображаться на экране'], correct: 1, why: 'onClick — обычная лямбда: если в её теле ничего не менять состояние, никакой setValue не вызовется, а значит и рекомпозиция не запланируется — кнопка будет "живой", но бесполезной.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="state-events" sectionId="event-handlers" />
 
 ## Состояние вверх: подъём состояния на счётчике
 
@@ -338,7 +378,9 @@ fun TrainingScreen() {
 - **Строка 12: `var count by remember { mutableStateOf(0) }`** — теперь состояние живёт здесь, в `TrainingScreen`, а не в `CounterDisplay`.
 - **Строка 13: `CounterDisplay(count = count, onIncrement = { count++ })`** — родитель передаёт вниз ТЕКУЩЕЕ значение (`count = count`) и лямбду, которая знает, как его изменить (`onIncrement = { count++ }`). Сам `count++` по-прежнему выполняется здесь, в `TrainingScreen`, — просто по сигналу, пришедшему снизу через вызов `onIncrement`.
 
+<Hint id="state-events-h3" type="fact">
 Это правило часто формулируют короче: состояние течёт вниз (state flows down) — как обычный параметр, а события текут вверх (events flow up) — как вызов лямбды-обработчика. Официальная документация Compose называет этот принцип однонаправленным потоком данных (unidirectional data flow, UDF): данные всегда движутся в одну сторону, вниз по дереву параметров, а изменения запрашиваются в обратную сторону, вызовом обработчика, а не прямой записью откуда-то снизу.
+</Hint>
 
 Главный практический выигрыш: `TrainingScreen` теперь — и только он — единственный источник истины (single source of truth) для `count`. `CounterDisplay` можно переиспользовать где угодно, дать ему любое число и любой обработчик — он не привязан к тому, откуда именно берётся состояние.
 
@@ -380,12 +422,16 @@ fun RegistrationScreen() {
 - **Строка 10: `NicknameField(nickname = nickname, onNicknameChange = { nickname = it })`** — та же схема, что и у счётчика: передаём текущее значение и лямбду, которая умеет его менять.
 - **Строка 11: `Text(text = if (nickname.isBlank()) "Введи никнейм" else "Привет, $nickname!")`** — а вот это стало возможным ТОЛЬКО благодаря подъёму состояния: `RegistrationScreen` читает `nickname` не только для передачи в `NicknameField`, но и здесь, во второй, совершенно независимой строке текста. Если бы `nickname` остался внутри `NicknameField`, эта строка не смогла бы вообще ничего узнать о введённом тексте.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Подъём состояния" chapterId="state-events" blockId="quiz-state-hoisting">
+<SelfCheck chapterId="state-events" quizId="quiz-state-hoisting" questions={[
   { q: 'Что именно означает фраза "состояние течёт вниз, события текут вверх"?', options: ['Состояние всегда хранится в самом нижнем composable дерева', 'Родитель передаёт текущее значение состояния вниз как обычный параметр, а дочерний компонент сообщает о желании его изменить, вызывая переданный сверху обработчик', 'Это метафора без технического смысла', 'Состояние течёт вниз только в TextField, а в Button — вверх'], correct: 1, why: 'Именно так устроена связка count: Int (вниз, параметр) и onIncrement: () -> Unit, вызываемый по клику (вверх, событие) — оба примера главы построены по этой схеме.' },
   { q: 'В NicknameField(nickname: String, onNicknameChange: (String) -> Unit) — почему onNicknameChange, а не просто изменение nickname внутри самой функции?', options: ['Потому что nickname внутри NicknameField — параметр функции, а параметры в Kotlin нельзя переприсваивать напрямую; изменение обязано пройти через родителя, который и владеет настоящим состоянием', 'Потому что TextField не поддерживает локальные переменные', 'Разницы нет, оба варианта работают одинаково', 'onNicknameChange нужен только для валидации ввода'], correct: 0, why: 'После подъёма состояния единственный владелец nickname — RegistrationScreen; NicknameField может только попросить изменение через обработчик, а не изменить состояние сам.' },
   { q: 'Что стало возможным в RegistrationScreen благодаря подъёму состояния, чего не было бы с самодостаточной NicknameField() без параметров?', options: ['Ничего не изменилось, это чисто косметическая правка', 'Строка Text с приветствием смогла прочитать nickname напрямую, потому что состояние теперь хранится в общем родителе, а не заперто внутри поля ввода', 'TextField стал работать быстрее', 'Появилась возможность вводить эмодзи'], correct: 1, why: 'Единственный источник истины (single source of truth) в RegistrationScreen позволяет любому месту внутри него читать nickname — в примере это делает вторая строка Text.' },
   { q: 'Почему CounterDisplay(count: Int, onIncrement: () -> Unit) называют stateless (бессостоятельной), хотя она всё равно показывает число и реагирует на клик?', options: ['Потому что она вообще не использует count', 'Потому что она сама не хранит remember { mutableStateOf(...) } — всё состояние ей приходит и уходит через параметры, а не живёт внутри неё', 'Stateless означает "без Compose"', 'Потому что у неё нет Column'], correct: 1, why: 'Stateless в терминах Compose — не "не работает с данными", а "не владеет собственным remember-состоянием": данные приходят снаружи параметром, изменения запрашиваются наружу через лямбду.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="state-events" sectionId="state-hoisting" />
 
 ## Собираем экран целиком
 
@@ -428,6 +474,8 @@ fun TrainingScreen() {
 - **Строка 24: `CounterDisplay(count = count, onIncrement = { count++ })`** — та же схема, что и для счётчика по отдельности.
 
 Ни `CounterDisplay`, ни `NicknameField` не знают о существовании друг друга и не хранят вообще никакого состояния — обе функции целиком переиспользуемы: их можно было бы поставить на любой другой экран с любым другим родителем, и они продолжили бы работать без единой правки внутри себя.
+
+<SectionAnchor chapterId="state-events" sectionId="full-screen" />
 
 ## Типичные ошибки
 
@@ -555,16 +603,21 @@ Assignment type mismatch: actual type is 'String', but 'Int' was expected.
 
 **Как починить:** присваивать значение того же типа, каким `count` был объявлен изначально — `count = 5`, а не строку; если действительно нужен текст, использовать отдельную переменную с собственным `mutableStateOf("")`, как `nickname` в разделе про поле ввода.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Типичные ошибки" chapterId="state-events" blockId="quiz-typical-errors">
+<SelfCheck chapterId="state-events" quizId="quiz-typical-errors" questions={[
   { q: 'Какая из пяти ошибок этой главы возникает из-за того, что параметры функций в Kotlin — всегда val?', options: ['Argument type mismatch (ошибка 4)', "'val' cannot be reassigned. (ошибка 1)", 'Assignment type mismatch (ошибка 5)', 'Unresolved reference (часть ошибки 3)'], correct: 1, why: 'Ошибка 1 — прямое следствие того, что параметр count: Int внутри counterDisplay — неявный val; изменить его можно только через отдельную лямбду-обработчик, как в разделе про подъём состояния.' },
   { q: 'Чем ошибка 2 (ReadOnlyBox) отличается по сути от ошибки 3 (MutableState без импортов)?', options: ['Это совершенно разные механизмы компилятора', 'В обеих не хватает нужного метода делегата — в ReadOnlyBox отсутствует только setValue, а в MutableState без импортов отсутствуют оба, getValue и setValue', 'Ошибка 3 вообще не связана с делегатами', 'ReadOnlyBox — единственная ошибка, которую нельзя воспроизвести в KotlinPlay'], correct: 1, why: 'Обе ошибки — один и тот же механизм поиска компилятором операторных функций getValue/setValue у делегата; разница только в том, чего именно не хватает.' },
   { q: 'Что нужно исправить в runOnClick(sayHi()), чтобы код заработал?', options: ['Добавить ещё одни скобки: sayHi()()', 'Убрать вызывающие скобки — передать саму функцию как ссылку: runOnClick(::sayHi) или через лямбду runOnClick { sayHi() }', 'Изменить тип параметра onClick на Unit', 'Переименовать sayHi в onClick'], correct: 1, why: 'sayHi() со скобками выполняется немедленно и передаёт результат (Unit); runOnClick ждёт саму функцию, чтобы вызвать её позже, а не готовый результат.' },
   { q: 'Почему count = "текст" в демо с Box — ошибка компиляции, а не просто неверный результат во время выполнения?', options: ['Kotlin вообще не поддерживает строки', 'Тип count как Int зафиксирован ещё на этапе объявления var count by Box(0); setValue у Box принимает только Int, и несовпадение типов компилятор ловит заранее, до запуска', 'Ошибка появляется только при повторном запуске программы', 'Box не поддерживает никакие операции присваивания'], correct: 1, why: 'Статическая типизация Kotlin проверяет типы на этапе компиляции: setValue(..., value: Int) просто не подходит по сигнатуре для String-аргумента, и компилятор сообщает об этом до запуска, а не в виде ошибки в рантайме.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="state-events" sectionId="typical-errors" />
 
 ## Слова главы
 
-<Flashcards cards={[
+<Block kind="vocab" title="Словарь главы" chapterId="state-events" blockId="vocab-glossary">
+<Flashcards chapterId="state-events" cards={[
   { term: 'state', translation: 'состояние (state)', note: 'любое значение, которое может измениться со временем и от которого зависит то, что видно на экране' },
   { term: 'mutableStateOf', translation: 'создать наблюдаемое состояние (mutableStateOf)', note: 'функция, оборачивающая значение в объект MutableState, за изменением которого следит Compose' },
   { term: 'remember', translation: 'запомнить (remember)', note: 'сохраняет результат вычисления между повторными вызовами composable-функции, а не пересчитывает его заново' },
@@ -574,18 +627,51 @@ Assignment type mismatch: actual type is 'String', but 'Int' was expected.
   { term: 'state hoisting', translation: 'подъём состояния (state hoisting)', note: 'перенос состояния из дочерней composable-функции в общего родителя, чтобы дочерняя стала переиспользуемой и stateless' },
   { term: 'single source of truth', translation: 'единственный источник истины (single source of truth)', note: 'принцип, при котором конкретное значение хранится ровно в одном месте, а не дублируется по разным composable-функциям' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="state-events" sectionId="vocab" />
 
 ## Потренируйся печатать
 
 Объявление делегированного состояния — то, что придётся набирать перед каждым изменяемым значением на экране:
 
-<CodeTyping snippet={'var count by remember { mutableStateOf(0) }'} />
+<Block kind="trainer" title="Строки состояния этой главы" chapterId="state-events" blockId="trainer-state-lines">
+<CodeTyping pools={[{ label: 'Состояние и события', snippets: [
+  'var count by remember { mutableStateOf(0) }',
+  'val countState = remember { mutableStateOf(0) }',
+  'var nickname by remember { mutableStateOf("") }',
+  'Button(onClick = { count++ })',
+  'CounterDisplay(count = count, onIncrement = { count++ })',
+  'onNicknameChange: (String) -> Unit',
+  'TextField(value = nickname, onValueChange = onNicknameChange)',
+  'fun CounterDisplay(count: Int, onIncrement: () -> Unit)',
+] }]} keyboard chapterId="state-events" trainerId="trainer-state-lines" targetCpm={110} targetAccuracy={90} />
+</Block>
 
 Поле ввода с обработчиком изменения текста — вторая самая частая связка символов этой главы:
 
-<CodeTyping snippet={'TextField(value = text, onValueChange = { text = it })'} />
+<Block kind="trainer" title="TextField с обработчиком" chapterId="state-events" blockId="trainer-textfield-line">
+<CodeTyping snippet={'TextField(value = text, onValueChange = { text = it })'} chapterId="state-events" trainerId="trainer-textfield-line" targetCpm={120} targetAccuracy={90} />
+</Block>
+
+<SectionAnchor chapterId="state-events" sectionId="practice-typing" />
 
 ## Символы и приёмы главы
+
+<Block kind="cheatsheet" title="Символы и приёмы главы" chapterId="state-events" blockId="cheatsheet-symbols-techniques" favPayload={{
+  kind: 'table',
+  head: ['Символ / приём', 'Как называется', 'Что делает', 'Пример'],
+  rows: [
+    ['by', 'ключевое слово-делегат', 'перенаправляет чтение и запись свойства объекту справа', 'var count by remember { ... }'],
+    ['remember { }', 'функция-хранилище', 'запоминает результат лямбды между рекомпозициями, не пересчитывая его заново', 'remember { mutableStateOf(0) }'],
+    ['mutableStateOf(x)', 'функция-конструктор состояния', 'создаёт наблюдаемый MutableState с начальным значением x', 'mutableStateOf(0)'],
+    ['.value', 'свойство состояния', 'прямой доступ к значению MutableState без делегата by', 'countState.value++'],
+    ['count++ через by', 'инкремент делегированной переменной', 'под капотом — getValue (прочитать), затем setValue с увеличенным значением', 'Button(onClick = { count++ })'],
+    ['onValueChange = { it }', 'лямбда-обработчик ввода', 'вызывается при каждом изменении текста; it — новое значение', 'TextField(value = t, onValueChange = { t = it })'],
+    ['(String) -> Unit', 'тип функции с параметром', 'лямбда, принимающая один аргумент и не возвращающая результата', 'onNicknameChange: (String) -> Unit'],
+    ['operator fun getValue/setValue', 'функции делегата', 'их вызывает компилятор при чтении/записи делегированного свойства', 'класс Loud в примере выше'],
+  ],
+}}>
 
 | Символ / приём | Как называется | Что делает | Пример |
 |---|---|---|---|
@@ -597,6 +683,8 @@ Assignment type mismatch: actual type is 'String', but 'Int' was expected.
 | `onValueChange = { it }` | лямбда-обработчик ввода | вызывается при каждом изменении текста; it — новое значение | `TextField(value = t, onValueChange = { t = it })` |
 | `(String) -> Unit` | тип функции с параметром | лямбда, принимающая один аргумент и не возвращающая результата | `onNicknameChange: (String) -> Unit` |
 | `operator fun getValue/setValue` | функции делегата | их вызывает компилятор при чтении/записи делегированного свойства | класс `Loud` в примере выше |
+
+</Block>
 
 <details>
 <summary>Углубиться</summary>
@@ -611,20 +699,32 @@ Assignment type mismatch: actual type is 'String', but 'Int' was expected.
 
 </details>
 
+<SectionAnchor chapterId="state-events" sectionId="cheatsheet" />
+
 ## Куда дальше: проверенные ресурсы
 
 ### Русские материалы
+
+<Block kind="cheatsheet" title="Русские материалы" chapterId="state-events" blockId="cheatsheet-resources-ru">
 
 - [Погружаемся в Compose-Verse — управление состоянием](https://habr.com/ru/companies/otus/articles/656231/) — открой за тем же материалом другими словами: от базового `mutableStateOf`/`remember` до подъёма состояния и вынесения его в отдельные state-holder классы.
 - [Урок 8: MutableState, remember. Состояние и Рекомпозиция](https://ievetrov.ru/android-jetpack-compose-uroki/urok-8-mutablestate-remember-sostoyanie-i-rekompaziya/) — открой для того же материала в формате видео-курса с текстовым конспектом рядом.
 - [Осознанная оптимизация Compose](https://habr.com/ru/companies/ozontech/articles/742854/) — открой, когда захочется заглянуть дальше базы: как рекомпозиция становится проблемой производительности на больших списках и что с этим делают в реальном проекте.
 
+</Block>
+
 ### Официальная документация (на английском)
+
+<Block kind="cheatsheet" title="Официальная документация" chapterId="state-events" blockId="cheatsheet-resources-en">
 
 - [State and Jetpack Compose](https://developer.android.com/develop/ui/compose/state) — открой за первоисточником примеров этой главы и более полным объяснением remember и State.
 - [Where to hoist state](https://developer.android.com/develop/ui/compose/state-hoisting) — открой за подробным разбором, КУДА именно поднимать состояние в более сложных экранах — до composable-родителя, отдельного state holder-класса или ViewModel.
 - [Delegated properties](https://kotlinlang.org/docs/delegated-properties.html) — открой за полным описанием механизма `by` в самом языке Kotlin, включая `lazy` и другие встроенные делегаты помимо `mutableStateOf`.
 - [State in Jetpack Compose (codelab)](https://developer.android.com/codelabs/jetpack-compose-state) — открой для пошагового практикума с заданиями на реальном приложении-опроснике, включая `rememberSaveable` — состояние, переживающее не только рекомпозицию, но и поворот экрана.
+
+</Block>
+
+<SectionAnchor chapterId="state-events" sectionId="resources" />
 
 ## Челлендж ⭐
 
@@ -678,6 +778,8 @@ fun TrainingScreen() {
 
 </details>
 
+<SectionAnchor chapterId="state-events" sectionId="challenge" />
+
 ## Что должен уметь
 
 - Объяснять, почему обычный `var` внутри тела composable-функции не переживает рекомпозицию, и какую роль в этом решении играют `remember` и `mutableStateOf` по отдельности.
@@ -688,3 +790,5 @@ fun TrainingScreen() {
 - Объяснять подъём состояния (state hoisting): зачем переносить `remember { mutableStateOf(...) }` из дочерней функции в родительскую и как при этом дочерняя функция получает данные и события через параметры.
 - Собирать hoisted-экран из stateless-компонентов на примере счётчика и поля ввода, читая и записывая по строкам, кто чем владеет.
 - Узнавать по сообщению компилятора пять типичных ошибок этой темы — изменение `val`-параметра, делегат без `setValue`, забытый импорт `getValue`/`setValue`, вызванный вместо переданный обработчик, несовпадение типа при присваивании делегированной переменной — и чинить каждую.
+
+<SectionAnchor chapterId="state-events" sectionId="what-you-should-know" />

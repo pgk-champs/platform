@@ -10,9 +10,15 @@ import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import ToolCard from '@site/src/components/ToolCard';
 import SelfCheck from '@site/src/components/SelfCheck';
-import TOCInline from '@theme/TOCInline';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # Git: ветки и merge
+
+<ChapterProgress chapterId="git-branches" totalSections={14} totalQuizzes={5} totalTrainers={2} />
 
 ## Зачем это нужно
 
@@ -20,7 +26,9 @@ import TOCInline from '@theme/TOCInline';
 
 Так устроена работа любой команды разработчиков, и на чемпионате «Профессионалы» в том числе: каждый участник — а иногда и один участник, но по разным задачам — пилит свою часть в своей ветке, а потом всё сливается вместе в одну историю. Иногда при слиянии Git встречает противоречие — конфликт (conflict): обе ветки поменяли одну и ту же строку по-разному, и машина не готова угадывать, кто прав. Звучит грозно, но на деле это обычная рабочая ситуация с понятным алгоритмом решения — научиться его проходить спокойно и быстро важнее, чем никогда не встречать конфликтов вообще. В этой главе, как и в прошлой, весь путь разобран по молекулам: что происходит внутри `.git` после каждой команды и что означает каждое слово в ответе терминала.
 
-<TOCInline toc={toc} />
+<CollapsibleToc toc={toc} chapterId="git-branches" />
+
+<SectionAnchor chapterId="git-branches" sectionId="why" />
 
 ## Сквозной пример: ветки в том же my-app
 
@@ -53,21 +61,27 @@ git branch
 
 Одна-единственная строка — ветка `master`, та самая, что создалась сама при первом `git init` в прошлой главе. Звёздочка перед именем — не украшение, а рабочий индикатор: она отмечает текущую ветку, ту, на которой стоит `HEAD` и куда лягут следующие коммиты.
 
+<Block kind="breakdown" title="Разбор вывода: git branch" chapterId="git-branches" blockId="breakdown-branch-list">
 <SyntaxBreakdown parts={[
   { text: '* ', label: 'звёздочка', note: 'отмечает текущую ветку — ту, на которой ты сейчас стоишь. У остальных веток в списке звёздочки не будет' },
   { text: 'master', label: 'имя ветки', note: 'единственная ветка в свежем репозитории; создаётся автоматически при первом коммите, отдельной команды на её создание не было' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="git-branches" sectionId="branch-list" />
 
 ### git switch -c: создать ветку и сразу на неё перейти
 
 Хотим попробовать доработку — добавить в `main.py` счёт и число игроков — но не портить пока рабочую версию в `master`. Заводим отдельную ветку:
 
+<Block kind="breakdown" title="Разбор по словам: git switch -c" chapterId="git-branches" blockId="breakdown-switch-create">
 <SyntaxBreakdown parts={[
   { text: 'git ', label: 'программа', note: 'сама система контроля версий' },
   { text: 'switch ', label: 'подкоманда', note: 'переключает рабочую папку и HEAD на другую ветку — именно её файлы окажутся на диске после команды' },
   { text: '-c ', label: 'флаг create', note: 'сначала создать новую ветку с указанным именем, затем сразу переключиться на неё — без флага switch умеет переходить только на уже существующую ветку' },
   { text: 'feature-scoreboard', label: 'имя ветки', note: 'придумываешь сам; принято коротко и по-английски описывать задачу, которую ветка решает' },
 ]} />
+</Block>
 
 ```bash
 git switch -c feature-scoreboard
@@ -90,7 +104,11 @@ git branch
 
 Звёздочка переехала: теперь текущая ветка — `feature-scoreboard`, а `master` просто стоит в списке рядом, никуда не делась и не изменилась.
 
-**Ветка — не копия проекта.** Внутри `.git` ветка — это один короткий текстовый файл в `refs/heads/`, который хранит всего один hash: на какой коммит она указывает. `git branch -c` не копирует ни один файл проекта — вот почему создание ветки происходит мгновенно, даже если в проекте гигабайты кода. Убедиться легко:
+<Hint id="git-branches-h1" type="fact">
+**Ветка — не копия проекта.** Внутри `.git` ветка — это один короткий текстовый файл в `refs/heads/`, который хранит всего один hash: на какой коммит она указывает. `git branch -c` не копирует ни один файл проекта — вот почему создание ветки происходит мгновенно, даже если в проекте гигабайты кода.
+</Hint>
+
+Убедиться легко:
 
 ```bash
 cat .git/refs/heads/feature-scoreboard
@@ -106,12 +124,16 @@ fe59fd2533f5042944c1211e96e7b96c92f5aa59
 
 В старых статьях и видео вместо `git switch -c` встретится `git checkout -b feature-scoreboard` — это ровно та же операция создания и переключения, просто старой универсальной командой `checkout`, которая умеет ещё много всего другого (например, отменять правки в файле) и поэтому исторически была источником путаницы. `git switch` — новее, появилась в Git 2.23 специально для того, чтобы у переключения веток была своя, ничем не перегруженная команда. Обе работают и сейчас, но новые материалы и эта глава используют `switch`.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Ветки и переключение" chapterId="git-branches" blockId="quiz-switch-create">
+<SelfCheck chapterId="git-branches" quizId="q1" questions={[
   { q: 'Что физически происходит с файлами проекта на диске в момент git switch -c feature-scoreboard?', options: ['Вся папка проекта копируется в новое место', 'Ничего не копируется — создаётся лёгкая закладка (ref), указывающая на текущий коммит, и HEAD переключается на неё', 'Файлы шифруются', 'Создаётся архив .zip со всем проектом'], correct: 1, why: 'Ветка в Git — это файл-указатель с одним hash внутри, а не копия файлов. Поэтому создание ветки мгновенно, даже в огромных проектах.' },
   { q: 'После git switch -c feature-scoreboard команда git branch показывает feature-scoreboard со звёздочкой и master без неё. Что это значит?', options: ['master удалена', 'Звёздочка отмечает текущую ветку — ту, на которой стоит HEAD и куда попадут следующие коммиты', 'feature-scoreboard временная и исчезнет после перезагрузки', 'Обе ветки сейчас активны одновременно'], correct: 1, why: 'Активной может быть только одна ветка одновременно — именно она помечена звёздочкой в git branch.' },
   { q: 'Флаг -c у команды git switch — для чего он?', options: ['Копирует файлы в новую папку', 'Создаёт новую ветку с указанным именем и сразу переключается на неё', 'Удаляет текущую ветку', 'Показывает список коммитов'], correct: 1, why: '-c — от create: без него git switch умеет переключаться только на уже существующие ветки, а с флагом ещё и создаёт новую.' },
   { q: 'В старой команде git checkout -b feature-scoreboard и новой git switch -c feature-scoreboard — в чём разница по результату?', options: ['Результат разный: checkout создаёт ветку без переключения', 'Результат одинаковый — это одна и та же операция «создать и переключиться», просто через разные команды', 'checkout работает только с удалёнными ветками', 'switch появилась раньше checkout'], correct: 1, why: 'git switch появилась в Git 2.23 как более узкая замена части возможностей checkout — конкретно для переключения и создания веток, результат тот же.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="git-branches" sectionId="switch-create" />
 
 ### Коммиты внутри ветки: master не шевелится
 
@@ -143,12 +165,14 @@ git commit -m "add player count line"
 
 Посмотрим на историю целиком, с новым флагом:
 
+<Block kind="breakdown" title="Разбор по словам: git log --graph --all" chapterId="git-branches" blockId="breakdown-log-graph-flags">
 <SyntaxBreakdown parts={[
   { text: 'git log ', label: 'команда', note: 'показать историю коммитов' },
   { text: '--oneline ', label: 'флаг', note: 'уже знаком: сжимает каждый коммит до одной строки' },
   { text: '--graph ', label: 'флаг graph', note: 'рисует ASCII-дерево слева от хешей: столбики и линии показывают, как ветки расходятся и сходятся' },
   { text: '--all', label: 'флаг all', note: 'без него git log показывает историю только текущей ветки; с --all — сразу всех веток в репозитории' },
 ]} />
+</Block>
 
 ```bash
 git log --oneline --graph --all
@@ -175,6 +199,8 @@ git branch -v
 
 Вот она, разница, спрятанная за одинаковой картинкой графа: `feature-scoreboard` ушла на два коммита вперёд, а `master` стоит там же, где стояла до `git switch -c`.
 
+<SectionAnchor chapterId="git-branches" sectionId="branch-commits" />
+
 ### git merge: перемотка (fast-forward)
 
 Эксперимент удался — пора вернуть счёт и число игроков в основную ветку. Встаём на ветку-приёмник и зовём к себе изменения:
@@ -198,11 +224,13 @@ print("Удачи!")
 
 Именно та старая версия — ведь на `master` мы ничего не коммитили, пока сидели в `feature-scoreboard`. Сливаем:
 
+<Block kind="breakdown" title="Разбор по словам: git merge" chapterId="git-branches" blockId="breakdown-merge-command">
 <SyntaxBreakdown parts={[
   { text: 'git ', label: 'программа', note: 'сама система контроля версий' },
   { text: 'merge ', label: 'подкоманда', note: 'merge — «слить»: перенести коммиты другой ветки в текущую' },
   { text: 'feature-scoreboard', label: 'откуда сливаем', note: 'имя ветки-источника; вливаем именно в ту ветку, на которой стоим сейчас, то есть в master' },
 ]} />
+</Block>
 
 ```bash
 git merge feature-scoreboard
@@ -215,12 +243,14 @@ Fast-forward
  1 file changed, 2 insertions(+)
 ```
 
+<Block kind="breakdown" title="Разбор вывода: Fast-forward" chapterId="git-branches" blockId="breakdown-fast-forward-output">
 <SyntaxBreakdown parts={[
   { text: 'Updating fe59fd2..074d80c', label: 'откуда куда', note: 'закладка master стояла на fe59fd2, а после операции окажется на 074d80c — двойная точка обозначает диапазон между двумя коммитами' },
   { text: '\nFast-forward', label: 'тип слияния', note: 'перемотка: раз master не менялась всё это время, Git не создаёт отдельный коммит слияния — он просто передвигает закладку master вперёд, на последний коммит feature-scoreboard. Никакой «магии»: коммиты dd98912 и 074d80c уже существовали, менялась только метка' },
   { text: '\n main.py | 2 ++', label: 'диффстат: файл', note: 'main.py изменился; два плюсика — сокращённая шкала того, сколько строк добавилось (уже видел такую же строку в прошлой главе для одной строки)' },
   { text: '\n 1 file changed, 2 insertions(+)', label: 'диффстат: итог', note: 'суммарно по всем слитым коммитам разом: один файл, две вставленные строки — те самые «Счёт: 0» и «Игроков: 2»' },
 ]} />
+</Block>
 
 ```bash
 cat main.py
@@ -261,12 +291,16 @@ Deleted branch feature-scoreboard (was 074d80c).
 
 `-d` — «удалить, но безопасно»: Git заранее проверяет, что все коммиты ветки уже присутствуют где-то ещё (в нашем случае — в `master`, после fast-forward), и только тогда соглашается удалить закладку. Сами коммиты `dd98912` и `074d80c` при этом никуда не делись — они остаются в истории `master`, просто больше не подписаны отдельным именем ветки.
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Fast-forward" chapterId="git-branches" blockId="quiz-fast-forward">
+<SelfCheck chapterId="git-branches" quizId="q2" questions={[
   { q: 'Git ответил Updating fe59fd2..074d80c / Fast-forward. Создался ли новый коммит слияния?', options: ['Да, всегда создаётся merge-коммит', 'Нет — при fast-forward Git просто передвигает закладку ветки на существующий коммит, нового коммита не появляется', 'Да, но только если файлы совпадают', 'Нет, но старые коммиты при этом удаляются'], correct: 1, why: 'Fast-forward — это перемотка указателя, а не создание истории: коммиты уже существовали в feature-ветке, merge просто дал на них указывать ветке master.' },
   { q: 'При каком условии git merge вообще способен сделать fast-forward?', options: ['Только если в сливаемой ветке один коммит', 'Если ветка-приёмник (например, master) не получила ни одного нового коммита с момента, когда от неё отделилась сливаемая ветка', 'Всегда, независимо от истории', 'Только на GitHub, локально не работает'], correct: 1, why: 'Fast-forward возможен, только когда истории не разошлись: ветка-приёмник стоит там же, где стояла в момент создания сливаемой ветки — тогда некуда объединять, можно просто перемотать вперёд.' },
   { q: 'После fast-forward слияния feature-scoreboard в master — что покажет git log --oneline --all: пять коммитов или семь (пять старых плюс два новых)?', options: ['Семь — коммиты дублируются для каждой ветки', 'Пять — это те же самые коммиты dd98912 и 074d80c, они не копируются, просто на них теперь смотрит и master тоже', 'Три — старые коммиты удаляются', 'Зависит от версии Git'], correct: 1, why: 'Коммит — это не файл, привязанный к одной ветке, а узел в общем графе истории. Несколько закладок (веток) могут указывать на один и тот же коммит или на цепочку, ведущую к нему.' },
   { q: 'Что реально делает git branch -d feature-scoreboard после успешного fast-forward слияния?', options: ['Удаляет из истории коммиты dd98912 и 074d80c', 'Удаляет только закладку (указатель) feature-scoreboard — сами коммиты остаются в истории master', 'Откатывает main.py к прошлой версии', 'Требует подтверждения по email'], correct: 1, why: '-d — безопасное удаление: Git проверяет, что коммиты ветки уже есть в другой ветке, и удаляет только сам указатель, а не содержимое истории.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="git-branches" sectionId="merge-fast-forward" />
 
 ### git merge: настоящее слияние с коммитом (three-way merge)
 
@@ -356,12 +390,14 @@ Date:   Tue Sep 1 02:51:16 2026 +0000
     Merge branch 'feature-timer'
 ```
 
+<Block kind="breakdown" title="Разбор вывода: merge-коммит" chapterId="git-branches" blockId="breakdown-merge-commit">
 <SyntaxBreakdown parts={[
   { text: 'commit f958c3f7168aa399da131b53a68694e8b8c18989', label: 'hash', note: 'у merge-коммита такой же 40-символьный SHA-1, как у любого другого — сам факт, что родителей два, ничего в формате hash не меняет' },
   { text: '\nMerge: d895572 1c96c1a', label: 'строка Merge', note: 'бывает только у коммитов слияния — перечисляет хеши обоих родителей: сначала тот, на котором стоял (master), затем влитый (feature-timer)' },
   { text: '\nAuthor: Ivan Petrov <ivan@example.com>', label: 'автор', note: 'тот, кто выполнил команду git merge — не обязательно тот, кто писал код в обеих ветках' },
   { text: '\n\n    Merge branch \'feature-timer\'', label: 'сообщение по умолчанию', note: 'Git сам подставляет этот текст. В настоящем терминале на этом шаге откроется текстовый редактор с уже вписанной строкой — просто сохрани и закрой (в nano — Ctrl+O, Enter, Ctrl+X), и коммит создастся с этим сообщением; можно и переписать текст на своё, если хочется объяснить причину слияния подробнее' },
 ]} />
+</Block>
 
 Взглянем на итоговую картину:
 
@@ -392,12 +428,16 @@ git branch -d feature-timer
 Deleted branch feature-timer (was 1c96c1a).
 ```
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Merge-коммит" chapterId="git-branches" blockId="quiz-three-way">
+<SelfCheck chapterId="git-branches" quizId="q3" questions={[
   { q: 'Чем ситуация с feature-timer отличалась от предыдущей с feature-scoreboard и привела не к fast-forward, а к merge-коммиту?', options: ['Файл main.py стал слишком большим', 'Пока существовала feature-timer, в master тоже появился собственный коммит («ignore log files») — истории разошлись, и перематывать стало некуда', 'feature-timer создали неправильной командой', 'Разница в названиях веток'], correct: 1, why: 'Fast-forward работает только пока ветка-приёмник стоит на месте. Как только у master появился свой коммит, единственный способ объединить линии — создать коммит с двумя родителями.' },
   { q: 'В выводе git log -1 у merge-коммита есть строка Merge: d895572 1c96c1a. Что она означает?', options: ['Это два разных сообщения коммита', 'Это хеши двух родителей merge-коммита — у обычного коммита родитель один, у merge-коммита их два', 'Это ошибка слияния', 'Это версии Git на двух компьютерах'], correct: 1, why: 'Строка Merge появляется только у коммитов слияния и перечисляет хеши обоих родителей — то, что делает merge-коммит особенным в графе истории.' },
   { q: 'В графе git log --graph коммит merge-коммита отмечен *  , а строкой ниже — |\\, ещё ниже — |/. Что показывает такая картинка?', options: ['Ошибку в истории', 'Развилку и последующее схождение: |\\ — расхождение от merge-коммита к двум родителям, |/ — место ниже, где эти две линии когда-то произошли из одного общего предка', 'Что репозиторий повреждён', 'Порядок файлов в проекте'], correct: 1, why: 'ASCII-граф рисует именно форму дерева коммитов: вертикальные линии — ветки, \\  и /  — точки расхождения и схождения истории.' },
   { q: 'Сообщение merge-коммита Merge branch \'feature-timer\' появилось само. Что произошло бы в обычном терминале (не в скрипте) на этом шаге?', options: ['Git создал бы коммит без единого слова о том, что произошло', 'Git открыл бы текстовый редактор по умолчанию с уже вписанным этим текстом — достаточно сохранить и закрыть, либо переписать сообщение своими словами', 'Потребовался бы флаг -m обязательно, иначе ошибка', 'Ничего — merge-коммиты не имеют сообщений'], correct: 1, why: 'Как и у git commit без -m, Git открывает редактор — только теперь уже с заранее подготовленным сообщением слияния, которое можно просто принять или отредактировать.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="git-branches" sectionId="merge-three-way" />
 
 ### Конфликт: когда Git не может выбрать сам
 
@@ -421,7 +461,9 @@ git commit -am "update greeting for finals"
  1 file changed, 1 insertion(+), 1 deletion(-)
 ```
 
-(Флаг `-a` у `commit` — «all»: сразу добавляет в коммит изменения уже отслеживаемых файлов, без отдельного `git add`. Работает только для файлов, которые Git уже знает, — на untracked-файлы, как в прошлой главе, не действует.)
+<Hint id="git-branches-h2" type="tip">
+Флаг `-a` у `commit` — «all»: сразу добавляет в коммит изменения уже отслеживаемых файлов, без отдельного `git add`. Работает только для файлов, которые Git уже знает, — на untracked-файлы, как в прошлой главе, не действует.
+</Hint>
 
 Вернёмся на `master` и поправим ту же самую первую строку — но по-другому:
 
@@ -455,11 +497,13 @@ CONFLICT (content): Merge conflict in main.py
 Automatic merge failed; fix conflicts and then commit the result.
 ```
 
+<Block kind="breakdown" title="Разбор вывода: CONFLICT" chapterId="git-branches" blockId="breakdown-conflict-output">
 <SyntaxBreakdown parts={[
   { text: 'Auto-merging main.py', label: 'Git честно попробовал сам', note: 'сначала Git всегда пытается слить автоматически — это сообщение появляется до того, как найдётся проблема' },
   { text: '\nCONFLICT (content): Merge conflict in main.py', label: 'конфликт содержимого', note: 'найдена строка, изменённая по-разному в обеих ветках, — Git не может выбрать сам и честно об этом сообщает, указывая конкретный файл' },
   { text: '\nAutomatic merge failed; fix conflicts and then commit the result.', label: 'что делать', note: 'дословно: «автоматическое слияние не удалось; исправь конфликты и затем закоммить результат». Уже сейчас Git подсказывает весь дальнейший план' },
 ]} />
+</Block>
 
 Ничего не сломалось. Команда завершилась с ненулевым кодом возврата — это ожидаемо, Git таким образом сигналит скриптам и IDE «слияние остановлено», а не «произошёл сбой». Спросим `git status`, что происходит:
 
@@ -480,12 +524,14 @@ Unmerged paths:
 no changes added to commit (use "git add" and/or "git commit -a")
 ```
 
+<Block kind="breakdown" title="Разбор вывода: git status при конфликте" chapterId="git-branches" blockId="breakdown-conflict-status">
 <SyntaxBreakdown parts={[
   { text: 'You have unmerged paths.', label: 'главный факт', note: '«у тебя есть неслитые пути» — репозиторий сейчас в промежуточном состоянии «посреди слияния», и так будет, пока конфликт не решён' },
   { text: '\n  (use "git merge --abort" to abort the merge)', label: 'аварийный выход', note: 'если решил, что сливать вообще не стоило, эта команда откатывает всё к состоянию до git merge — как будто слияния не было' },
   { text: '\nUnmerged paths:', label: 'список конфликтных файлов', note: 'здесь окажется каждый файл, где обе стороны изменили одно и то же место — в этот раз файл ровно один' },
   { text: '\n\tboth modified:   main.py', label: 'both modified', note: '«изменён с обеих сторон» — специальный статус конфликта, отличный от обычного modified из прошлой главы' },
 ]} />
+</Block>
 
 Откроем сам файл — Git уже вставил в него разметку конфликта прямо на месте спорной строки:
 
@@ -604,12 +650,16 @@ git branch -d feature-name-fix
 Deleted branch feature-name-fix (was f1d457a).
 ```
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Конфликт" chapterId="git-branches" blockId="quiz-conflict">
+<SelfCheck chapterId="git-branches" quizId="q4" questions={[
   { q: 'Что означают три маркера <<<<<<< HEAD, ======= и >>>>>>> feature-name-fix внутри файла с конфликтом?', options: ['Файл повреждён и не читается', 'Между первым и вторым — версия текущей ветки (HEAD), между вторым и третьим — версия вливаемой ветки (её имя подписано в третьем маркере)', 'Это три разных файла, склеенных в один', 'Маркеры нужно закомментировать, а не удалять'], correct: 1, why: 'Git показывает обе конфликтующие версии прямо в файле, подписывая, где чья, чтобы ты выбрал или объединил их сам.' },
   { q: 'После git merge с конфликтом команда завершилась ненулевым кодом возврата. Значит ли это, что что-то сломалось?', options: ['Да, репозиторий повреждён и требует переустановки Git', 'Нет — это ожидаемый сигнал «слияние остановлено, жду решения», а не сбой; сам репозиторий цел', 'Да, файл main.py теперь потерян', 'Нет, но нужно сделать git init заново'], correct: 1, why: 'Ненулевой код — это то, как Git сообщает скриптам и IDE о незавершённом слиянии. Ничего не потеряно: и обе версии строки, и остальной файл на месте.' },
   { q: 'Каким должен быть файл после решения конфликта, прежде чем делать git add?', options: ['В нём могут остаться маркеры для истории', 'Все три вида маркеров (<<<<<<<, ======= и >>>>>>>) должны быть удалены целиком, а сама строка — переписана в финальном виде', 'Нужно оставить только строку из HEAD, вторую версию удалить целиком', 'Файл нужно переименовать'], correct: 1, why: 'Если маркеры остались в файле, они станут частью кода — Git не проверяет это за тебя, слежение за чистотой файла целиком на программисте.' },
   { q: 'Почему после конфликтного слияния git commit сработал без флага -m?', options: ['Флаг -m в принципе необязателен', 'Посреди незавершённого слияния Git уже подготовил сообщение по умолчанию (Merge branch \'...\') — как и при обычном merge-коммите без конфликтов', 'Потому что main.py маленький файл', 'Это баг именно этой версии Git'], correct: 1, why: 'Поведение то же самое, что у бесконфликтного merge-коммита из прошлого раздела: Git сам знает, что писать в сообщение о слиянии, коммит без -m лишь принимает подготовленный текст.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="git-branches" sectionId="merge-conflict" />
 
 ## Типичные ответы Git на четыре частые ситуации
 
@@ -704,16 +754,45 @@ git branch -D feature-unmerged
 Deleted branch feature-unmerged (was b488e60).
 ```
 
+<Hint id="git-branches-h3" type="important">
 `-D` — это буквально `-d --force`: разница ровно в одной проверке, но именно она отделяет «удалить хвост уже слитой работы» от «выбросить единственную копию незавершённой». Пользоваться заглавной версией стоит осознанно, а не по привычке.
+</Hint>
 
-<SelfCheck questions={[
+<Block kind="quiz" title="Ответы Git" chapterId="git-branches" blockId="quiz-git-answers">
+<SelfCheck chapterId="git-branches" quizId="q5" questions={[
   { q: 'git merge feature-name-fix во второй раз ответил Already up to date. Что произошло с историей?', options: ['Git создал ещё один пустой merge-коммит', 'Ничего — Git проверил, что коммит уже является предком текущей ветки, и добавлять нечего; история не изменилась', 'Ветка feature-name-fix была удалена', 'Это ошибка, слияние не удалось'], correct: 1, why: 'Already up to date — не ошибка, а честный ответ: Git заранее проверяет, есть ли вообще что сливать, и если нет — просто сообщает об этом.' },
   { q: 'git switch does-not-exist отвечает fatal: invalid reference: does-not-exist. Какой код возврата у любой fatal-ошибки Git?', options: ['0', '1', '128', 'Зависит от текста ошибки'], correct: 2, why: 'Fatal-ошибки Git всегда возвращают код 128 — это полезно знать при написании скриптов и в CI, где код возврата определяет, продолжать ли дальше.' },
   { q: 'Сообщение об ошибке при заблокированном переключении говорит "overwritten by checkout", хотя запускали git switch. Почему?', options: ['Это баг именно в твоей версии Git', 'Под капотом switch использует ту же старую защиту от потери несохранённых изменений, что и checkout, и сообщение об этом ещё не переименовали — но относится оно именно к твоему switch', 'Нужно было использовать команду checkout вместо switch', 'Сообщение вообще не связано с текущей командой'], correct: 1, why: 'Исторически вся эта логика жила в checkout; switch — более новый и узкий интерфейс поверх того же механизма, поэтому часть внутренних сообщений сохранила старое имя.' },
   { q: 'Чем git branch -D отличается от git branch -d?', options: ['Ничем, это два способа написать одну и ту же команду', '-D удаляет ветку без проверки, что все её коммиты уже есть в другой ветке; -d делает такую проверку и отказывается удалять, если рискует потерять единственную копию коммитов', '-D работает только с удалёнными ветками на GitHub', '-d удаляет ветку вместе с файлами проекта'], correct: 1, why: '-D — это -d --force: та же операция, но без предохранителя. Использовать заглавную стоит осознанно, когда точно понимаешь, что теряешь.' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="git-branches" sectionId="typical-errors" />
 
 ## Символы и команды главы
+
+<Block kind="cheatsheet" title="Символы и команды главы" chapterId="git-branches" blockId="cheatsheet-commands" favPayload={{
+  kind: 'table',
+  head: ['Команда / символ', 'Что делает', 'Пример'],
+  rows: [
+    ['git branch', 'показывает список веток; текущая отмечена звёздочкой', 'git branch'],
+    ['git branch -v', 'список веток вместе с последним коммитом каждой', 'git branch -v'],
+    ['git switch <name>', 'переключает рабочую папку и HEAD на существующую ветку', 'git switch master'],
+    ['git switch -c <name>', 'создаёт новую ветку и сразу переключается на неё', 'git switch -c fix-title'],
+    ['git checkout -b <name>', 'старый эквивалент git switch -c', 'git checkout -b fix-title'],
+    ['git merge <name>', 'вливает коммиты указанной ветки в текущую', 'git merge feature-timer'],
+    ['Fast-forward', 'тип слияния без нового коммита: закладка ветки просто сдвигается вперёд', 'Fast-forward в выводе merge'],
+    ["Merge made by the 'ort' strategy.", 'настоящее слияние: создан merge-коммит с двумя родителями', 'вывод git merge при разошедшихся ветках'],
+    ['<<<<<<< ======= >>>>>>>', 'разметка конфликта: своя версия / чужая версия', 'внутри файла во время конфликта'],
+    ['git status во время конфликта', 'показывает both modified и подсказки для решения', 'git status'],
+    ['git merge --abort', 'отменяет незавершённое слияние, откатывает как до merge', 'git merge --abort'],
+    ['git log --graph --all', 'рисует ASCII-дерево всех веток разом', 'git log --oneline --graph --all'],
+    ['git branch -d <name>', 'безопасно удаляет уже влитую ветку', 'git branch -d fix-title'],
+    ['git branch -D <name>', 'удаляет ветку без проверки, что она влита', 'git branch -D fix-title'],
+    ['Already up to date.', 'сливать нечего — коммит уже есть в текущей ветке', 'вывод git merge'],
+    ['HEAD', 'указатель на текущую ветку и её последний коммит', 'видно в <<<<<<< HEAD'],
+  ],
+}}>
 
 | Команда / символ | Что делает | Пример |
 |---|---|---|
@@ -734,9 +813,14 @@ Deleted branch feature-unmerged (was b488e60).
 | `Already up to date.` | сливать нечего — коммит уже есть в текущей ветке | вывод `git merge` |
 | HEAD | указатель на текущую ветку и её последний коммит | видно в `<<<<<<< HEAD` |
 
+</Block>
+
+<SectionAnchor chapterId="git-branches" sectionId="cheatsheet-symbols" />
+
 ## Слова главы
 
-<Flashcards cards={[
+<Block kind="vocab" title="Словарь главы" chapterId="git-branches" blockId="vocab-glossary">
+<Flashcards chapterId="git-branches" cards={[
   { term: 'branch', translation: 'ветка', note: 'параллельная линия истории; create a branch — создать ветку' },
   { term: 'merge', translation: 'слияние', note: 'влить изменения одной ветки в другую: git merge feature-timer' },
   { term: 'conflict', translation: 'конфликт', note: 'обе ветки изменили одни и те же строки — Git ждёт твоего решения' },
@@ -746,20 +830,40 @@ Deleted branch feature-unmerged (was b488e60).
   { term: 'HEAD', translation: 'указатель на текущее место', note: 'на какой ветке и коммите ты сейчас стоишь; сдвигается при каждом switch' },
   { term: 'diverge', translation: 'разойтись', note: 'ветки разошлись — у обеих появились свои коммиты после общей точки, поэтому fast-forward уже невозможен' },
 ]} />
+</Block>
+
+<SectionAnchor chapterId="git-branches" sectionId="vocab" />
 
 ## Потренируйся печатать
 
-<CodeTyping snippet={'git switch -c feature-timer'} />
+<Block kind="trainer" title="Команды главы" chapterId="git-branches" blockId="trainer-git-commands">
+<CodeTyping keyboard chapterId="git-branches" trainerId="trainer-git-commands" targetCpm={140} targetAccuracy={90} pools={[
+  { label: 'Команды главы', snippets: [
+    'git switch -c feature-timer',
+    'git branch -v',
+    'git log --oneline --graph --all',
+    'git merge feature-timer',
+    'git branch -d feature-timer',
+    'git merge --abort',
+  ] },
+]} />
+</Block>
 
 Полный рабочий цикл слияния и уборки — набери его целиком одной строкой, как делают в реальной работе:
 
-<CodeTyping snippet={'git switch master && git merge feature-timer && git branch -d feature-timer'} />
+<Block kind="trainer" title="Полный цикл слияния" chapterId="git-branches" blockId="trainer-merge-cycle">
+<CodeTyping snippet={'git switch master && git merge feature-timer && git branch -d feature-timer'} chapterId="git-branches" trainerId="trainer-merge-cycle" targetCpm={150} targetAccuracy={90} />
+</Block>
+
+<Block kind="cheatsheet" title="Тренажёр веток" chapterId="git-branches" blockId="cheatsheet-trainer-lgb">
 
 <ToolCard
   name="Learn Git Branching"
   url="https://learngitbranching.js.org/?locale=ru_RU"
   desc="Визуальный тренажёр Git прямо в браузере: вводишь команды — дерево коммитов перестраивается на глазах, а не только текстом в терминале. Есть русский язык. Пройди уровни раздела «Introduction Sequence» — там как раз branch и merge, ровно то, что было в этой главе."
 />
+
+</Block>
 
 <details>
 <summary>Углубиться</summary>
@@ -790,24 +894,34 @@ print("Удачи!")
 
 </details>
 
+<SectionAnchor chapterId="git-branches" sectionId="practice" />
+
 ## Куда дальше: проверенные ресурсы
 
-### Русские материалы
+<Block kind="cheatsheet" title="Русские материалы" chapterId="git-branches" blockId="cheatsheet-resources-ru">
 
 - [Pro Git: Основы ветвления и слияния](https://git-scm.com/book/ru/v2/Ветвление-в-Git-Основы-ветвления-и-слияния) — официальный перевод главной книги про Git; та же тема, что в этой главе, с дополнительными картинками деревьев коммитов.
 - [Хабр: раскладываем Git по полочкам — терминология](https://habr.com/ru/articles/796219/) — чёткие определения branch, merge и fast-forward с диаграммами, если после этой главы хочется увидеть те же понятия ещё раз другими словами.
 - [Хабр: как решить конфликт в Git — merge, rebase, cherry-pick](https://habr.com/ru/companies/amvera/articles/1041676/) — конфликты не только при merge: та же логика возникает при `rebase` и `cherry-pick`, с которыми ты столкнёшься позже.
 - [Atlassian: Git Merge](https://www.atlassian.com/ru/git/tutorials/using-branches/git-merge) — разбор fast-forward и трёхстороннего слияния с наглядными схемами веток на русском.
 
-### Официальная документация (на английском)
+</Block>
+
+<Block kind="cheatsheet" title="Официальная документация (на английском)" chapterId="git-branches" blockId="cheatsheet-resources-docs">
 
 - [git-switch](https://git-scm.com/docs/git-switch) — man-страница команды переключения веток.
 - [git-merge](https://git-scm.com/docs/git-merge) — man-страница слияния: стратегии, флаги, разбор конфликтов.
 - [git-branch](https://git-scm.com/docs/git-branch) — man-страница управления ветками: создание, удаление, переименование.
 
-### Полезное
+</Block>
+
+<Block kind="cheatsheet" title="Полезное" chapterId="git-branches" blockId="cheatsheet-resources-extra">
 
 - [Шпаргалка по Git на dev-notes.ru](https://www.dev-notes.ru/articles/git/git-cheatsheet/) — все команды главы (и не только) на одной странице: удобно держать открытой во время практики или на чемпионате.
+
+</Block>
+
+<SectionAnchor chapterId="git-branches" sectionId="resources" />
 
 ## Челлендж ⭐
 
@@ -869,6 +983,8 @@ git log --oneline --graph
 
 </details>
 
+<SectionAnchor chapterId="git-branches" sectionId="challenge" />
+
 ## Что должен уметь
 
 - Объяснять, что такое ветка (branch): лёгкий указатель на коммит, а не копия файлов проекта — и почему её создание мгновенно.
@@ -878,3 +994,5 @@ git log --oneline --graph
 - Проходить конфликт от начала до конца: понимать `CONFLICT` и `git status` во время конфликта, читать разметку `<<<<<<<`/`=======`/`>>>>>>>`, убирать маркеры, завершать через `git add` и `git commit`.
 - Узнавать по точному тексту четыре типичные ситуации — `Already up to date`, `invalid reference`, заблокированное незакоммиченными правками переключение, отказ `git branch -d` удалить невлитую ветку — и знать, что делать в каждой, включая разницу между `-d` и `-D`.
 - Убирать за собой уже влитые ветки командой `git branch -d`.
+
+<SectionAnchor chapterId="git-branches" sectionId="what-you-should-know" />
