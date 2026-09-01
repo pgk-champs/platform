@@ -110,5 +110,21 @@
     "level": "база",
     "order": 6,
     "path": "mobile/layout-by-mockup.mdx"
+  },
+  {
+    "id": "what-is-blockchain",
+    "title": "Что такое блокчейн",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 1,
+    "path": "blockchain/what-is-blockchain.mdx"
+  },
+  {
+    "id": "waves-first-network",
+    "title": "Первая сеть на Waves Enterprise",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 2,
+    "path": "blockchain/waves-first-network.mdx"
   }
 ]
