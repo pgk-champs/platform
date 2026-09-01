@@ -102,5 +102,13 @@
     "level": "база",
     "order": 5,
     "path": "mobile/state-events.mdx"
+  },
+  {
+    "id": "layout-by-mockup",
+    "title": "Вёрстка по макету",
+    "audience": "мобилка",
+    "level": "база",
+    "order": 6,
+    "path": "mobile/layout-by-mockup.mdx"
   }
 ]
