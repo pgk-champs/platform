@@ -112,6 +112,14 @@
     "path": "mobile/layout-by-mockup.mdx"
   },
   {
+    "id": "ui-kit",
+    "title": "Многомодульность и UI Kit",
+    "audience": "мобилка",
+    "level": "база",
+    "order": 7,
+    "path": "mobile/ui-kit.mdx"
+  },
+  {
     "id": "what-is-blockchain",
     "title": "Что такое блокчейн",
     "audience": "блокчейн",
