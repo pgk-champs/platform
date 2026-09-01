@@ -16,11 +16,12 @@ import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import WordOrder from '@site/src/components/WordOrder';
 import ErrorTranslator from '@site/src/components/ErrorTranslator';
+import TranslatorBox from '@site/src/components/TranslatorBox';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # IT-английский: стартовый словарь
 
-<ChapterProgress chapterId="it-english" totalSections={12} totalQuizzes={5} totalTrainers={5} />
+<ChapterProgress chapterId="it-english" totalSections={12} totalQuizzes={5} totalTrainers={6} />
 
 ## Зачем это нужно
 
@@ -205,6 +206,12 @@ bash: gti: command not found
 
 <Block kind="trainer" title="Переводчик ошибок" chapterId="it-english" blockId="trainer-error-translator">
 <ErrorTranslator chapterId="it-english" trainerId="trainer-error-translator" />
+</Block>
+
+А если после подсветки фраза всё ещё непонятна — время звать настоящий переводчик. Вставь фразу один раз, открой её сразу в нужном сервисе и сравни варианты:
+
+<Block kind="trainer" title="Открыть в переводчике" chapterId="it-english" blockId="trainer-translator-box">
+<TranslatorBox chapterId="it-english" trainerId="trainer-translator-box" />
 </Block>
 
 <SectionAnchor chapterId="it-english" sectionId="google-error" />

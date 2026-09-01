@@ -1,6 +1,7 @@
 import React from 'react';
 import Layout from '@theme/Layout';
 import GymCatalog from '../components/GymCatalog';
+import GymBuilder from '../components/GymBuilder';
 import '../components/trainers.css';
 
 export default function Gym() {
@@ -13,6 +14,9 @@ export default function Gym() {
           раз. У каждой карточки есть ссылка на главу, где механика встречается по программе.
           Результаты отсюда не влияют на прогресс глав: зал — это чистая тренировка.
         </p>
+        {/* Конструктор выше каталога: баннер «Вам передали набор» из ссылки
+            #preset=... должен быть виден сразу при открытии. */}
+        <GymBuilder />
         <GymCatalog />
       </main>
     </Layout>

@@ -1,9 +1,21 @@
-import React, { useSyncExternalStore } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 import Layout from '@theme/Layout';
 import { store, type TrainerResult } from '../lib/store';
-import { ACHIEVEMENTS } from '../lib/achievements';
+import {
+  ACHIEVEMENTS,
+  ACHIEVEMENT_CATEGORIES,
+  type AchievementCategory,
+  type AchievementRarity,
+} from '../lib/achievements';
 import knowledgeMap from '../data/knowledge-map.json';
 import '../components/trainers.css';
+
+// Классы редкости — латиницей, чтобы не тащить кириллицу в CSS-селекторы.
+const RARITY_CLASS: Record<AchievementRarity, string> = {
+  обычное: 'ach-card-common',
+  редкое: 'ach-card-rare',
+  эпическое: 'ach-card-epic',
+};
 
 const CHAPTER_TITLES: Record<string, string> = Object.fromEntries(
   (knowledgeMap as { id: string; title: string }[]).map((e) => [e.id, e.title]),
@@ -44,27 +56,55 @@ function trainerRecords(trainers: Record<string, Record<string, TrainerResult>>)
 
 export default function Achievements() {
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
+  const [filter, setFilter] = useState<AchievementCategory | 'все'>('все');
   const xp = store.getXp();
   const unlocked = new Set(store.achievements.list());
   const snap = store.snapshot();
   const quizRows = quizRecords(snap.quizLog);
   const trainerRows = trainerRecords(snap.trainers);
 
+  const byCategory = (cat: AchievementCategory | 'все') =>
+    cat === 'все' ? ACHIEVEMENTS : ACHIEVEMENTS.filter((a) => a.category === cat);
+  const shown = byCategory(filter);
+  const countLabel = (cat: AchievementCategory | 'все') => {
+    const list = byCategory(cat);
+    return `${list.filter((a) => unlocked.has(a.id)).length}/${list.length}`;
+  };
+
   return (
     <Layout title="Достижения" description="Достижения и опыт на платформе PGK Champs">
       <main className="container margin-vert--lg">
         <h1>Достижения</h1>
         <div className="ach-xp">XP: {xp}</div>
+        <div className="ach-filters" role="group" aria-label="Фильтр по категориям">
+          {(['все', ...ACHIEVEMENT_CATEGORIES] as const).map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              className={`ach-filter ${filter === cat ? 'ach-filter-on' : ''}`.trim()}
+              aria-pressed={filter === cat}
+              onClick={() => setFilter(cat)}
+            >
+              {cat} <span className="ach-filter-count">{countLabel(cat)}</span>
+            </button>
+          ))}
+        </div>
         <div className="ach-grid">
-          {ACHIEVEMENTS.map((a) => {
+          {shown.map((a) => {
             const isUnlocked = unlocked.has(a.id);
             return (
-              <div key={a.id} className={`ach-card ${isUnlocked ? 'ach-card-on' : 'ach-card-off'}`.trim()}>
+              <div
+                key={a.id}
+                className={`ach-card ${RARITY_CLASS[a.rarity]} ${isUnlocked ? 'ach-card-on' : 'ach-card-off'}`.trim()}
+              >
                 <div className="ach-icon" aria-hidden="true">
                   {isUnlocked ? a.icon : '🔒'}
                 </div>
                 <div className="ach-title">{a.title}</div>
                 <div className="ach-desc">{a.desc}</div>
+                <div className={`ach-rarity ach-rarity-${a.rarity === 'эпическое' ? 'epic' : a.rarity === 'редкое' ? 'rare' : 'common'}`}>
+                  {a.rarity}
+                </div>
               </div>
             );
           })}

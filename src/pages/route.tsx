@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Layout from '@theme/Layout';
 import RouteList, { type Entry } from '../components/RouteList';
 import DailyChallenge from '../components/DailyChallenge';
+import TrainingSchedule from '../components/TrainingSchedule';
 import map from '../data/knowledge-map.json';
 
 export default function Route() {
@@ -27,6 +28,7 @@ export default function Route() {
           </button>
         </div>
         <RouteList map={map as Entry[]} track={track} />
+        <TrainingSchedule />
       </main>
     </Layout>
   );

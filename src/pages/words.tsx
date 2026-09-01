@@ -1,6 +1,7 @@
 import React from 'react';
 import Layout from '@theme/Layout';
 import WordsTrainer from '../components/WordsTrainer';
+import WordExport from '../components/WordExport';
 
 export default function Words() {
   return (
@@ -12,6 +13,7 @@ export default function Words() {
           слова с «не знал» будут показываться чаще.
         </p>
         <WordsTrainer />
+        <WordExport />
       </main>
     </Layout>
   );

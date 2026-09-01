@@ -6828,3 +6828,521 @@
     align-items: flex-start;
   }
 }
+
+/* gym-v2: конструктор тренажёров на /gym (пакет gym-v2) */
+.gb-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--ifm-color-primary);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-color-primary-contrast-background);
+}
+
+.gb-banner-broken {
+  border-color: var(--ifm-color-danger);
+  background: var(--ifm-color-danger-contrast-background);
+}
+
+.gb-banner-actions,
+.gb-preset-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.gb-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.gb-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.gb-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.gb-field textarea,
+.gb-field input {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.85rem;
+  padding: 0.5rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+}
+
+.gb-error {
+  margin: 0;
+  color: var(--ifm-color-danger);
+}
+
+.gb-notice {
+  margin: 0.75rem 0 0;
+  color: var(--ifm-color-success);
+  overflow-wrap: anywhere;
+}
+
+.gb-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.gb-presets {
+  margin-top: 1rem;
+}
+
+.gb-preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.gb-preset-name {
+  font-weight: 600;
+}
+
+.gb-preset-engine {
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.85rem;
+}
+
+.gb-preset-actions {
+  margin-left: auto;
+}
+
+.gb-run {
+  margin-top: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--ifm-color-emphasis-300);
+}
+
+/* ===== sim-v2: «чистый таймер» (fullscreen) + перерывы чемпионата ===== */
+
+.sim-break-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sim-break-input {
+  width: 4.5rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--ifm-color-emphasis-400);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+}
+
+.sim-break-beep {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-600);
+  cursor: pointer;
+}
+
+.sim-break-active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--ifm-color-primary);
+  border-radius: var(--ifm-global-radius);
+}
+
+.sim-break-time {
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.sim-zen {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: var(--ifm-background-color);
+  text-align: center;
+  padding: 1rem;
+}
+
+.sim-zen-module {
+  font-size: 1.2rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.sim-zen-label {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+}
+
+.sim-zen-time {
+  /* ТЗ: огромные цифры 10–15vw */
+  font-size: clamp(4rem, 13vw, 18rem);
+  font-weight: var(--ifm-font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.sim-zen-score {
+  font-size: 1.1rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.sim-zen-exit {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  border: 1px solid var(--ifm-color-emphasis-400);
+  border-radius: var(--ifm-global-radius);
+  background: transparent;
+  color: var(--ifm-color-emphasis-700);
+  cursor: pointer;
+}
+
+.sim-zen-exit:hover {
+  color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+}
+
+/* ===== integrations: WordExport, ShareResult, TrainingSchedule, TranslatorBox ===== */
+.intg-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.6rem 0;
+}
+
+.intg-note {
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-600);
+  margin: 0.4rem 0 0;
+}
+
+.intg-export {
+  margin-top: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.intg-share {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.intg-share-link {
+  font-size: 0.9rem;
+}
+
+.intg-schedule {
+  margin-top: 2rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: var(--ifm-global-radius);
+}
+
+.intg-days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.6rem 0;
+}
+
+.intg-day {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  cursor: pointer;
+  user-select: none;
+}
+
+.intg-day-on {
+  background: var(--ifm-color-primary-lightest);
+  border-color: var(--ifm-color-primary);
+}
+
+.intg-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.intg-field input {
+  padding: 0.25rem 0.4rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+}
+
+.intg-field input[type='number'] {
+  width: 4.5rem;
+}
+
+.intg-translator-input {
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+  font-size: 0.95rem;
+}
+
+.intg-translator-tips {
+  font-size: 0.9rem;
+  color: var(--ifm-color-emphasis-700);
+  margin-top: 0.5rem;
+}
+
+.intg-translator-tips ul {
+  margin: 0.3rem 0 0;
+  padding-left: 1.2rem;
+}
+
+/* ===== ach-v2 (волна 5): категории, редкость, фильтры на /achievements ===== */
+
+.ach-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.ach-filter {
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 999px;
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.ach-filter:hover {
+  background: var(--ifm-hover-overlay);
+}
+
+.ach-filter-on,
+.ach-filter-on:hover {
+  border-color: var(--ifm-color-primary);
+  background: var(--ifm-color-primary);
+  color: var(--ifm-color-white);
+}
+
+.ach-filter-count {
+  opacity: 0.75;
+  font-size: 0.8em;
+}
+
+/* Рамка карточки = редкость: редкое — primary, эпическое — warning.
+   Обычное не трогает рамку, чтобы разблокированные оставались зелёными. */
+.ach-card-rare {
+  border: 2px solid var(--ifm-color-primary);
+}
+
+.ach-card-epic {
+  border: 2px solid var(--ifm-color-warning);
+}
+
+.ach-rarity {
+  margin-top: 0.4rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.ach-rarity-rare {
+  color: var(--ifm-color-primary);
+}
+
+.ach-rarity-epic {
+  color: var(--ifm-color-warning-darkest);
+}
+
+/* ===== english-deep (wave 5): MatchPairs, ReverseQuiz ===== */
+.mp-status {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.9rem;
+  color: var(--ifm-color-emphasis-700);
+  margin-bottom: 0.75rem;
+}
+
+.mp-sep {
+  color: var(--ifm-color-emphasis-400);
+}
+
+.mp-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.mp-card {
+  min-height: 3.5rem;
+  padding: 0.4rem;
+  border: 2px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  background: var(--ifm-color-emphasis-100);
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  overflow-wrap: break-word;
+}
+
+.mp-card:hover {
+  border-color: var(--ifm-color-primary);
+}
+
+.mp-open {
+  background: var(--ifm-background-surface-color);
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-font-color-base);
+}
+
+.mp-matched {
+  border-color: var(--ifm-color-success);
+  background: var(--ifm-color-success-contrast-background);
+  color: var(--ifm-color-success-contrast-foreground);
+  cursor: default;
+}
+
+.mp-ok {
+  margin: 0.75rem 0 0;
+  font-weight: 600;
+  color: var(--ifm-color-success);
+}
+
+@media (max-width: 480px) {
+  .mp-card {
+    font-size: 0.8rem;
+    min-height: 3rem;
+  }
+}
+
+.rq-counter {
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-600);
+  margin-bottom: 0.5rem;
+}
+
+.rq-question {
+  margin-bottom: 0.75rem;
+}
+
+.rq-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.rq-option {
+  padding: 0.6rem 0.8rem;
+  border: 2px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.rq-option:hover:not(:disabled) {
+  border-color: var(--ifm-color-primary);
+}
+
+.rq-right {
+  border-color: var(--ifm-color-success);
+  background: var(--ifm-color-success-contrast-background);
+  color: var(--ifm-color-success-contrast-foreground);
+}
+
+.rq-wrong {
+  border-color: var(--ifm-color-danger);
+  background: var(--ifm-color-danger-contrast-background);
+  color: var(--ifm-color-danger-contrast-foreground);
+}
+
+.rq-feedback {
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.rq-ok {
+  color: var(--ifm-color-success);
+  font-weight: 600;
+}
+
+.rq-no {
+  color: var(--ifm-color-danger);
+}
+
+.rq-note {
+  color: var(--ifm-color-emphasis-600);
+}
+
+.rq-result {
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin: 0 0 0.75rem;
+}
+
+.rq-next,
+.rq-restart {
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--ifm-color-primary);
+  border-radius: 6px;
+  background: var(--ifm-color-primary);
+  color: var(--ifm-color-white);
+  cursor: pointer;
+}
+
+.rq-next:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+@media (max-width: 480px) {
+  .rq-options {
+    grid-template-columns: 1fr;
+  }
+}

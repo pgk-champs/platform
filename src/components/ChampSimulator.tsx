@@ -4,6 +4,8 @@
 import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import criteria from '../data/champ-criteria.json';
 import { store } from '../lib/store';
+import { simShareText } from '../lib/integrations';
+import ShareResult from './ShareResult';
 import './trainers.css';
 
 type Item = { text: string; maxScore: number; type: 'measurable' | 'judgement' };
@@ -43,6 +45,30 @@ function itemKey(sIdx: number, iIdx: number): string {
   return `${sIdx}-${iIdx}`;
 }
 
+// Короткий beep по окончании перерыва (WebAudio, без внешних файлов).
+// Любая ошибка (нет API, автоплей заблокирован) — просто тишина.
+function beep(): void {
+  try {
+    const Ctx = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.4);
+    osc.onended = () => void ctx.close();
+  } catch {
+    // без звука
+  }
+}
+
+const BREAK_PRESETS = [10, 15, 30];
+
 const LEADERBOARD_REPO = 'pgk-champs/leaderboard';
 
 // Строит ссылку на предзаполненную issue-форму лидерборда: GitHub issue forms
@@ -78,29 +104,94 @@ export default function ChampSimulator() {
   const [checks, setChecks] = useState<Record<string, number>>({});
   const [timeLeft, setTimeLeft] = useState(0);
   const [running, setRunning] = useState(true);
+  // Перерыв «как на чемпионате»: основной таймер стоит, перерыв тикает вниз.
+  const [brk, setBrk] = useState<{ left: number; planned: number } | null>(null);
+  const [breakLog, setBreakLog] = useState({ count: 0, totalSec: 0 });
+  const [customBreak, setCustomBreak] = useState('');
+  const [beepOn, setBeepOn] = useState(false);
+  // «Чистый таймер»: полноэкранный оверлей с огромными цифрами.
+  const [zen, setZen] = useState(false);
   const rewardedRef = useRef<Set<string>>(new Set());
 
   const mod = MODULES.find((m) => m.id === moduleId) ?? null;
+  const onBreak = brk !== null;
 
   const score = Object.values(checks).reduce((acc, v) => acc + v, 0);
+
+  const exitZen = () => {
+    setZen(false);
+    try {
+      if (document.fullscreenElement) document.exitFullscreen?.().catch?.(() => {});
+    } catch {
+      // ignore
+    }
+  };
+
+  const enterZen = () => {
+    setZen(true);
+    // Fullscreen API опционален: если недоступен или отклонён — остаётся
+    // просто оверлей на весь вьюпорт (graceful fallback).
+    try {
+      document.documentElement.requestFullscreen?.()?.catch?.(() => {});
+    } catch {
+      // fallback: только оверлей
+    }
+  };
 
   const finish = () => {
     if (!mod) return;
     const rounded = Math.round(score * 100) / 100;
-    store.sim.addRun(mod.id, { score: rounded, maxScore: mod.maxTotal });
+    // Незавершённый перерыв тоже попадает в лог (фактически отгулянное время).
+    let log = breakLog;
+    if (brk) log = { count: log.count + 1, totalSec: log.totalSec + brk.planned - Math.max(0, brk.left) };
+    store.sim.addRun(mod.id, {
+      score: rounded,
+      maxScore: mod.maxTotal,
+      ...(log.count > 0 ? { breaks: log } : {}),
+    });
     if (!rewardedRef.current.has(mod.id)) {
       rewardedRef.current.add(mod.id);
       const xp = Math.round(rounded * XP_PER_POINT);
       if (xp > 0) store.addXp(xp, `sim:${mod.id}`);
     }
+    setBreakLog(log);
+    setBrk(null);
+    exitZen();
     setPhase('done');
   };
 
   useEffect(() => {
-    if (phase !== 'run' || !running) return;
+    if (phase !== 'run' || !running || onBreak) return;
     const id = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(id);
-  }, [phase, running]);
+  }, [phase, running, onBreak]);
+
+  // Тик перерыва: отдельный интервал, основной таймер в это время замер.
+  useEffect(() => {
+    if (phase !== 'run' || !onBreak) return;
+    const id = setInterval(() => setBrk((b) => (b && b.left > 0 ? { ...b, left: b.left - 1 } : b)), 1000);
+    return () => clearInterval(id);
+  }, [phase, onBreak]);
+
+  // Окончание перерыва: лог + оповещение (beep — опционально по чекбоксу).
+  useEffect(() => {
+    if (brk && brk.left <= 0) {
+      setBreakLog((l) => ({ count: l.count + 1, totalSec: l.totalSec + brk.planned }));
+      setBrk(null);
+      if (beepOn) beep();
+    }
+  }, [brk, beepOn]);
+
+  // Выход из браузерного fullscreen (Esc) закрывает и «чистый таймер».
+  // В fallback-режиме событие не приходит — выход только кнопкой.
+  useEffect(() => {
+    if (!zen) return;
+    const onChange = () => {
+      if (!document.fullscreenElement) setZen(false);
+    };
+    document.addEventListener('fullscreenchange', onChange);
+    return () => document.removeEventListener('fullscreenchange', onChange);
+  }, [zen]);
 
   useEffect(() => {
     if (phase === 'run' && timeLeft <= 0) finish();
@@ -114,6 +205,8 @@ export default function ChampSimulator() {
     setChecks({});
     setTimeLeft((m.timeLimitMinutes ?? 60) * 60);
     setRunning(true);
+    setBrk(null);
+    setBreakLog({ count: 0, totalSec: 0 });
     setPhase('run');
   };
 
@@ -122,6 +215,21 @@ export default function ChampSimulator() {
     setChecks({});
     setTimeLeft((mod.timeLimitMinutes ?? 60) * 60);
     setRunning(true);
+    setBrk(null);
+    setBreakLog({ count: 0, totalSec: 0 });
+  };
+
+  const startBreak = (minutes: number) => {
+    const m = Math.round(minutes);
+    if (!m || m <= 0) return;
+    setBrk({ left: m * 60, planned: m * 60 });
+  };
+
+  // Досрочное завершение: в лог идёт фактически отгулянное время.
+  const endBreakEarly = () => {
+    if (!brk) return;
+    setBreakLog((l) => ({ count: l.count + 1, totalSec: l.totalSec + brk.planned - Math.max(0, brk.left) }));
+    setBrk(null);
   };
 
   const backToSelect = () => {
@@ -198,6 +306,11 @@ export default function ChampSimulator() {
               Лучший результат: {stats.best ? `${stats.best.score} из ${stats.best.maxScore}` : '—'}
             </div>
             <div className="sim-history-row">Попыток всего: {stats.count}</div>
+            {breakLog.count > 0 && (
+              <div className="sim-history-row">
+                Перерывы: {breakLog.count}, суммарно {fmtTime(breakLog.totalSec)}
+              </div>
+            )}
           </div>
           <div className="sim-leaderboard">
             <button type="button" className="sim-submit" onClick={submitToLeaderboard}>
@@ -210,6 +323,7 @@ export default function ChampSimulator() {
               </a>
             </div>
           </div>
+          <ShareResult text={simShareText(Math.round(score * 100) / 100, mod.maxTotal)} />
           <div className="sim-done-actions">
             <button type="button" className="sim-card-start" onClick={() => selectModule(mod.id)}>
               Попробовать снова
@@ -243,7 +357,64 @@ export default function ChampSimulator() {
           <button type="button" className="sim-timer-btn" onClick={resetRun}>
             Сбросить
           </button>
+          <button type="button" className="sim-timer-btn" onClick={enterZen}>
+            Чистый таймер
+          </button>
         </div>
+
+        {onBreak ? (
+          <div className="sim-break-active">
+            <span className="sim-break-time">Перерыв: {fmtTime(brk?.left ?? 0)}</span>
+            <button type="button" className="sim-timer-btn" onClick={endBreakEarly}>
+              Завершить перерыв
+            </button>
+          </div>
+        ) : (
+          <div className="sim-break-controls">
+            {BREAK_PRESETS.map((m) => (
+              <button type="button" className="sim-timer-btn" key={m} onClick={() => startBreak(m)}>
+                Перерыв {m} мин
+              </button>
+            ))}
+            <input
+              type="number"
+              className="sim-break-input"
+              min={1}
+              max={180}
+              placeholder="мин"
+              aria-label="Свой перерыв, минут"
+              value={customBreak}
+              onChange={(e) => setCustomBreak(e.target.value)}
+            />
+            <button type="button" className="sim-timer-btn" onClick={() => startBreak(Number(customBreak))}>
+              Свой перерыв
+            </button>
+            <label className="sim-break-beep">
+              <input type="checkbox" checked={beepOn} onChange={(e) => setBeepOn(e.target.checked)} />
+              звук по окончании
+            </label>
+          </div>
+        )}
+
+        {zen && (
+          <div className="sim-zen">
+            <div className="sim-zen-module">{mod.title}</div>
+            {onBreak ? (
+              <>
+                <div className="sim-zen-label">Перерыв</div>
+                <div className="sim-zen-time">{fmtTime(brk?.left ?? 0)}</div>
+              </>
+            ) : (
+              <div className={`sim-zen-time ${lowTime ? 'sim-timer-low' : ''}`.trim()}>{fmtTime(timeLeft)}</div>
+            )}
+            <div className="sim-zen-score">
+              Набрано {Math.round(score * 100) / 100} из {mod.maxTotal}
+            </div>
+            <button type="button" className="sim-zen-exit" onClick={exitZen}>
+              Выйти
+            </button>
+          </div>
+        )}
 
         <div className="sim-score-live">
           Набрано {Math.round(score * 100) / 100} из {mod.maxTotal}

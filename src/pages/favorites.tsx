@@ -2,6 +2,7 @@ import React, { useSyncExternalStore } from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import { store, type FavoriteItem } from '../lib/store';
+import WordExport from '../components/WordExport';
 import knowledgeMap from '../data/knowledge-map.json';
 import '../components/trainers.css';
 
@@ -118,6 +119,7 @@ export default function Favorites() {
         <p>
           <Link to="/words">Тренировать слова →</Link>
         </p>
+        <WordExport />
         {items.length === 0 ? (
           <p className="fav-empty">
             Пока пусто. Отмечайте звёздочкой ★ тренажёры, квизы и другие блоки на страницах глав — здесь

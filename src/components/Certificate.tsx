@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { store } from '../lib/store';
+import { certShareText } from '../lib/integrations';
+import ShareResult from './ShareResult';
 import './trainers.css';
 
 // Сертификат трека. Пока не все главы пройдены — прогресс до сертификата.
@@ -181,6 +183,7 @@ export default function Certificate({
               <button type="button" className="button button--primary" onClick={download}>
                 Скачать PNG
               </button>
+              <ShareResult text={certShareText(track, total)} />
             </div>
           </div>
         </div>

@@ -16,6 +16,14 @@
     "path": "foundation/it-english.mdx"
   },
   {
+    "id": "02b-english-practice",
+    "title": "Английский на практике",
+    "audience": "все",
+    "level": "база",
+    "order": 2.5,
+    "path": "foundation/02b-english-practice.mdx"
+  },
+  {
     "id": "linux-terminal",
     "title": "Linux и терминал",
     "audience": "все",

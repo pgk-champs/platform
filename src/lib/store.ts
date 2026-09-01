@@ -28,10 +28,22 @@ export type FavoriteItem = {
   ts: number;
 };
 
+// Пользовательский пресет конструктора тренажёров (/gym, пакет gym-v2):
+// данные движка отдельно от самого движка, чтобы наставник мог собрать
+// свой набор и запустить/пошарить его без правки глав.
+export type CustomPresetData =
+  | { engine: 'flashcards'; cards: { term: string; translation: string; note?: string }[] }
+  | { engine: 'wordorder'; phrase: string }
+  | { engine: 'codetyping'; snippets: string[] }
+  | { engine: 'predict'; code: string; expected: string };
+
+export type CustomPreset = { id: string; name: string; ts: number } & CustomPresetData;
+
 export type QuizResult = { correct: number; total: number; ts: number };
 export type DailyEntry = { correct: number; total: number; ts: number };
 export type ExamResult = { correct: number; total: number; ts: number };
-export type SimRunResult = { score: number; maxScore: number; ts: number };
+export type SimBreaksLog = { count: number; totalSec: number };
+export type SimRunResult = { score: number; maxScore: number; ts: number; breaks?: SimBreaksLog };
 export type TrainerResult = { result: unknown; ts: number };
 export type QuizLogEntry = { chapterId: string; quizId: string; correct: number; total: number; ts: number };
 
@@ -51,6 +63,7 @@ type State = {
   wordWeights: Record<string, number>;
   daily: Record<string, DailyEntry>;
   simRuns: Record<string, SimRunResult[]>;
+  customPresets: CustomPreset[];
 };
 
 function emptyState(): State {
@@ -70,6 +83,7 @@ function emptyState(): State {
     wordWeights: {},
     daily: {},
     simRuns: {},
+    customPresets: [],
   };
 }
 
@@ -341,7 +355,7 @@ function dailyState(todayKey: string): { done: boolean; today?: DailyEntry; stre
 }
 
 // --- симулятор чемпионата (тайм-боксед прогон модуля критериев) ---
-function addSimRun(moduleId: string, score: { score: number; maxScore: number }): void {
+function addSimRun(moduleId: string, score: { score: number; maxScore: number; breaks?: SimBreaksLog }): void {
   const runs = state.simRuns[moduleId] ?? [];
   state.simRuns = { ...state.simRuns, [moduleId]: [...runs, { ...score, ts: Date.now() }] };
   persist();
@@ -354,6 +368,28 @@ function getSimStats(moduleId: string) {
     if (!best || r.score > best.score) best = r;
   }
   return { runs, best, count: runs.length };
+}
+
+// --- пользовательские пресеты конструктора тренажёров (/gym) ---
+function customPresetAdd(preset: Omit<CustomPreset, 'id' | 'ts'>): CustomPreset {
+  const item = {
+    ...preset,
+    id: `cp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    ts: Date.now(),
+  } as CustomPreset;
+  state.customPresets = [...state.customPresets, item];
+  persist();
+  return item;
+}
+
+function customPresetList(): CustomPreset[] {
+  return state.customPresets;
+}
+
+function customPresetRemove(id: string): void {
+  if (!state.customPresets.some((p) => p.id === id)) return;
+  state.customPresets = state.customPresets.filter((p) => p.id !== id);
+  persist();
 }
 
 // --- progress / snapshot ---
@@ -389,6 +425,7 @@ export const store = {
   completeDaily,
   dailyState,
   sim: { addRun: addSimRun, stats: getSimStats },
+  customPresets: { add: customPresetAdd, list: customPresetList, remove: customPresetRemove },
   snapshot,
   /** Тестовый хелпер: сбрасывает состояние в памяти и в localStorage. */
   __resetForTests(): void {
