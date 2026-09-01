@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import './trainers.css';
 
-// Витринный виджет главы печати: ANSI-раскладка, пять рядов. Три независимых
-// режима-пропса можно комбинировать: zones красит клавиши по зонам пальцев
-// (легенда снизу, тултип по hover/фокусу), highlight подсвечивает конкретные
-// клавиши (например ['F','J'] для «найди на ощупь»), symbols показывает
-// верхний регистр Shift поверх базового символа.
+// Витринный виджет главы печати: ANSI-раскладка, пять рядов. Пропсы-режимы
+// можно комбинировать: zones красит клавиши по зонам пальцев (легенда снизу,
+// тултип по hover/фокусу), highlight подсвечивает конкретные клавиши
+// (например ['F','J'] для «найди на ощупь»), symbols показывает верхний
+// регистр Shift поверх базового символа, nextKey/activeKey — live-режим
+// (см. CodeTyping: связка тренажёра печати с клавиатурой).
 
 type Finger =
   | 'l-pinky'
@@ -136,6 +137,22 @@ const GAP = 6;
 const PAD = 12;
 const ROW_UNITS = 15; // все ряды выровнены на одинаковую суммарную ширину
 
+// Символ → базовая клавиша (+ нужен ли Shift). Буквы и пробел — особые
+// случаи (нет отдельной «строчной» клавиши на схеме), остальное ищем по
+// label/shiftLabel самих клавиш. Используется live-режимом (CodeTyping).
+export function charToKey(ch: string): { id: string; shift: boolean } | null {
+  if (ch === ' ') return { id: 'Space', shift: false };
+  if (/[a-z]/.test(ch)) return { id: ch.toUpperCase(), shift: false };
+  if (/[A-Z]/.test(ch)) return { id: ch, shift: true };
+  for (const row of ROWS) {
+    for (const key of row) {
+      if (key.label === ch) return { id: key.id, shift: false };
+      if (key.shiftLabel === ch) return { id: key.id, shift: true };
+    }
+  }
+  return null;
+}
+
 export type InteractiveKeyboardProps = {
   /** Красит клавиши по зонам пальцев + легенда снизу + тултип с именем пальца. */
   zones?: boolean;
@@ -143,11 +160,33 @@ export type InteractiveKeyboardProps = {
   highlight?: string[];
   /** Показывает верхний символ Shift маленькой подписью над основным. */
   symbols?: boolean;
+  /** Live-режим: id клавиши, ожидаемой следующей (можно передать пару — базовая клавиша + Shift-L/Shift-R). Пульсирующая рамка. */
+  nextKey?: string | string[];
+  /** Затемняет остальные клавиши, пока задан nextKey. */
+  dim?: boolean;
+  /** Live-режим: клавиша последнего нажатия. */
+  activeKey?: string;
+  /** Верно ('ok') или неверно ('err') был нажат activeKey — красит «вдавленную» заливку. */
+  activeState?: 'ok' | 'err';
 };
 
-export default function InteractiveKeyboard({ zones = false, highlight, symbols = false }: InteractiveKeyboardProps) {
+export default function InteractiveKeyboard({
+  zones = false,
+  highlight,
+  symbols = false,
+  nextKey,
+  dim = false,
+  activeKey,
+  activeState,
+}: InteractiveKeyboardProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const highlightSet = useMemo(() => new Set((highlight ?? []).map((h) => h.toUpperCase())), [highlight]);
+  const nextIds = useMemo(
+    () => (Array.isArray(nextKey) ? nextKey : nextKey ? [nextKey] : []).map((id) => id.toUpperCase()),
+    [nextKey],
+  );
+  const nextSet = useMemo(() => new Set(nextIds), [nextIds]);
+  const activeKeyId = activeKey?.toUpperCase();
 
   const width = ROW_UNITS * UNIT + PAD * 2;
   const height = ROWS.length * UNIT + (ROWS.length - 1) * GAP + PAD * 2;
@@ -155,68 +194,86 @@ export default function InteractiveKeyboard({ zones = false, highlight, symbols 
   const describe = (key: KeyDef): string =>
     zones ? `клавиша ${key.label} — палец: ${FINGER_LABEL[key.finger]}` : `клавиша ${key.label}`;
 
-  const active = activeId ? ROWS.flat().find((k) => k.id === activeId) ?? null : null;
+  const allKeys = ROWS.flat();
+  const active = activeId ? allKeys.find((k) => k.id === activeId) ?? null : null;
+
+  // Основная (не-Shift) следующая клавиша — для подписи пальца в статус-строке.
+  const primaryNextId = nextIds.find((id) => id !== 'SHIFT-L' && id !== 'SHIFT-R');
+  const primaryNextKey = primaryNextId ? allKeys.find((k) => k.id.toUpperCase() === primaryNextId) : undefined;
+  const nextHasShift = nextIds.includes('SHIFT-L') || nextIds.includes('SHIFT-R');
+  const nextCaption = primaryNextKey
+    ? `следующая: ${primaryNextKey.label} — ${FINGER_LABEL[primaryNextKey.finger]}${nextHasShift ? ' (+ Shift)' : ''}`
+    : null;
 
   return (
     <div className="kb">
-      <svg
-        className="kb-svg"
-        viewBox={`0 0 ${width} ${height}`}
-        width="100%"
-        role="img"
-        aria-label="Интерактивная клавиатура: наведите или сфокусируйте клавишу для подсказки"
-      >
-        {ROWS.map((row, ri) => {
-          let x = PAD;
-          const y = PAD + ri * (UNIT + GAP);
-          return (
-            <g key={ri}>
-              {row.map((key) => {
-                const kx = x;
-                const kw = key.w * UNIT;
-                x += kw + GAP;
-                const isHighlighted = highlightSet.has(key.id.toUpperCase());
-                const cls = [
-                  'kb-key',
-                  zones ? FINGER_CLASS[key.finger] : '',
-                  isHighlighted ? 'kb-key-highlight' : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ');
-                const showShift = symbols && !!key.shiftLabel;
-                const mainY = showShift ? y + UNIT - 10 : y + UNIT / 2 + 5;
-                return (
-                  <g
-                    key={key.id}
-                    className={cls}
-                    tabIndex={0}
-                    role="img"
-                    aria-label={describe(key)}
-                    onMouseEnter={() => setActiveId(key.id)}
-                    onMouseLeave={() => setActiveId((cur) => (cur === key.id ? null : cur))}
-                    onFocus={() => setActiveId(key.id)}
-                    onBlur={() => setActiveId((cur) => (cur === key.id ? null : cur))}
-                  >
-                    <title>{describe(key)}</title>
-                    <rect x={kx} y={y} width={kw} height={UNIT} rx={6} />
-                    {showShift ? (
-                      <text x={kx + 8} y={y + 16} className="kb-key-shift">
-                        {key.shiftLabel}
+      <div className="kb-wrap">
+        <svg
+          className="kb-svg"
+          viewBox={`0 0 ${width} ${height}`}
+          role="img"
+          aria-label="Интерактивная клавиатура: наведите или сфокусируйте клавишу для подсказки"
+        >
+          {ROWS.map((row, ri) => {
+            let x = PAD;
+            const y = PAD + ri * (UNIT + GAP);
+            return (
+              <g key={ri}>
+                {row.map((key) => {
+                  const kx = x;
+                  const kw = key.w * UNIT;
+                  x += kw + GAP;
+                  const idUpper = key.id.toUpperCase();
+                  const isHighlighted = highlightSet.has(idUpper);
+                  const isNext = nextSet.has(idUpper);
+                  const isActive = !!activeKeyId && activeKeyId === idUpper;
+                  const isDimmed = dim && nextSet.size > 0 && !isNext && !isActive;
+                  const cls = [
+                    'kb-key',
+                    zones ? FINGER_CLASS[key.finger] : '',
+                    isHighlighted ? 'kb-key-highlight' : '',
+                    isNext ? 'kb-key-next' : '',
+                    isActive && activeState === 'err' ? 'kb-key-active-err' : '',
+                    isActive && activeState !== 'err' ? 'kb-key-active-ok' : '',
+                    isDimmed ? 'kb-key-dim' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ');
+                  const showShift = symbols && !!key.shiftLabel;
+                  const mainY = showShift ? y + UNIT - 10 : y + UNIT / 2 + 5;
+                  return (
+                    <g
+                      key={key.id}
+                      className={cls}
+                      tabIndex={0}
+                      role="img"
+                      aria-label={describe(key)}
+                      onMouseEnter={() => setActiveId(key.id)}
+                      onMouseLeave={() => setActiveId((cur) => (cur === key.id ? null : cur))}
+                      onFocus={() => setActiveId(key.id)}
+                      onBlur={() => setActiveId((cur) => (cur === key.id ? null : cur))}
+                    >
+                      <title>{describe(key)}</title>
+                      <rect x={kx} y={y} width={kw} height={UNIT} rx={6} />
+                      {showShift ? (
+                        <text x={kx + 8} y={y + 16} className="kb-key-shift">
+                          {key.shiftLabel}
+                        </text>
+                      ) : null}
+                      <text x={kx + kw / 2} y={mainY} textAnchor="middle" className="kb-key-label">
+                        {key.label}
                       </text>
-                    ) : null}
-                    <text x={kx + kw / 2} y={mainY} textAnchor="middle" className="kb-key-label">
-                      {key.label}
-                    </text>
-                  </g>
-                );
-              })}
-            </g>
-          );
-        })}
-      </svg>
+                    </g>
+                  );
+                })}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
 
       <div className="kb-tooltip" role="status" aria-live="polite">
-        {active ? describe(active) : ' '}
+        {active ? describe(active) : (nextCaption ?? ' ')}
       </div>
 
       {zones ? (

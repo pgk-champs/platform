@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import InteractiveKeyboard from './InteractiveKeyboard';
+import InteractiveKeyboard, { charToKey } from './InteractiveKeyboard';
 
 test('renders every ANSI key with a base accessible label, no legend by default', () => {
   render(<InteractiveKeyboard />);
@@ -55,4 +55,46 @@ test('symbols mode shows the shifted character above the base digit', () => {
 test('symbols are absent when the prop is off', () => {
   render(<InteractiveKeyboard />);
   expect(screen.queryByText('!')).toBeNull();
+});
+
+test('nextKey pulses the expected key and the status line names its finger', () => {
+  render(<InteractiveKeyboard nextKey="F" />);
+  const keyF = screen.getByRole('img', { name: 'клавиша F' });
+  expect(keyF.getAttribute('class')).toContain('kb-key-next');
+  const status = screen.getByRole('status');
+  expect(status.textContent).toBe('следующая: F — указательный левой руки');
+});
+
+test('nextKey as [base, Shift-L] also lights the shift key and notes it in the caption', () => {
+  render(<InteractiveKeyboard nextKey={['A', 'Shift-L']} />);
+  const keyA = screen.getByRole('img', { name: 'клавиша A' });
+  expect(keyA.getAttribute('class')).toContain('kb-key-next');
+  // both Shift-L and Shift-R render label "Shift" — at least one must be lit
+  const shiftKeys = screen.getAllByRole('img', { name: 'клавиша Shift' });
+  expect(shiftKeys.some((k) => k.getAttribute('class')?.includes('kb-key-next'))).toBe(true);
+  expect(screen.getByRole('status').textContent).toContain('следующая: A — мизинец левой руки (+ Shift)');
+});
+
+test('activeKey shows a success fill for ok and a danger fill for err', () => {
+  const { rerender } = render(<InteractiveKeyboard activeKey="F" activeState="ok" />);
+  expect(screen.getByRole('img', { name: 'клавиша F' }).getAttribute('class')).toContain('kb-key-active-ok');
+
+  rerender(<InteractiveKeyboard activeKey="F" activeState="err" />);
+  expect(screen.getByRole('img', { name: 'клавиша F' }).getAttribute('class')).toContain('kb-key-active-err');
+});
+
+test('dim mode fades keys that are neither next nor active', () => {
+  render(<InteractiveKeyboard nextKey="F" dim />);
+  expect(screen.getByRole('img', { name: 'клавиша F' }).getAttribute('class')).not.toContain('kb-key-dim');
+  expect(screen.getByRole('img', { name: 'клавиша A' }).getAttribute('class')).toContain('kb-key-dim');
+});
+
+test('charToKey maps letters (with case = Shift), digits, space and shifted symbols', () => {
+  expect(charToKey('a')).toEqual({ id: 'A', shift: false });
+  expect(charToKey('A')).toEqual({ id: 'A', shift: true });
+  expect(charToKey('1')).toEqual({ id: '1', shift: false });
+  expect(charToKey('!')).toEqual({ id: '1', shift: true });
+  expect(charToKey(' ')).toEqual({ id: 'Space', shift: false });
+  expect(charToKey(';')).toEqual({ id: ';', shift: false });
+  expect(charToKey(':')).toEqual({ id: ';', shift: true });
 });

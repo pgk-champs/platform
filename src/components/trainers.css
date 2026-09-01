@@ -77,6 +77,54 @@
   margin-top: 0.5rem;
 }
 
+.ct-pools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.ct-pool-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.ct-pool-btn {
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.ct-pool-btn:hover {
+  border-color: var(--ifm-color-primary);
+}
+
+.ct-pool-btn-active {
+  background: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary-contrast-foreground);
+}
+
+.ct-next-btn {
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--ifm-code-border-radius);
+  border: 1px solid var(--ifm-color-primary);
+  background: none;
+  color: var(--ifm-color-primary);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.ct-next-btn:hover {
+  background: var(--ifm-color-primary-contrast-background);
+}
+
 .fc {
   margin: var(--ifm-leading) 0;
 }
@@ -881,8 +929,18 @@
   margin: var(--ifm-leading) 0;
 }
 
+/* Скроллится по горизонтали на узких экранах вместо обрезки клавиатуры справа. */
+.kb-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 .kb-svg {
   display: block;
+  width: 100%;
+  height: auto;
+  /* ниже этой ширины клавиши превращаются в кашу — вместо сжатия даём горизонтальный скролл */
+  min-width: 640px;
 }
 
 .kb-key rect {
@@ -919,6 +977,39 @@
   fill-opacity: 0.35;
   stroke: var(--ifm-color-warning);
   stroke-width: 2;
+}
+
+.kb-key-next rect {
+  stroke: var(--ifm-color-primary);
+  stroke-width: 3;
+  animation: kb-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes kb-pulse {
+  0%, 100% {
+    stroke-opacity: 1;
+  }
+  50% {
+    stroke-opacity: 0.35;
+  }
+}
+
+.kb-key-active-ok rect {
+  fill: var(--ifm-color-success);
+  fill-opacity: 0.55;
+  stroke: var(--ifm-color-success);
+  stroke-width: 2;
+}
+
+.kb-key-active-err rect {
+  fill: var(--ifm-color-danger);
+  fill-opacity: 0.55;
+  stroke: var(--ifm-color-danger);
+  stroke-width: 2;
+}
+
+.kb-key-dim {
+  opacity: 0.35;
 }
 
 .kb-f1 rect {

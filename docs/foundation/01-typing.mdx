@@ -173,7 +173,7 @@ QWERTY придумал в 1873 году Кристофер Шоулз — не 
 Разомнись на классической фразе — в ней встречаются почти все буквы английского алфавита, поэтому ей разминают пальцы перед любой тренировкой:
 
 <Block kind="trainer" title="Разминка: классическая фраза" chapterId="typing" blockId="trainer-warmup-latin">
-<CodeTyping snippet={'the quick brown fox jumps over the lazy dog'} chapterId="typing" trainerId="trainer-warmup-latin" targetCpm={80} targetAccuracy={90} />
+<CodeTyping preset="latin" keyboard chapterId="typing" trainerId="trainer-warmup-latin" targetCpm={80} targetAccuracy={90} />
 </Block>
 
 <SectionAnchor chapterId="typing" sectionId="practice-latin" />
@@ -278,7 +278,7 @@ QWERTY придумал в 1873 году Кристофер Шоулз — не 
 Спецсимволы тормозят новичков сильнее всего именно потому, что до них не доходят пальцы-новобранцы — домашний ряд успевает стать привычкой, а скобки и стрелки ещё нет. Потренируй их отдельно, связками:
 
 <Block kind="trainer" title="Спецсимволы связками" chapterId="typing" blockId="trainer-symbols-combo">
-<CodeTyping snippet={`-> => != == <= >= && || () {} [] <> ;; :: "" '' ?? .. // ## __`} chapterId="typing" trainerId="trainer-symbols-combo" targetCpm={95} targetAccuracy={90} />
+<CodeTyping preset="symbols" keyboard chapterId="typing" trainerId="trainer-symbols-combo" targetCpm={95} targetAccuracy={90} />
 </Block>
 
 А теперь — короткая строка кода целиком, ровно та, что уже разобрана по символам выше:
@@ -335,13 +335,13 @@ QWERTY придумал в 1873 году Кристофер Шоулз — не 
 Длинная строка, где буквы, скобки и спецсимволы перемешаны вперемешку — как в настоящем коде:
 
 <Block kind="trainer" title="Цикл for с условием" chapterId="typing" blockId="trainer-code-for-loop">
-<CodeTyping snippet={`for (i in 0..9) { if (i % 2 == 0) { println("even: " + i) } }`} chapterId="typing" trainerId="trainer-code-for-loop" targetCpm={125} targetAccuracy={90} />
+<CodeTyping preset="code" chapterId="typing" trainerId="trainer-code-for-loop" targetCpm={125} targetAccuracy={90} />
 </Block>
 
 И команда git — набери её так, будто действительно фиксируешь свою работу:
 
 <Block kind="trainer" title="Команда git commit" chapterId="typing" blockId="trainer-code-git-commit">
-<CodeTyping snippet={'git commit -m "готова часть 1"'} chapterId="typing" trainerId="trainer-code-git-commit" targetCpm={140} targetAccuracy={90} />
+<CodeTyping preset="git" chapterId="typing" trainerId="trainer-code-git-commit" targetCpm={140} targetAccuracy={90} />
 </Block>
 
 <SectionAnchor chapterId="typing" sectionId="practice-code-commands" />

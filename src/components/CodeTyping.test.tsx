@@ -66,3 +66,59 @@ test('missing the target shows "Цель пока не достигнута"', (
   fireEvent.change(screen.getByRole('textbox'), { target: { value: 'ab' } });
   expect(screen.getByText('Цель пока не достигнута')).toBeTruthy();
 });
+
+test('preset pool starts on the first fragment deterministically (no pool-switch button for a single pool)', () => {
+  render(<CodeTyping preset="git" />);
+  expect(screen.getByText('Следующий фрагмент')).toBeTruthy();
+  expect(screen.queryByRole('button', { name: 'git' })).toBeNull();
+});
+
+test('"Следующий фрагмент" swaps to the other snippet in a 2-item pool and never repeats it', () => {
+  render(<CodeTyping pools={[{ label: 'p', snippets: ['ab', 'cd'] }]} />);
+  const codeText = () => screen.getByRole('textbox').closest('.ct')!.querySelector('.ct-code')!.textContent;
+  expect(codeText()).toBe('ab');
+  fireEvent.click(screen.getByText('Следующий фрагмент'));
+  expect(codeText()).toBe('cd');
+  fireEvent.click(screen.getByText('Следующий фрагмент'));
+  expect(codeText()).toBe('ab');
+});
+
+test('multiple pools show a switcher and switching resets the trainer to the new pool', () => {
+  render(
+    <CodeTyping
+      pools={[
+        { label: 'Alpha', snippets: ['ab'] },
+        { label: 'Beta', snippets: ['xy'] },
+      ]}
+    />,
+  );
+  const codeText = () => screen.getByRole('textbox').closest('.ct')!.querySelector('.ct-code')!.textContent;
+  expect(codeText()).toBe('ab');
+  fireEvent.click(screen.getByRole('button', { name: 'Beta' }));
+  expect(codeText()).toBe('xy');
+});
+
+test('plain snippet prop still works with no pool toolbar (backward compatibility)', () => {
+  render(<CodeTyping snippet="ab" />);
+  expect(screen.queryByText('Следующий фрагмент')).toBeNull();
+});
+
+test('keyboard prop renders a live InteractiveKeyboard highlighting the next expected key', () => {
+  render(<CodeTyping snippet="ab" keyboard />);
+  const keyA = screen.getByRole('img', { name: 'клавиша A' });
+  expect(keyA.getAttribute('class')).toContain('kb-key-next');
+});
+
+test('keyboard prop marks the last typed key ok or err by comparing against the snippet', () => {
+  render(<CodeTyping snippet="ab" keyboard />);
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'a' } });
+  expect(screen.getByRole('img', { name: 'клавиша A' }).getAttribute('class')).toContain('kb-key-active-ok');
+
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'ax' } });
+  expect(screen.getByRole('img', { name: 'клавиша X' }).getAttribute('class')).toContain('kb-key-active-err');
+});
+
+test('without the keyboard prop no InteractiveKeyboard is rendered', () => {
+  render(<CodeTyping snippet="ab" />);
+  expect(screen.queryByRole('img', { name: 'клавиша A' })).toBeNull();
+});
