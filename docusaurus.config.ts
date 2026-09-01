@@ -27,6 +27,28 @@ const config: Config = {
 
   onBrokenLinks: 'throw',
 
+  headTags: [
+    {
+      tagName: 'link',
+      attributes: {rel: 'preconnect', href: 'https://fonts.googleapis.com'},
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preconnect',
+        href: 'https://fonts.gstatic.com',
+        crossorigin: 'anonymous',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Onest:wght@700;800&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap',
+      },
+    },
+  ],
+
   clientModules: ['./src/clientModules/readingProgress.ts'],
 
   // Even if you don't use internationalization, you can use this field to set
@@ -93,6 +115,11 @@ const config: Config = {
         {
           to: '/achievements',
           label: 'Достижения',
+          position: 'left',
+        },
+        {
+          to: '/community',
+          label: 'Сообщество',
           position: 'left',
         },
         {

@@ -7346,3 +7346,301 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* === Волна 6: типографика — hero главной, мягкие тени карточек === */
+
+.block {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.block:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.hh-hero {
+  padding: 4rem 1rem 3rem;
+  text-align: center;
+  background:
+    radial-gradient(
+      50rem 24rem at 80% -20%,
+      color-mix(in srgb, var(--ifm-color-primary) 14%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--ifm-color-emphasis-100), transparent 80%);
+}
+
+.hh-title {
+  margin: 0 auto 1rem;
+  max-width: 40rem;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.hh-subtitle {
+  margin: 0 auto 2rem;
+  max-width: 38rem;
+  font-size: 1.15rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.hh-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.hh-stats {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.hh-tracks {
+  max-width: var(--ifm-container-width);
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+
+.hh-tracks-title {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.hh-tracks-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.hh-track {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: var(--ifm-card-border-radius);
+  background: var(--ifm-background-surface-color);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  color: inherit;
+  text-decoration: none;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.hh-track:hover {
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  color: inherit;
+  text-decoration: none;
+}
+
+.hh-track-title {
+  font-family: var(--ifm-heading-font-family);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ifm-color-primary);
+}
+
+.hh-track-desc {
+  color: var(--ifm-color-emphasis-700);
+}
+
+@media (max-width: 768px) {
+  .hh-tracks-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* === wave6 covers: ChapterCover / TrackBanner === */
+.chapter-cover,
+.track-banner {
+  margin: 0 0 1.5rem;
+}
+
+.chapter-cover svg,
+.track-banner svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--ifm-global-radius, 8px);
+}
+
+.track-banner--mini {
+  margin: 0;
+}
+
+.track-banners {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 1rem 0 1.5rem;
+}
+
+.track-banners a {
+  display: block;
+  transition: transform 0.15s ease;
+}
+
+.track-banners a:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .track-banners {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* === daily-adaptive: адаптивный вызов дня === */
+.dc-src {
+  font-size: 0.8rem;
+  color: var(--ifm-color-emphasis-600);
+  margin: 0.15rem 0 0.4rem;
+}
+.dc-src a {
+  color: var(--ifm-color-primary);
+}
+.dc-more {
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-700);
+  background: var(--ifm-color-emphasis-100);
+  border-radius: var(--ifm-global-radius);
+  padding: 0.35rem 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+/* ===== terminal-fun (волна 6): TerminalSim — ASCII-арт, паровозик sl, matrix ===== */
+.ts-screenbox {
+  position: relative;
+}
+
+.ts-screen {
+  overflow-x: auto;
+}
+
+.ts-line-art {
+  white-space: pre;
+  word-break: normal;
+}
+
+.ts-sl {
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  white-space: pre;
+  overflow: hidden;
+}
+
+.ts-matrix {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--ifm-pre-background);
+  border-radius: 0 0 var(--ifm-global-radius) var(--ifm-global-radius);
+  z-index: 2;
+}
+
+.ts-matrix-col {
+  position: absolute;
+  top: 0;
+  white-space: pre;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+  line-height: 1.1;
+  color: var(--ifm-color-success);
+  text-shadow: 0 0 6px var(--ifm-color-success);
+  animation: ts-matrix-fall linear infinite;
+}
+
+@keyframes ts-matrix-fall {
+  from {
+    transform: translateY(-110%);
+  }
+  to {
+    transform: translateY(110%);
+  }
+}
+
+/* === community: каталог контента от студентов (/community, волна 6) === */
+
+.cc-head {
+  margin-bottom: 1.5rem;
+}
+
+.cc-status {
+  color: var(--ifm-color-emphasis-700);
+  margin: 1rem 0;
+}
+
+.cc-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.cc-filters label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.cc-filters select {
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 6px;
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+}
+
+.cc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.cc-card {
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 10px;
+  padding: 1rem;
+  background: var(--ifm-background-surface-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.cc-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--ifm-color-emphasis-100);
+  color: var(--ifm-color-emphasis-800);
+}
+
+.cc-badge-preset {
+  background: var(--ifm-color-primary-lightest);
+  color: var(--ifm-color-primary-darkest);
+}
+
+.cc-title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.cc-meta {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-600);
+}

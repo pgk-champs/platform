@@ -35,3 +35,26 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+/* === Волна 6: типографика и полировка === */
+:root {
+  --ifm-font-family-base: 'Golos Text', system-ui, -apple-system, 'Segoe UI',
+    Roboto, Arial, sans-serif;
+  --ifm-font-family-monospace: 'JetBrains Mono', 'SF Mono', SFMono-Regular,
+    Menlo, Consolas, 'Liberation Mono', monospace;
+  --ifm-heading-font-family: 'Onest', 'Golos Text', system-ui, -apple-system,
+    'Segoe UI', Roboto, Arial, sans-serif;
+  --ifm-heading-font-weight: 700;
+  --ifm-line-height-base: 1.65;
+  --ifm-card-border-radius: 12px;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.01em;
+}
+
+a {
+  text-underline-offset: 0.2em;
+}

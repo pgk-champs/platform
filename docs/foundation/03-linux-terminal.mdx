@@ -5,6 +5,10 @@ level: 'база'
 order: 3
 ---
 
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="linux-terminal" />
+
 import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
 import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
@@ -773,3 +777,7 @@ mv reports/*.txt reports/archive/
 - Узнавать по точному тексту сообщения пять типичных ошибок этой главы и знать, как каждую починить.
 
 <SectionAnchor chapterId="linux-terminal" sectionId="what-you-should-know" />
+
+<Hint id="linux-terminal-h4" type="fact">
+В учебном терминале этой главы спрятаны пасхалки из настоящего Linux: попробуй набрать `sl`, `cowsay Привет`, `fortune`, `neofetch`, `figlet PGK`, `matrix` — и попроси что-нибудь у `sudo`.
+</Hint>

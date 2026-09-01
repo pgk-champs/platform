@@ -148,6 +148,84 @@ test('пустое звено конвейера — синтаксическа�
   expect(screen.getByText("bash: syntax error near unexpected token `|'")).toBeTruthy();
 });
 
+// Точное совпадение текста строки (getByText нормализует пробелы, а нам важны отступы).
+function byExact(t: string): HTMLElement {
+  return screen.getByText((_, el) => (el?.className ?? '').includes('ts-line') && el?.textContent === t);
+}
+
+test('tree: ASCII-ветки, вложенность и итоговая строка счётчиков', () => {
+  render(<TerminalSim initialFs={{ docs: { 'a.txt': '1' }, 'z.txt': '2' }} />);
+  run('tree');
+  expect(byExact('├── docs')).toBeTruthy();
+  expect(byExact('│   └── a.txt')).toBeTruthy();
+  expect(byExact('└── z.txt')).toBeTruthy();
+  expect(screen.getByText('1 directory, 2 files')).toBeTruthy();
+});
+
+test('history: нумерованный список, включая саму команду history', () => {
+  render(<TerminalSim />);
+  run('pwd');
+  run('whoami');
+  run('history');
+  expect(byExact('    1  pwd')).toBeTruthy();
+  expect(byExact('    2  whoami')).toBeTruthy();
+  expect(byExact('    3  history')).toBeTruthy();
+});
+
+test('sudo: точное сообщение sudoers с двойным пробелом, сэндвич по xkcd — Okay.', () => {
+  render(<TerminalSim />);
+  run('sudo apt install fun');
+  expect(byExact('student is not in the sudoers file.  This incident will be reported.')).toBeTruthy();
+  run('sudo make me a sandwich');
+  expect(screen.getByText('Okay.')).toBeTruthy();
+});
+
+test('cowsay: облачко и корова оригинальной разметки', () => {
+  render(<TerminalSim />);
+  run('cowsay Привет');
+  expect(byExact(' ________')).toBeTruthy();
+  expect(byExact('< Привет >')).toBeTruthy();
+  expect(byExact(' --------')).toBeTruthy();
+  expect(byExact('        \\   ^__^')).toBeTruthy();
+  expect(byExact('         \\  (oo)\\_______')).toBeTruthy();
+  expect(byExact('                ||----w |')).toBeTruthy();
+});
+
+test('whoami, date и echo с переменными $HOME/$USER', () => {
+  render(<TerminalSim />);
+  run('whoami');
+  expect(screen.getByText('student')).toBeTruthy();
+  run('date');
+  expect(screen.getByText(/^\w{3} \w{3} \d{1,2} \d{2}:\d{2}:\d{2} GMT[+-]\d{2}(:\d{2})? \d{4}$/)).toBeTruthy();
+  run('echo $HOME');
+  expect(screen.getByText('/home/student')).toBeTruthy();
+  run('echo я $USER и это дом');
+  expect(screen.getByText('я student и это дом')).toBeTruthy();
+});
+
+test('yes печатает 50 строк с пометкой об остановке, figlet рисует большие буквы', () => {
+  render(<TerminalSim />);
+  run('yes ok');
+  expect(screen.getAllByText('ok').length).toBe(50);
+  expect(screen.getByText('(остановлено: в настоящем yes — бесконечно, Ctrl+C)')).toBeTruthy();
+  run('figlet Hi');
+  expect(screen.getAllByText(/█/).length).toBeGreaterThan(0);
+  run('neofetch');
+  expect(screen.getByText(/OS: PGK Champs Learning Env/)).toBeTruthy();
+  expect(screen.getByText(/Shell: учебный bash/)).toBeTruthy();
+});
+
+test('пасхалок нет в help, но man знает про tree и history', () => {
+  render(<TerminalSim />);
+  run('help');
+  expect(screen.queryByText(/cowsay|figlet|neofetch|fortune/)).toBeNull();
+  expect(screen.getByText(/tree \[путь\]/)).toBeTruthy();
+  run('man tree');
+  expect(byExact('tree — дерево папок и файлов')).toBeTruthy();
+  run('man history');
+  expect(byExact('history — нумерованная история введённых команд')).toBeTruthy();
+});
+
 test('cp -r copies a directory, plain cp on directory refuses', () => {
   render(<TerminalSim initialFs={{ src: { 'a.txt': 'data' } }} />);
   run('cp src backup');

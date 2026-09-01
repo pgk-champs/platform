@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import Layout from '@theme/Layout';
+import Link from '@docusaurus/Link';
+import { TrackBanner } from '../components/ChapterCover';
 import RouteList, { type Entry } from '../components/RouteList';
 import DailyChallenge from '../components/DailyChallenge';
 import TrainingSchedule from '../components/TrainingSchedule';
@@ -12,6 +14,13 @@ export default function Route() {
     <Layout title="Маршрут" description="Маршрут обучения по треку с прогрессом и матрицей охвата">
       <main className="container margin-vert--lg">
         <h1>Маршрут</h1>
+        <div className="track-banners">
+          {(['foundation', 'mobile', 'blockchain'] as const).map((t) => (
+            <Link key={t} to={`/docs/${t}`}>
+              <TrackBanner track={t} mini />
+            </Link>
+          ))}
+        </div>
         <DailyChallenge />
         <div className="rl-track-switch">
           <button
