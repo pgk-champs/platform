@@ -6,6 +6,7 @@ order: 7
 ---
 
 import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import GitSim from '@site/src/components/GitSim';
 import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import ToolCard from '@site/src/components/ToolCard';
@@ -18,7 +19,7 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # Git: push, PR и командная работа
 
-<ChapterProgress chapterId="git-remote" totalSections={15} totalQuizzes={7} totalTrainers={2} />
+<ChapterProgress chapterId="git-remote" totalSections={15} totalQuizzes={7} totalTrainers={3} />
 
 ## Зачем это нужно
 
@@ -293,6 +294,15 @@ Fast-forward
   { q: 'Вывод git pull состоит из блока From ... -> origin/main и блока Updating ... Fast-forward .... Откуда взялись эти два блока?', options: ['Это случайное совпадение форматирования', 'Это буквально вывод git fetch, а следом за ним — вывод git merge; pull — это последовательный запуск двух этих команд', 'Первый блок — ошибка, второй — успех', 'Оба блока относятся только к merge'], correct: 1, why: 'pull — не отдельная третья операция, а обёртка ровно над fetch и merge, запущенными одна за другой; вывод честно показывает результат обеих.' },
   { q: 'В каком случае имеет смысл делать fetch и merge раздельно, а не просто git pull?', options: ['Раздельно они вообще не работают', 'Когда хочется сначала посмотреть, что изменилось на сервере (например, git log main..origin/main), прежде чем впускать это в свою рабочую ветку', 'Раздельные команды работают быстрее', 'Это нужно только для очень больших репозиториев'], correct: 1, why: 'fetch безопасен и обратим — он ничего не меняет в рабочей копии, поэтому даёт возможность сначала изучить чужие изменения и только потом осознанно их слить.' },
 ]} />
+</Block>
+
+<Block kind="trainer" title="Git-симулятор: два репозитория, push и pull" chapterId="git-remote" blockId="trainer-gitsim-remote">
+<GitSim
+  scenario="remote-demo"
+  quest={{ title: 'Нажми «Коммит коллеги», получи rejected при git push и почини рассинхрон через git pull', goal: 'merged' }}
+  chapterId="git-remote"
+  trainerId="trainer-gitsim-remote"
+/>
 </Block>
 
 <SectionAnchor chapterId="git-remote" sectionId="pull-fetch-merge" />

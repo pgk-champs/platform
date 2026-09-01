@@ -9,6 +9,7 @@ import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
 import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
+import PredictOutput from '@site/src/components/PredictOutput';
 import SelfCheck from '@site/src/components/SelfCheck';
 import Block from '@site/src/components/Block';
 import Hint from '@site/src/components/Hint';
@@ -18,7 +19,7 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # Переменные и типы
 
-<ChapterProgress chapterId="kotlin-vars" totalSections={13} totalQuizzes={3} totalTrainers={2} />
+<ChapterProgress chapterId="kotlin-vars" totalSections={13} totalQuizzes={3} totalTrainers={4} />
 
 ## Зачем это нужно
 
@@ -80,6 +81,18 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 <Hint id="kotlin-vars-h1" type="tip">
 Хорошее правило для новичка: по умолчанию бери `val` и переключайся на `var` только тогда, когда точно знаешь, что значение будет меняться. Так меньше шанс случайно испортить данные, на которые полагается остальной код.
 </Hint>
+
+Прежде чем жать Run — сначала предскажи вывод сам: прокрути `+=` в голове и вспомни, что делает `$` в кавычках.
+
+<Block kind="trainer" title="Предскажи вывод: val, var и +=" chapterId="kotlin-vars" blockId="trainer-predict-val-var">
+<PredictOutput kotlin expected={'Соня набрала 42 очков'} chapterId="kotlin-vars" trainerId="trainer-predict-val-var" code={`fun main() {
+    val name: String = "Соня"
+    var score = 0
+    score += 15
+    score += 27
+    println("$name набрала $score очков")
+}`} />
+</Block>
 
 <KotlinPlay code={`fun main() {
     val name: String = "Соня"
@@ -261,6 +274,15 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 - **Строки 5–6** — печать. **Что выведет:** `[2, 4]`, затем `6`. Списки печатаются в квадратных скобках через запятую — так выглядит их текстовое представление.
 
 Лямбду не обязательно писать через `it`. Когда так понятнее, параметру дают явное имя и отделяют его стрелкой `->` (минус и знак «больше», читается «переходит в»):
+
+И здесь сначала предскажи: подставь 15 вместо `score` в тело лямбды и посчитай, что напечатается.
+
+<Block kind="trainer" title="Предскажи вывод: лямбда со стрелкой" chapterId="kotlin-vars" blockId="trainer-predict-lambda-bonus">
+<PredictOutput kotlin expected={'40'} chapterId="kotlin-vars" trainerId="trainer-predict-lambda-bonus" code={`fun main() {
+    val calculateBonus: (Int) -> Int = { score -> score * 2 + 10 }
+    println(calculateBonus(15))
+}`} />
+</Block>
 
 <KotlinPlay code={`fun main() {
     val calculateBonus: (Int) -> Int = { score -> score * 2 + 10 }

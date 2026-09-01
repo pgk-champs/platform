@@ -17,10 +17,12 @@ import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import KeysTabs from '@site/src/components/KeysTabs';
+import IdeTour from '@site/src/components/IdeTour';
+import HotkeyTrainer from '@site/src/components/HotkeyTrainer';
 
 # Android Studio: знакомство с IDE
 
-<ChapterProgress chapterId="android-studio" totalSections={14} totalQuizzes={5} totalTrainers={2} />
+<ChapterProgress chapterId="android-studio" totalSections={14} totalQuizzes={5} totalTrainers={4} />
 
 ## Зачем это нужно
 
@@ -144,6 +146,12 @@ cd /opt/android-studio/bin
 ### Панель Gradle
 
 Справа — узкая вертикальная вкладка **Gradle**. Разворачиваешь её — видишь дерево задач (task) сборки: `build`, `assembleDebug`, `test` и десятки других, каждую из которых можно запустить кликом в обход кнопки Run. Здесь же — кнопка обновления (иконка двух круговых стрелок или слон-логотип Gradle), которой можно вручную запустить синхронизацию проекта, не дожидаясь, пока IDE попросит об этом сама.
+
+Теперь то же самое — на интерактивной схеме окна: сначала кликай по панелям и читай, что где живёт, а потом запусти викторину и найди каждую панель по памяти:
+
+<Block kind="trainer" title="Схема окна: найди панель" chapterId="android-studio" blockId="trainer-ide-tour">
+<IdeTour chapterId="android-studio" trainerId="trainer-ide-tour" />
+</Block>
 
 <Block kind="quiz" title="Окно Android Studio" chapterId="android-studio" blockId="quiz-ide-window">
 <SelfCheck chapterId="android-studio" quizId="quiz-ide-window" questions={[
@@ -336,6 +344,23 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 </Block>
 
 Не заучивай список — повесь на него глаза и пробуй по одной в день. Через неделю рука будет тянуться сама.
+
+А чтобы рука начала запоминать уже сейчас, нажми каждое сочетание по-настоящему — прямо на этой странице:
+
+<Block kind="trainer" title="Тренажёр горячих клавиш" chapterId="android-studio" blockId="trainer-hotkeys">
+<HotkeyTrainer chapterId="android-studio" trainerId="trainer-hotkeys" items={[
+  { action: 'Показать/скрыть панель Project', mac: '⌘1', win: 'Alt+1', linux: 'Alt+1', browserReserved: true },
+  { action: 'Search Everywhere: найти файл, класс, действие или настройку — что угодно', mac: 'Shift, дважды', win: 'Shift, дважды', linux: 'Shift, дважды' },
+  { action: 'Базовое автодополнение кода', mac: '⌃Space', win: 'Ctrl+Space', linux: 'Ctrl+Space' },
+  { action: 'Быстрое исправление: показать intention actions — варианты того, как починить подчёркнутое место', mac: '⌥Enter', win: 'Alt+Enter', linux: 'Alt+Enter' },
+  { action: 'Закомментировать/раскомментировать текущую строку', mac: '⌘/', win: 'Ctrl+/', linux: 'Ctrl+/' },
+  { action: 'Переформатировать код: расставить отступы и пробелы по стилю проекта', mac: '⌥⌘L', win: 'Ctrl+Alt+L', linux: 'Ctrl+Alt+L', browserReserved: true },
+  { action: 'Build & Run: собрать и запустить приложение на выбранном устройстве', mac: '⌃R', win: 'Shift+F10', linux: 'Shift+F10' },
+  { action: 'Запустить в режиме отладки (Debug)', mac: '⌃D', win: 'Shift+F9', linux: 'Shift+F9' },
+  { action: 'Открыть панель Logcat', mac: '⌘6', win: 'Alt+6', linux: 'Alt+6', browserReserved: true },
+  { action: 'Переименовать (Rename) — переименует символ везде, где он используется в проекте', mac: '⇧F6', win: 'Shift+F6', linux: 'Shift+F6' },
+]} />
+</Block>
 
 <SectionAnchor chapterId="android-studio" sectionId="hotkeys" />
 

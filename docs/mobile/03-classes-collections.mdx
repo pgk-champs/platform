@@ -6,6 +6,7 @@ order: 3
 ---
 
 import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import PredictOutput from '@site/src/components/PredictOutput';
 import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
@@ -18,7 +19,7 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # Классы и коллекции
 
-<ChapterProgress chapterId="classes-collections" totalSections={15} totalQuizzes={6} totalTrainers={2} />
+<ChapterProgress chapterId="classes-collections" totalSections={15} totalQuizzes={6} totalTrainers={4} />
 
 ## Зачем это нужно
 
@@ -241,6 +242,19 @@ Competitor(name=Богдан, score=91)
 Competitor(name=Богдан, score=96)
 ```
 
+Проверь себя на связке `toString()` + `copy()` — сначала предскажи обе строки вывода, потом запускай:
+
+<Block kind="trainer" title="Предскажи вывод: toString и copy" chapterId="classes-collections" blockId="trainer-predict-data-copy">
+<PredictOutput kotlin expected={'Competitor(name=Богдан, score=96)\n91'} chapterId="classes-collections" trainerId="trainer-predict-data-copy" code={`fun main() {
+    val bogdan = Competitor("Богдан", 91)
+    val next = bogdan.copy(score = 96)
+    println(next)
+    println(bogdan.score)
+}
+
+data class Competitor(val name: String, var score: Int)`} />
+</Block>
+
 ### Бонус: деструктуризация через componentN()
 
 Последний сгенерированный кусок — функции `component1()`, `component2()` и так далее, по одной на каждое свойство основного конструктора, в порядке объявления. Их редко вызывают напрямую — вместо этого есть удобный синтаксис: разложить объект на отдельные переменные одной строкой.
@@ -328,6 +342,22 @@ data class Competitor(val name: String, var score: Int)`} />
 - **Строка 7: `team.map { it.score }.sum()`** — та же цепочка `map`/`sum` из главы 1, только теперь `it` — не число, а целый объект `Competitor`. `it.score` достаёт из каждого объекта одно свойство, `map` собирает из этих свойств новый список чисел, `sum()` складывает их.
 
 **Что выведет:** `250` — потому что 82 + 91 + 77 = 250.
+
+Та же команда, но теперь цепочка `filter`/`map` из главы 1 — предскажи, какой список напечатается:
+
+<Block kind="trainer" title="Предскажи вывод: filter и map по команде" chapterId="classes-collections" blockId="trainer-predict-filter-map">
+<PredictOutput kotlin expected={'[Алиса, Богдан]'} chapterId="classes-collections" trainerId="trainer-predict-filter-map" code={`fun main() {
+    val team = listOf(
+        Competitor("Алиса", 82),
+        Competitor("Богдан", 91),
+        Competitor("Соня", 77)
+    )
+    val qualified = team.filter { it.score >= 80 }.map { it.name }
+    println(qualified)
+}
+
+data class Competitor(val name: String, var score: Int)`} />
+</Block>
 
 Список из `listOf` — неизменяемый (в том смысле, что через сам этот `List` нельзя ни добавить, ни удалить элемент). Когда список должен расти и меняться, используют `mutableListOf` — тот же список, но с методами `add`/`remove`.
 

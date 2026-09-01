@@ -15,10 +15,12 @@ import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
+import ChmodCalc from '@site/src/components/ChmodCalc';
+import PermQuest from '@site/src/components/PermQuest';
 
 # Файлы, пакеты, SSH
 
-<ChapterProgress chapterId="files-packages-ssh" totalSections={15} totalQuizzes={6} totalTrainers={2} />
+<ChapterProgress chapterId="files-packages-ssh" totalSections={15} totalQuizzes={6} totalTrainers={4} />
 
 ## Зачем это нужно
 
@@ -202,6 +204,10 @@ ls -l hello.sh
 ```
 
 Ровно та же строка прав, что мы уже видели после `u=rwx,g=rx,o=rx` — буквенная и числовая запись всегда приводят к одному и тому же результату, просто это два разных языка для одной идеи.
+
+<Block kind="trainer" title="Калькулятор прав chmod" chapterId="files-packages-ssh" blockId="trainer-chmod-calc">
+<ChmodCalc chapterId="files-packages-ssh" trainerId="trainer-chmod-calc" />
+</Block>
 
 <details>
 <summary>Углубиться</summary>
@@ -645,6 +651,16 @@ student
 ```
 
 Права снова `600` — и ключ снова принят без единого возражения.
+
+<Block kind="trainer" title="Квест: кто и что может с файлом" chapterId="files-packages-ssh" blockId="trainer-perm-quest">
+<PermQuest chapterId="files-packages-ssh" trainerId="trainer-perm-quest" scenarios={[
+  { file: 'deploy.sh', perm: '755', owner: 'student', group: 'student', user: 'student', userGroups: ['student'], action: 'execute', correct: 'yes', why: 'student — владелец, ему достаётся первая цифра: 7 = rwx. Запуск разрешён — 755 и есть стандартные права исполняемого скрипта.' },
+  { file: 'deploy.conf', perm: '640', owner: 'student', group: 'student', user: 'teammate', userGroups: ['student'], action: 'write', correct: 'read-only', why: 'teammate попадает во вторую тройку — группу файла. Вторая цифра 4 = r--: чтение есть, а записи (w) нет, менять конфиг может только владелец.' },
+  { file: 'deploy.conf', perm: '640', owner: 'student', group: 'student', user: 'guest', userGroups: [], action: 'read', correct: 'no', why: 'guest не владелец и не в группе student — работает третья цифра: 0 = ---. Для всех остальных файл закрыт полностью, даже на чтение.' },
+  { file: 'id_ed25519', perm: '644', owner: 'student', group: 'student', user: 'guest', userGroups: [], action: 'read', correct: 'yes', why: 'Третья тройка в 644 — это r--: прочитать закрытый ключ может кто угодно в системе. Именно поэтому ssh при правах 0644 пишет are too open и вовсе отказывается использовать такой ключ.' },
+  { file: 'id_ed25519', perm: '600', owner: 'student', group: 'student', user: 'teammate', userGroups: ['student'], action: 'read', correct: 'no', why: '600 = rw-------: у группы и у остальных нет вообще ничего, читать может только владелец. Ровно такие права ставит ssh-keygen сам — и ровно их требует ssh.' },
+]} />
+</Block>
 
 <Block kind="quiz" title="SSH и ключи" chapterId="files-packages-ssh" blockId="quiz-ssh">
 <SelfCheck chapterId="files-packages-ssh" quizId="quiz-ssh" questions={[

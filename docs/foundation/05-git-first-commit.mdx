@@ -15,10 +15,11 @@ import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
+import GitSim from '@site/src/components/GitSim';
 
 # Git: первый коммит
 
-<ChapterProgress chapterId="git-first-commit" totalSections={15} totalQuizzes={6} totalTrainers={3} />
+<ChapterProgress chapterId="git-first-commit" totalSections={15} totalQuizzes={6} totalTrainers={4} />
 
 ## Зачем это нужно
 
@@ -700,6 +701,17 @@ fatal: unable to auto-detect email address (got 'root@d5508f32bf9c.(none)')
 </Block>
 
 <SectionAnchor chapterId="git-first-commit" sectionId="resources" />
+
+Прежде чем браться за челлендж, прогони весь цикл в симуляторе: перед тобой виртуальный репозиторий с уже лежащим в папке `README.md` — доведи его от `git init` до цепочки минимум из трёх коммитов и посмотри на графе, как растёт история.
+
+<Block kind="trainer" title="Git-симулятор: от init до трёх коммитов" chapterId="git-first-commit" blockId="trainer-gitsim-first-commit">
+<GitSim
+  scenario="first-commit"
+  quest={{ title: 'Прогони цикл init → add → commit и собери минимум три коммита', goal: 'commits>=3' }}
+  chapterId="git-first-commit"
+  trainerId="trainer-gitsim-first-commit"
+/>
+</Block>
 
 ## Челлендж ⭐
 

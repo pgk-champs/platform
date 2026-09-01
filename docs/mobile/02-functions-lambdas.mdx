@@ -9,6 +9,7 @@ import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
 import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
+import PredictOutput from '@site/src/components/PredictOutput';
 import SelfCheck from '@site/src/components/SelfCheck';
 import Block from '@site/src/components/Block';
 import Hint from '@site/src/components/Hint';
@@ -18,7 +19,7 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # Функции и лямбды
 
-<ChapterProgress chapterId="functions-lambdas" totalSections={14} totalQuizzes={4} totalTrainers={2} />
+<ChapterProgress chapterId="functions-lambdas" totalSections={14} totalQuizzes={4} totalTrainers={4} />
 
 ## Зачем это нужно
 
@@ -232,6 +233,20 @@ fun describe(name: String, score: Int, isChampion: Boolean = false) {
 Заметь: `name = "ПГК"` при вызове и `greeting: String = "Привет"` при объявлении выглядят похоже, но это разные вещи. В объявлении `имя: Тип = значение` задаёт значение по умолчанию. При вызове `имя = значение` — это именованный аргумент, у него нет двоеточия и типа, потому что тип параметр уже получил при объявлении.
 </Hint>
 
+Проверь себя: здесь встречаются и значение по умолчанию, и именованные аргументы из этого раздела.
+
+<Block kind="trainer" title="Предскажи вывод: default и именованные аргументы" chapterId="functions-lambdas" blockId="trainer-predict-default-named">
+<PredictOutput kotlin normalizeWhitespace chapterId="functions-lambdas" trainerId="trainer-predict-default-named" expected={`Привет, Соня!
+Здравствуй, Олег!`} code={`fun main() {
+    greet("Соня")
+    greet(greeting = "Здравствуй", name = "Олег")
+}
+
+fun greet(name: String, greeting: String = "Привет") {
+    println("$greeting, $name!")
+}`} />
+</Block>
+
 <Block kind="quiz" title="Параметры по умолчанию и именованные аргументы" chapterId="functions-lambdas" blockId="quiz-default-named">
 <SelfCheck chapterId="functions-lambdas" quizId="q2" questions={[
   { q: 'Что делает greeting: String = "Привет" в объявлении параметра?', options: ['Присваивает переменной greeting значение "Привет" один раз', 'Делает параметр необязательным: если его не передать при вызове, используется "Привет"', 'Меняет тип параметра на String', 'Ничего — это просто комментарий'], correct: 1, why: 'Значение по умолчанию (default argument) используется, только если вызывающий код не передал свой аргумент для этого параметра.' },
@@ -331,6 +346,18 @@ fun calculate(a: Int, b: Int, operation: (Int, Int) -> Int): Int {
 3
 ```
 Первый вызов сложил (6 + 3 = 9), второй вычел (6 − 3 = 3) — потому что мы передали разные лямбды одной и той же функции `calculate`.
+
+А если той же `calculate` с теми же `6` и `3` передать третью лямбду — с умножением?
+
+<Block kind="trainer" title="Предскажи вывод: calculate с новой лямбдой" chapterId="functions-lambdas" blockId="trainer-predict-calculate">
+<PredictOutput kotlin chapterId="functions-lambdas" trainerId="trainer-predict-calculate" expected="18" code={`fun main() {
+    println(calculate(6, 3) { a, b -> a * b })
+}
+
+fun calculate(a: Int, b: Int, operation: (Int, Int) -> Int): Int {
+    return operation(a, b)
+}`} />
+</Block>
 
 <Block kind="quiz" title="Лямбды и функции высшего порядка" chapterId="functions-lambdas" blockId="quiz-lambdas-hof">
 <SelfCheck chapterId="functions-lambdas" quizId="q3" questions={[

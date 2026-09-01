@@ -9,6 +9,7 @@ import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
 import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
+import ComposePreview from '@site/src/components/ComposePreview';
 import SelfCheck from '@site/src/components/SelfCheck';
 import Block from '@site/src/components/Block';
 import Hint from '@site/src/components/Hint';
@@ -18,7 +19,7 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # Вёрстка по макету
 
-<ChapterProgress chapterId="layout-by-mockup" totalSections={14} totalQuizzes={7} totalTrainers={2} />
+<ChapterProgress chapterId="layout-by-mockup" totalSections={14} totalQuizzes={7} totalTrainers={3} />
 
 ## Зачем это нужно
 
@@ -488,6 +489,42 @@ fun ProductCard(title: String, price: String, discountPercent: Int) {
 - **Строки 25–33: `Row` с ценой и кнопкой** — четвёртый и последний ребёнок `Column`; `SpaceBetween` разводит цену и кнопку по краям строки.
 
 **Что должно появиться на экране:** белая карточка на всю ширину, сверху — серый прямоугольник изображения с красным бейджем `-N%` в правом верхнем углу, ниже — заголовок товара, ещё ниже — строка, где слева цена, а справа кнопка «В корзину».
+
+Собранную карточку можно покрутить вживую прямо здесь: слева — упрощённый мокап экрана, справа — Compose-псевдокод, сгенерированный из того же самого дерева вёрстки. Подвигай padding, arrangement и fontSize и смотри, как едет вёрстка — и как синхронно переписывается код. Одно упрощение: `Modifier.align(Alignment.TopEnd)` эта песочница не умеет, поэтому бейдж скидки здесь прижат к углу по умолчанию — `TopStart`.
+
+<Block kind="trainer" title="Живой мокап: покрути карточку товара" chapterId="layout-by-mockup" blockId="trainer-card-preview">
+<ComposePreview
+  editable
+  tree={{
+    type: 'Column',
+    fillMaxWidth: true,
+    background: '#FFFFFF',
+    padding: 12,
+    children: [
+      {
+        type: 'Box',
+        children: [
+          { type: 'Box', fillMaxWidth: true, height: 120, background: '#EEEEEE' },
+          { type: 'Text', text: '-20%', fontSize: 12, background: '#E53935', padding: 4 },
+        ],
+      },
+      { type: 'Text', text: 'Заголовок товара', fontSize: 16 },
+      {
+        type: 'Row',
+        fillMaxWidth: true,
+        arrangement: 'spaceBetween',
+        alignment: 'center',
+        children: [
+          { type: 'Text', text: '1 990 ₽', fontSize: 18 },
+          { type: 'Button', text: 'В корзину' },
+        ],
+      },
+    ],
+  }}
+  chapterId="layout-by-mockup"
+  trainerId="trainer-card-preview"
+/>
+</Block>
 
 <Block kind="quiz" title="Карточка товара" chapterId="layout-by-mockup" blockId="quiz-product-card">
 <SelfCheck chapterId="layout-by-mockup" quizId="quiz-product-card" questions={[

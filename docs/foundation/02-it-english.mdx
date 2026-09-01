@@ -14,11 +14,12 @@ import Block from '@site/src/components/Block';
 import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
+import WordOrder from '@site/src/components/WordOrder';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # IT-английский: стартовый словарь
 
-<ChapterProgress chapterId="it-english" totalSections={12} totalQuizzes={5} totalTrainers={2} />
+<ChapterProgress chapterId="it-english" totalSections={12} totalQuizzes={5} totalTrainers={4} />
 
 ## Зачем это нужно
 
@@ -135,6 +136,20 @@ bash: gti: command not found
 <Hint id="it-english-h3" type="important">
 Отсюда и практический вывод: если видишь `command not found`, в 9 случаях из 10 дело в опечатке, а не в том, что программа не установлена, — сперва перечитай, что напечатал.
 </Hint>
+
+Теперь проверь себя наоборот: собери переводы разобранных фраз из перемешанных слов.
+
+Сначала `No such file or directory`:
+
+<Block kind="trainer" title="Собери перевод: No such file or directory" chapterId="it-english" blockId="trainer-wordorder-no-such-file">
+<WordOrder chapterId="it-english" trainerId="trainer-wordorder-no-such-file" correct={['нет', 'такого', 'файла', 'или', 'каталога']} words={['или', 'файла', 'нет', 'каталога', 'такого']} />
+</Block>
+
+Теперь смысл фразы `Permission denied` — целиком, как разбирали выше:
+
+<Block kind="trainer" title="Собери перевод: Permission denied" chapterId="it-english" blockId="trainer-wordorder-permission-denied">
+<WordOrder chapterId="it-english" trainerId="trainer-wordorder-permission-denied" correct={['у', 'файла', 'нет', 'права', 'быть', 'запущенным']} words={['права', 'нет', 'запущенным', 'у', 'быть', 'файла']} />
+</Block>
 
 <Block kind="quiz" title="Три ошибки по словам" chapterId="it-english" blockId="quiz-errors-by-words">
 <SelfCheck chapterId="it-english" quizId="quiz-errors-by-words" questions={[

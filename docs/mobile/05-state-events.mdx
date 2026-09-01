@@ -9,6 +9,7 @@ import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
 import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
+import PredictOutput from '@site/src/components/PredictOutput';
 import SelfCheck from '@site/src/components/SelfCheck';
 import Block from '@site/src/components/Block';
 import Hint from '@site/src/components/Hint';
@@ -18,7 +19,7 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # Состояние и события
 
-<ChapterProgress chapterId="state-events" totalSections={15} totalQuizzes={5} totalTrainers={2} />
+<ChapterProgress chapterId="state-events" totalSections={15} totalQuizzes={5} totalTrainers={4} />
 
 ## Зачем это нужно
 
@@ -52,6 +53,22 @@ fun main() {
 
 - **Строки 1–4: `fun renderScreen(): Int { var count = 0; count++; return count }`** — функция объявляет локальную переменную `count`, сразу увеличивает её на единицу и возвращает результат. `renderScreen` условно изображает composable-функцию: Compose вызывает такую функцию заново при каждой перерисовке, точно как здесь `main` вызывает `renderScreen` заново три раза подряд.
 - **Строки 7–9: `println(renderScreen())` × 3** — три отдельных, независимых вызова одной и той же функции.
+
+Прежде чем читать разгадку ниже — предскажи сам, что напечатают три вызова подряд:
+
+<Block kind="trainer" title="Предскажи вывод: var внутри функции" chapterId="state-events" blockId="trainer-predict-var-lifetime">
+<PredictOutput kotlin normalizeWhitespace expected={'1\n1\n1'} chapterId="state-events" trainerId="trainer-predict-var-lifetime" code={`fun renderScreen(): Int {
+    var count = 0
+    count++
+    return count
+}
+
+fun main() {
+    println(renderScreen())
+    println(renderScreen())
+    println(renderScreen())
+}`} />
+</Block>
 
 **Что выведет:** `1`, `1`, `1` — три одинаковые строки, а не `1`, `2`, `3`, как можно было бы ожидать от «счётчика». Причина в том, что `var count = 0` внутри тела функции — это не одна переменная, которая живёт между вызовами, а новая переменная при **каждом** вызове: она создаётся, увеличивается на единицу и тут же исчезает вместе с завершением функции. Ровно так же вела бы себя composable-функция, если бы попыталась хранить счётчик нажатий в обычном `var` внутри своего тела: при каждой рекомпозиции счётчик обнулялся бы заново, и нажатия как будто не считались бы.
 
@@ -191,6 +208,30 @@ fun main() {
   { text: ')', label: 'закрывающая скобка параметров', note: 'конец списка параметров' },
   { text: ': Int', label: 'тип возврата', note: 'то, что фактически получит код, читающий count, — в этой главе всегда Int, тот же тип, что хранит делегат внутри' },
 ]} />
+</Block>
+
+Прокрути `main` в голове: какие строки и в каком порядке напечатает делегат? Ответь сам, прежде чем читать разбор ниже:
+
+<Block kind="trainer" title="Предскажи вывод: делегат Loud" chapterId="state-events" blockId="trainer-predict-loud-delegate">
+<PredictOutput kotlin normalizeWhitespace expected={'Старт\nЧитаю count: 0\nПишу в count: 0 -> 1\nЧитаю count: 1\nИтог: 1'} chapterId="state-events" trainerId="trainer-predict-loud-delegate" code={`import kotlin.reflect.KProperty
+
+class Loud(private var current: Int) {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): Int {
+        println("Читаю \${property.name}: $current")
+        return current
+    }
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) {
+        println("Пишу в \${property.name}: $current -> $value")
+        current = value
+    }
+}
+
+fun main() {
+    var count by Loud(0)
+    println("Старт")
+    count++
+    println("Итог: $count")
+}`} />
 </Block>
 
 **Что выведет:** `Старт`, затем `Читаю count: 0`, `Пишу в count: 0 -> 1`, `Читаю count: 1`, и наконец `Итог: 1`. Обрати внимание: слово `count` нигде явно не вызывает `getValue` или `setValue` — Kotlin сам подставляет эти вызовы на месте каждого чтения и каждой записи, потому что `count` объявлен через `by`.
