@@ -6793,6 +6793,33 @@
   margin-top: 0.5rem;
 }
 
+.sim-leaderboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.sim-submit {
+  padding: 0.6rem 1.5rem;
+  border: 1px solid #b7791f;
+  border-radius: var(--ifm-global-radius);
+  background: #d69e2e;
+  color: var(--ifm-color-white);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sim-submit:hover {
+  background: #b7791f;
+}
+
+.sim-leaderboard-hint {
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
 @media (max-width: 480px) {
   .sim-timer {
     font-size: clamp(2rem, 14vw, 3rem);

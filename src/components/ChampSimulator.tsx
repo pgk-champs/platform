@@ -43,6 +43,31 @@ function itemKey(sIdx: number, iIdx: number): string {
   return `${sIdx}-${iIdx}`;
 }
 
+const LEADERBOARD_REPO = 'pgk-champs/leaderboard';
+
+// Строит ссылку на предзаполненную issue-форму лидерборда: GitHub issue forms
+// принимают предзаполнение полей через query-параметры, у которых имя
+// совпадает с `id` поля формы (см. .github/ISSUE_TEMPLATE/result.yml в репо
+// лидерборда — там текстовое поле имеет id="result"). Логин студента для
+// таблицы бот берёт из github.event.issue.user.login на своей стороне, не из
+// этого JSON — подделать чужой результат отсюда нельзя.
+export function buildLeaderboardUrl(mod: SimModule, score: number, timeLeft: number): string {
+  const durationSec = Math.max(0, Math.round((mod.timeLimitMinutes ?? 60) * 60 - timeLeft));
+  const payload = {
+    module: mod.id,
+    score: Math.round(score * 100) / 100,
+    maxScore: mod.maxTotal,
+    durationSec,
+    date: new Date().toISOString().slice(0, 10),
+  };
+  const params = new URLSearchParams({
+    template: 'result.yml',
+    title: `Результат: ${mod.title}`,
+    result: JSON.stringify(payload),
+  });
+  return `https://github.com/${LEADERBOARD_REPO}/issues/new?${params.toString()}`;
+}
+
 type Phase = 'select' | 'run' | 'done';
 
 export default function ChampSimulator() {
@@ -102,6 +127,11 @@ export default function ChampSimulator() {
   const backToSelect = () => {
     setPhase('select');
     setModuleId(null);
+  };
+
+  const submitToLeaderboard = () => {
+    if (!mod) return;
+    window.open(buildLeaderboardUrl(mod, score, timeLeft), '_blank', 'noopener,noreferrer');
   };
 
   const toggleMeasurable = (key: string, maxScore: number) => {
@@ -168,6 +198,17 @@ export default function ChampSimulator() {
               Лучший результат: {stats.best ? `${stats.best.score} из ${stats.best.maxScore}` : '—'}
             </div>
             <div className="sim-history-row">Попыток всего: {stats.count}</div>
+          </div>
+          <div className="sim-leaderboard">
+            <button type="button" className="sim-submit" onClick={submitToLeaderboard}>
+              Отправить в лидерборд 🏆
+            </button>
+            <div className="sim-leaderboard-hint">
+              Нужен доступ к репозиторию лидерборда (выдаёт наставник) ·{' '}
+              <a href={`https://github.com/${LEADERBOARD_REPO}#readme`} target="_blank" rel="noopener noreferrer">
+                Таблица лидеров
+              </a>
+            </div>
           </div>
           <div className="sim-done-actions">
             <button type="button" className="sim-card-start" onClick={() => selectModule(mod.id)}>

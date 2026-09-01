@@ -106,6 +106,33 @@ test('finishing a perfect module scores full marks, "Отлично" and XP once
   expect(store.sim.stats('g').count).toBe(2);
 });
 
+test('"Отправить в лидерборд" opens a leaderboard issue with the correct JSON', () => {
+  vi.useFakeTimers();
+  const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+  render(<ChampSimulator />);
+  startModule('Ж. Подготовка продукта');
+  fireEvent.click(screen.getAllByRole('checkbox')[0]); // 0.4 из 7
+  act(() => {
+    vi.advanceTimersByTime(10_000); // 10с прошло из отведённого часа
+  });
+  fireEvent.click(screen.getByText('Завершить спринт'));
+
+  fireEvent.click(screen.getByText('Отправить в лидерборд 🏆'));
+  expect(openSpy).toHaveBeenCalledTimes(1);
+  const url = new URL(openSpy.mock.calls[0][0] as string);
+  expect(url.origin + url.pathname).toBe('https://github.com/pgk-champs/leaderboard/issues/new');
+  expect(url.searchParams.get('template')).toBe('result.yml');
+  expect(url.searchParams.get('title')).toBe('Результат: Ж. Подготовка продукта');
+  const payload = JSON.parse(url.searchParams.get('result') as string);
+  expect(payload.module).toBe('zh');
+  expect(payload.score).toBe(0.4);
+  expect(payload.maxScore).toBe(7);
+  expect(payload.durationSec).toBe(10);
+  expect(payload.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+
+  openSpy.mockRestore();
+});
+
 test('"Выбрать другой модуль" returns to the module grid', () => {
   render(<ChampSimulator />);
   startModule('Ж. Подготовка продукта');
