@@ -70,5 +70,13 @@
     "level": "база",
     "order": 1,
     "path": "mobile/kotlin-vars.mdx"
+  },
+  {
+    "id": "functions-lambdas",
+    "title": "Функции и лямбды",
+    "audience": "мобилка",
+    "level": "база",
+    "order": 2,
+    "path": "mobile/functions-lambdas.mdx"
   }
 ]
