@@ -16,10 +16,12 @@ import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import ComposePreview from '@site/src/components/ComposePreview';
+import ModifierChain from '@site/src/components/ModifierChain';
+import CodeSketchMatch from '@site/src/components/CodeSketchMatch';
 
 # Первый экран Compose
 
-<ChapterProgress chapterId="first-compose-screen" totalSections={15} totalQuizzes={5} totalTrainers={3} />
+<ChapterProgress chapterId="first-compose-screen" totalSections={15} totalQuizzes={5} totalTrainers={5} />
 
 ## Зачем это нужно
 
@@ -265,6 +267,12 @@ fun StartButton(onStartClick: () -> Unit) {
 ]} />
 </Block>
 
+`Text`, `Column`, `Row` и `Button` теперь в руках — проверь, что узнаёшь каждый фрагмент по результату, который он нарисует на экране.
+
+<Block kind="trainer" title="Код ↔ скетч: что нарисует этот фрагмент" chapterId="first-compose-screen" blockId="trainer-code-sketch">
+<CodeSketchMatch chapterId="first-compose-screen" trainerId="trainer-code-sketch" />
+</Block>
+
 <SectionAnchor chapterId="first-compose-screen" sectionId="button-onclick" />
 
 ## Modifier: цепочка вызовов
@@ -327,6 +335,12 @@ fun main() {
 <Hint id="first-compose-screen-h2" type="important">
 Каждый модификатор «оборачивает» результат предыдущего, как слои: `Modifier.a().b()` значит «сначала оберни элемент в `a`, потом результат — в `b`», и от этого порядка меняется итоговая форма и поведение, совсем как в цепочке `.withPadding(...)` из демо выше, где порядок вызовов определял, какой объект получится на выходе.
 </Hint>
+
+Правило про порядок легче всего увидеть глазами: переставляй карточки модификаторов и смотри, как меняется тот же самый элемент.
+
+<Block kind="trainer" title="Собери цепочку Modifier в нужном порядке" chapterId="first-compose-screen" blockId="trainer-modifier-order">
+<ModifierChain chapterId="first-compose-screen" trainerId="trainer-modifier-order" />
+</Block>
 
 <Block kind="quiz" title="Цепочка Modifier" chapterId="first-compose-screen" blockId="quiz-modifier">
 <SelfCheck chapterId="first-compose-screen" quizId="q4" questions={[

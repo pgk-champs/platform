@@ -13,7 +13,7 @@ const SEED_TS = 1756723200000; // фиксированная дата старт
 export type GitSimScenario = 'free' | 'first-commit' | 'branches' | 'remote-demo';
 export type GitSimQuest = {
   title: string;
-  goal: 'commits>=3' | 'merged' | 'conflict-resolved';
+  goal: 'commits>=3' | 'merged' | 'conflict-resolved' | 'ff-and-merge';
 };
 export type GitSimProps = {
   scenario?: GitSimScenario;
@@ -50,13 +50,14 @@ type Sim = {
   local: Repo;
   origin: Repo | null; // только в remote-demo
   lines: Line[];
-  counters: { commits: number; merged: boolean; conflictResolved: boolean };
+  counters: { commits: number; merged: boolean; conflictResolved: boolean; ff: boolean; mergeCommit: boolean };
 };
 
 const GOAL_LABELS: Record<GitSimQuest['goal'], string> = {
   'commits>=3': 'сделай минимум три коммита',
   merged: 'слей ветку командой git merge',
   'conflict-resolved': 'получи merge-конфликт и разреши его',
+  'ff-and-merge': 'получи оба вида слияния — перемотку и merge-коммит',
 };
 
 // --- чистые помощники над Sim ---
@@ -333,6 +334,7 @@ function exec(prev: Sim, raw: string): Sim {
         sim.counters.commits += 1;
         sim.counters.merged = true;
         sim.counters.conflictResolved = true;
+        sim.counters.mergeCommit = true; // завершённый конфликт — тоже настоящий merge-коммит с двумя родителями
         out(`[${repo.head} ${h}] ${message}`);
         return sim;
       }
@@ -570,6 +572,7 @@ function doMerge(sim: Sim, label: string, theirsHash: string): void {
     repo.files = { ...keep, ...sim.commits[theirsHash].snap };
     repo.index = {};
     sim.counters.merged = true;
+    sim.counters.ff = true;
     out(`Updating ${ourHash ?? '0000000'}..${theirsHash}\nFast-forward`);
     return;
   }
@@ -620,6 +623,7 @@ function doMerge(sim: Sim, label: string, theirsHash: string): void {
   repo.files = { ...keep, ...merged };
   repo.index = {};
   sim.counters.merged = true;
+  sim.counters.mergeCommit = true;
   out("Merge made by the 'ort' strategy.");
 }
 
@@ -632,7 +636,7 @@ function makeInitial(scenario: GitSimScenario): Sim {
     local: emptyRepo(),
     origin: null,
     lines: [],
-    counters: { commits: 0, merged: false, conflictResolved: false },
+    counters: { commits: 0, merged: false, conflictResolved: false, ff: false, mergeCommit: false },
   };
   const greet = (s: string) => sim.lines.push({ t: 'hint', s });
 
@@ -685,6 +689,7 @@ function makeInitial(scenario: GitSimScenario): Sim {
 function goalMet(sim: Sim, goal: GitSimQuest['goal']): boolean {
   if (goal === 'commits>=3') return sim.counters.commits >= 3;
   if (goal === 'merged') return sim.counters.merged;
+  if (goal === 'ff-and-merge') return sim.counters.ff && sim.counters.mergeCommit;
   return sim.counters.conflictResolved;
 }
 
@@ -870,6 +875,17 @@ export default function GitSim({ scenario = 'free', quest, chapterId, trainerId 
           ) : (
             <>
               Квест «{quest.title}»: {GOAL_LABELS[quest.goal]}
+              {quest.goal === 'ff-and-merge' ? (
+                <div className="gs-quest-steps">
+                  <span className={sim.counters.ff ? 'gs-step gs-step-done' : 'gs-step'}>
+                    {sim.counters.ff ? '✓' : '○'} шаг 1 — fast-forward: слей ветку, пока main не двигался (без расхождения)
+                  </span>
+                  <span className={sim.counters.mergeCommit ? 'gs-step gs-step-done' : 'gs-step'}>
+                    {sim.counters.mergeCommit ? '✓' : '○'} шаг 2 — merge-коммит: вернись, создай расхождение (свой коммит и в
+                    main, и в ветке) и слей снова
+                  </span>
+                </div>
+              ) : null}
             </>
           )}
         </div>

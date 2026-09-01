@@ -14,10 +14,13 @@ import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
+import NodeNetSim from '@site/src/components/NodeNetSim';
+import ComposeBuilder from '@site/src/components/ComposeBuilder';
+import DockerCmdQuest from '@site/src/components/DockerCmdQuest';
 
 # Первая сеть на Waves Enterprise
 
-<ChapterProgress chapterId="waves-first-network" totalSections={13} totalQuizzes={4} totalTrainers={5} />
+<ChapterProgress chapterId="waves-first-network" totalSections={13} totalQuizzes={4} totalTrainers={8} />
 
 ## Зачем это нужно
 
@@ -52,6 +55,12 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 ## Зачем именно три ноды, а не одна
 
 Одна-единственная нода ничем не отличается от обычной базы данных на одном сервере: если она единственный источник правды, распределённость из прошлой главы попросту не работает — некому сверять хеши и обнаруживать подмену. Минимальное число нод, на котором вообще имеет смысл понятие «согласие большинства» (consensus), — три: тогда большинство — это две ноды из трёх, и сеть продолжает работать и договариваться, даже если одна нода на время отключилась или ведёт себя неправильно. Поэтому все официальные обучающие и демонстрационные окружения Waves Enterprise по умолчанию поднимают именно три ноды — этого достаточно, чтобы вживую увидеть согласование блоков между независимыми участниками, и при этом не тратить лишние ресурсы компьютера.
+
+Проверить это утверждение можно прямо здесь: перед тобой та самая сеть из трёх нод, и любую из них можно выключить кликом.
+
+<Block kind="trainer" title="Симулятор сети из трёх нод" chapterId="waves-first-network" blockId="trainer-node-net">
+<NodeNetSim chapterId="waves-first-network" trainerId="trainer-node-net" />
+</Block>
 
 <Block kind="quiz" title="Нода и три участника" chapterId="waves-first-network" blockId="quiz-three-nodes">
 <SelfCheck chapterId="waves-first-network" quizId="q1" questions={[
@@ -89,6 +98,18 @@ Docker Compose — инструмент, который описывает не�
 ```text
 yaml: while parsing a block mapping at line 2, column 5: line 5, column 6: did not find expected key
 ```
+
+Теперь собери этот фрагмент файла сам — строки перемешаны, а отступы в них уже проставлены.
+
+<Block kind="trainer" title="Собери docker-compose.yml" chapterId="waves-first-network" blockId="trainer-compose-builder">
+<ComposeBuilder chapterId="waves-first-network" trainerId="trainer-compose-builder" lines={[
+  'services:',
+  '  node-0:',
+  '    image: wavesenterprise/node:v1.16.0',
+  '    ports:',
+  '      - "6862:6862"',
+]} />
+</Block>
 
 ### Шаг 2. Конфиги и ключи нод — до первого запуска
 
@@ -133,6 +154,17 @@ yaml: while parsing a block mapping at line 2, column 5: line 5, column 6: did n
 
 <Block kind="trainer" title="Команда остановки с очисткой" chapterId="waves-first-network" blockId="trainer-compose-down">
 <CodeTyping snippet={'docker compose down -v'} chapterId="waves-first-network" trainerId="trainer-compose-down" targetCpm={100} targetAccuracy={90} />
+</Block>
+
+Все четыре шага вместе — это конкретный порядок команд. Выстрой его сам, от генерации конфигов до полной остановки.
+
+<Block kind="trainer" title="Порядок команд: от конфигов до остановки" chapterId="waves-first-network" blockId="trainer-cmd-order">
+<DockerCmdQuest chapterId="waves-first-network" trainerId="trainer-cmd-order" steps={[
+  { cmd: 'docker run --rm <генератор конфигов>', why: 'до первого запуска: одноразовый контейнер создаёт node.conf и ключи для всех трёх нод и завершает работу — без ключей нодам нечем подписывать транзакции.' },
+  { cmd: 'docker compose up -d', why: 'поднимает все три ноды из docker-compose.yml в фоне (-d), не занимая терминал.' },
+  { cmd: 'docker compose logs -f node-0', why: 'проверка, что сеть живёт: журналы запущенной ноды в реальном времени (-f — следить за новыми строками).' },
+  { cmd: 'docker compose down -v', why: 'полная остановка в самом конце: удаляет контейнеры, сети и тома с данными — следующий up начнёт с чистого состояния.' },
+]} />
 </Block>
 
 <Block kind="quiz" title="docker-compose и конфиги" chapterId="waves-first-network" blockId="quiz-compose">

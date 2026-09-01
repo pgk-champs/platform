@@ -17,10 +17,11 @@ import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import ChmodCalc from '@site/src/components/ChmodCalc';
 import PermQuest from '@site/src/components/PermQuest';
+import NanoQuest from '@site/src/components/NanoQuest';
 
 # Файлы, пакеты, SSH
 
-<ChapterProgress chapterId="files-packages-ssh" totalSections={15} totalQuizzes={6} totalTrainers={4} />
+<ChapterProgress chapterId="files-packages-ssh" totalSections={15} totalQuizzes={6} totalTrainers={5} />
 
 ## Зачем это нужно
 
@@ -472,6 +473,12 @@ Save modified buffer?
 <Hint id="files-packages-ssh-h2" type="important">
 Здесь легко потерять текст по невнимательности, нажав `N` вместо `Y` на автомате, — так что стоит на секунду прочитать вопрос, а не бить `N` рефлекторно.
 </Hint>
+
+Обе связки — «сохранить и выйти» и «выйти, отбросив правки» — проще один раз прожать руками, чем запоминать по таблице:
+
+<Block kind="trainer" title="Тренажёр nano: сохранить и выйти" chapterId="files-packages-ssh" blockId="trainer-nano-quest">
+<NanoQuest chapterId="files-packages-ssh" trainerId="trainer-nano-quest" />
+</Block>
 
 <Block kind="quiz" title="Редактор nano" chapterId="files-packages-ssh" blockId="quiz-nano">
 <SelfCheck chapterId="files-packages-ssh" quizId="quiz-nano" questions={[

@@ -16,10 +16,11 @@ import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import HashPlayground from '@site/src/components/HashPlayground';
 import BlockChainDemo from '@site/src/components/BlockChainDemo';
+import SignDemo from '@site/src/components/SignDemo';
 
 # Что такое блокчейн
 
-<ChapterProgress chapterId="what-is-blockchain" totalSections={13} totalQuizzes={4} totalTrainers={5} />
+<ChapterProgress chapterId="what-is-blockchain" totalSections={13} totalQuizzes={4} totalTrainers={6} />
 
 ## Зачем это нужно
 
@@ -150,6 +151,12 @@ import BlockChainDemo from '@site/src/components/BlockChainDemo';
 ```
 
 Подпись даёт сразу два свойства: **аутентификацию** (перевод точно инициировала Alice, а не кто-то другой — подделать подпись без закрытого ключа нельзя) и **целостность** (если изменить в транзакции хоть цифру суммы, старая подпись перестанет быть действительной для нового текста — она привязана именно к исходным данным через хеш). Поэтому в блокчейне не нужен банк-посредник, который «на честном слове» подтверждает: «да, это точно Alice». Математика подтверждает это сама, и проверить может каждый узел независимо.
+
+А теперь то же самое живьём: подпись выше была посчитана заранее, а здесь твой браузер сгенерирует настоящую пару ключей ECDSA и подпишет сообщение прямо сейчас. Проверь подпись, потом измени в сообщении хоть один символ — и посмотри, что скажет проверка.
+
+<Block kind="trainer" title="Живая подпись: подпиши и попробуй подделать" chapterId="what-is-blockchain" blockId="trainer-sign-demo">
+<SignDemo chapterId="what-is-blockchain" trainerId="trainer-sign-demo" />
+</Block>
 
 <Block kind="quiz" title="Распределённость и подпись" chapterId="what-is-blockchain" blockId="quiz-distributed-signature">
 <SelfCheck chapterId="what-is-blockchain" quizId="q2" questions={[

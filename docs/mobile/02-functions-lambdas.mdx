@@ -16,10 +16,12 @@ import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
+import SignatureBuilder from '@site/src/components/SignatureBuilder';
+import CallTracer from '@site/src/components/CallTracer';
 
 # Функции и лямбды
 
-<ChapterProgress chapterId="functions-lambdas" totalSections={14} totalQuizzes={4} totalTrainers={4} />
+<ChapterProgress chapterId="functions-lambdas" totalSections={14} totalQuizzes={4} totalTrainers={6} />
 
 ## Зачем это нужно
 
@@ -301,6 +303,12 @@ fun greet(name: String, greeting: String = "Привет") {
 
 **Что выведет:** `[5000, 6000]` — сначала `filter` оставил тренировки длиннее 4 км (`[5, 6]`), затем `map` перевёл их в метры. Каждый метод в цепочке — сам по себе функция высшего порядка: и `filter`, и `map` принимают лямбду параметром.
 
+Посмотри в замедленной съёмке, как выполнение прыгает из `main` в функцию и обратно, а `map` прогоняет лямбду по каждому элементу:
+
+<Block kind="trainer" title="Трассировка вызова: функция + map с лямбдой" chapterId="functions-lambdas" blockId="trainer-call-tracer">
+<CallTracer chapterId="functions-lambdas" trainerId="trainer-call-tracer" />
+</Block>
+
 Теперь напишем свою функцию высшего порядка — такую же, как `filter`/`map` внутри устроены сами.
 
 <Block kind="breakdown" title="Разбор по символам: функция calculate" chapterId="functions-lambdas" blockId="breakdown-calculate-signature">
@@ -357,6 +365,25 @@ fun calculate(a: Int, b: Int, operation: (Int, Int) -> Int): Int {
 fun calculate(a: Int, b: Int, operation: (Int, Int) -> Int): Int {
     return operation(a, b)
 }`} />
+</Block>
+
+Теперь собери сигнатуры сам — от простой функции до функции высшего порядка:
+
+<Block kind="trainer" title="Собери сигнатуру из кусочков" chapterId="functions-lambdas" blockId="trainer-signature-builder">
+<SignatureBuilder chapterId="functions-lambdas" trainerId="trainer-signature-builder" tasks={[
+  {
+    brief: 'Функция greet: принимает имя-строку, возвращает строку.',
+    pieces: ['fun ', 'greet', '(', 'name: ', 'String', ')', ': ', 'String'],
+  },
+  {
+    brief: 'Функция greet: принимает имя-строку и приветствие-строку со значением по умолчанию "Привет", возвращает строку.',
+    pieces: ['fun greet', '(', 'name: String', ', ', 'greeting: String', ' = ', '"Привет"', ')', ': String'],
+  },
+  {
+    brief: 'Функция высшего порядка calculate: принимает два Int и операцию-лямбду (два Int → Int), возвращает Int.',
+    pieces: ['fun calculate', '(', 'a: Int', ', ', 'b: Int', ', ', 'operation: ', '(Int, Int)', ' -> ', 'Int', ')', ': Int'],
+  },
+]} />
 </Block>
 
 <Block kind="quiz" title="Лямбды и функции высшего порядка" chapterId="functions-lambdas" blockId="quiz-lambdas-hof">

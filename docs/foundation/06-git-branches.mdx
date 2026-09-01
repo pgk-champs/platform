@@ -19,7 +19,7 @@ import GitSim from '@site/src/components/GitSim';
 
 # Git: ветки и merge
 
-<ChapterProgress chapterId="git-branches" totalSections={14} totalQuizzes={5} totalTrainers={4} />
+<ChapterProgress chapterId="git-branches" totalSections={14} totalQuizzes={5} totalTrainers={5} />
 
 ## Зачем это нужно
 
@@ -444,6 +444,17 @@ Deleted branch feature-timer (was 1c96c1a).
   quest={{ title: 'Создай ветку, закоммить в ней и слей её в main', goal: 'merged' }}
   chapterId="git-branches"
   trainerId="trainer-gitsim-merge"
+/>
+</Block>
+
+А теперь закрепи разницу между перемоткой и настоящим слиянием руками — получи в одном репозитории оба ответа Git: сначала `Fast-forward`, затем `Merge made by the 'ort' strategy`.
+
+<Block kind="trainer" title="Git-симулятор: fast-forward против merge-коммита" chapterId="git-branches" blockId="trainer-gitsim-ff-vs-merge">
+<GitSim
+  scenario="branches"
+  quest={{ title: 'Fast-forward против merge-коммита', goal: 'ff-and-merge' }}
+  chapterId="git-branches"
+  trainerId="trainer-gitsim-ff-vs-merge"
 />
 </Block>
 

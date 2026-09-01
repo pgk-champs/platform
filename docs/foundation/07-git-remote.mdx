@@ -16,10 +16,12 @@ import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
+import FetchPullViz from '@site/src/components/FetchPullViz';
+import PRTrainer from '@site/src/components/PRTrainer';
 
 # Git: push, PR и командная работа
 
-<ChapterProgress chapterId="git-remote" totalSections={15} totalQuizzes={7} totalTrainers={3} />
+<ChapterProgress chapterId="git-remote" totalSections={15} totalQuizzes={7} totalTrainers={5} />
 
 ## Зачем это нужно
 
@@ -287,6 +289,12 @@ Fast-forward
 **Зачем вообще делать их порознь, если есть pull одной командой?** Иногда полезно посмотреть, что именно изменилось на сервере, прежде чем впускать это в свою рабочую ветку — например, командой `git log main..origin/main` сразу после `fetch`, до `merge`. `pull` для этого слишком тороплив: он вливает всё сразу.
 </Hint>
 
+А теперь то же самое — не текстом, а картинкой: прокликай оба сценария по шагам и посмотри, какой указатель двигает каждая команда.
+
+<Block kind="trainer" title="Схема по шагам: fetch, merge и pull" chapterId="git-remote" blockId="trainer-fetch-pull-viz">
+<FetchPullViz chapterId="git-remote" trainerId="trainer-fetch-pull-viz" />
+</Block>
+
 <Block kind="quiz" title="fetch, merge и pull" chapterId="git-remote" blockId="quiz-fetch-merge">
 <SelfCheck chapterId="git-remote" quizId="q3" questions={[
   { q: 'После git fetch содержимое файла report.md на диске у Анны изменилось?', options: ['Да, сразу же', 'Нет — fetch только скачивает новые коммиты в служебную ветку origin/main, но не трогает рабочую копию и текущую ветку', 'Да, но только текст, не структура файла', 'Зависит от размера файла'], correct: 1, why: 'fetch — «тихая» операция: она обновляет знание о том, что есть на сервере, но ничего не применяет к твоим файлам, пока ты сам не скажешь merge.' },
@@ -341,6 +349,12 @@ branch 'anna-conclusions' set up to track 'origin/anna-conclusions'.
 - **Request changes** — «нужны правки»: PR помечается как требующий доработки, пока автор не внесёт изменения и ревьюер не снимет этот статус.
 
 Автор PR правит код обычными коммитами в той же ветке и пушит их той же командой `git push`, которой отправлял ветку впервые — GitHub сам подтягивает новые коммиты в уже открытый PR, отдельно ничего пересоздавать не нужно.
+
+Побудь теперь сам ревьюером: в этом фрагменте с вкладки `Files changed` спрятаны три проблемы — найди их кликом по строкам.
+
+<Block kind="trainer" title="Мини-ревью: найди три проблемы в diff" chapterId="git-remote" blockId="trainer-pr-review">
+<PRTrainer chapterId="git-remote" trainerId="trainer-pr-review" />
+</Block>
 
 ### Слияние: три способа нажать одну кнопку
 

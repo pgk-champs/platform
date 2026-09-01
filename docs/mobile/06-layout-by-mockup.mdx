@@ -16,10 +16,12 @@ import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
+import EyeDp from '@site/src/components/EyeDp';
+import CardAssembler from '@site/src/components/CardAssembler';
 
 # Вёрстка по макету
 
-<ChapterProgress chapterId="layout-by-mockup" totalSections={14} totalQuizzes={7} totalTrainers={3} />
+<ChapterProgress chapterId="layout-by-mockup" totalSections={14} totalQuizzes={7} totalTrainers={5} />
 
 ## Зачем это нужно
 
@@ -53,6 +55,12 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 | Заголовок товара | подпись рядом с текстом «16sp / Medium» | размер шрифта 16sp | `fontSize = Dimens.TitleFontSize`, где `TitleFontSize = 16.sp` |
 | Цена | подпись «18sp / Bold» | размер шрифта 18sp | `fontSize = Dimens.PriceFontSize` |
 | Ряд «цена + кнопка» | стрелка от левого края до правого с засечками на обоих концах, подпись «space-between» | распределить по краям, ничего не оставляя посередине | `horizontalArrangement = Arrangement.SpaceBetween` |
+
+А теперь потренируй сам навык чтения чисел с макета — на глаз, как это приходится делать, когда стрелки с подписями на картинке видны, а точное значение нужно назвать самому.
+
+<Block kind="trainer" title="Глазомер: сколько тут dp?" chapterId="layout-by-mockup" blockId="trainer-eye-dp">
+<EyeDp chapterId="layout-by-mockup" trainerId="trainer-eye-dp" />
+</Block>
 
 ### Цвет как число: hex-запись
 
@@ -524,6 +532,12 @@ fun ProductCard(title: String, price: String, discountPercent: Int) {
   chapterId="layout-by-mockup"
   trainerId="trainer-card-preview"
 />
+</Block>
+
+А чтобы структура «внешний контейнер → изображение → заголовок → ряд с ценой» уложилась в голове, собери её ещё раз сам — из перемешанных строк вёрстки.
+
+<Block kind="trainer" title="Собери структуру карточки" chapterId="layout-by-mockup" blockId="trainer-card-assembler">
+<CardAssembler chapterId="layout-by-mockup" trainerId="trainer-card-assembler" />
 </Block>
 
 <Block kind="quiz" title="Карточка товара" chapterId="layout-by-mockup" blockId="quiz-product-card">

@@ -19,10 +19,11 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 import KeysTabs from '@site/src/components/KeysTabs';
 import IdeTour from '@site/src/components/IdeTour';
 import HotkeyTrainer from '@site/src/components/HotkeyTrainer';
+import WizardOrder from '@site/src/components/WizardOrder';
 
 # Android Studio: знакомство с IDE
 
-<ChapterProgress chapterId="android-studio" totalSections={14} totalQuizzes={5} totalTrainers={4} />
+<ChapterProgress chapterId="android-studio" totalSections={14} totalQuizzes={5} totalTrainers={5} />
 
 ## Зачем это нужно
 
@@ -271,6 +272,19 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
   { q: 'Ты выбрал Minimum SDK = API 24 (Android 7.0). Что это значит для владельца телефона с Android 5.0 (API 21)?', options: ['Приложение установится, но будет работать медленнее', 'Приложение не предложат к установке — устройство ниже заявленного минимума', 'minSdk влияет только на скорость сборки, не на установку', 'Ничего, minSdk — просто информационная пометка'], correct: 1, why: 'minSdk — это именно порог совместимости: устройство с версией Android ниже заявленной не сможет установить приложение, что и показал runnable-пример в главе.' },
   { q: 'После нажатия Finish внизу экрана долго бегут полоски прогресса без видимого результата. Это зависшая программа?', options: ['Да, нужно принудительно закрывать Android Studio', 'Нет — идёт первая синхронизация Gradle: она читает build.gradle.kts и докачивает библиотеки, и может занимать несколько минут', 'Да, но это нормально для медленных компьютеров, надо переустановить IDE', 'Нет, но продолжать работу можно сразу же, полоски ни на что не влияют'], correct: 1, why: 'Первый sync — самый долгий: Gradle с нуля выясняет, какие библиотеки нужны проекту, и скачивает их; трогать проект в этот момент не стоит, хотя это не зависание.' },
   { q: 'В коде Greeting("Android") напечатает текст "Hello Android!" — откуда взялось восклицание и слово Android именно в такой форме?', options: ['Android жёстко записан внутри функции Text', 'Строка шаблона "Hello $name!" внутри Greeting подставляет значение параметра name (здесь — "Android") на место $name, а "!" — обычный символ текста рядом', 'Это подставляется автоматически системой Android при каждом запуске', 'Слово Android Android Studio добавляет само как водяной знак'], correct: 1, why: 'Тот же принцип строковых шаблонов $, что в главе про переменные Kotlin: $name внутри двойных кавычек подставляет значение аргумента, а всё остальное в строке — обычный текст.' },
+]} />
+</Block>
+
+Весь путь от New Project до надписи на экране уложился в несколько шагов — проверь, что помнишь их порядок, а не только каждый по отдельности:
+
+<Block kind="trainer" title="Порядок шагов мастера" chapterId="android-studio" blockId="trainer-wizard-order">
+<WizardOrder chapterId="android-studio" trainerId="trainer-wizard-order" steps={[
+  { text: 'Открыть New Project на стартовом экране', why: 'всё начинается со стартового экрана: пока проект не создаётся, ни шаблонов, ни полей мастера не существует' },
+  { text: 'Выбрать шаблон Empty Activity', why: 'экран Templates идёт первым: от выбранного шаблона зависит, какую заготовку проекта сгенерирует IDE' },
+  { text: 'Назвать проект и заполнить Package name', why: 'имя и package name — верхние поля экрана Configure your project, который открывается сразу после выбора шаблона' },
+  { text: 'Выбрать Minimum SDK', why: 'minSdk — нижнее поле того же экрана Configure your project: порог совместимости выбирается до нажатия Finish' },
+  { text: 'Дождаться Gradle sync', why: 'после Finish Gradle читает build.gradle.kts и докачивает библиотеки — пока sync не закончился, собирать проект не из чего' },
+  { text: 'Нажать Run ▶', why: 'запуск — последний шаг: он имеет смысл только когда проект синхронизирован и готов к сборке' },
 ]} />
 </Block>
 

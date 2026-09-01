@@ -15,10 +15,13 @@ import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
+import ModuleGraph from '@site/src/components/ModuleGraph';
+import ModuleSort from '@site/src/components/ModuleSort';
+import ApiVisToggle from '@site/src/components/ApiVisToggle';
 
 # Многомодульность и UI Kit
 
-<ChapterProgress chapterId="ui-kit" totalSections={13} totalQuizzes={6} totalTrainers={2} />
+<ChapterProgress chapterId="ui-kit" totalSections={13} totalQuizzes={6} totalTrainers={5} />
 
 ## Зачем это нужно
 
@@ -125,6 +128,12 @@ Multi-module Gradle-проект начинается не с кода, а с о
   { q: 'В чём разница между com.android.application и com.android.library на уровне итогового артефакта?', options: ['Разницы нет, это два названия одного и того же плагина', 'application собирает .apk/.aab и требует applicationId; library собирает .aar, applicationId не разрешён, а сам модуль нельзя запустить напрямую', 'library всегда быстрее компилируется, чем application', 'application можно подключить как зависимость из другого модуля, library — нельзя'], correct: 1, why: 'application — точка входа, устанавливаемая на устройство; library — переиспользуемая часть, которую подключают как зависимость, но саму по себе на устройство не ставят.' },
   { q: 'Сколько модулей с плагином com.android.application обычно бывает в одном Android-проекте?', options: ['Ровно один — точка входа приложения', 'Ноль — application вообще не нужен для Android', 'Столько же, сколько экранов в приложении', 'Один на каждого участника команды'], correct: 0, why: 'com.android.application отмечает единственную точку входа — модуль, который реально устанавливается и запускается; library-модулей вокруг него может быть сколько угодно.' },
 ]} />
+</Block>
+
+Прежде чем читать дальше — собери граф зависимостей сам: какие стрелки между `:app`, `:ui-kit` и `:net` дадут рабочую сборку, а какие её сломают.
+
+<Block kind="trainer" title="Собери граф зависимостей" chapterId="ui-kit" blockId="trainer-module-graph">
+<ModuleGraph chapterId="ui-kit" trainerId="trainer-module-graph" />
 </Block>
 
 <SectionAnchor chapterId="ui-kit" sectionId="project-anatomy" />
@@ -287,6 +296,12 @@ fun CatalogScreen() {
   { q: 'Почему рефакторинг describeBadgeBefore/After печатает ОДИНАКОВЫЕ числа до и после выноса в отдельные object?', options: ['Потому что рефакторинг ничего не меняет в поведении — только в том, откуда код берёт значения', 'Это случайное совпадение чисел', 'На самом деле числа отличаются, просто выглядят одинаково', 'Потому что UiKitColors — это не настоящий object'], correct: 0, why: 'Рефакторинг по определению не должен менять результат — он меняет только структуру: где именно объявлено значение и сколько раз оно продублировано.' },
   { q: 'Почему в примере с :ui-kit цвета объявлены как val Colors = Color(0xFF...), а не как const val, аналогично тому, что уже разбиралось для Dimens в прошлой главе?', options: ['Color — это тоже вызов функции-конструктора, а не значение, известное на этапе компиляции, поэтому const val для него, как и для Dp/Sp, не подходит', 'Цвета в Kotlin вообще нельзя объявлять внутри object', 'const val работает только с Int', 'Это опечатка, на самом деле нужен const val'], correct: 0, why: 'Тот же принцип, что и с Dp/Sp в прошлой главе: Color(0xFF...) — вызов конструктора, вычисляемый во время выполнения, а const val требует значения, известного компилятору ещё до запуска программы.' },
 ]} />
+</Block>
+
+Теперь проверь то же самое с другой стороны: разложи сущности проекта по модулям, в которых им место.
+
+<Block kind="trainer" title="Разложи по модулям" chapterId="ui-kit" blockId="trainer-module-sort">
+<ModuleSort chapterId="ui-kit" trainerId="trainer-module-sort" />
 </Block>
 
 <SectionAnchor chapterId="ui-kit" sectionId="design-system" />
@@ -454,6 +469,12 @@ Cannot access 'fun fetchInternal(): NetResponse': it is private in 'Implementati
 ```
 
 **Перевод:** «нет доступа к функции fetchInternal(): NetResponse — она приватная в ImplementationStyleRepository». Это точная механика Kotlin-модификатора `private` (подтверждена официальной документацией Kotlin: «`private` means that the member is visible inside this class only» — «private означает, что член виден только внутри этого класса»), а не Gradle — но результат по духу тот же самый, что и у настоящей `implementation`-зависимости: то, что не решили сделать публичным, снаружи не достать. Разница в механизме важна: `private` — это языковый барьер уровня Kotlin (член существует, но доступ к нему запрещён компилятором); `implementation` — это барьер уровня Gradle (модуль `:net` в случае `:app` физически отсутствует на classpath компиляции, поэтому импорт `ru.champs.net.ApiResponse` в `:app` вообще не найдёт, что импортировать). К этой, второй, разновидности — и к её настоящему сообщению об ошибке — вернёмся в разделе «Типичные ошибки».
+
+А пока пощёлкай переключатель сам: та же цепочка модулей, что и в живом проекте выше (третий модуль здесь назван обобщённо `:lib`), и одно слово в `ui-kit/build.gradle.kts`, решающее судьбу импорта в `:app`.
+
+<Block kind="trainer" title="api или implementation: что видит :app" chapterId="ui-kit" blockId="trainer-api-vis">
+<ApiVisToggle chapterId="ui-kit" trainerId="trainer-api-vis" />
+</Block>
 
 <Block kind="quiz" title="api против implementation" chapterId="ui-kit" blockId="quiz-api-vs-implementation">
 <SelfCheck chapterId="ui-kit" quizId="q4" questions={[

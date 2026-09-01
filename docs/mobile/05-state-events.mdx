@@ -12,6 +12,8 @@ import KotlinPlay from '@site/src/components/KotlinPlay';
 import PredictOutput from '@site/src/components/PredictOutput';
 import SelfCheck from '@site/src/components/SelfCheck';
 import Block from '@site/src/components/Block';
+import RememberSim from '@site/src/components/RememberSim';
+import RecompositionCounter from '@site/src/components/RecompositionCounter';
 import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
@@ -19,7 +21,7 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # Состояние и события
 
-<ChapterProgress chapterId="state-events" totalSections={15} totalQuizzes={5} totalTrainers={4} />
+<ChapterProgress chapterId="state-events" totalSections={15} totalQuizzes={5} totalTrainers={6} />
 
 ## Зачем это нужно
 
@@ -117,6 +119,12 @@ val countState = remember { mutableStateOf(0) }
   { text: ' mutableStateOf(0)', label: 'тело лямбды — что именно запоминаем', note: 'вызов другой функции, mutableStateOf, с начальным значением 0; результат этого вызова remember и сохранит' },
   { text: ' }', label: 'закрывающая скобка', note: 'конец тела лямбды remember' },
 ]} />
+</Block>
+
+А теперь потрогай разницу руками: один и тот же счётчик, объявленный с remember и без, и кнопка, которая форсирует рекомпозицию — то есть вызывает функцию заново.
+
+<Block kind="trainer" title="Симулятор: с remember и без" chapterId="state-events" blockId="trainer-remember-sim">
+<RememberSim chapterId="state-events" trainerId="trainer-remember-sim" />
 </Block>
 
 <SectionAnchor chapterId="state-events" sectionId="remember" />
@@ -298,6 +306,12 @@ fun main() {
 <Hint id="state-events-h2" type="tip">
 Отсюда и требование из прошлой главы, что composable-функция должна быть быстрой и идемпотентной (при одинаковых входных данных вести себя одинаково, сколько бы раз её ни вызвали): раз Compose решает сам, когда и сколько раз перевызвать функцию, внутри неё нельзя полагаться на побочные эффекты, которые ломаются от повторного выполнения, — печать в лог для отладки безопасна, а, например, отправка сетевого запроса «на каждый вызов функции» — нет.
 </Hint>
+
+Тот же принцип — вживую: родитель со счётчиком и два дочерних куска экрана, у каждого — бейдж с числом реальных перерисовок.
+
+<Block kind="trainer" title="Счётчик перерисовок: кто перерисовался" chapterId="state-events" blockId="trainer-recomposition-counter">
+<RecompositionCounter chapterId="state-events" trainerId="trainer-recomposition-counter" />
+</Block>
 
 <Block kind="quiz" title="Рекомпозиция" chapterId="state-events" blockId="quiz-recomposition">
 <SelfCheck chapterId="state-events" quizId="quiz-recomposition" questions={[

@@ -15,11 +15,12 @@ import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import WordOrder from '@site/src/components/WordOrder';
+import ErrorTranslator from '@site/src/components/ErrorTranslator';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # IT-английский: стартовый словарь
 
-<ChapterProgress chapterId="it-english" totalSections={12} totalQuizzes={5} totalTrainers={4} />
+<ChapterProgress chapterId="it-english" totalSections={12} totalQuizzes={5} totalTrainers={5} />
 
 ## Зачем это нужно
 
@@ -198,6 +199,12 @@ bash: gti: command not found
   { q: 'Что делает оператор site:stackoverflow.com в поисковом запросе?', options: ['Открывает сайт Stack Overflow напрямую', 'Ограничивает результаты поиска только этим одним сайтом', 'Ищет слово site в тексте', 'Это не настоящий оператор, просто текст'], correct: 1, why: 'site: — оператор поисковика: показывает только страницы указанного домена, отфильтровывая всё остальное.' },
   { q: 'Сообщение Permission denied само по себе даёт мало результатов по теме. Что стоит сделать?', options: ['Ничего не менять, фраза и так достаточно точная', 'Добавить к запросу имя инструмента, который напечатал сообщение — например git или bash', 'Убрать слово denied', 'Перевести фразу на русский перед поиском'], correct: 1, why: 'Permission denied — общая фраза, которую печатают десятки разных программ. Имя инструмента сужает поиск до релевантных результатов.' },
 ]} />
+</Block>
+
+Прежде чем гуглить, полезно понять, сколько в сообщении ты уже понимаешь сам. Вставь любую ошибку — знакомые слова из словаря главы подсветятся, а пути и знаки приглушатся:
+
+<Block kind="trainer" title="Переводчик ошибок" chapterId="it-english" blockId="trainer-error-translator">
+<ErrorTranslator chapterId="it-english" trainerId="trainer-error-translator" />
 </Block>
 
 <SectionAnchor chapterId="it-english" sectionId="google-error" />

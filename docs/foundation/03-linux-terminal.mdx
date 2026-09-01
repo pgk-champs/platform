@@ -17,10 +17,11 @@ import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import KeysTabs from '@site/src/components/KeysTabs';
 import TerminalSim from '@site/src/components/TerminalSim';
+import FsTreeViz from '@site/src/components/FsTreeViz';
 
 # Linux и терминал
 
-<ChapterProgress chapterId="linux-terminal" totalSections={13} totalQuizzes={5} totalTrainers={3} />
+<ChapterProgress chapterId="linux-terminal" totalSections={13} totalQuizzes={5} totalTrainers={4} />
 
 ## Зачем это нужно
 
@@ -167,6 +168,12 @@ ls: cannot access 'nope': No such file or directory
 ```text
 bash: cd: nope: No such file or directory
 ```
+
+Все четыре формы пути удобно потрогать на живом дереве: кликай по узлам — и смотри, какой `cd` туда ведёт из текущего места.
+
+<Block kind="trainer" title="Дерево файловой системы: куда ведёт cd" chapterId="linux-terminal" blockId="trainer-fstree">
+<FsTreeViz chapterId="linux-terminal" trainerId="trainer-fstree" />
+</Block>
 
 <Block kind="quiz" title="Навигация: pwd, ls, cd" chapterId="linux-terminal" blockId="quiz-navigation">
 <SelfCheck chapterId="linux-terminal" quizId="quiz-navigation" questions={[

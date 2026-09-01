@@ -16,10 +16,12 @@ import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
+import MapFilterViz from '@site/src/components/MapFilterViz';
+import DataClassBuilder from '@site/src/components/DataClassBuilder';
 
 # Классы и коллекции
 
-<ChapterProgress chapterId="classes-collections" totalSections={15} totalQuizzes={6} totalTrainers={4} />
+<ChapterProgress chapterId="classes-collections" totalSections={15} totalQuizzes={6} totalTrainers={6} />
 
 ## Зачем это нужно
 
@@ -269,6 +271,12 @@ data class Competitor(val name: String, var score: Int)`} />
 
 **Что выведет:** `Богдан -> 91`. `val (name, score) = bogdan` — деструктуризация (destructuring declaration): `name` берётся из `component1()` (первое свойство, `name`), `score` — из `component2()` (второе свойство, `score`). Работает это только благодаря `data`: у обычного класса `component1()`/`component2()` не сгенерированы, и такая запись не скомпилируется.
 
+Теперь собери свой `data class` сам: задай имя и поля — и посмотри живьём, что дадут сгенерированные `toString()`, `equals()` и `copy()`.
+
+<Block kind="trainer" title="Собери свой data class" chapterId="classes-collections" blockId="trainer-data-class-builder">
+<DataClassBuilder chapterId="classes-collections" trainerId="trainer-data-class-builder" />
+</Block>
+
 <Block kind="quiz" title="data class" chapterId="classes-collections" blockId="quiz-data-class">
 <SelfCheck chapterId="classes-collections" quizId="q2" questions={[
   { q: 'Что печатает println(bogdan) для обычного (не data) класса?', options: ['Все свойства объекта в виде текста', 'Имя класса, @ и адрес объекта в памяти вроде Competitor@2c7b84de', 'Пустую строку', 'Ошибку компиляции — println нельзя вызывать для объектов'], correct: 1, why: 'Обычный класс наследует стандартный toString() от Any, который не знает содержимого объекта и печатает только служебную метку с адресом.' },
@@ -357,6 +365,12 @@ data class Competitor(val name: String, var score: Int)`} />
 }
 
 data class Competitor(val name: String, var score: Int)`} />
+</Block>
+
+Та же цепочка — теперь в замедленной съёмке: прогони каждый элемент через конвейер `filter`/`map` по шагам и посмотри, где элемент отбрасывается, а где превращается.
+
+<Block kind="trainer" title="Конвейер map и filter" chapterId="classes-collections" blockId="trainer-map-filter-viz">
+<MapFilterViz chapterId="classes-collections" trainerId="trainer-map-filter-viz" />
 </Block>
 
 Список из `listOf` — неизменяемый (в том смысле, что через сам этот `List` нельзя ни добавить, ни удалить элемент). Когда список должен расти и меняться, используют `mutableListOf` — тот же список, но с методами `add`/`remove`.

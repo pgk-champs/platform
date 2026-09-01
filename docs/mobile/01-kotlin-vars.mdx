@@ -16,10 +16,12 @@ import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
+import MemoryViz from '@site/src/components/MemoryViz';
+import BugHunt from '@site/src/components/BugHunt';
 
 # Переменные и типы
 
-<ChapterProgress chapterId="kotlin-vars" totalSections={13} totalQuizzes={3} totalTrainers={4} />
+<ChapterProgress chapterId="kotlin-vars" totalSections={13} totalQuizzes={3} totalTrainers={6} />
 
 ## Зачем это нужно
 
@@ -81,6 +83,12 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 <Hint id="kotlin-vars-h1" type="tip">
 Хорошее правило для новичка: по умолчанию бери `val` и переключайся на `var` только тогда, когда точно знаешь, что значение будет меняться. Так меньше шанс случайно испортить данные, на которые полагается остальной код.
 </Hint>
+
+Пощупай разницу руками: попробуй переприсвоить обе ячейки и посмотри, как ответит компилятор.
+
+<Block kind="trainer" title="Ячейки памяти: val против var" chapterId="kotlin-vars" blockId="trainer-memory-viz">
+<MemoryViz chapterId="kotlin-vars" trainerId="trainer-memory-viz" />
+</Block>
 
 Прежде чем жать Run — сначала предскажи вывод сам: прокрути `+=` в голове и вспомни, что делает `$` в кавычках.
 
@@ -367,6 +375,31 @@ Unresolved reference 'scre'.
 **Перевод:** «Неразрешённая ссылка scre» — компилятор не нашёл ничего с таким именем. Переменной `scre` не существует: есть `score`, а в строке 4 — опечатка. Та же ошибка появится, если использовать переменную, которую вообще забыли объявить.
 
 **Как починить:** исправить имя на существующее — `println(score)`. Компилятор различает каждую букву и даже регистр: `Score` и `score` — разные имена.
+
+Теперь охота: в каждом сниппете ровно одна строка не пройдёт компиляцию — найди её с первого клика.
+
+<Block kind="trainer" title="Охота на ошибки: кликни строку" chapterId="kotlin-vars" blockId="trainer-bug-hunt">
+<BugHunt chapterId="kotlin-vars" trainerId="trainer-bug-hunt" rounds={[
+  {
+    lines: ['fun main() {', '    val record = 100', '    println(record)', '    record = 120', '}'],
+    bugLine: 3,
+    error: "'val' cannot be reassigned.",
+    why: 'record объявлена как val — переприсвоить нельзя. Нужен var record = 100 или новая переменная val newRecord = 120.',
+  },
+  {
+    lines: ['fun main() {', '    val team = "ПГК"', '    val points: Int = "5"', '    println("$team: $points")', '}'],
+    bugLine: 2,
+    error: "Initializer type mismatch: expected 'Int', actual 'String'.",
+    why: 'Обещан Int, а "5" в кавычках — строка. Убери кавычки или поменяй тип на String.',
+  },
+  {
+    lines: ['fun main() {', '    val score = 10', '    println("Очки: $score")', '    println(scre)', '}'],
+    bugLine: 3,
+    error: "Unresolved reference 'scre'.",
+    why: 'Переменной scre не существует — есть score, в имени опечатка. Компилятор различает каждую букву.',
+  },
+]} />
+</Block>
 
 <Block kind="quiz" title="Цепочки и типичные ошибки" chapterId="kotlin-vars" blockId="quiz-chain-errors">
 <SelfCheck chapterId="kotlin-vars" quizId="quiz-chain-errors" questions={[

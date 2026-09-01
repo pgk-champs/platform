@@ -16,10 +16,12 @@ import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import GitSim from '@site/src/components/GitSim';
+import GitStatusReader from '@site/src/components/GitStatusReader';
+import CommitMsgBuilder from '@site/src/components/CommitMsgBuilder';
 
 # Git: первый коммит
 
-<ChapterProgress chapterId="git-first-commit" totalSections={15} totalQuizzes={6} totalTrainers={4} />
+<ChapterProgress chapterId="git-first-commit" totalSections={15} totalQuizzes={6} totalTrainers={6} />
 
 ## Зачем это нужно
 
@@ -406,6 +408,12 @@ git log --oneline
 ]} />
 </Block>
 
+Теперь в обратную сторону: перед тобой три знакомых вывода `git status` — по каждому определи, что именно попадёт в снимок, если набрать `git commit` прямо сейчас.
+
+<Block kind="trainer" title="Что попадёт в коммит?" chapterId="git-first-commit" blockId="trainer-status-reader">
+<GitStatusReader chapterId="git-first-commit" trainerId="trainer-status-reader" />
+</Block>
+
 <SectionAnchor chapterId="git-first-commit" sectionId="git-log" />
 
 ## Хорошие сообщения коммитов
@@ -415,6 +423,12 @@ git log --oneline
 <Hint id="git-first-commit-h3" type="tip">
 Плохие сообщения — `fix`, `asdf`, `изменения 2`, `последняя версия точно` — через неделю не скажут вообще ничего ни тебе, ни эксперту на чемпионате. Хватает трёх-шести слов, зато честных и по делу.
 </Hint>
+
+Проверь формулу на живых ситуациях: набирай сообщение — чек-лист правил загорается прямо по мере набора.
+
+<Block kind="trainer" title="Конструктор сообщения коммита" chapterId="git-first-commit" blockId="trainer-msg-builder">
+<CommitMsgBuilder chapterId="git-first-commit" trainerId="trainer-msg-builder" />
+</Block>
 
 <SectionAnchor chapterId="git-first-commit" sectionId="commit-messages" />
 

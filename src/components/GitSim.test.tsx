@@ -114,6 +114,65 @@ test('конфликт: маркеры в файле, edit + add + commit зав
   expect(text()).toContain('Квест выполнен');
 });
 
+test('квест ff-and-merge: две галочки — сначала fast-forward, затем merge-коммит', () => {
+  const { container } = render(
+    <GitSim
+      scenario="branches"
+      quest={{ title: 'Два вида слияния', goal: 'ff-and-merge' }}
+      chapterId="git-branches"
+      trainerId="sim-ff-and-merge"
+    />,
+  );
+  const text = () => container.textContent ?? '';
+
+  // трекер двух шагов виден, оба пустые
+  expect(text()).toContain('шаг 1 — fast-forward');
+  expect(text()).toContain('шаг 2 — merge-коммит');
+  expect(text()).not.toContain('✓ шаг 1');
+  expect(text()).not.toContain('✓ шаг 2');
+
+  // шаг 1: fast-forward — main не двигался
+  run('git switch -c quick');
+  run('edit quick.txt быстрая правка');
+  run('git add .');
+  run('git commit -m "правка в quick"');
+  run('git switch main');
+  run('git merge quick');
+  expect(text()).toContain('Fast-forward');
+  expect(text()).toContain('✓ шаг 1');
+  expect(screen.queryByText(/Квест выполнен/)).toBeNull();
+
+  // шаг 2: расхождение без конфликта (разные файлы) — merge-коммит
+  run('git switch -c slow');
+  run('edit slow.txt правка в ветке');
+  run('git add .');
+  run('git commit -m "правка в slow"');
+  run('git switch main');
+  run('edit other.txt правка в main');
+  run('git add .');
+  run('git commit -m "правка в main"');
+  run('git merge slow');
+
+  expect(text()).toContain("Merge made by the 'ort' strategy.");
+  expect(text()).toContain('Квест выполнен');
+  expect(store.getProgress().trainers['git-branches']?.['sim-ff-and-merge']).toBeTruthy();
+  expect(store.getXp()).toBeGreaterThan(0);
+});
+
+test('ff-and-merge: один fast-forward квест не закрывает, merge-коммит обязателен', () => {
+  const { container } = render(<GitSim scenario="branches" quest={{ title: 'Оба слияния', goal: 'ff-and-merge' }} />);
+
+  run('git switch -c f1');
+  run('edit a.txt раз');
+  run('git add .');
+  run('git commit -m "раз"');
+  run('git switch main');
+  run('git merge f1');
+
+  expect(container.textContent).toContain('Fast-forward');
+  expect(screen.queryByText(/Квест выполнен/)).toBeNull();
+});
+
 test('remote-demo: push после коммита коллеги отклоняется, после pull проходит', () => {
   const { container } = render(<GitSim scenario="remote-demo" />);
   const text = () => container.textContent ?? '';
