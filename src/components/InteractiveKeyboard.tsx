@@ -135,7 +135,6 @@ const ROWS: KeyDef[][] = [
 const UNIT = 50;
 const GAP = 6;
 const PAD = 12;
-const ROW_UNITS = 15; // все ряды выровнены на одинаковую суммарную ширину
 
 // Символ → базовая клавиша (+ нужен ли Shift). Буквы и пробел — особые
 // случаи (нет отдельной «строчной» клавиши на схеме), остальное ищем по
@@ -188,7 +187,14 @@ export default function InteractiveKeyboard({
   const nextSet = useMemo(() => new Set(nextIds), [nextIds]);
   const activeKeyId = activeKey?.toUpperCase();
 
-  const width = ROW_UNITS * UNIT + PAD * 2;
+  // x-координата в рендере ниже добавляет GAP ПОСЛЕ каждой клавиши (включая
+  // последнюю в ряду), поэтому реальный правый край ряда шире простой суммы
+  // w*UNIT на GAP*(n-1). Без этой поправки viewBox был у́же фактической
+  // раскладки, и крайние правые клавиши (Backspace, Enter, Shift, Ctrl)
+  // обрезались самим svg — на любой ширине контейнера, не только на узких.
+  const width = Math.max(
+    ...ROWS.map((row) => PAD * 2 + row.reduce((sum, k) => sum + k.w * UNIT, 0) + GAP * (row.length - 1)),
+  );
   const height = ROWS.length * UNIT + (ROWS.length - 1) * GAP + PAD * 2;
 
   const describe = (key: KeyDef): string =>
