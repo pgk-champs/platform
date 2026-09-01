@@ -2,9 +2,18 @@ import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { store } from '../lib/store';
 import './trainers.css';
 
-export type Question = { q: string; options: string[]; correct: number; why?: string };
+export type Question = {
+  q: string;
+  options: string[];
+  correct: number;
+  why?: string;
+  /** Показывается после 2 неверных попыток — наводит на мысль, не выдавая ответ. */
+  hint?: string;
+};
 
 const PERFECT_XP = 20;
+const HINT_AFTER_ATTEMPTS = 2;
+const GENERIC_HINT = 'Подсказка: не гадай — вернись к разделу перед вопросом и перечитай его ещё раз, ответ там прямым текстом.';
 
 export default function SelfCheck({
   questions,
@@ -22,6 +31,7 @@ export default function SelfCheck({
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
 
   const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [wrongCounts, setWrongCounts] = useState<Record<number, number>>({});
   const rewardedRef = useRef(false);
 
   const answeredCount = Object.keys(answers).length;
@@ -44,6 +54,9 @@ export default function SelfCheck({
   const pick = (qi: number, oi: number) => {
     if (answers[qi] === questions[qi].correct) return;
     setAnswers((a) => ({ ...a, [qi]: oi }));
+    if (oi !== questions[qi].correct) {
+      setWrongCounts((c) => ({ ...c, [qi]: (c[qi] ?? 0) + 1 }));
+    }
   };
 
   const progressPct = questions.length > 0 ? (answeredCount / questions.length) * 100 : 0;
@@ -96,6 +109,11 @@ export default function SelfCheck({
                 ) : (
                   'Не совсем — подумай ещё'
                 )}
+              </div>
+            ) : null}
+            {!solved && (wrongCounts[qi] ?? 0) >= HINT_AFTER_ATTEMPTS ? (
+              <div className="sc-scaffold-hint" role="status">
+                {item.hint ?? GENERIC_HINT}
               </div>
             ) : null}
           </div>

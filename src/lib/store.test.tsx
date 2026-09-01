@@ -256,3 +256,19 @@ test('sim runs are keyed independently per module and persisted', () => {
   expect(raw.simRuns.a[0]).toMatchObject({ score: 5, maxScore: 19.9 });
   expect(raw.simRuns.b[0]).toMatchObject({ score: 20, maxScore: 25.5 });
 });
+
+// --- tour (онбординг-тур Driver.js): показывается один раз на весь сайт ---
+
+test('tour.isSeen is false until markSeen, then persists and is idempotent', () => {
+  expect(store.tour.isSeen('chapter-basics')).toBe(false);
+  store.tour.markSeen('chapter-basics');
+  expect(store.tour.isSeen('chapter-basics')).toBe(true);
+  store.tour.markSeen('chapter-basics'); // повторная отметка не дублирует запись
+  const raw = JSON.parse(localStorage.getItem('pgk-store')!);
+  expect(raw.toursSeen).toEqual(['chapter-basics']);
+});
+
+test('tour ids are independent of each other', () => {
+  store.tour.markSeen('chapter-basics');
+  expect(store.tour.isSeen('gym')).toBe(false);
+});

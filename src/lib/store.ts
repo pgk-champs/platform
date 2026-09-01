@@ -70,6 +70,7 @@ type State = {
   simRuns: Record<string, SimRunResult[]>;
   customPresets: CustomPreset[];
   easter: EasterState;
+  toursSeen: string[];
 };
 
 function emptyState(): State {
@@ -91,6 +92,7 @@ function emptyState(): State {
     simRuns: {},
     customPresets: [],
     easter: { konami: false, speedrun: false, historyOpened: [] },
+    toursSeen: [],
   };
 }
 
@@ -419,6 +421,17 @@ function easterOpenHistory(id: string): void {
   persist();
 }
 
+// --- онбординг-тур (Driver.js): показывается один раз на весь сайт ---
+function markTourSeen(id: string): void {
+  if (state.toursSeen.includes(id)) return;
+  state.toursSeen = [...state.toursSeen, id];
+  persist();
+}
+
+function isTourSeen(id: string): boolean {
+  return state.toursSeen.includes(id);
+}
+
 // --- progress / snapshot ---
 function getProgress() {
   return { sections: state.sections, quizzes: state.quizzes, trainers: state.trainers };
@@ -454,6 +467,7 @@ export const store = {
   sim: { addRun: addSimRun, stats: getSimStats },
   customPresets: { add: customPresetAdd, list: customPresetList, remove: customPresetRemove },
   easter: { markKonami: easterMarkKonami, markSpeedrun: easterMarkSpeedrun, openHistory: easterOpenHistory },
+  tour: { markSeen: markTourSeen, isSeen: isTourSeen },
   snapshot,
   /** Тестовый хелпер: сбрасывает состояние в памяти и в localStorage. */
   __resetForTests(): void {

@@ -19,13 +19,14 @@ import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import WordOrder from '@site/src/components/WordOrder';
+import MatchPairs from '@site/src/components/MatchPairs';
 import ErrorTranslator from '@site/src/components/ErrorTranslator';
 import TranslatorBox from '@site/src/components/TranslatorBox';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # IT-английский: стартовый словарь
 
-<ChapterProgress chapterId="it-english" totalSections={12} totalQuizzes={5} totalTrainers={6} />
+<ChapterProgress chapterId="it-english" totalSections={12} totalQuizzes={5} totalTrainers={10} />
 
 ## Зачем это нужно
 
@@ -243,6 +244,18 @@ bash: gti: command not found
 ]} />
 </Block>
 
+Десять новых слов подряд — многовато, чтобы они улеглись в голове с первого раза. Прежде чем читать дальше, повтори их прямо сейчас — это работает лучше, чем просто перечитать словарь ещё раз (testing effect: вспоминать эффективнее, чем узнавать):
+
+<Block kind="trainer" title="Мини-повторение: действия программ" chapterId="it-english" blockId="trainer-recall-actions">
+<MatchPairs chapterId="it-english" trainerId="trainer-recall-actions" pairs={[
+  { term: 'create', translation: 'создать' },
+  { term: 'open', translation: 'открыть' },
+  { term: 'save', translation: 'сохранить' },
+  { term: 'run', translation: 'запустить' },
+  { term: 'error', translation: 'ошибка' },
+]} />
+</Block>
+
 ### Файлы и система
 
 Всё в компьютере крутится вокруг файла (file). Файлы лежат в папках (folder), которые в мире Linux чаще называют каталогами (directory) — это синонимы, пугаться не надо, оба слова уже встречались в разборе ошибок выше. Дорога до файла через все вложенные папки — путь (path), например `/home/student/docs/report.txt`. Команды системе отдают через терминал (terminal) — текстовое окно, с которым мы подружимся в следующей главе. Программы в Ubuntu ставятся пакетами (package): пакет можно установить (install) или обновить (update) до свежей версии (version). А поведение почти любой программы меняется в настройках (settings).
@@ -259,6 +272,18 @@ bash: gti: command not found
   { term: 'version', translation: 'версия', note: 'which version do you use? — какой версией пользуешься?' },
   { term: 'settings', translation: 'настройки', note: 'open the settings — открой настройки' },
   { term: 'terminal', translation: 'терминал', note: 'type it in the terminal — набери это в терминале' },
+]} />
+</Block>
+
+Ещё десять слов — и снова стоит повторить их сразу, пока не наложились на предыдущий блок:
+
+<Block kind="trainer" title="Мини-повторение: файлы и система" chapterId="it-english" blockId="trainer-recall-files">
+<MatchPairs chapterId="it-english" trainerId="trainer-recall-files" pairs={[
+  { term: 'file', translation: 'файл' },
+  { term: 'folder', translation: 'папка' },
+  { term: 'path', translation: 'путь' },
+  { term: 'install', translation: 'установить' },
+  { term: 'terminal', translation: 'терминал' },
 ]} />
 </Block>
 
@@ -281,6 +306,18 @@ bash: gti: command not found
 ]} />
 </Block>
 
+Эти слова ты пока встречаешь только на бумаге — тем более стоит закрепить их сразу:
+
+<Block kind="trainer" title="Мини-повторение: слова из кода" chapterId="it-english" blockId="trainer-recall-code-words">
+<MatchPairs chapterId="it-english" trainerId="trainer-recall-code-words" pairs={[
+  { term: 'variable', translation: 'переменная' },
+  { term: 'function', translation: 'функция' },
+  { term: 'value', translation: 'значение' },
+  { term: 'loop', translation: 'цикл' },
+  { term: 'comment', translation: 'комментарий' },
+]} />
+</Block>
+
 ### Глаголы git и терминала
 
 Отдельный блок — потому что эти десять слов будут звучать на каждом занятии про git, начиная со следующих глав. Изменения фиксируют коммитом (commit) и отправляют (push) на сервер; чужие изменения забирают (pull) себе. Параллельную линию разработки называют веткой (branch), а объединение веток — слиянием (merge). Весь репозиторий целиком копируют командой «клонировать» (clone), а посмотреть, что изменилось на сервере, не вливая это в свою ветку, можно командой «скачать» (fetch). Файл перед коммитом кладут в индекс командой «добавить» (add), текущее состояние проекта показывает статус (status), а всю историю коммитов — журнал (log).
@@ -297,6 +334,18 @@ bash: gti: command not found
   { term: 'add', translation: 'добавить (в индекс)', note: 'add the file to staging — добавь файл в индекс' },
   { term: 'status', translation: 'состояние, статус', note: 'check the status — проверь состояние проекта' },
   { term: 'log', translation: 'журнал (истории коммитов)', note: 'view the log — посмотри журнал коммитов' },
+]} />
+</Block>
+
+Последняя десятка — и снова короткое повторение, прежде чем перейти к общему квизу по всем сорока словам:
+
+<Block kind="trainer" title="Мини-повторение: глаголы git" chapterId="it-english" blockId="trainer-recall-git-verbs">
+<MatchPairs chapterId="it-english" trainerId="trainer-recall-git-verbs" pairs={[
+  { term: 'push', translation: 'отправить' },
+  { term: 'pull', translation: 'забрать' },
+  { term: 'branch', translation: 'ветка' },
+  { term: 'clone', translation: 'клонировать' },
+  { term: 'status', translation: 'статус' },
 ]} />
 </Block>
 

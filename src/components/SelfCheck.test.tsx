@@ -125,6 +125,36 @@ test('"Мои результаты" shows best/attempts/streak after a full perf
   expect(screen.getByText('Текущая серия без ошибок: 1')).toBeTruthy();
 });
 
+// --- эскалация подсказки после 2 неверных попыток (scaffolded hint) ---
+
+test('no hint after a single wrong attempt', () => {
+  render(<SelfCheck questions={questions} />);
+  fireEvent.click(screen.getByText('Киев')); // 1-я неверная попытка вопроса 2
+  expect(screen.queryByText(/Подсказка/)).toBeNull();
+});
+
+test('generic scaffolded hint appears after the 2nd wrong attempt, without leaking the answer', () => {
+  render(<SelfCheck questions={questions} />);
+  fireEvent.click(screen.getByText('Киев')); // 1-я неверная попытка
+  fireEvent.click(screen.getByText('Минск')); // 2-я неверная попытка — должна показать подсказку
+  expect(screen.getByText(/Подсказка/)).toBeTruthy();
+  expect(document.querySelector('.sc-scaffold-hint')?.textContent).not.toContain('Москва');
+
+  fireEvent.click(screen.getByText('Москва')); // теперь отвечает верно
+  expect(screen.getByText('Верно!')).toBeTruthy();
+  expect(screen.queryByText(/Подсказка/)).toBeNull();
+});
+
+test('an authored hint is shown instead of the generic fallback', () => {
+  const withHint = [
+    { q: '1 + 1?', options: ['1', '2', '3'], correct: 1, hint: 'Посчитай на пальцах.' },
+  ];
+  render(<SelfCheck questions={withHint} />);
+  fireEvent.click(screen.getByText('1'));
+  fireEvent.click(screen.getByText('3'));
+  expect(screen.getByText('Посчитай на пальцах.')).toBeTruthy();
+});
+
 test('quiz history stats are keyed per quizId and read from store.quiz.stats', () => {
   store.markQuizDone('typing', 'q1', { correct: 1, total: 2 });
   store.markQuizDone('typing', 'q1', { correct: 2, total: 2 });

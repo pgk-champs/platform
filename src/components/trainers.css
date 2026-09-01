@@ -10,8 +10,10 @@
 }
 
 .sb-part {
+  all: unset;
   cursor: pointer;
-  outline: none;
+  font: inherit;
+  color: inherit;
 }
 
 .sb-part:focus-visible {
@@ -352,6 +354,17 @@
 
 .sc-why {
   color: var(--ifm-color-emphasis-700);
+}
+
+/* Подсказка после 2 неверных попыток (scaffolded hint, не выдаёт ответ) */
+.sc-scaffold-hint {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--ifm-code-border-radius);
+  background: var(--ifm-color-warning-contrast-background);
+  border: 1px solid var(--ifm-color-warning-dark);
+  color: var(--ifm-font-color-base);
+  font-size: 0.9rem;
 }
 
 .sc-counter {
@@ -8100,4 +8113,57 @@
   margin: 0 0 0.75rem;
   font-size: 0.9rem;
   color: var(--ifm-color-emphasis-600);
+}
+
+/* ===== onboarding tour (цикл качества 1): Driver.js под цвета темы =====
+   Оверлей-затемнение оставлен дефолтным (полупрозрачный чёрный) — это
+   универсальный сумрак модалки, одинаково уместный в обеих темах. Всё
+   видимое содержимое поповера — на var(--ifm-...), меняется с темой сама.
+   Селектор с :root — не для каскада по вложенности, а чтобы specificity
+   (0,2,0) гарантированно перебивал driver.css (0,1,0) независимо от того,
+   в каком порядке бандлер конкатенирует CSS-модули двух разных импортов. */
+
+:root .driver-popover {
+  background-color: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  box-shadow: var(--ifm-global-shadow-md);
+  border-radius: var(--ifm-code-border-radius);
+}
+
+:root .driver-popover-title {
+  color: var(--ifm-heading-color);
+}
+
+:root .driver-popover-description {
+  color: var(--ifm-font-color-base);
+}
+
+:root .driver-popover-progress-text {
+  color: var(--ifm-color-emphasis-600);
+}
+
+:root .driver-popover-footer-btn {
+  background-color: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-button-border-radius);
+}
+
+:root .driver-popover-footer-btn:hover,
+:root .driver-popover-footer-btn:focus {
+  background-color: var(--ifm-hover-overlay);
+}
+
+:root .driver-popover-close-btn {
+  color: var(--ifm-color-emphasis-500);
+}
+
+:root .driver-popover-close-btn:hover,
+:root .driver-popover-close-btn:focus {
+  color: var(--ifm-font-color-base);
+}
+
+:root .driver-popover-arrow {
+  border-color: var(--ifm-background-surface-color);
 }
