@@ -78,5 +78,13 @@
     "level": "база",
     "order": 2,
     "path": "mobile/functions-lambdas.mdx"
+  },
+  {
+    "id": "classes-collections",
+    "title": "Классы и коллекции",
+    "audience": "мобилка",
+    "level": "база",
+    "order": 3,
+    "path": "mobile/classes-collections.mdx"
   }
 ]
