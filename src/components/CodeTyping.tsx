@@ -16,7 +16,7 @@ export type CodeTypingPreset = 'latin' | 'symbols' | 'code' | 'git';
 // Встроенные пулы — самодостаточный тренажёр без зашитой единственной фразы.
 // latin: панграммы для разминки; symbols: связки символов кода; code: короткие
 // строки Kotlin; git: реальные команды git.
-const PRESET_POOLS: Record<CodeTypingPreset, CodeTypingPool> = {
+export const PRESET_POOLS: Record<CodeTypingPreset, CodeTypingPool> = {
   latin: {
     label: 'Панграммы',
     snippets: [

@@ -10,6 +10,7 @@ import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import ToolCard from '@site/src/components/ToolCard';
 import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
 import Block from '@site/src/components/Block';
 import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
@@ -768,6 +769,19 @@ git log --oneline         # пять строк
 </details>
 
 <SectionAnchor chapterId="git-first-commit" sectionId="challenge" />
+
+<Block kind="quiz" title="Экзамен главы" chapterId="git-first-commit" blockId="exam">
+<ChapterExam chapterId="git-first-commit" questions={[
+  { q: 'Какая из этих команд выполняется один раз за всю жизнь проекта?', options: ['git status', 'git add', 'git init', 'git commit'], correct: 2, why: 'git init создаёт репозиторий однажды. Дальше по кругу крутится рабочий цикл: изменил файлы → status → add → commit.' },
+  { q: 'Сразу после git init в пустой папке на диске появляется…', options: ['Файл history.txt с журналом', 'Только скрытая папка .git — именно в ней будет жить вся история проекта', 'Копия проекта на GitHub', 'Первый пустой коммит'], correct: 1, why: 'git init не создаёт ни файлов проекта, ни коммитов, ни чего-либо в интернете — только служебный скрытый каталог .git в текущей папке.' },
+  { q: 'git status показывает main.py как untracked. Что сделать, чтобы файл попал в следующий коммит, и что при этом изменится на диске?', options: ['git commit — файл закоммитится сразу', 'git add main.py — содержимое файла не изменится, файл лишь попадёт в индекс (staging area)', 'Переименовать файл, чтобы Git его заметил', 'Ничего: untracked-файлы попадают в коммит автоматически'], correct: 1, why: 'git add — учёт, а не редактирование: байты main.py остаются прежними, меняется только статус файла в глазах Git — из untracked в «к коммиту».' },
+  { q: 'В метафоре посылки git rm --cached file — это…', options: ['Выбросить вещь в мусорное ведро', 'Вынуть вещь из коробки обратно на стол: файл остаётся на диске, но уходит из индекса', 'Заклеить коробку скотчем', 'Отдать посылку курьеру'], correct: 1, why: 'Команда убирает файл только из staging area. На диске он цел и снова числится untracked — ничего не потеряно.' },
+  { q: 'Коммит хранит hash, author, date и message. Что из этого ты набираешь руками в момент коммита?', options: ['Все четыре поля', 'Только message (через -m): автора Git берёт из git config, дату и hash вычисляет сам', 'hash и date', 'Ничего, всё генерируется автоматически'], correct: 1, why: 'Руками пишется только сообщение. Identity задаётся один раз через git config --global, а hash и дата появляются сами в момент снимка.' },
+  { q: 'git commit -m "..." вместо создания коммита напечатал вывод, похожий на git status. Наиболее вероятная причина?', options: ['Пропал интернет', 'Индекс пуст: забыли git add, и фиксировать нечего', 'Сообщение коммита слишком короткое', 'В папке слишком много файлов'], correct: 1, why: 'Commit фиксирует только содержимое staging area. Пустой индекс — и Git вместо снимка показывает состояние, подсказывая, что добавить.' },
+  { q: 'Верхняя строка вывода git log --oneline — это всегда…', options: ['Самый первый коммит проекта', 'Самый свежий коммит: история печатается от нового к старому, по строке на снимок', 'Коммит с самым длинным сообщением', 'Случайный коммит'], correct: 1, why: 'Git листает историю от текущего состояния назад в прошлое, а --oneline сжимает каждый коммит до короткого hash и сообщения в одну строку.' },
+  { q: 'Пометка (root-commit) в полном git log стоит у…', options: ['Каждого коммита', 'Только самого первого коммита репозитория — единственного, у которого нет родителя', 'Последнего коммита', 'Коммитов, сделанных с ошибкой'], correct: 1, why: 'Все коммиты, кроме первого, ссылаются на предыдущий как на родителя. Первый снимок в истории родителя не имеет — отсюда и пометка, ровно одна на репозиторий.' },
+]} />
+</Block>
 
 ## Что должен уметь
 

@@ -138,3 +138,92 @@ test('loads previously persisted state back after a fresh read from localStorage
   expect(raw).toBeTruthy();
   expect(JSON.parse(raw!).xp).toBe(7);
 });
+
+test('markExamDone appends attempts and getExamStats picks the best', () => {
+  store.markExamDone('typing', { correct: 3, total: 8 });
+  store.markExamDone('typing', { correct: 7, total: 8 });
+  store.markExamDone('typing', { correct: 5, total: 8 });
+  const stats = store.getExamStats('typing');
+  expect(stats.count).toBe(3);
+  expect(stats.attempts.map((a) => a.correct)).toEqual([3, 7, 5]);
+  expect(stats.best).toMatchObject({ correct: 7, total: 8 });
+});
+
+test('getExamStats for a chapter without exams is empty', () => {
+  const stats = store.getExamStats('nope');
+  expect(stats.count).toBe(0);
+  expect(stats.attempts).toEqual([]);
+  expect(stats.best).toBeUndefined();
+});
+
+test('exam attempts are persisted to localStorage', () => {
+  store.markExamDone('git-first-commit', { correct: 6, total: 6 });
+  const raw = JSON.parse(localStorage.getItem('pgk-store')!);
+  expect(raw.exams['git-first-commit']).toHaveLength(1);
+  expect(raw.exams['git-first-commit'][0]).toMatchObject({ correct: 6, total: 6 });
+});
+
+test('completeDaily records once per dateKey; dailyState reads score back', () => {
+  expect(store.dailyState('2026-09-01')).toMatchObject({ done: false, streak: 0 });
+
+  expect(store.completeDaily('2026-09-01', { correct: 4, total: 5 })).toBe(true);
+  expect(store.completeDaily('2026-09-01', { correct: 5, total: 5 })).toBe(false); // раз в день
+
+  const ds = store.dailyState('2026-09-01');
+  expect(ds.done).toBe(true);
+  expect(ds.today).toMatchObject({ correct: 4, total: 5 });
+  expect(ds.streak).toBe(1);
+});
+
+test('dailyState streak counts consecutive days across month boundary and breaks on a gap', () => {
+  store.completeDaily('2026-08-30', { correct: 5, total: 5 });
+  store.completeDaily('2026-08-31', { correct: 5, total: 5 });
+  store.completeDaily('2026-09-01', { correct: 3, total: 5 });
+  expect(store.dailyState('2026-09-01').streak).toBe(3);
+
+  // пропуск 2026-09-02 обнуляет серию
+  store.completeDaily('2026-09-03', { correct: 5, total: 5 });
+  expect(store.dailyState('2026-09-03').streak).toBe(1);
+});
+
+test('dailyState keeps yesterday-ending streak alive while today is not yet done', () => {
+  store.completeDaily('2026-08-30', { correct: 5, total: 5 });
+  store.completeDaily('2026-08-31', { correct: 5, total: 5 });
+  const ds = store.dailyState('2026-09-01');
+  expect(ds.done).toBe(false);
+  expect(ds.streak).toBe(2);
+});
+
+// --- cert-words (wave 4): имя для сертификата + тренировка слов ---
+
+test('prefs.setName persists the certificate name', () => {
+  expect(store.prefs.getName()).toBeUndefined();
+  store.prefs.setName('Олег');
+  expect(store.prefs.getName()).toBe('Олег');
+  expect(JSON.parse(localStorage.getItem('pgk-store')!).prefs.name).toBe('Олег');
+});
+
+test('words.grade moves weight within [1..4] and persists', () => {
+  expect(store.words.weight('api')).toBe(2); // дефолт
+  store.words.grade('api', false);
+  expect(store.words.weight('api')).toBe(3);
+  store.words.grade('api', false);
+  store.words.grade('api', false);
+  expect(store.words.weight('api')).toBe(4); // потолок
+  store.words.grade('api', true);
+  store.words.grade('api', true);
+  store.words.grade('api', true);
+  store.words.grade('api', true);
+  expect(store.words.weight('api')).toBe(1); // пол
+  expect(JSON.parse(localStorage.getItem('pgk-store')!).wordWeights.api).toBe(1);
+});
+
+test('words.queue puts unknown words first and repeats them in the round', () => {
+  store.words.grade('bug', false); // вес 3
+  store.words.grade('loop', true); // вес 1
+  const q = store.words.queue(['loop', 'bug', 'var']);
+  expect(q[0]).toBe('bug'); // самый тяжёлый — первым
+  expect(q.filter((t) => t === 'bug').length).toBe(2); // и повторяется
+  expect(q.filter((t) => t === 'loop').length).toBe(1);
+  expect(q.filter((t) => t === 'var').length).toBe(1);
+});

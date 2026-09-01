@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { store } from '../lib/store';
+import UnderHood from './UnderHood';
 import './trainers.css';
 
 // Мини-превью Compose-вёрстки: телефон 360x640 рендерится настоящим HTML
@@ -285,6 +286,8 @@ export default function ComposePreview({ tree, editable, controls, chapterId, tr
   const [changes, setChanges] = useState(0);
   const [done, setDone] = useState(false);
   const [awarded, setAwarded] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const codeRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (chapterId && trainerId && store.getProgress().trainers[chapterId]?.[trainerId]) setDone(true);
@@ -310,6 +313,25 @@ export default function ComposePreview({ tree, editable, controls, chapterId, tr
 
   const hasGoal = !!chapterId && !!trainerId && resolvedControls.length > 0;
 
+  const copyCode = async () => {
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('no clipboard');
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // фолбэк: выделяем код — пользователю остаётся нажать Ctrl/Cmd+C
+      const el = codeRef.current;
+      const sel = window.getSelection();
+      if (el && sel) {
+        sel.removeAllRanges();
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        sel.addRange(range);
+      }
+    }
+  };
+
   return (
     <div className="cpv">
       <div className="cpv-stage">
@@ -317,9 +339,14 @@ export default function ComposePreview({ tree, editable, controls, chapterId, tr
           <div className="cpv-screen">{renderNode(current, 'root')}</div>
           <div className="cpv-notch" aria-hidden />
         </div>
-        <pre className="cpv-code" aria-label="код Compose">
-          <code>{code}</code>
-        </pre>
+        <div className="cpv-codewrap">
+          <button type="button" className="cpv-copy" onClick={copyCode}>
+            {copied ? '✓ Скопировано' : 'Скопировать код'}
+          </button>
+          <pre className="cpv-code" aria-label="код Compose">
+            <code ref={codeRef}>{code}</code>
+          </pre>
+        </div>
       </div>
 
       {resolvedControls.length > 0 && (
@@ -383,6 +410,15 @@ export default function ComposePreview({ tree, editable, controls, chapterId, tr
             : `Измени параметры ${GOAL} раза и посмотри, как меняется код: ${Math.min(changes, GOAL)} из ${GOAL}`}
         </div>
       )}
+
+      <UnderHood>
+        Телефон слева — это не Android и не Compose, а обычный HTML: вёрстка описана JSON-деревом, где Column и Row
+        превращаются во flexbox-контейнеры (flex-direction: column / row), Box — в CSS grid с наложением слоёв, а dp — в
+        пиксели один к одному. Код справа генерируется из того же самого JSON-дерева обходом в глубину, поэтому превью и
+        код физически не могут разойтись. Двигаешь ползунок — меняется одно поле в дереве, и React перерисовывает обе
+        стороны сразу. Кнопка копирования отдаёт именно этот сгенерированный текст — его можно вставить в Android Studio
+        как основу настоящего экрана.
+      </UnderHood>
     </div>
   );
 }

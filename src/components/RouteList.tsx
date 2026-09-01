@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import Link from '@docusaurus/Link';
 import { store } from '../lib/store';
+import Certificate from './Certificate';
 import './trainers.css';
 
 export type Audience = 'все' | 'мобилка' | 'блокчейн';
@@ -21,7 +22,7 @@ const LEVELS: Level[] = ['база', 'углубление', 'челлендж']
 const PROGRESS_KEY = 'pgk-progress';
 const STATUS_LABEL: Record<Status, string> = { passed: 'пройдена', reading: 'читается', 'not-started': 'не начата' };
 
-function loadProgress(): Record<string, boolean> {
+export function loadProgress(): Record<string, boolean> {
   try {
     const raw = localStorage.getItem(PROGRESS_KEY);
     return raw ? JSON.parse(raw) : {};
@@ -41,7 +42,7 @@ function saveProgress(progress: Record<string, boolean>) {
 // «Пройдена» — ручной чекбокс подтверждён И все пройденные в главе квизы без
 // ошибок; «читается» — есть хоть какой-то след в store (секция/квиз/тренажёр)
 // или отмечен чекбокс без идеальных квизов; иначе «не начата».
-function statusOf(chapterId: string, checked: boolean): Status {
+export function statusOf(chapterId: string, checked: boolean): Status {
   const progress = store.getProgress();
   const quizzes = progress.quizzes[chapterId] ?? {};
   const quizIds = Object.keys(quizzes);
@@ -139,6 +140,12 @@ export default function RouteList({ map, track }: { map: Entry[]; track: 'моб
           ))}
         </tbody>
       </table>
+
+      <Certificate
+        track={track}
+        total={chapters.length}
+        passed={statuses.filter((s) => s === 'passed').length}
+      />
     </div>
   );
 }

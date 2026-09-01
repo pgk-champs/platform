@@ -11,6 +11,7 @@ import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
 import PredictOutput from '@site/src/components/PredictOutput';
 import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
 import Block from '@site/src/components/Block';
 import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
@@ -579,6 +580,18 @@ println("В среднем $averageKm км за тренировку")
 </details>
 
 <SectionAnchor chapterId="kotlin-vars" sectionId="challenge" />
+
+<Block kind="quiz" title="Экзамен главы" chapterId="kotlin-vars" blockId="exam">
+<ChapterExam chapterId="kotlin-vars" questions={[
+  { q: 'В приложении есть счётчик очков, который меняется во время игры, и имя игрока, которое после ввода не меняется. Как их объявить?', options: ['var score и val playerName', 'val score и var playerName', 'Оба через val', 'Оба через var'], correct: 0, why: 'Меняется — var, не меняется — val. По умолчанию бери val и переходи на var только там, где переприсваивание действительно нужно.' },
+  { q: 'Что напечатает код: val km = 4; println("Дистанция: ${km * 1000} м")', options: ['Дистанция: ${km * 1000} м', 'Дистанция: 4000 м', 'Дистанция: km * 1000 м', 'Ошибку компиляции'], correct: 1, why: 'Внутри двойных кавычек ${...} — строковый шаблон: выражение вычисляется (4 * 1000) и результат подставляется в текст.' },
+  { q: 'Выполняются строки: var x = 10, затем x += 5, затем println(x). Что окажется на экране?', options: ['10', '5', '15', "Ошибка 'val' cannot be reassigned"], correct: 2, why: '+= прибавляет к текущему значению: 10 + 5 = 15. Переменная объявлена как var, поэтому менять её можно.' },
+  { q: 'Что скажет компилятор на val n: Int = "7" — и почему?', options: ['Скомпилирует: "7" сам превратится в число', 'Ошибку несоответствия типов: обещан Int, а кавычки делают "7" строкой String', 'Только предупреждение, код запустится', "Ошибку 'val' cannot be reassigned"], correct: 1, why: 'Кавычки превращают запись в текст: "7" — String из одного символа, а не число. Обещание типа Int нарушено — компиляция останавливается.' },
+  { q: 'val score = 100 — какого типа score и кто это решил?', options: ['Типа нет: val объявляет бестиповую переменную', 'Int: компилятор вывел тип сам по значению справа — это вывод типов (type inference)', 'String: без аннотации всё считается текстом', 'Double: числа по умолчанию дробные'], correct: 1, why: 'Тип есть всегда и фиксируется при компиляции. Просто когда он очевиден из правой части, компилятор определяет его без подсказки.' },
+  { q: 'Что вернёт выражение listOf(1, 2, 3).map { it * 10 }.sum()?', options: ['6', '60', '123', 'Ошибку: у списка нет метода map'], correct: 1, why: 'map превращает каждый элемент (it) в it * 10 — получается [10, 20, 30], а sum складывает их в 60. Точка читается «у того, что слева, вызови то, что справа».' },
+  { q: 'Почему println(listOf(3, 5, 4).average()) напечатает 4.0, а не 4?', options: ['Это ошибка округления в Kotlin', 'average() возвращает Double, а дробные числа всегда печатаются с дробной частью', 'println округляет всё до одного знака', 'Потому что список объявлен через val'], correct: 1, why: 'Среднее в общем случае дробное, поэтому тип результата — Double. Даже «круглое» значение такого типа печатается как 4.0.' },
+]} />
+</Block>
 
 ## Что должен уметь
 

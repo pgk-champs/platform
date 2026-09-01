@@ -5965,3 +5965,573 @@
 .sd-fail {
   color: var(--ifm-color-danger);
 }
+
+/* ===== exam: ChapterExam ===== */
+.ce {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.ce-intro {
+  margin: 0;
+  color: var(--ifm-color-emphasis-700);
+}
+.ce-start {
+  align-self: flex-start;
+  padding: 0.5rem 1.25rem;
+  border: 1px solid var(--ifm-color-primary);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-color-primary);
+  color: var(--ifm-color-white);
+  font-weight: 600;
+  cursor: pointer;
+}
+.ce-start:hover {
+  background: var(--ifm-color-primary-dark);
+}
+.ce-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+.ce-step {
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-600);
+}
+.ce-timer {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--ifm-color-emphasis-800);
+}
+.ce-timer-low {
+  color: var(--ifm-color-danger);
+}
+.ce-grade {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ifm-color-emphasis-900);
+}
+.ce-score {
+  color: var(--ifm-color-emphasis-800);
+}
+
+/* under-hood — свёрнутое «Как это устроено под капотом» */
+
+.under-hood {
+  margin-top: 1rem;
+  border: 1px dashed var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-surface-color);
+}
+
+.under-hood > summary {
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: var(--ifm-font-weight-semibold);
+  color: var(--ifm-color-emphasis-700);
+}
+
+.under-hood > summary:hover {
+  color: var(--ifm-color-primary);
+}
+
+.under-hood-body {
+  padding: 0 0.75rem 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--ifm-color-emphasis-700);
+}
+
+/* cpv-copy — «Скопировать код» в ComposePreview */
+
+.cpv-codewrap {
+  position: relative;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.cpv-copy {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  border: 1px solid var(--ifm-color-emphasis-400);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  cursor: pointer;
+}
+
+.cpv-copy:hover {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+}
+
+/* pow-miner */
+
+.pm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.pm-label {
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.pm-input {
+  padding: 0.45rem 0.65rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.9rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+}
+
+.pm-input:focus {
+  outline: none;
+  border-color: var(--ifm-color-primary);
+}
+
+.pm-nonce {
+  width: 8rem;
+  margin-left: 0.5rem;
+}
+
+.pm-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.pm-diff {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.pm-diff button {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 999px;
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  cursor: pointer;
+}
+
+.pm-diff button[aria-pressed='true'] {
+  border-color: var(--ifm-color-primary);
+  background: var(--ifm-color-primary);
+  color: var(--ifm-color-white);
+}
+
+.pm-hash {
+  display: block;
+  padding: 0.5rem 0.65rem;
+  word-break: break-all;
+  border-radius: var(--ifm-global-radius);
+}
+
+.pm-hash-found {
+  background: var(--ifm-color-success-contrast-background);
+  border: 1px solid var(--ifm-color-success);
+}
+
+.pm-zeros {
+  color: var(--ifm-color-success);
+  font-weight: var(--ifm-font-weight-bold);
+}
+
+.pm-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.pm-btn {
+  padding: 0.45rem 1.2rem;
+  font-weight: var(--ifm-font-weight-semibold);
+  border: none;
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-color-primary);
+  color: var(--ifm-color-white);
+  cursor: pointer;
+}
+
+.pm-btn:hover {
+  background: var(--ifm-color-primary-dark);
+}
+
+.pm-btn-stop {
+  background: var(--ifm-color-danger);
+}
+
+.pm-btn-stop:hover {
+  background: var(--ifm-color-danger-dark);
+}
+
+.pm-stats {
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.pm-done {
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-color-success-contrast-background);
+  color: var(--ifm-color-success-contrast-foreground);
+  font-weight: var(--ifm-font-weight-semibold);
+}
+
+/* dailychallenge */
+.dc {
+  margin-bottom: 1.5rem;
+}
+
+.dc-plaque {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-surface-color);
+}
+
+.dc-streak {
+  font-weight: var(--ifm-font-weight-bold);
+  color: var(--ifm-font-color-base);
+}
+
+.dc-fire {
+  margin-right: 0.25rem;
+}
+
+.dc-done {
+  color: var(--ifm-color-success);
+}
+
+.dc-quiz {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+}
+
+.dc-intro {
+  margin-bottom: 1rem;
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.9rem;
+}
+
+.dc-question {
+  margin-bottom: 1.25rem;
+}
+
+.dc-q {
+  font-weight: var(--ifm-font-weight-bold);
+  margin-bottom: 0.5rem;
+}
+
+.dc-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.dc-option {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+  cursor: pointer;
+}
+
+.dc-option:hover:not(:disabled) {
+  border-color: var(--ifm-color-primary);
+}
+
+.dc-option:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.dc-right {
+  border-color: var(--ifm-color-success);
+  color: var(--ifm-color-success);
+  font-weight: var(--ifm-font-weight-bold);
+}
+
+.dc-wrong {
+  border-color: var(--ifm-color-danger);
+  color: var(--ifm-color-danger);
+}
+
+.dc-feedback {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.dc-ok {
+  color: var(--ifm-color-success);
+}
+
+.dc-no {
+  color: var(--ifm-color-danger);
+}
+
+.dc-why {
+  color: var(--ifm-color-emphasis-600);
+}
+
+.dc-result {
+  font-weight: var(--ifm-font-weight-bold);
+  color: var(--ifm-color-primary);
+}
+
+/* cert-words (wave 4: сертификат трека + тренировка слов) */
+.cert-progress {
+  margin-top: var(--ifm-spacing-vertical);
+  padding: calc(var(--ifm-spacing-vertical) / 2) var(--ifm-spacing-horizontal);
+  border: 1px dashed var(--ifm-color-emphasis-400);
+  border-radius: var(--ifm-global-radius);
+  color: var(--ifm-color-emphasis-700);
+}
+
+.cert {
+  margin-top: var(--ifm-spacing-vertical);
+}
+
+.cert-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--ifm-z-index-fixed) + 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ifm-spacing-horizontal);
+  background: var(--ifm-background-surface-color);
+}
+
+.cert-modal {
+  max-width: 900px;
+  width: 100%;
+  max-height: 100%;
+  overflow: auto;
+  padding: var(--ifm-spacing-horizontal);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-color);
+  box-shadow: var(--ifm-global-shadow-md);
+}
+
+.cert-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ifm-spacing-horizontal);
+  margin-bottom: var(--ifm-spacing-vertical);
+}
+
+.cert-name-label input {
+  margin-left: 0.5em;
+  padding: 0.3em 0.6em;
+  border: 1px solid var(--ifm-color-emphasis-400);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+}
+
+.cert-close {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.cert-canvas {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--ifm-color-emphasis-300);
+}
+
+.cert-actions {
+  margin-top: var(--ifm-spacing-vertical);
+}
+
+.wt {
+  max-width: 520px;
+}
+
+.wt-counter {
+  margin-bottom: calc(var(--ifm-spacing-vertical) / 2);
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.9rem;
+}
+
+.wt-card {
+  padding: var(--ifm-spacing-vertical) var(--ifm-spacing-horizontal);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-surface-color);
+  min-height: 8rem;
+}
+
+.wt-controls {
+  display: flex;
+  gap: var(--ifm-spacing-horizontal);
+  margin-top: var(--ifm-spacing-vertical);
+}
+
+.wt-empty p,
+.wt-done p {
+  color: var(--ifm-color-emphasis-700);
+}
+
+/* gym-catalog: страница /gym «Тренажёрный зал» */
+
+.gym-section {
+  margin-top: 2rem;
+}
+
+.gym-card {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-surface-color);
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.gym-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.gym-card-name {
+  font-weight: var(--ifm-font-weight-bold);
+}
+
+.gym-chapter {
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.gym-scenarios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* deepen-sims: memoryviz v2 «значение vs ссылка» */
+
+.mv2 {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--ifm-color-emphasis-300);
+}
+
+.mv2-title {
+  font-weight: var(--ifm-font-weight-bold);
+}
+
+.mv2-lead,
+.mv2-note {
+  font-size: 0.9rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.mv2-scene {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.mv2-vars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mv2-arrows {
+  flex: 0 0 auto;
+}
+
+.mv2-arrow {
+  fill: none;
+  stroke: var(--ifm-color-emphasis-500);
+  stroke-width: 2;
+}
+
+.mv2-arrowhead {
+  fill: var(--ifm-color-emphasis-500);
+}
+
+.mv2-arrow-active {
+  stroke: var(--ifm-color-primary);
+  stroke-dasharray: 6 4;
+  animation: mv2-flow 0.6s linear;
+}
+
+.mv2-arrowhead-active {
+  fill: var(--ifm-color-primary);
+}
+
+@keyframes mv2-flow {
+  from { stroke-dashoffset: 30; }
+  to { stroke-dashoffset: 0; }
+}
+
+.mv2-obj {
+  border-color: var(--ifm-color-primary);
+  min-width: 12rem;
+}
+
+.mv2-items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.mv2-item {
+  padding: 0.15rem 0.55rem;
+  border: 1px solid var(--ifm-color-emphasis-400);
+  border-radius: 999px;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.85rem;
+}
+
+.mv2-note code {
+  color: var(--ifm-color-primary);
+}
+
+.mv2-moral {
+  padding: 0.6rem 0.75rem;
+  border-left: 3px solid var(--ifm-color-primary);
+  background: var(--ifm-background-surface-color);
+  border-radius: var(--ifm-global-radius);
+  font-size: 0.9rem;
+}

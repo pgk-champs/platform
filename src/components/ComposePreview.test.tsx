@@ -90,3 +90,31 @@ test('already completed trainer shows done state and does not re-award XP', () =
   fireEvent.click(screen.getByRole('button', { name: 'center' }));
   expect(store.getXp()).toBe(0);
 });
+
+test('copy button writes generated code to the clipboard', async () => {
+  const writeText = vi.fn().mockResolvedValue(undefined);
+  vi.stubGlobal('navigator', { ...navigator, clipboard: { writeText } });
+
+  render(<ComposePreview tree={tree} />);
+  fireEvent.click(screen.getByText('Скопировать код'));
+
+  await screen.findByText('✓ Скопировано');
+  expect(writeText).toHaveBeenCalledTimes(1);
+  expect(writeText.mock.calls[0][0]).toContain('Column(modifier = Modifier.fillMaxSize()');
+
+  vi.unstubAllGlobals();
+});
+
+test('without clipboard API the copy button falls back to selecting the code', () => {
+  vi.stubGlobal('navigator', { ...navigator, clipboard: undefined });
+
+  const { container } = render(<ComposePreview tree={tree} />);
+  fireEvent.click(screen.getByText('Скопировать код'));
+
+  const selected = window.getSelection()?.toString() ?? '';
+  expect(selected).toContain('Column(');
+  // подтверждение «скопировано» не показываем — копирования не было
+  expect(screen.queryByText('✓ Скопировано')).toBeNull();
+
+  vi.unstubAllGlobals();
+});

@@ -16,11 +16,12 @@ import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import HashPlayground from '@site/src/components/HashPlayground';
 import BlockChainDemo from '@site/src/components/BlockChainDemo';
+import PowMiner from '@site/src/components/PowMiner';
 import SignDemo from '@site/src/components/SignDemo';
 
 # Что такое блокчейн
 
-<ChapterProgress chapterId="what-is-blockchain" totalSections={13} totalQuizzes={4} totalTrainers={6} />
+<ChapterProgress chapterId="what-is-blockchain" totalSections={13} totalQuizzes={4} totalTrainers={7} />
 
 ## Зачем это нужно
 
@@ -100,6 +101,12 @@ import SignDemo from '@site/src/components/SignDemo';
 
 <Block kind="trainer" title="Цепочка блоков: испорти и почини" chapterId="what-is-blockchain" blockId="trainer-blockchain-demo">
 <BlockChainDemo chapterId="what-is-blockchain" trainerId="trainer-blockchain-demo" />
+</Block>
+
+А теперь почувствуй, откуда в публичных сетях берётся та самая «тяжёлая работа»: майнинг — это перебор числа nonce до тех пор, пока хеш блока не начнётся с нужного количества нулей. Другого способа найти подходящий nonce не существует — только пробовать снова и снова, и именно поэтому подделать блок задним числом так дорого.
+
+<Block kind="trainer" title="PoW-майнер: подбери nonce" chapterId="what-is-blockchain" blockId="trainer-pow-miner">
+<PowMiner chapterId="what-is-blockchain" trainerId="trainer-pow-miner" />
 </Block>
 
 <Block kind="quiz" title="Блок и хеш" chapterId="what-is-blockchain" blockId="quiz-hash-chain">

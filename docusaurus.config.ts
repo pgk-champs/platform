@@ -76,6 +76,11 @@ const config: Config = {
           position: 'left',
         },
         {
+          to: '/gym',
+          label: 'Зал',
+          position: 'left',
+        },
+        {
           to: '/favorites',
           label: 'Избранное',
           position: 'left',

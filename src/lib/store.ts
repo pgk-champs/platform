@@ -29,6 +29,8 @@ export type FavoriteItem = {
 };
 
 export type QuizResult = { correct: number; total: number; ts: number };
+export type DailyEntry = { correct: number; total: number; ts: number };
+export type ExamResult = { correct: number; total: number; ts: number };
 export type TrainerResult = { result: unknown; ts: number };
 export type QuizLogEntry = { chapterId: string; quizId: string; correct: number; total: number; ts: number };
 
@@ -40,10 +42,13 @@ type State = {
   dismissedHints: string[];
   xp: number;
   achievementsUnlocked: string[];
-  prefs: { os?: OsId };
+  prefs: { os?: OsId; name?: string };
   tocCollapsed: Record<string, boolean>;
   quizLog: QuizLogEntry[];
   blocksCollapsed: Record<string, boolean>;
+  exams: Record<string, ExamResult[]>;
+  wordWeights: Record<string, number>;
+  daily: Record<string, DailyEntry>;
 };
 
 function emptyState(): State {
@@ -59,6 +64,9 @@ function emptyState(): State {
     tocCollapsed: {},
     quizLog: [],
     blocksCollapsed: {},
+    exams: {},
+    wordWeights: {},
+    daily: {},
   };
 }
 
@@ -206,6 +214,41 @@ function getOs(): OsId | undefined {
   return state.prefs.os;
 }
 
+function setName(name: string): void {
+  state.prefs = { ...state.prefs, name };
+  persist();
+}
+
+function getName(): string | undefined {
+  return state.prefs.name;
+}
+
+// --- тренировка слов (простое интервальное повторение) ---
+// Вес слова 1..4: чем выше, тем чаще слово попадается. Новое слово — 2,
+// «знал» — минус 1, «не знал» — плюс 1.
+const WORD_WEIGHT_DEFAULT = 2;
+const WORD_WEIGHT_MAX = 4;
+
+function gradeWord(term: string, known: boolean): void {
+  const w = state.wordWeights[term] ?? WORD_WEIGHT_DEFAULT;
+  const next = known ? Math.max(1, w - 1) : Math.min(WORD_WEIGHT_MAX, w + 1);
+  state.wordWeights = { ...state.wordWeights, [term]: next };
+  persist();
+}
+
+function wordWeight(term: string): number {
+  return state.wordWeights[term] ?? WORD_WEIGHT_DEFAULT;
+}
+
+// Очередь раунда: слова по убыванию веса (незнакомые — первыми, порядок
+// внутри одного веса сохраняется), а слова с весом выше дефолтного идут
+// вторым кругом в конец — так «не знал» показываются чаще за раунд.
+function wordsQueue(terms: string[]): string[] {
+  const sorted = [...terms].sort((a, b) => wordWeight(b) - wordWeight(a));
+  const repeats = sorted.filter((t) => wordWeight(t) > WORD_WEIGHT_DEFAULT);
+  return [...sorted, ...repeats];
+}
+
 // --- collapsible TOC state ---
 function setTocCollapsed(chapterId: string, collapsed: boolean): void {
   state.tocCollapsed = { ...state.tocCollapsed, [chapterId]: collapsed };
@@ -245,6 +288,55 @@ function quizStats(chapterId: string, quizId: string) {
   return { attempts, best, count: attempts.length, streak };
 }
 
+// --- chapter exams (timed final quiz, retakes allowed) ---
+function markExamDone(chapterId: string, score: { correct: number; total: number }): void {
+  const attempts = state.exams[chapterId] ?? [];
+  state.exams = { ...state.exams, [chapterId]: [...attempts, { ...score, ts: Date.now() }] };
+  persist();
+}
+
+function getExamStats(chapterId: string) {
+  const attempts = state.exams[chapterId] ?? [];
+  let best: ExamResult | undefined;
+  for (const a of attempts) {
+    if (!best || a.correct > best.correct) best = a;
+  }
+  return { attempts, best, count: attempts.length };
+}
+
+// --- daily challenge ---
+// dateKey — 'YYYY-MM-DD' (new Date().toISOString().slice(0, 10)); дату считает
+// вызывающий код в обработчике/эффекте, поэтому store остаётся SSR-safe.
+const DAY_MS = 86400000;
+
+function prevDayKey(dateKey: string): string {
+  return new Date(new Date(`${dateKey}T00:00:00Z`).getTime() - DAY_MS).toISOString().slice(0, 10);
+}
+
+/** Записывает прохождение вызова дня. Второй раз за тот же день — false. */
+function completeDaily(dateKey: string, score: { correct: number; total: number }): boolean {
+  if (state.daily[dateKey]) return false;
+  state.daily = { ...state.daily, [dateKey]: { ...score, ts: Date.now() } };
+  persist();
+  return true;
+}
+
+/**
+ * Состояние вызова дня на дату todayKey: пройден ли сегодня, результат
+ * и серия подряд идущих дней. Если сегодня ещё не пройден, серия
+ * считается от вчера — день ещё не потерян.
+ */
+function dailyState(todayKey: string): { done: boolean; today?: DailyEntry; streak: number } {
+  const today = state.daily[todayKey];
+  let key = today ? todayKey : prevDayKey(todayKey);
+  let streak = 0;
+  while (state.daily[key]) {
+    streak += 1;
+    key = prevDayKey(key);
+  }
+  return { done: !!today, today, streak };
+}
+
 // --- progress / snapshot ---
 function getProgress() {
   return { sections: state.sections, quizzes: state.quizzes, trainers: state.trainers };
@@ -268,10 +360,15 @@ export const store = {
   addXp,
   getXp,
   achievements: { unlock: achUnlock, list: achList, isUnlocked: achIsUnlocked },
-  prefs: { setOs, getOs },
+  prefs: { setOs, getOs, setName, getName },
+  words: { queue: wordsQueue, grade: gradeWord, weight: wordWeight },
   toc: { setCollapsed: setTocCollapsed, isCollapsed: isTocCollapsed },
   block: { setCollapsed: setBlockCollapsed, isCollapsed: isBlockCollapsed },
   quiz: { attempts: quizAttempts, stats: quizStats },
+  markExamDone,
+  getExamStats,
+  completeDaily,
+  dailyState,
   snapshot,
   /** Тестовый хелпер: сбрасывает состояние в памяти и в localStorage. */
   __resetForTests(): void {

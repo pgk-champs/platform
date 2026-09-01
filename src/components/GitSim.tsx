@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { store } from '../lib/store';
+import UnderHood from './UnderHood';
 import './trainers.css';
 
 // Визуальный симулятор git: виртуальный репозиторий в памяти, терминал с
@@ -199,6 +200,87 @@ function logText(sim: Sim, repo: Repo, oneline: boolean): string {
   return entries.join(oneline ? '\n' : '\n\n');
 }
 
+// Псевдо-хеш содержимого для строки index в diff (у настоящего git это хеш blob-объекта).
+function blobHash(s: string): string {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
+  return h.toString(16).padStart(7, '0').slice(0, 7);
+}
+
+// Diff одного файла: общий префикс/суффикс — контекст (до 3 строк, как у git),
+// середина — минус-строки старого и плюс-строки нового. Формат сверен с git 2.x.
+function fileDiff(f: string, oldS: string, newS: string): string {
+  const a = oldS.split('\n');
+  const b = newS.split('\n');
+  let pre = 0;
+  while (pre < a.length && pre < b.length && a[pre] === b[pre]) pre++;
+  let post = 0;
+  while (post < a.length - pre && post < b.length - pre && a[a.length - 1 - post] === b[b.length - 1 - post]) post++;
+  const del = a.slice(pre, a.length - post);
+  const add = b.slice(pre, b.length - post);
+  const ctxPre = Math.min(pre, 3);
+  const ctxPost = Math.min(post, 3);
+  const start = pre - ctxPre + 1;
+  const range = (n: number) => (n === 1 ? `${start}` : `${start},${n}`);
+  return [
+    `diff --git a/${f} b/${f}`,
+    `index ${blobHash(oldS)}..${blobHash(newS)} 100644`,
+    `--- a/${f}`,
+    `+++ b/${f}`,
+    `@@ -${range(ctxPre + del.length + ctxPost)} +${range(ctxPre + add.length + ctxPost)} @@`,
+    ...a.slice(pre - ctxPre, pre).map((l) => ` ${l}`),
+    ...del.map((l) => `-${l}`),
+    ...add.map((l) => `+${l}`),
+    ...a.slice(a.length - post, a.length - post + ctxPost).map((l) => ` ${l}`),
+  ].join('\n');
+}
+
+// git diff без аргументов: рабочая директория против индекса (или HEAD, если файла нет в индексе).
+function diffText(sim: Sim, repo: Repo): string {
+  const snap = headSnap(sim, repo);
+  const chunks: string[] = [];
+  for (const f of Object.keys(repo.files).sort()) {
+    const base = repo.index[f] ?? snap[f];
+    if (base === undefined || repo.files[f] === base) continue; // untracked или без правок — git diff молчит
+    chunks.push(fileDiff(f, base, repo.files[f]));
+  }
+  return chunks.join('\n');
+}
+
+// git log --graph --oneline: ASCII-граф. Колонки — «ожидаемые» коммиты; идём от новых
+// к старым, звезда — коммит, |\ — расхождение на два родителя, |/ — схождение веток.
+function graphLogText(sim: Sim, repo: Repo): string {
+  const headHash = repo.branches[repo.head];
+  if (!headHash) return `fatal: your current branch '${repo.head}' does not have any commits yet`;
+  const anc = ancestors(sim, headHash);
+  const list = sim.order.filter((h) => anc.has(h)).reverse();
+  const cols: (string | undefined)[] = [headHash];
+  const rows: string[] = [];
+  const bar = (n: number) => Array(n).fill('|').join(' ');
+  for (const h of list) {
+    let ci = cols.indexOf(h);
+    if (ci === -1) {
+      cols.push(h);
+      ci = cols.length - 1;
+    }
+    for (let j = cols.length - 1; j > ci; j--) {
+      if (cols[j] === h) {
+        cols.splice(j, 1);
+        rows.push(bar(j) + '/'); // ветка влилась — колонка схлопывается
+      }
+    }
+    const c = sim.commits[h];
+    const marks = cols.map((_, i) => (i === ci ? '*' : '|')).join(' ');
+    rows.push(`${marks}${c.parents.length > 1 ? '  ' : ''} ${h}${decorations(repo, h)} ${c.message}`);
+    cols[ci] = c.parents[0];
+    if (c.parents.length > 1) {
+      cols.splice(ci + 1, 0, c.parents[1]);
+      rows.push(bar(ci + 1) + '\\'); // ponytail: третью параллельную ветку рисуем упрощённо — глубже сим не заходит
+    }
+  }
+  return rows.join('\n');
+}
+
 function tokenize(line: string): string[] {
   const out: string[] = [];
   const re = /"([^"]*)"|'([^']*)'|(\S+)/g;
@@ -214,7 +296,9 @@ function helpText(hasRemote: boolean): string {
     '  git status                    — состояние файлов',
     '  git add <файл|.>              — добавить изменения в индекс',
     '  git commit -m "сообщение"     — создать коммит',
-    '  git log [--oneline]           — история коммитов',
+    '  git diff                      — незастейджённые изменения (- было, + стало)',
+    '  git restore <файл|.>          — отменить незастейджённые правки',
+    '  git log [--oneline] [--graph] — история коммитов (--graph — ASCII-граф веток)',
     '  git branch [имя]              — список веток / новая ветка',
     '  git switch <имя>  (checkout)  — перейти на ветку, -c/-b — создать и перейти',
     '  git merge <ветка>             — слить ветку, --abort — отменить слияние',
@@ -355,7 +439,35 @@ function exec(prev: Sim, raw: string): Sim {
     }
 
     case 'log': {
-      out(logText(sim, repo, tok.includes('--oneline')));
+      if (tok.includes('--graph')) out(graphLogText(sim, repo));
+      else out(logText(sim, repo, tok.includes('--oneline')));
+      return sim;
+    }
+
+    case 'diff': {
+      const d = diffText(sim, repo);
+      if (d) out(d);
+      else sim.lines.push({ t: 'hint', s: '(незастейджённых изменений нет — git diff молчит)' });
+      return sim;
+    }
+
+    case 'restore': {
+      const target = tok[2];
+      if (!target) {
+        out('fatal: you must specify path(s) to restore');
+        return sim;
+      }
+      const known = (f: string) => f in snap || f in repo.index;
+      const files = target === '.' ? Object.keys(repo.files).filter(known) : [target];
+      if (target !== '.' && !known(target)) {
+        out(`error: pathspec '${target}' did not match any file(s) known to git`);
+        return sim;
+      }
+      for (const f of files) repo.files[f] = repo.index[f] ?? snap[f];
+      sim.lines.push({
+        t: 'hint',
+        s: `(незастейджённые правки ${target === '.' ? 'всех файлов' : `в ${target}`} отменены — вернулось состояние из индекса/HEAD)`,
+      });
       return sim;
     }
 
@@ -915,7 +1027,7 @@ export default function GitSim({ scenario = 'free', quest, chapterId, trainerId 
             </button>
           </form>
           <div className="gs-help-line">
-            Команды: git init · status · add · commit -m · log · branch · switch · merge
+            Команды: git init · status · add · commit -m · diff · log · branch · switch · merge · restore
             {sim.origin ? ' · push · pull' : ''} · edit · help · clear
           </div>
           <FilesPanel sim={sim} repo={sim.local} />
@@ -932,6 +1044,15 @@ export default function GitSim({ scenario = 'free', quest, chapterId, trainerId 
           ) : null}
         </div>
       </div>
+
+      <UnderHood>
+        Внутри — не настоящий git, а его модель в памяти: коммит — объект с хешем, сообщением, списком родителей и
+        полным снимком файлов, а ветка — просто указатель на хеш коммита. Команды меняют этот граф объектов, при этом
+        формулировки вывода сняты с настоящего git 2.x, чтобы глаз привыкал к реальному терминалу. Граф справа рисуется
+        по тем же объектам: SVG-кружки — коммиты, линии — связи «родитель — потомок», а merge с расхождением создаёт
+        коммит с двумя родителями, ровно как в настоящем git. Push и pull в режиме с origin — упрощённая пересылка
+        недостающих коммитов между двумя такими репозиториями.
+      </UnderHood>
     </div>
   );
 }

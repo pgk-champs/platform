@@ -44,6 +44,43 @@ test('creating a new val on top adds the new cell', () => {
   expect(screen.getByText('120')).toBeTruthy();
 });
 
+test('секция «значение vs ссылка»: две val-переменные, один общий MutableList', () => {
+  const { container } = render(<MemoryViz />);
+  expect(screen.getByText('Значение vs ссылка')).toBeTruthy();
+  expect(screen.getAllByText('val a').length).toBeGreaterThan(0);
+  expect(screen.getAllByText('val b').length).toBeGreaterThan(0);
+  expect(screen.getAllByText('MutableList').length).toBeGreaterThan(0);
+  expect(screen.getByText('Алиса')).toBeTruthy();
+  expect(screen.getByText('Богдан')).toBeTruthy();
+  // обе стрелки нарисованы
+  expect(container.querySelectorAll('.mv2-arrow').length).toBe(2);
+  // факт из главы classes-collections
+  expect(container.textContent).toContain('Коробка прибита, содержимое меняется');
+});
+
+test('add через a виден и через b: объект один, заметка объясняет почему', () => {
+  const { container } = render(<MemoryViz />);
+  fireEvent.click(screen.getByText('a.add("Соня")'));
+  expect(screen.getByText('Соня')).toBeTruthy();
+  expect(container.textContent).toContain('объект-то один');
+  // анимация течёт по стрелке той переменной, через которую добавляли
+  expect(container.querySelectorAll('.mv2-arrow-active').length).toBe(1);
+  // следующее имя добавляется уже через b — в тот же список
+  fireEvent.click(screen.getByText('b.add("Тимур")'));
+  expect(screen.getByText('Тимур')).toBeTruthy();
+  expect(container.querySelectorAll('.mv2-item').length).toBe(4);
+});
+
+test('список конечен: после всех имён кнопки отключаются', () => {
+  render(<MemoryViz />);
+  for (const name of ['Соня', 'Тимур', 'Ринат', 'Диана']) {
+    fireEvent.click(screen.getByText(`a.add("${name}")`));
+  }
+  const full = screen.getAllByText('список полон');
+  expect(full.length).toBe(2);
+  full.forEach((btn) => expect((btn as HTMLButtonElement).disabled).toBe(true));
+});
+
 test('all three steps mark trainer done and award xp once', () => {
   render(<MemoryViz chapterId="kotlin-vars" trainerId="trainer-memory-viz" />);
   const [valBtn, varBtn] = screen.getAllByText('Присвоить новое значение');

@@ -193,6 +193,66 @@ test('remote-demo: push после коммита коллеги отклоня�
   expect(text()).toMatch(/[0-9a-f]{7}\.\.[0-9a-f]{7} {2}main -> main/);
 });
 
+test('git diff: формат как у настоящего git, staged и untracked не показываются', () => {
+  const { container } = render(<GitSim scenario="branches" />);
+  const text = () => container.textContent ?? '';
+
+  run('git diff');
+  expect(text()).toContain('незастейджённых изменений нет');
+
+  run('edit README.md Проект PGK, вторая версия');
+  run('git diff');
+  expect(text()).toContain('diff --git a/README.md b/README.md');
+  expect(text()).toContain('--- a/README.md');
+  expect(text()).toContain('+++ b/README.md');
+  expect(text()).toContain('@@ -1 +1 @@');
+  expect(text()).toContain('-Проект PGK\n+Проект PGK, вторая версия');
+
+  run('git add README.md');
+  run('git diff');
+  // после add изменений вне индекса нет — второй раз выводится «молчит»
+  expect(text().match(/незастейджённых изменений нет/g)?.length).toBe(2);
+});
+
+test('git log --graph --oneline: ASCII-граф с расхождением и merge-коммитом', () => {
+  const { container } = render(<GitSim scenario="branches" />);
+  const text = () => container.textContent ?? '';
+
+  run('git switch -c slow');
+  run('edit slow.txt раз');
+  run('git add .');
+  run('git commit -m "правка в slow"');
+  run('git switch main');
+  run('edit other.txt два');
+  run('git add .');
+  run('git commit -m "правка в main"');
+  run('git merge slow');
+  run('git log --graph --oneline');
+
+  expect(text()).toMatch(/\*   [0-9a-f]{7} \(HEAD -> main\) Merge branch 'slow'/);
+  expect(text()).toContain('|\\');
+  expect(text()).toMatch(/\* \| [0-9a-f]{7} правка в main/);
+  expect(text()).toMatch(/\| \* [0-9a-f]{7} \(slow\) правка в slow/);
+  expect(text()).toContain('|/');
+  expect(text()).toMatch(/\|\/\n\* [0-9a-f]{7} начало проекта/);
+});
+
+test('git restore откатывает незастейджённое, чужой файл — ошибка pathspec', () => {
+  const { container } = render(<GitSim scenario="branches" />);
+  const text = () => container.textContent ?? '';
+
+  run('edit README.md испорченный вариант');
+  run('git restore README.md');
+  run('git status');
+  expect(text()).toContain('nothing to commit, working tree clean');
+
+  run('git restore nope.txt');
+  expect(text()).toContain("error: pathspec 'nope.txt' did not match any file(s) known to git");
+
+  run('git restore');
+  expect(text()).toContain('fatal: you must specify path(s) to restore');
+});
+
 test('дружелюбные ошибки: неизвестная команда и несуществующая ветка', () => {
   const { container } = render(<GitSim scenario="branches" />);
   const text = () => container.textContent ?? '';

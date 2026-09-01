@@ -115,6 +115,9 @@ export default function Favorites() {
     <Layout title="Избранное" description="Сохранённые тренажёры, квизы и материалы платформы">
       <main className="container margin-vert--lg">
         <h1>Избранное</h1>
+        <p>
+          <Link to="/words">Тренировать слова →</Link>
+        </p>
         {items.length === 0 ? (
           <p className="fav-empty">
             Пока пусто. Отмечайте звёздочкой ★ тренажёры, квизы и другие блоки на страницах глав — здесь

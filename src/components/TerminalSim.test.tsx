@@ -95,6 +95,59 @@ test('arrow up recalls history, Tab completes a directory name', () => {
   expect(input().value).toBe('cd projects/');
 });
 
+test('grep: по файлу и через конвейер, ошибки как у настоящего grep', () => {
+  render(<TerminalSim initialFs={{ 'log.txt': 'ошибка раз\nвсё хорошо\nошибка два' }} />);
+  run('grep ошибка log.txt');
+  expect(screen.getByText('ошибка раз')).toBeTruthy();
+  expect(screen.getByText('ошибка два')).toBeTruthy();
+  expect(screen.queryByText('всё хорошо')).toBeNull();
+  run('cat log.txt | grep хорошо');
+  expect(screen.getByText('всё хорошо')).toBeTruthy();
+  run('grep x nope.txt');
+  expect(screen.getByText('grep: nope.txt: No such file or directory')).toBeTruthy();
+});
+
+test('find -name: шаблон со звёздочкой, поиск от текущей папки', () => {
+  render(<TerminalSim initialFs={{ docs: { 'a.txt': '1', 'b.md': '2' }, 'c.txt': '3' }} />);
+  run('find . -name "*.txt"');
+  expect(screen.getByText('./docs/a.txt')).toBeTruthy();
+  expect(screen.getByText('./c.txt')).toBeTruthy();
+  expect(screen.queryByText('./docs/b.md')).toBeNull();
+  run('find nope');
+  expect(screen.getByText("find: 'nope': No such file or directory")).toBeTruthy();
+});
+
+test('head/tail -n и wc -l, в том числе в конвейере', () => {
+  const content = ['строка 1', 'строка 2', 'строка 3', 'строка 4', 'строка 5'].join('\n');
+  render(<TerminalSim initialFs={{ 'f.txt': content }} />);
+  run('head -n 2 f.txt');
+  expect(screen.getByText('строка 1')).toBeTruthy();
+  expect(screen.getByText('строка 2')).toBeTruthy();
+  expect(screen.queryByText('строка 3')).toBeNull();
+  run('tail -n 1 f.txt');
+  expect(screen.getByText('строка 5')).toBeTruthy();
+  run('wc -l f.txt');
+  expect(screen.getByText('5 f.txt')).toBeTruthy();
+  run('cat f.txt | wc -l');
+  expect(screen.getByText('5')).toBeTruthy();
+  run('grep строка f.txt | head -n 1 | wc -l');
+  expect(screen.getByText('1')).toBeTruthy();
+});
+
+test('man выдаёт справку из словаря, для неизвестной команды — как настоящий man', () => {
+  render(<TerminalSim />);
+  run('man grep');
+  expect(screen.getByText('grep — найти строки, содержащие текст')).toBeTruthy();
+  run('man kotlin');
+  expect(screen.getByText('No manual entry for kotlin')).toBeTruthy();
+});
+
+test('пустое звено конвейера — синтаксическая ошибка bash', () => {
+  render(<TerminalSim />);
+  run('ls |');
+  expect(screen.getByText("bash: syntax error near unexpected token `|'")).toBeTruthy();
+});
+
 test('cp -r copies a directory, plain cp on directory refuses', () => {
   render(<TerminalSim initialFs={{ src: { 'a.txt': 'data' } }} />);
   run('cp src backup');

@@ -1,6 +1,7 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { store } from '../lib/store';
 import { sha256Hex } from '../lib/sha256';
+import UnderHood from './UnderHood';
 import './trainers.css';
 
 const XP = 10;
@@ -90,6 +91,14 @@ export default function HashPlayground({
       {rewarded ? (
         <div className="hc-reward">✓ Готово! +{XP} XP — ты увидел лавинный эффект своими глазами</div>
       ) : null}
+
+      <UnderHood>
+        Хеш здесь считает не наш код, а встроенный в браузер WebCrypto: вызов crypto.subtle.digest(&apos;SHA-256&apos;,
+        байты текста) возвращает 32 байта, которые мы переводим в 64 hex-символа. Это тот же самый SHA-256, что работает
+        в настоящих блокчейнах — никакой упрощённой учебной версии. Подсветка отличий устроена просто: две hex-строки
+        сравниваются посимвольно, совпадения остаются серыми, отличия подсвечиваются. Вся «магия» лавинного эффекта
+        происходит внутри самой хеш-функции, компонент её только показывает.
+      </UnderHood>
     </div>
   );
 }

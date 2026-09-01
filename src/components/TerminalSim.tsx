@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { store } from '../lib/store';
+import UnderHood from './UnderHood';
 import './trainers.css';
 
 const FIRST_XP = 10;
@@ -28,7 +29,32 @@ type Dir = JsonTree;
 type Line = { text: string; kind: 'cmd' | 'out' | 'err'; prompt?: string };
 
 const HOME_SEGS = ['home', 'student'];
-const COMMANDS = ['pwd', 'ls', 'cd', 'mkdir', 'touch', 'cp', 'mv', 'rm', 'cat', 'echo', 'clear', 'help'];
+const COMMANDS = [
+  'pwd', 'ls', 'cd', 'mkdir', 'touch', 'cp', 'mv', 'rm', 'cat', 'echo',
+  'grep', 'find', 'head', 'tail', 'wc', 'man', 'clear', 'help',
+];
+
+// Краткие man-страницы. Ключи совпадают со списком COMMANDS.
+const MAN: Record<string, string[]> = {
+  pwd: ['pwd — print working directory', 'Печатает абсолютный путь текущей папки.', 'пример: pwd'],
+  ls: ['ls — list, список файлов и папок', 'использование: ls [-l] [-a] [путь]', '-l — подробный формат (права, размер), -a — показать скрытые.', 'пример: ls -la ~/docs'],
+  cd: ['cd — change directory, сменить папку', 'использование: cd [путь]', 'cd .. — на уровень вверх, cd без аргумента — домой (~).', 'пример: cd projects/site'],
+  mkdir: ['mkdir — make directory, создать папку', 'использование: mkdir [-p] <имя>', '-p — создать сразу всю цепочку родителей.', 'пример: mkdir -p a/b/c'],
+  touch: ['touch — создать пустой файл (или обновить дату)', 'использование: touch <файл>', 'пример: touch notes.txt'],
+  cat: ['cat — concatenate, показать содержимое файла', 'использование: cat <файл>', 'В конвейере без аргумента передаёт вход дальше.', 'пример: cat notes.txt'],
+  echo: ['echo — вывести текст', 'использование: echo <текст> [> файл | >> файл]', '> — записать в файл (перезаписав), >> — дописать в конец.', 'пример: echo "привет" > hi.txt'],
+  cp: ['cp — copy, копировать', 'использование: cp [-r] <откуда> <куда>', '-r — рекурсивно, обязателен для папок.', 'пример: cp -r src backup'],
+  mv: ['mv — move, переместить или переименовать', 'использование: mv <откуда> <куда>', 'пример: mv draft.txt final.txt'],
+  rm: ['rm — remove, удалить', 'использование: rm [-r] [-f] <что>', '-r — рекурсивно для папок, -f — без ошибок о несуществующих.', 'пример: rm -r old_dir'],
+  grep: ['grep — найти строки, содержащие текст', 'использование: grep <что искать> [файл]', 'Без файла фильтрует то, что пришло по конвейеру |.', 'пример: cat log.txt | grep ошибка'],
+  find: ['find — искать файлы и папки по имени', 'использование: find [путь] -name <шаблон>', 'В шаблоне * — любые символы, ? — один символ. Шаблон бери в кавычки.', 'пример: find . -name "*.txt"'],
+  head: ['head — первые строки файла', 'использование: head [-n N] [файл]', 'По умолчанию 10 строк. Без файла читает из конвейера.', 'пример: head -n 3 log.txt'],
+  tail: ['tail — последние строки файла', 'использование: tail [-n N] [файл]', 'По умолчанию 10 строк. Без файла читает из конвейера.', 'пример: tail -n 3 log.txt'],
+  wc: ['wc — word count, посчитать строки, слова и символы', 'использование: wc [-l] [файл]', '-l — только количество строк. Без файла считает вход из конвейера.', 'пример: ls | wc -l'],
+  man: ['man — manual, справка по команде', 'использование: man <команда>', 'пример: man grep'],
+  clear: ['clear — очистить экран терминала', 'использование: clear'],
+  help: ['help — список всех команд тренажёра', 'использование: help'],
+};
 
 function isDir(n: Dir | string | undefined): n is Dir {
   return typeof n === 'object' && n !== null;
@@ -109,8 +135,54 @@ function tokenize(s: string): string[] {
 
 type ExecResult = { lines: { text: string; kind: 'out' | 'err' }[]; cwd: string[]; clear?: boolean };
 
-// Выполняет одну команду. Мутирует root (он живёт в ref компонента).
+// Режет строку по | вне кавычек — звенья конвейера.
+function splitPipes(s: string): string[] {
+  const parts: string[] = [];
+  let cur = '';
+  let quote: string | null = null;
+  for (const ch of s) {
+    if (quote) {
+      cur += ch;
+      if (ch === quote) quote = null;
+    } else if (ch === '"' || ch === "'") {
+      quote = ch;
+      cur += ch;
+    } else if (ch === '|') {
+      parts.push(cur);
+      cur = '';
+    } else {
+      cur += ch;
+    }
+  }
+  parts.push(cur);
+  return parts;
+}
+
+// Точка входа: одиночная команда или конвейер cmd1 | cmd2 (| cmd3 ...).
+// Вывод (out) каждого звена становится входом (stdin) следующего; ошибки идут сразу на экран.
 function exec(root: Dir, cwd: string[], input: string): ExecResult {
+  const parts = splitPipes(input);
+  if (parts.length === 1) return execOne(root, cwd, input, null);
+  if (parts.some((p) => !p.trim())) {
+    return { lines: [{ text: "bash: syntax error near unexpected token `|'", kind: 'err' }], cwd };
+  }
+  const lines: ExecResult['lines'] = [];
+  let stdin: string[] | null = null;
+  for (let i = 0; i < parts.length; i++) {
+    const r = execOne(root, cwd, parts[i], stdin);
+    if (i < parts.length - 1) {
+      lines.push(...r.lines.filter((l) => l.kind === 'err'));
+      stdin = r.lines.filter((l) => l.kind === 'out').map((l) => l.text);
+    } else {
+      lines.push(...r.lines);
+    }
+  }
+  return { lines, cwd }; // звенья конвейера живут в «подоболочке»: cd внутри | не меняет текущую папку
+}
+
+// Выполняет одну команду. Мутирует root (он живёт в ref компонента).
+// stdin — строки, пришедшие по конвейеру (null вне конвейера).
+function execOne(root: Dir, cwd: string[], input: string, stdin: string[] | null): ExecResult {
   const lines: ExecResult['lines'] = [];
   const o = (t: string) => lines.push({ text: t, kind: 'out' });
   const e = (t: string) => lines.push({ text: t, kind: 'err' });
@@ -210,6 +282,10 @@ function exec(root: Dir, cwd: string[], input: string): ExecResult {
     }
 
     case 'cat': {
+      if (!args.length && stdin) {
+        stdin.forEach(o);
+        break;
+      }
       for (const t of args) {
         const node = getNode(root, resolvePath(cwd, t));
         if (node === undefined) e(`cat: ${t}: No such file or directory`);
@@ -330,6 +406,162 @@ function exec(root: Dir, cwd: string[], input: string): ExecResult {
       break;
     }
 
+    case 'grep': {
+      const pattern = args[0];
+      if (pattern === undefined) {
+        e('использование: grep <что искать> [файл]');
+        break;
+      }
+      let src: string[] | null = null;
+      if (args[1] !== undefined) {
+        const node = getNode(root, resolvePath(cwd, args[1]));
+        if (node === undefined) {
+          e(`grep: ${args[1]}: No such file or directory`);
+          break;
+        }
+        if (isDir(node)) {
+          e(`grep: ${args[1]}: Is a directory`);
+          break;
+        }
+        src = node.split('\n');
+      } else if (stdin) {
+        src = stdin;
+      }
+      if (!src) {
+        e('grep: укажи файл — или подай вход по конвейеру: команда | grep <что искать>');
+        break;
+      }
+      src.filter((l) => l.includes(pattern)).forEach(o);
+      break;
+    }
+
+    case 'find': {
+      // find [путь] -name <шаблон>. Разбираем rawArgs: -name съедается общим парсером флагов.
+      const ni = rawArgs.indexOf('-name');
+      const pattern = ni >= 0 ? rawArgs[ni + 1] : undefined;
+      if (ni >= 0 && pattern === undefined) {
+        e('find: -name: требуется аргумент (шаблон имени)');
+        break;
+      }
+      const rest = ni < 0 ? rawArgs : rawArgs.filter((_, i) => i !== ni && i !== ni + 1);
+      const startTok = rest[0] ?? '.';
+      const startSegs = resolvePath(cwd, startTok);
+      const startNode = getNode(root, startSegs);
+      if (startNode === undefined) {
+        e(`find: '${startTok}': No such file or directory`);
+        break;
+      }
+      const re = pattern
+        ? new RegExp(
+            '^' +
+              pattern
+                .split('')
+                .map((ch) => (ch === '*' ? '.*' : ch === '?' ? '.' : ch.replace(/[.+^${}()|[\]\\]/, '\\$&')))
+                .join('') +
+              '$',
+          )
+        : null;
+      const walk = (node: Dir | string, path: string, name: string) => {
+        if (!re || re.test(name)) o(path);
+        if (isDir(node)) for (const k of Object.keys(node)) walk(node[k], `${path}/${k}`, k);
+      };
+      const shownStart = startTok.replace(/\/+$/, '') || '/';
+      walk(startNode, shownStart, shownStart.split('/').pop() || '/');
+      break;
+    }
+
+    case 'head':
+    case 'tail': {
+      let n = 10;
+      let file: string | undefined;
+      let badN: string | undefined;
+      for (let i = 0; i < rawArgs.length; i++) {
+        const a = rawArgs[i];
+        if (a === '-n') {
+          const v = rawArgs[++i];
+          if (!v || !/^\d+$/.test(v)) badN = v ?? '';
+          else n = parseInt(v, 10);
+        } else if (/^-\d+$/.test(a)) {
+          n = parseInt(a.slice(1), 10);
+        } else if (!a.startsWith('-')) {
+          file = a;
+        }
+      }
+      if (badN !== undefined) {
+        e(`${cmd}: invalid number of lines: '${badN}'`);
+        break;
+      }
+      let src: string[] | null = null;
+      if (file !== undefined) {
+        const node = getNode(root, resolvePath(cwd, file));
+        if (node === undefined) {
+          e(`${cmd}: cannot open '${file}' for reading: No such file or directory`);
+          break;
+        }
+        if (isDir(node)) {
+          e(`${cmd}: error reading '${file}': Is a directory`);
+          break;
+        }
+        src = node.split('\n');
+      } else if (stdin) {
+        src = stdin;
+      }
+      if (!src) {
+        e(`использование: ${cmd} [-n N] <файл> — или через конвейер: команда | ${cmd} -n N`);
+        break;
+      }
+      (cmd === 'head' ? src.slice(0, n) : n === 0 ? [] : src.slice(-n)).forEach(o);
+      break;
+    }
+
+    case 'wc': {
+      let text: string | null = null;
+      let name = '';
+      const file = args[0];
+      if (file !== undefined) {
+        const node = getNode(root, resolvePath(cwd, file));
+        if (node === undefined) {
+          e(`wc: ${file}: No such file or directory`);
+          break;
+        }
+        if (isDir(node)) {
+          e(`wc: ${file}: Is a directory`);
+          break;
+        }
+        text = node;
+        name = ` ${file}`;
+      } else if (stdin) {
+        text = stdin.join('\n');
+      }
+      if (text === null) {
+        e('использование: wc [-l] <файл> — или через конвейер: команда | wc -l');
+        break;
+      }
+      const lns = text === '' ? 0 : text.split('\n').length;
+      if (flags.has('l')) {
+        o(`${lns}${name}`);
+      } else {
+        const words = text.split(/\s+/).filter(Boolean).length;
+        o(`${lns} ${words} ${text.length}${name}`);
+      }
+      break;
+    }
+
+    case 'man': {
+      const t = args[0];
+      if (!t) {
+        e('Какая страница руководства нужна? Например: man ls');
+        break;
+      }
+      const page = MAN[t];
+      if (!page) {
+        e(`No manual entry for ${t}`);
+        break;
+      }
+      page.forEach(o);
+      break;
+    }
+
     case 'clear':
       res.clear = true;
       break;
@@ -347,7 +579,13 @@ function exec(root: Dir, cwd: string[], input: string): ExecResult {
         '  cp [-r] <откуда> <куда>  — копировать (-r для папок)',
         '  mv <откуда> <куда>       — переместить или переименовать',
         '  rm [-r] <что>            — удалить (-r для папок)',
+        '  grep <текст> [файл]      — найти строки с текстом (работает и после |)',
+        '  find [путь] -name <шаблон> — искать файлы по имени (* — любые символы)',
+        '  head/tail [-n N] [файл]  — первые/последние N строк (по умолчанию 10)',
+        '  wc [-l] [файл]           — посчитать строки, слова, символы (-l — строки)',
+        '  man <команда>            — краткая справка по команде',
         '  clear                    — очистить экран',
+        'Конвейер: cmd1 | cmd2 — вывод первой команды идёт на вход второй (cat log.txt | grep ошибка).',
         'Подсказки: стрелки вверх/вниз — история, Tab — автодополнение.',
       ].forEach(o);
       break;
@@ -524,6 +762,14 @@ export default function TerminalSim({ initialFs, quest, chapterId, trainerId }: 
           />
         </div>
       </div>
+
+      <UnderHood>
+        Никакого настоящего Linux здесь нет: файловая система — обычный JS-объект в памяти браузера, где папка — это
+        вложенный объект, а файл — строка с содержимым. Команды ls, cd, mkdir, rm и остальные — функции, которые читают
+        и меняют этот объект, а cp -r — просто глубокое копирование куска JSON. После каждой команды проверка квеста
+        проходит по требуемым путям и смотрит, существуют ли они в этом дереве. Перезагрузишь страницу — «диск»
+        создастся заново с нуля, так что ломать тут можно безнаказанно.
+      </UnderHood>
     </div>
   );
 }
