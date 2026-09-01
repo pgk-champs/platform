@@ -777,6 +777,245 @@
   }
 }
 
+.ct-live {
+  margin: 0.4rem 0 0;
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.85rem;
+}
+
+.ct-best {
+  margin-top: 0.5rem;
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.85rem;
+}
+
+.ct-goal-ok {
+  color: var(--ifm-color-success);
+  font-weight: var(--ifm-font-weight-bold);
+}
+
+.ct-goal-no {
+  color: var(--ifm-color-emphasis-700);
+}
+
+.kb {
+  margin: var(--ifm-leading) 0;
+}
+
+.kb-svg {
+  display: block;
+}
+
+.kb-key rect {
+  fill: var(--ifm-background-surface-color);
+  stroke: var(--ifm-color-emphasis-400);
+  stroke-width: 1;
+}
+
+.kb-key {
+  cursor: default;
+  outline: none;
+}
+
+.kb-key:hover rect,
+.kb-key:focus-visible rect {
+  stroke: var(--ifm-color-primary);
+  stroke-width: 2;
+}
+
+.kb-key-label {
+  font-size: 15px;
+  fill: var(--ifm-font-color-base);
+  font-family: var(--ifm-font-family-base);
+}
+
+.kb-key-shift {
+  font-size: 11px;
+  fill: var(--ifm-color-emphasis-600);
+  font-family: var(--ifm-font-family-base);
+}
+
+.kb-key-highlight rect {
+  fill: var(--ifm-color-warning);
+  fill-opacity: 0.35;
+  stroke: var(--ifm-color-warning);
+  stroke-width: 2;
+}
+
+.kb-f1 rect {
+  fill: var(--ifm-color-danger);
+  fill-opacity: 0.28;
+  stroke: var(--ifm-color-danger);
+}
+.kb-f2 rect {
+  fill: var(--ifm-color-warning);
+  fill-opacity: 0.28;
+  stroke: var(--ifm-color-warning);
+}
+.kb-f3 rect {
+  fill: var(--ifm-color-success);
+  fill-opacity: 0.28;
+  stroke: var(--ifm-color-success);
+}
+.kb-f4 rect {
+  fill: var(--ifm-color-info);
+  fill-opacity: 0.28;
+  stroke: var(--ifm-color-info);
+}
+.kb-f5 rect {
+  fill: var(--ifm-color-info-dark);
+  fill-opacity: 0.28;
+  stroke: var(--ifm-color-info-dark);
+}
+.kb-f6 rect {
+  fill: var(--ifm-color-success-dark);
+  fill-opacity: 0.28;
+  stroke: var(--ifm-color-success-dark);
+}
+.kb-f7 rect {
+  fill: var(--ifm-color-warning-dark);
+  fill-opacity: 0.28;
+  stroke: var(--ifm-color-warning-dark);
+}
+.kb-f8 rect {
+  fill: var(--ifm-color-danger-dark);
+  fill-opacity: 0.28;
+  stroke: var(--ifm-color-danger-dark);
+}
+.kb-f-thumb rect {
+  fill: var(--ifm-color-emphasis-200);
+}
+
+.kb-tooltip {
+  margin-top: 0.5rem;
+  min-height: 1.4em;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--ifm-code-border-radius);
+  background: var(--ifm-hover-overlay);
+  font-size: 0.85rem;
+  color: var(--ifm-font-color-base);
+}
+
+.kb-legend {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  padding: 0;
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.kb-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.kb-legend-swatch {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 3px;
+  display: inline-block;
+}
+.kb-legend-swatch.kb-f1 {
+  background: var(--ifm-color-danger);
+  opacity: 0.55;
+  border: 1px solid var(--ifm-color-danger);
+}
+.kb-legend-swatch.kb-f2 {
+  background: var(--ifm-color-warning);
+  opacity: 0.55;
+  border: 1px solid var(--ifm-color-warning);
+}
+.kb-legend-swatch.kb-f3 {
+  background: var(--ifm-color-success);
+  opacity: 0.55;
+  border: 1px solid var(--ifm-color-success);
+}
+.kb-legend-swatch.kb-f4 {
+  background: var(--ifm-color-info);
+  opacity: 0.55;
+  border: 1px solid var(--ifm-color-info);
+}
+.kb-legend-swatch.kb-f5 {
+  background: var(--ifm-color-info-dark);
+  opacity: 0.55;
+  border: 1px solid var(--ifm-color-info-dark);
+}
+.kb-legend-swatch.kb-f6 {
+  background: var(--ifm-color-success-dark);
+  opacity: 0.55;
+  border: 1px solid var(--ifm-color-success-dark);
+}
+.kb-legend-swatch.kb-f7 {
+  background: var(--ifm-color-warning-dark);
+  opacity: 0.55;
+  border: 1px solid var(--ifm-color-warning-dark);
+}
+.kb-legend-swatch.kb-f8 {
+  background: var(--ifm-color-danger-dark);
+  opacity: 0.55;
+  border: 1px solid var(--ifm-color-danger-dark);
+}
+
+.cp {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: var(--ifm-leading);
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--ifm-code-border-radius);
+  background: var(--ifm-hover-overlay);
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.cp-item {
+  font-weight: var(--ifm-font-weight-bold);
+  color: var(--ifm-font-color-base);
+}
+
+.cp-sep {
+  color: var(--ifm-color-emphasis-500);
+}
+
+.rl-status {
+  margin-left: auto;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  color: var(--ifm-color-emphasis-700);
+}
+
+.rl-status-passed {
+  border-color: var(--ifm-color-success);
+  color: var(--ifm-color-success);
+}
+
+.rl-status-reading {
+  border-color: var(--ifm-color-warning);
+  color: var(--ifm-color-warning-dark);
+}
+
+.rl-status-not-started {
+  color: var(--ifm-color-emphasis-600);
+}
+
+.rl-lock {
+  font-size: 0.75rem;
+  color: var(--ifm-color-emphasis-600);
+  white-space: nowrap;
+}
+
+/* Once a status chip is present it takes over the "push right" job that
+   the badge used to do alone (see .rl-badge margin-left: auto below). */
+.rl-list li .rl-badge {
+  margin-left: 0;
+}
+
 #reading-progress-bar {
   position: fixed;
   top: 0;
