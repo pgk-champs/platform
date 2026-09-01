@@ -81,6 +81,11 @@ const config: Config = {
           position: 'left',
         },
         {
+          to: '/simulator',
+          label: 'Симулятор',
+          position: 'left',
+        },
+        {
           to: '/favorites',
           label: 'Избранное',
           position: 'left',

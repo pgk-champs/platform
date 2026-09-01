@@ -6535,3 +6535,269 @@
   border-radius: var(--ifm-global-radius);
   font-size: 0.9rem;
 }
+
+/* ===== sim: /simulator — симулятор чемпионата по официальным критериям ===== */
+
+.sim-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.sim-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-surface-color);
+  padding: 1rem;
+}
+
+.sim-card-title {
+  font-weight: var(--ifm-font-weight-bold);
+}
+
+.sim-card-meta {
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.sim-card-best {
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.sim-card-best-empty {
+  color: var(--ifm-color-emphasis-500);
+  font-style: italic;
+}
+
+.sim-card-start {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  padding: 0.5rem 1.25rem;
+  border: 1px solid var(--ifm-color-primary);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-color-primary);
+  color: var(--ifm-color-white);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sim-card-start:hover {
+  background: var(--ifm-color-primary-dark);
+}
+
+.sim-run {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sim-run-head {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.sim-run-title {
+  font-weight: var(--ifm-font-weight-bold);
+}
+
+.sim-back {
+  border: 1px solid var(--ifm-color-emphasis-400);
+  border-radius: var(--ifm-global-radius);
+  background: transparent;
+  color: var(--ifm-color-emphasis-700);
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+}
+
+.sim-back:hover {
+  color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+}
+
+.sim-timer {
+  align-self: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: clamp(2.5rem, 10vw, 4rem);
+  color: var(--ifm-color-emphasis-900);
+}
+
+.sim-timer-low {
+  color: var(--ifm-color-danger);
+}
+
+.sim-timer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.sim-timer-btn {
+  border: 1px solid var(--ifm-color-emphasis-400);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-color-emphasis-800);
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+}
+
+.sim-timer-btn:hover {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+}
+
+.sim-score-live {
+  position: sticky;
+  top: var(--ifm-navbar-height, 0);
+  z-index: 1;
+  text-align: center;
+  padding: 0.5rem;
+  font-weight: 600;
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+}
+
+.sim-section {
+  margin-top: 0.5rem;
+}
+
+.sim-section-title {
+  font-weight: var(--ifm-font-weight-semibold);
+  color: var(--ifm-color-emphasis-700);
+  margin-bottom: 0.35rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.sim-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.25rem;
+  border-bottom: 1px solid var(--ifm-color-emphasis-100);
+}
+
+.sim-item-measurable {
+  cursor: pointer;
+}
+
+.sim-item-measurable input[type='checkbox'] {
+  flex: 0 0 auto;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.sim-item-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.92rem;
+}
+
+.sim-item-score {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-600);
+  white-space: nowrap;
+}
+
+.sim-item-judgement {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.3rem;
+}
+
+.sim-item-slider {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.sim-item-slider input[type='range'] {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.sim-finish {
+  align-self: center;
+  margin-top: 0.75rem;
+  padding: 0.6rem 1.5rem;
+  border: 1px solid var(--ifm-color-primary);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-color-primary);
+  color: var(--ifm-color-white);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sim-finish:hover {
+  background: var(--ifm-color-primary-dark);
+}
+
+.sim-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+  max-width: 480px;
+  margin: 1rem auto 0;
+}
+
+.sim-done-title {
+  font-weight: var(--ifm-font-weight-bold);
+}
+
+.sim-done-grade {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ifm-color-emphasis-900);
+}
+
+.sim-done-score {
+  color: var(--ifm-color-emphasis-800);
+}
+
+.sim-history {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-surface-color);
+}
+
+.sim-history-title {
+  font-weight: var(--ifm-font-weight-semibold);
+  margin-bottom: 0.3rem;
+}
+
+.sim-history-row {
+  font-size: 0.9rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.sim-done-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 480px) {
+  .sim-timer {
+    font-size: clamp(2rem, 14vw, 3rem);
+  }
+  .sim-item-measurable {
+    align-items: flex-start;
+  }
+}

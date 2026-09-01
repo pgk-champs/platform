@@ -31,6 +31,7 @@ export type FavoriteItem = {
 export type QuizResult = { correct: number; total: number; ts: number };
 export type DailyEntry = { correct: number; total: number; ts: number };
 export type ExamResult = { correct: number; total: number; ts: number };
+export type SimRunResult = { score: number; maxScore: number; ts: number };
 export type TrainerResult = { result: unknown; ts: number };
 export type QuizLogEntry = { chapterId: string; quizId: string; correct: number; total: number; ts: number };
 
@@ -49,6 +50,7 @@ type State = {
   exams: Record<string, ExamResult[]>;
   wordWeights: Record<string, number>;
   daily: Record<string, DailyEntry>;
+  simRuns: Record<string, SimRunResult[]>;
 };
 
 function emptyState(): State {
@@ -67,6 +69,7 @@ function emptyState(): State {
     exams: {},
     wordWeights: {},
     daily: {},
+    simRuns: {},
   };
 }
 
@@ -337,6 +340,22 @@ function dailyState(todayKey: string): { done: boolean; today?: DailyEntry; stre
   return { done: !!today, today, streak };
 }
 
+// --- симулятор чемпионата (тайм-боксед прогон модуля критериев) ---
+function addSimRun(moduleId: string, score: { score: number; maxScore: number }): void {
+  const runs = state.simRuns[moduleId] ?? [];
+  state.simRuns = { ...state.simRuns, [moduleId]: [...runs, { ...score, ts: Date.now() }] };
+  persist();
+}
+
+function getSimStats(moduleId: string) {
+  const runs = state.simRuns[moduleId] ?? [];
+  let best: SimRunResult | undefined;
+  for (const r of runs) {
+    if (!best || r.score > best.score) best = r;
+  }
+  return { runs, best, count: runs.length };
+}
+
 // --- progress / snapshot ---
 function getProgress() {
   return { sections: state.sections, quizzes: state.quizzes, trainers: state.trainers };
@@ -369,6 +388,7 @@ export const store = {
   getExamStats,
   completeDaily,
   dailyState,
+  sim: { addRun: addSimRun, stats: getSimStats },
   snapshot,
   /** Тестовый хелпер: сбрасывает состояние в памяти и в localStorage. */
   __resetForTests(): void {

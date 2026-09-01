@@ -227,3 +227,32 @@ test('words.queue puts unknown words first and repeats them in the round', () =>
   expect(q.filter((t) => t === 'loop').length).toBe(1);
   expect(q.filter((t) => t === 'var').length).toBe(1);
 });
+
+// --- sim (этап 3): прогоны симулятора чемпионата по модулю критериев ---
+
+test('sim.stats for a module without runs is empty', () => {
+  const stats = store.sim.stats('a');
+  expect(stats.count).toBe(0);
+  expect(stats.runs).toEqual([]);
+  expect(stats.best).toBeUndefined();
+});
+
+test('sim.addRun appends runs and sim.stats picks the best by score', () => {
+  store.sim.addRun('a', { score: 10, maxScore: 19.9 });
+  store.sim.addRun('a', { score: 15.5, maxScore: 19.9 });
+  store.sim.addRun('a', { score: 12, maxScore: 19.9 });
+  const stats = store.sim.stats('a');
+  expect(stats.count).toBe(3);
+  expect(stats.runs.map((r) => r.score)).toEqual([10, 15.5, 12]);
+  expect(stats.best).toMatchObject({ score: 15.5, maxScore: 19.9 });
+});
+
+test('sim runs are keyed independently per module and persisted', () => {
+  store.sim.addRun('a', { score: 5, maxScore: 19.9 });
+  store.sim.addRun('b', { score: 20, maxScore: 25.5 });
+  expect(store.sim.stats('a').count).toBe(1);
+  expect(store.sim.stats('b').count).toBe(1);
+  const raw = JSON.parse(localStorage.getItem('pgk-store')!);
+  expect(raw.simRuns.a[0]).toMatchObject({ score: 5, maxScore: 19.9 });
+  expect(raw.simRuns.b[0]).toMatchObject({ score: 20, maxScore: 25.5 });
+});
