@@ -15,6 +15,13 @@
   --ifm-color-primary-lightest: #3cad6e;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  /* Infima leaves the light theme's body background as `transparent` and
+     relies on the browser painting its default (white) canvas for the
+     `color-scheme: light` used-value. Some browsers/webviews don't repaint
+     that canvas on a manual light/dark toggle, so the page stays on the
+     previous (dark) canvas while text colors already switched. Pin it to
+     an explicit Infima token instead of trusting the UA fallback. */
+  --ifm-background-color: var(--ifm-background-surface-color);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
