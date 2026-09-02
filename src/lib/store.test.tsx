@@ -329,3 +329,21 @@ test('tour ids are independent of each other', () => {
   store.tour.markSeen('chapter-basics');
   expect(store.tour.isSeen('gym')).toBe(false);
 });
+
+test('migrates progress saved under the old prefixed id of the GitHub chapter', () => {
+  localStorage.setItem(
+    'pgk-store',
+    JSON.stringify({
+      sections: { '00-github-start': ['a', 'b'], 'github-start': ['b', 'c'] },
+      quizzes: { '00-github-start': { q1: { correct: 1, total: 2, ts: 1 } } },
+      trainers: { '00-github-start': { t1: { ts: 1 } } },
+    }),
+  );
+  store.__reloadForTests();
+  const p = store.getProgress();
+  expect(p.sections['00-github-start']).toBeUndefined();
+  expect(p.sections['github-start']).toEqual(['b', 'c', 'a']);
+  expect(p.quizzes['github-start']?.q1).toMatchObject({ correct: 1, total: 2 });
+  expect(p.trainers['github-start']?.t1).toBeTruthy();
+  expect(p.trainers['00-github-start']).toBeUndefined();
+});

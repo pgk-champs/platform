@@ -8,7 +8,7 @@ const LVL = ['база', 'углубление', 'челлендж'];
 // Mirrors Docusaurus's DefaultNumberPrefixParser: it strips a leading "NN-"/"NN_"/"NN."
 // from each path segment when computing doc ids/slugs (e.g. "01-kotlin-vars" -> "kotlin-vars"),
 // so links built from this map must strip it the same way or they 404.
-function stripNumberPrefix(segment) {
+export function stripNumberPrefix(segment) {
   if (/^\d+[-_.]\d+/.test(segment)) return segment; // date/version-like, e.g. "2024-01-foo"
   const m = /^\d+\s*[-_.]+\s*([^-_.\s].*)$/.exec(segment);
   return m ? m[1] : segment;

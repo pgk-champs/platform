@@ -46,7 +46,7 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="137" y="134" textAnchor="middle" fontSize="26" fontWeight={800} fill="#fff">RU</text>
     </g>
   ),
-  'english-practice': () => (
+  '02b-english-practice': () => (
     <g>
       <path
         d="M100 74 C82 60 52 58 30 66 V138 C52 130 82 132 100 146 C118 132 148 130 170 138 V66 C148 58 118 60 100 74 Z"
@@ -227,7 +227,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'github-start': { track: 'foundation', num: '00', title: 'GitHub с нуля' },
   typing: { track: 'foundation', num: '01', title: 'Печать и клавиатура' },
   'it-english': { track: 'foundation', num: '02', title: 'IT-английский: стартовый словарь' },
-  'english-practice': { track: 'foundation', num: '03', title: 'Английский на практике' },
+  '02b-english-practice': { track: 'foundation', num: '03', title: 'Английский на практике' },
   'linux-terminal': { track: 'foundation', num: '04', title: 'Linux и терминал' },
   'files-packages-ssh': { track: 'foundation', num: '05', title: 'Файлы, пакеты, SSH' },
   'git-first-commit': { track: 'foundation', num: '06', title: 'Git: первый коммит' },

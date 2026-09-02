@@ -97,12 +97,32 @@ function emptyState(): State {
   };
 }
 
+// Старые записи главы «GitHub с нуля» писались под id с числовым префиксом,
+// а knowledge-map (как и Docusaurus) префикс «00-» срезает — переносим прогресс.
+const CHAPTER_ID_RENAMES: Record<string, string> = { '00-github-start': 'github-start' };
+
+function migrateChapterIds(st: State): State {
+  for (const [from, to] of Object.entries(CHAPTER_ID_RENAMES)) {
+    for (const key of ['sections', 'quizzes', 'trainers'] as const) {
+      const map = st[key] as Record<string, unknown>;
+      if (!(from in map)) continue;
+      const a = map[from];
+      const b = map[to];
+      map[to] = Array.isArray(a)
+        ? [...new Set([...(Array.isArray(b) ? b : []), ...a])]
+        : { ...(a as object), ...((b as object) ?? {}) };
+      delete map[from];
+    }
+  }
+  return st;
+}
+
 function loadState(): State {
   try {
     if (typeof localStorage === 'undefined') return emptyState();
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return emptyState();
-    return { ...emptyState(), ...JSON.parse(raw) };
+    return migrateChapterIds({ ...emptyState(), ...JSON.parse(raw) });
   } catch {
     return emptyState();
   }
@@ -515,6 +535,11 @@ export const store = {
   easter: { markKonami: easterMarkKonami, markSpeedrun: easterMarkSpeedrun, openHistory: easterOpenHistory },
   tour: { markSeen: markTourSeen, isSeen: isTourSeen },
   snapshot,
+  /** Тестовый хелпер: перечитывает состояние из localStorage (как при загрузке страницы). */
+  __reloadForTests(): void {
+    state = loadState();
+    version += 1;
+  },
   /** Тестовый хелпер: сбрасывает состояние в памяти и в localStorage. */
   __resetForTests(): void {
     state = emptyState();

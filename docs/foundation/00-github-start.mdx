@@ -23,7 +23,7 @@ import ChapterExam from '@site/src/components/ChapterExam';
 
 # GitHub с нуля: регистрация и первые шаги
 
-<ChapterProgress chapterId="00-github-start" totalSections={8} totalQuizzes={3} totalTrainers={1} />
+<ChapterProgress chapterId="github-start" totalSections={8} totalQuizzes={3} totalTrainers={1} />
 
 Эта страница — для человека, который с компьютером пока на «вы». Здесь нет ни одной команды и ни одной строчки кода: только как завести себе аккаунт на GitHub, войти в него, принять приглашение наставника и отправить свою первую заявку. Каждый экран описан словами — что на нём написано, куда нажать и какие ошибки бывают. Если что-то на твоём экране выглядит чуть иначе — это нормально: GitHub время от времени переставляет кнопки, но смысл шагов не меняется.
 
@@ -37,9 +37,9 @@ import ChapterExam from '@site/src/components/ChapterExam';
 
 **Копирование ссылки.** Ссылка (link) — это адрес страницы, обычно синего цвета и подчёркнутый или начинающийся с `https://`. Скопировать её текстом можно так же, как любой текст: выделить и нажать `Ctrl+C` (`Cmd+C` на macOS). Потренируйся прямо здесь — ниже показан адрес ссылки текстом, выдели его целиком (двойной клик выделит только одно слово из него, а нужен адрес целиком — подойдёт протяжка мышью или тройной клик по всей строке):
 
-<Block kind="trainer" title="Тренажёр: выдели и скопируй ссылку" chapterId="00-github-start" blockId="trainer-copy-link">
+<Block kind="trainer" title="Тренажёр: выдели и скопируй ссылку" chapterId="github-start" blockId="trainer-copy-link">
 <SelectionSandbox
-  chapterId="00-github-start"
+  chapterId="github-start"
   trainerId="trainer-copy-link"
   missions={[
     {
@@ -59,7 +59,7 @@ import ChapterExam from '@site/src/components/ChapterExam';
 
 </Fold>
 
-<CollapsibleToc toc={toc} chapterId="00-github-start" />
+<CollapsibleToc toc={toc} chapterId="github-start" />
 
 ## Что такое аккаунт и зачем ему почта
 
@@ -76,7 +76,7 @@ GitHub (читается «гит-ха́б») — это сайт, где про
 Пароль от GitHub не говори и не пересылай никому — ни одногруппнику, ни «техподдержке» из письма. Настоящий GitHub никогда не спрашивает пароль в письмах. Наставнику твой пароль тоже не нужен: для совместной работы есть приглашения в организацию, о них ниже. Запиши пароль в надёжное место — в менеджер паролей или в бумажный блокнот, который лежит дома, а не в файл «пароли.txt» на рабочем столе.
 </Hint>
 
-<SectionAnchor chapterId="00-github-start" sectionId="why" />
+<SectionAnchor chapterId="github-start" sectionId="why" />
 
 ## Регистрация по шагам
 
@@ -102,7 +102,7 @@ GitHub (читается «гит-ха́б») — это сайт, где про
 
 Готово: ты на главной странице своего аккаунта. Выглядит пустовато — так и должно быть, наполнять начнём с первого практикума.
 
-<SectionAnchor chapterId="00-github-start" sectionId="signup" />
+<SectionAnchor chapterId="github-start" sectionId="signup" />
 
 ## Вход и выход
 
@@ -112,9 +112,9 @@ GitHub (читается «гит-ха́б») — это сайт, где про
 
 Выход — по клику на свой кружок-аватарку в правом верхнем углу: в выпавшем меню внизу есть **Sign out**. На своём личном компьютере можно не выходить вовсе; на чужом или общем (в колледже!) — выходи обязательно.
 
-<SectionAnchor chapterId="00-github-start" sectionId="signin" />
+<SectionAnchor chapterId="github-start" sectionId="signin" />
 
-<SelfCheck chapterId="00-github-start" quizId="quiz-signup" questions={[
+<SelfCheck chapterId="github-start" quizId="quiz-signup" questions={[
   {
     q: 'Письмо с кодом подтверждения (launch code) не приходит уже пять минут. Что сделать в первую очередь?',
     options: ['Зарегистрироваться заново с другой почтой', 'Проверить папку «Спам» и нажать повторную отправку', 'Написать в поддержку GitHub'],
@@ -147,7 +147,7 @@ GitHub (читается «гит-ха́б») — это сайт, где про
 
 Кликни на свой кружок в правом верхнем углу и выбери в меню пункт **Settings** («настройки»). Откроется страница профиля — раздел **Public profile**. Справа будет твоя текущая картинка и кнопка **Edit** (или сразу **Upload a photo…** — «загрузить фото»). Нажми, выбери файл с картинкой на компьютере, при желании подвинь рамку кадрирования и подтверди. Тут же, в поле **Name**, можно вписать имя и фамилию — можно по-русски: логин останется латиницей, а имя будет отображаться человеческое. Изменения сохраняются кнопкой **Update profile** внизу.
 
-<SectionAnchor chapterId="00-github-start" sectionId="avatar" />
+<SectionAnchor chapterId="github-start" sectionId="avatar" />
 
 ## Принять приглашение в организацию
 
@@ -162,7 +162,7 @@ GitHub (читается «гит-ха́б») — это сайт, где про
 
 Проверить, что всё получилось, просто: на странице `github.com/pgk-champs` ты теперь видишь репозитории организации, а на своей страничке профиля появился её значок.
 
-<SectionAnchor chapterId="00-github-start" sectionId="org-invite" />
+<SectionAnchor chapterId="github-start" sectionId="org-invite" />
 
 ## Открыть issue по ссылке и нажать Submit
 
@@ -179,7 +179,7 @@ GitHub (читается «гит-ха́б») — это сайт, где про
 
 Найти свои старые заявки можно так: на любой странице GitHub вверху есть поиск и меню — открой `github.com/issues`, там список «Created» — всё, что создал ты.
 
-<SectionAnchor chapterId="00-github-start" sectionId="issue" />
+<SectionAnchor chapterId="github-start" sectionId="issue" />
 
 ## «Зелёная галочка»: как понять, что практикум сдан
 
@@ -195,11 +195,11 @@ GitHub (читается «гит-ха́б») — это сайт, где про
 GitHub появился в 2008 году, а сегодня на нём больше ста миллионов аккаунтов — почти все программисты мира. Талисман сайта — Октокот (Octocat), кот с щупальцами осьминога. Так что аккаунт, который ты только что завёл, — тот же самый инструмент, которым пользуются авторы Linux, Android и почти всех программ у тебя в телефоне.
 </Hint>
 
-<SectionAnchor chapterId="00-github-start" sectionId="green-check" />
+<SectionAnchor chapterId="github-start" sectionId="green-check" />
 
 ## Мини-словарь GitHub
 
-<Block kind="cheatsheet" title="Мини-словарь GitHub" chapterId="00-github-start" blockId="cheatsheet-github-words" favPayload={{
+<Block kind="cheatsheet" title="Мини-словарь GitHub" chapterId="github-start" blockId="cheatsheet-github-words" favPayload={{
   kind: 'table',
   head: ['Слово', 'Как читается', 'Что это'],
   rows: [
@@ -243,7 +243,7 @@ GitHub появился в 2008 году, а сегодня на нём боль
 
 </Block>
 
-<SelfCheck chapterId="00-github-start" quizId="quiz-first-steps" questions={[
+<SelfCheck chapterId="github-start" quizId="quiz-first-steps" questions={[
   {
     q: 'Как правильно попасть в организацию pgk-champs?',
     options: ['Зарегистрироваться и подождать — добавят автоматически', 'Получить от наставника приглашение и нажать Join, войдя в свой аккаунт', 'Прислать наставнику свой пароль, чтобы он всё настроил'],
@@ -270,8 +270,8 @@ GitHub появился в 2008 году, а сегодня на нём боль
   },
 ]} />
 
-<Block kind="quiz" title="Экзамен главы" chapterId="00-github-start" blockId="exam">
-<ChapterExam chapterId="00-github-start" questions={[
+<Block kind="quiz" title="Экзамен главы" chapterId="github-start" blockId="exam">
+<ChapterExam chapterId="github-start" questions={[
   { q: 'При входе (Sign in) GitHub спрашивает поле «Username or email address». Что там можно ввести?', options: ['Только логин', 'Логин или почту — без разницы', 'Только почту, логин не подходит', 'Пароль от почты, а не от GitHub'], correct: 1, why: 'Поле явно принимает оба варианта — логин или почту, разницы нет.' },
   { q: 'Забыл пароль от GitHub. Как его восстановить?', options: ['Зарегистрировать аккаунт заново', 'Нажать «Forgot password?» под формой входа — на почту придёт письмо со сменой пароля', 'Попросить пароль у наставника', 'Ввести старый пароль ещё раз — система сама подскажет верный'], correct: 1, why: 'Ссылка Forgot password? под формой входа отправляет письмо со сменой пароля на ту же почту, что и при регистрации.' },
   { q: 'На компьютере в компьютерном классе колледжа (общий, не свой) после работы с GitHub правильно...', options: ['Просто закрыть вкладку браузера', 'Оставить сессию активной — так удобнее в следующий раз', 'Нажать Sign out через меню на аватарке', 'Сменить пароль на новый'], correct: 2, why: 'На чужом или общем компьютере выходить нужно обязательно — через Sign out в меню аватарки; на личном можно не выходить.' },
@@ -288,4 +288,4 @@ GitHub появился в 2008 году, а сегодня на нём боль
 - Следующая глава фундамента — «[Печать и клавиатура](/docs/foundation/typing)»: научит рукам не отставать от головы.
 - [Видео и материалы сообщества — ниже](#community-sources) — ролики по теме и ссылки от студентов и преподавателей смотри в самом низу страницы.
 
-<SectionAnchor chapterId="00-github-start" sectionId="next" />
+<SectionAnchor chapterId="github-start" sectionId="next" />
