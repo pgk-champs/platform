@@ -13,16 +13,50 @@ import ChapterCover from '@site/src/components/ChapterCover';
 import SelfCheck from '@site/src/components/SelfCheck';
 import Block from '@site/src/components/Block';
 import Hint from '@site/src/components/Hint';
+import Fold from '@site/src/components/Fold';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import Figure from '@site/src/components/Figure';
+import SelectionSandbox from '@site/src/components/SelectionSandbox';
 
 # GitHub с нуля: регистрация и первые шаги
 
-<ChapterProgress chapterId="00-github-start" totalSections={8} totalQuizzes={2} totalTrainers={0} />
+<ChapterProgress chapterId="00-github-start" totalSections={8} totalQuizzes={2} totalTrainers={1} />
 
 Эта страница — для человека, который с компьютером пока на «вы». Здесь нет ни одной команды и ни одной строчки кода: только как завести себе аккаунт на GitHub, войти в него, принять приглашение наставника и отправить свою первую заявку. Каждый экран описан словами — что на нём написано, куда нажать и какие ошибки бывают. Если что-то на твоём экране выглядит чуть иначе — это нормально: GitHub время от времени переставляет кнопки, но смысл шагов не меняется.
+
+<Fold title="Совсем новичок в компьютере? Открой сначала это">
+
+Если раньше почти не пользовался компьютером — вот три вещи, без которых регистрация и работа с почтой будут даваться труднее, чем должны. Остальное в главе рассчитано и на тебя, просто эти три пригодятся уже на первом шаге.
+
+**Вкладки браузера.** Вверху окна браузера — полоска с «ярлычками»-вкладками: каждая открывает свою страницу, а всё окно можно не закрывать. Новая вкладка — значок `+` рядом с последней или сочетание `Ctrl+T` (`Cmd+T` на macOS). Переключаться между вкладками — просто кликнуть по нужной. Закрыть вкладку — крестик на ней или `Ctrl+W`. Это пригодится буквально в этой же главе: открыть почту в соседней вкладке, не теряя страницу GitHub с формой регистрации.
+
+**Поиск письма в почте.** Когда писем много, листать их все не нужно — вверху страницы почты есть строка поиска. Кликни в неё и напечатай слово из письма, которое ищешь, — например `GitHub`. Почтовый сервис сам покажет только подходящие письма, обычно самое новое — сверху.
+
+**Копирование ссылки.** Ссылка (link) — это адрес страницы, обычно синего цвета и подчёркнутый или начинающийся с `https://`. Скопировать её текстом можно так же, как любой текст: выделить и нажать `Ctrl+C` (`Cmd+C` на macOS). Потренируйся прямо здесь — ниже показан адрес ссылки текстом, выдели его целиком (двойной клик выделит только одно слово из него, а нужен адрес целиком — подойдёт протяжка мышью или тройной клик по всей строке):
+
+<Block kind="trainer" title="Тренажёр: выдели и скопируй ссылку" chapterId="00-github-start" blockId="trainer-copy-link">
+<SelectionSandbox
+  chapterId="00-github-start"
+  trainerId="trainer-copy-link"
+  missions={[
+    {
+      id: 'copy-link',
+      instruction: 'Выдели ссылку целиком (протяжкой мыши или тройным кликом), затем при желании скопируй её Ctrl+C.',
+      text: 'github.com/pgk-champs',
+      expected: 'github.com/pgk-champs',
+    },
+  ]}
+/>
+</Block>
+
+**Куда дальше**, если хочется потренировать базовые навыки компьютера ещё подробнее и не спеша:
+
+- [neumeka.ru](https://neumeka.ru/) — бесплатные русскоязычные уроки компьютерной грамотности с нуля: мышь, клавиатура, файлы, интернет.
+- [Northstar Digital Literacy](https://www.digitalliteracyassessment.org/build-skills) — бесплатный англоязычный курс с самопроверкой по темам: базовые навыки компьютера, интернета, работы с файлами.
+
+</Fold>
 
 <CollapsibleToc toc={toc} chapterId="00-github-start" />
 

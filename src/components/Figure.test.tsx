@@ -21,6 +21,7 @@ test('every scheme renders an svg with the caption as accessible name', () => {
     'blockchain-chain',
     'compose-layout',
     'ui-kit-modules',
+    'ubuntu-windows',
   ]);
   for (const id of SCHEME_IDS) {
     const { unmount } = render(<Figure scheme={id} caption={`схема ${id}`} />);

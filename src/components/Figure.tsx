@@ -228,6 +228,22 @@ const SCHEMES: Record<string, (aria: string) => React.ReactNode> = {
       </g>
     </Panel>
   ),
+  /* Super → Activities + snapping Super+←/→ */
+  'ubuntu-windows': (aria) => (
+    <Panel id="fig-g-ubuntu" w={800} h={300} aria={aria}>
+      <text x={30} y={42} fontSize={13} letterSpacing={3} fontWeight={600} fill={FADE}>UBUNTU · ОКНА ЗА 1 МИНУТУ</text>
+      <rect x={60} y={70} width={300} height={170} rx={10} fill={SOFT} stroke={INK} strokeWidth={2.5} />
+      <rect x={60} y={70} width={300} height={26} rx={10} fill={ACCENT} />
+      <rect x={440} y={70} width={300} height={170} rx={10} fill={SOFT} stroke={INK} strokeWidth={2.5} strokeDasharray="8 6" />
+      <rect x={440} y={70} width={300} height={26} rx={10} fill="rgba(255,255,255,0.3)" />
+      <Arrow x1={366} y1={155} x2={434} y2={155} color={ACCENT} w={5} />
+      <text x={400} y={196} textAnchor="middle" fontSize={14} fontWeight={700} fill={ACCENT} fontFamily={MONO}>Super+→</text>
+      <text x={210} y={264} textAnchor="middle" fontSize={16} fontWeight={600} fill="#fff">окно A</text>
+      <text x={590} y={264} textAnchor="middle" fontSize={16} fontWeight={600} fill="#fff">окно B</text>
+      <rect x={300} y={100} width={200} height={40} rx={10} fill="rgba(0,0,0,0.32)" stroke={ACCENT} strokeWidth={2.5} />
+      <text x={400} y={126} textAnchor="middle" fontSize={16} fontWeight={800} fill={ACCENT} fontFamily={MONO}>Super = Activities</text>
+    </Panel>
+  ),
 };
 
 export const SCHEME_IDS = Object.keys(SCHEMES);

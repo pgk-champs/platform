@@ -23,10 +23,12 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 import InteractiveKeyboard from '@site/src/components/InteractiveKeyboard';
 import KeysTabs from '@site/src/components/KeysTabs';
 import Figure from '@site/src/components/Figure';
+import HotkeyTrainer from '@site/src/components/HotkeyTrainer';
+import SelectionSandbox from '@site/src/components/SelectionSandbox';
 
 # Печать и клавиатура
 
-<ChapterProgress chapterId="typing" totalSections={15} totalQuizzes={4} totalTrainers={6} />
+<ChapterProgress chapterId="typing" totalSections={16} totalQuizzes={5} totalTrainers={8} />
 
 ## Зачем это нужно
 
@@ -102,7 +104,58 @@ import HistoryNote from '@site/src/components/HistoryNote';
 
 Две последние строки — не опечатка, а реальная разница между системами. Переключение окон на macOS всегда держится на `Cmd`, а на Windows и Ubuntu — на `Alt`, хотя копирование-вставка там же держится на `Ctrl`. Со скриншотом разница ещё глубже: на macOS это всегда `Cmd`+`Shift`+цифра, на Windows — отдельная клавиша `PrtScn` в сочетании с `Win` (без неё картинка просто копируется в буфер, но не сохраняется файлом), а Ubuntu в окружении GNOME по умолчанию сохраняет скриншот одним нажатием `PrtScn` без единого модификатора. На других окружениях рабочего стола Linux (KDE, Xfce) сочетание может отличаться — при сомнении ищи в системных настройках по слову «Screenshot».
 
+<Hint id="typing-hint-ctrlc-terminal" type="important">
+Есть одно важное исключение из таблицы выше: в терминале `Ctrl+C` не копирует. Там это же сочетание прерывает выполняющуюся команду — совсем другая команда клавиатуры на уровне операционной системы. Подробный разбор с таблицей по трём системам — в главе про терминал. Уже сейчас, если нужно скопировать текст ИЗ терминала: на Ubuntu (GNOME Terminal) для этого отдельное сочетание — `Ctrl+Shift+C`.
+</Hint>
+
+Не заучивай список — попробуй нажать каждое сочетание по-настоящему прямо сейчас:
+
+<Block kind="trainer" title="Тренажёр горячих клавиш" chapterId="typing" blockId="trainer-hotkeys">
+<HotkeyTrainer chapterId="typing" trainerId="trainer-hotkeys" items={[
+  { action: 'Скопировать выделенное', mac: '⌘C', win: 'Ctrl+C', linux: 'Ctrl+C' },
+  { action: 'Вставить из буфера обмена', mac: '⌘V', win: 'Ctrl+V', linux: 'Ctrl+V' },
+  { action: 'Вырезать выделенное', mac: '⌘X', win: 'Ctrl+X', linux: 'Ctrl+X' },
+  { action: 'Отменить последнее действие', mac: '⌘Z', win: 'Ctrl+Z', linux: 'Ctrl+Z' },
+  { action: 'Повторить отменённое действие', mac: '⇧⌘Z', win: 'Ctrl+Y', linux: 'Ctrl+Shift+Z' },
+  { action: 'Сохранить файл', mac: '⌘S', win: 'Ctrl+S', linux: 'Ctrl+S', browserReserved: true },
+  { action: 'Выделить всё', mac: '⌘A', win: 'Ctrl+A', linux: 'Ctrl+A' },
+  { action: 'Найти на странице или в файле', mac: '⌘F', win: 'Ctrl+F', linux: 'Ctrl+F', browserReserved: true },
+  { action: 'Переключиться между открытыми окнами', mac: '⌘Tab', win: 'Alt+Tab', linux: 'Alt+Tab', browserReserved: true },
+  { action: 'Скриншот всего экрана', mac: '⇧⌘3', win: 'Win+PrtScn', linux: 'PrtScn', browserReserved: true },
+]} />
+</Block>
+
+<Block kind="quiz" title="Горячие клавиши: проверь себя" chapterId="typing" blockId="quiz-hotkeys-recall">
+<SelfCheck chapterId="typing" quizId="quiz-hotkeys-recall" questions={[
+  { q: 'Какое сочетание вставляет из буфера обмена и на Windows, и на Ubuntu?', options: ['Ctrl+V', 'Ctrl+C', 'Ctrl+Z', 'Ctrl+A'], correct: 0, why: 'Ctrl+V — вставить. Ctrl+C копирует, Ctrl+Z отменяет, Ctrl+A выделяет всё.' },
+  { q: 'Каким модификатором почти всегда пользуется macOS вместо Ctrl других систем?', options: ['Alt', 'Fn', 'Cmd (⌘)', 'Super'], correct: 2, why: 'На macOS большинство системных сочетаний держится на Cmd (⌘), а не на Ctrl.' },
+  { q: 'Чем переключение между окнами на macOS отличается от Windows и Ubuntu?', options: ['Ничем — везде Alt+Tab', 'На macOS такого сочетания нет', 'На macOS это Cmd+Tab, на Windows и Ubuntu — Alt+Tab', 'На Ubuntu это Ctrl+Tab'], correct: 2, why: 'macOS переключает окна через Cmd+Tab, а Windows и Ubuntu — через Alt+Tab.' },
+  { q: 'Как в Ubuntu (GNOME) по умолчанию сохранить скриншот всего экрана одной клавишей?', options: ['Просто PrtScn — сразу сохранит файл, без модификаторов', 'Обязательно Win+PrtScn, как в Windows', 'Cmd+Shift+3, как на macOS', 'В Ubuntu скриншот одной клавишей не сохранить'], correct: 0, why: 'В GNOME по умолчанию одна клавиша PrtScn и сохраняет скриншот файлом, без Win или других модификаторов.' },
+]} />
+</Block>
+
 <SectionAnchor chapterId="typing" sectionId="hotkeys" />
+
+## Выделение текста мышью
+
+Прежде чем сочетание вроде `Ctrl+C` вообще что-то скопирует, нужно выделить (select) текст — отметить кусок, с которым будет работать команда. За выделение отвечает Selection API браузера (`window.getSelection()`) — обычный веб-стандарт, которому больше десяти лет, работает в любом браузере. У выделения мышью есть несколько разных жестов, и они экономят время не хуже горячих клавиш:
+
+- **Двойной клик** по слову — выделяет слово целиком, без соседних пробелов и знаков препинания.
+- **Тройной клик** (три клика подряд без паузы) — выделяет весь абзац или строку целиком.
+- **Клик, затем Shift+клик** в другом месте — продлевает уже начатое выделение до точки второго клика.
+- **Протяжка** (зажать левую кнопку мыши и вести курсор, не отпуская) — выделяет произвольный кусок текста, без всякой привязки к границам слов; так можно выделить то, что не выделит ни двойной, ни тройной клик.
+
+<Hint id="typing-hint-selection-api" type="fact">
+window.getSelection() — часть Selection API, который браузеры поддерживают одинаково с 2015 года (статус Baseline на MDN). Именно этот API читает текст, который ты выделил мышью, — на нём построена, например, кнопка «поделиться цитатой» на новостных сайтах.
+</Hint>
+
+Потренируй все четыре жеста прямо здесь — движок сам проверит, что ты выделил, независимо от того, каким способом ты это сделал:
+
+<Block kind="trainer" title="Тренажёр выделения текста" chapterId="typing" blockId="trainer-selection">
+<SelectionSandbox chapterId="typing" trainerId="trainer-selection" />
+</Block>
+
+<SectionAnchor chapterId="typing" sectionId="selection" />
 
 ## Домашний ряд и позиция пальцев
 
