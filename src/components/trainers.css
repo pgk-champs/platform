@@ -8362,8 +8362,11 @@
 }
 
 .mfm-file-selected {
-  background: var(--ifm-color-primary-lightest);
-  color: var(--ifm-color-primary-darkest);
+  /* -lightest/-darkest give ~2.6:1 in both themes (fails WCAG AA); the
+     -contrast- pair is Infima's dedicated high-contrast combo, ~13.7:1
+     here — same pattern already used by .ct-pool-btn-active. */
+  background: var(--ifm-color-primary-contrast-background);
+  color: var(--ifm-color-primary-contrast-foreground);
 }
 
 .mfm-rename-input {
