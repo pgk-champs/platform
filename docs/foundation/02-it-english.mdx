@@ -14,6 +14,7 @@ import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import ToolCard from '@site/src/components/ToolCard';
 import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
 import Block from '@site/src/components/Block';
 import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
@@ -26,7 +27,7 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 
 # IT-английский: стартовый словарь
 
-<ChapterProgress chapterId="it-english" totalSections={12} totalQuizzes={5} totalTrainers={10} />
+<ChapterProgress chapterId="it-english" totalSections={12} totalQuizzes={6} totalTrainers={10} />
 
 ## Зачем это нужно
 
@@ -566,6 +567,18 @@ fatal: not a git repository (or any of the parent directories): .git
 </Block>
 
 <SectionAnchor chapterId="it-english" sectionId="cheatsheet-words" />
+
+<Block kind="quiz" title="Экзамен главы" chapterId="it-english" blockId="exam">
+<ChapterExam chapterId="it-english" questions={[
+  { q: 'В разборе bash: ./run_tests.sh: Permission denied перед именем файла стоят символы ./. Что они означают?', options: ['Это просто часть имени файла, отдельного смысла не несёт', './  говорит искать файл в текущей папке, а не где-то в системе', './  означает, что файл скрытый', './  запускает файл с правами администратора'], correct: 1, why: 'В разборе прямо сказано: ./  в начале значит «искать в текущей папке», а не где-то в системе — это часть пути, а не имени файла.' },
+  { q: 'В «Углубиться» описаны три уровня серьёзности у компиляторов и сборщиков. Кроме error и warning, там назван третий — что он означает?', options: ['note/info — просто справка, часто с подсказкой к соседней ошибке', 'debug — служебный уровень только для разработчиков компилятора', 'critical — уровень серьёзнее fatal', 'skip — сообщение, которое можно всегда игнорировать'], correct: 0, why: 'Глава пишет: note/info — «просто справка, часто — подсказка к соседней ошибке», и стоит читать даже её — за error нередко идёт note с советом «может, ты имел в виду...».' },
+  { q: 'Чем, по тексту главы, метка fatal у git отличается по смыслу от обычного error?', options: ['Ничем, это просто два разных слова для одного и того же', 'fatal значит, что операция не просто не удалась, а прервана полностью — ничего не сохранено и не отправлено', 'fatal — более вежливая форма error', 'fatal бывает только рядом с warning'], correct: 1, why: 'В «Углубиться» уточняется: git добавляет метку fatal — операция прервана полностью, ничего не сохранено и не отправлено, это сильнее обычного error.' },
+  { q: 'Почему, по мнению главы, авторов технической документации специально учат писать одними и теми же словами?', options: ['Чтобы документация выглядела официальнее', 'Один термин — одно понятие, без синонимов ради красоты, поэтому пары сотен слов хватает, чтобы читать доки', 'Синонимы запрещены стандартами W3C', 'Чтобы усложнить перевод текста на русский'], correct: 1, why: 'Глава объясняет: «один термин — одно понятие, никаких синонимов ради красоты» — это осознанное сужение словаря индустрией.' },
+  { q: 'В коде встретилась фраза the actual value. Что она значит, если верить разбору ложных друзей переводчика из главы?', options: ['«Актуальное (свежее) значение»', '«Настоящее, фактическое значение» — то, которое есть на самом деле, а не «свежее»', '«Возможное значение»', '«Значение по умолчанию»'], correct: 1, why: 'actual — ложный друг переводчика: не «актуальный» (current, relevant), а «настоящий, фактический». the actual value — «то значение, которое есть на самом деле».' },
+  { q: 'В тренажёре набирается запрос "not a git repository" site:stackoverflow.com. Почему глава отдельно предупреждает быть внимательным именно с оператором site:?', options: ['Пробел после site: ни на что не влияет', 'Лишний пробел после site: испортит результат — оператор пишется без пробела перед доменом', 'Без пробела запрос вообще не сработает', 'Пробел превращает site: в обычный текст в кавычках'], correct: 1, why: 'Глава прямо предупреждает: «в реальном поиске лишний пробел после site: испортит результат» — оператор должен идти вплотную к домену.' },
+  { q: 'В «Углубиться» упомянут системный код ENOENT. Как он расшифровывается по тексту главы?', options: ['External Node Entry — внешняя точка входа', 'Error NO ENTry — «нет такой записи»', 'Emergency Network Error — сетевая авария', 'Enhanced NOtification — расширенное уведомление'], correct: 1, why: 'Глава расшифровывает: ENOENT — «Error NO ENTry», «нет такой записи» — числовой код, зашитый в системную библиотеку за фразой No such file or directory.' },
+]} />
+</Block>
 
 ## Что должен уметь
 

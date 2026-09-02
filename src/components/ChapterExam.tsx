@@ -40,6 +40,10 @@ export default function ChapterExam({
   const finish = (finalAnswers: Record<number, number>) => {
     const correct = questions.filter((q, i) => finalAnswers[i] === q.correct).length;
     store.markExamDone(chapterId, { correct, total: questions.length });
+    // Тот же blockId "exam", что и у <Block>: считается в счётчике «Квизы x/y»
+    // в ChapterProgress наравне с SelfCheck — так totalQuizzes+1 в главе не
+    // повисает недостижимым знаменателем.
+    store.markQuizDone(chapterId, 'exam', { correct, total: questions.length });
     const pct = questions.length > 0 ? (correct / questions.length) * 100 : 0;
     // Пасхалка «Спидраннер»: экзамен сдан, а времени ушло меньше половины лимита.
     if (pct >= PASS_PCT && timeLeft * 2 > timeLimitSec) store.easter.markSpeedrun();

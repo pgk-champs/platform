@@ -50,6 +50,8 @@ test('all correct: grade "Отлично", double XP, result in store', () => {
   const stats = store.getExamStats('ch');
   expect(stats.count).toBe(1);
   expect(stats.best).toMatchObject({ correct: 4, total: 4 });
+  // Экзамен считается в счётчике «Квизы x/y» ChapterProgress наравне с SelfCheck.
+  expect(store.getProgress().quizzes.ch?.exam).toMatchObject({ correct: 4, total: 4 });
 });
 
 test('half correct: grade "Потренируйся ещё" and no XP', () => {
