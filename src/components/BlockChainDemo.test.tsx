@@ -65,7 +65,7 @@ test('mining repairs the chain, explains why, marks trainer done and awards xp',
 
   await waitFor(() => expect(okBlocks(container)).toBe(4));
   expect(container.querySelectorAll('.bcd-block.bcd-broken').length).toBe(0);
-  expect(screen.getByText(/Цепь пересчитана/)).toBeTruthy();
+  await screen.findByText(/Цепь пересчитана/);
   expect(store.getProgress().trainers.crypto?.chain).toMatchObject({ result: { repaired: true } });
   expect(store.getXp()).toBe(15);
   await screen.findByText(/\+15 XP/);
@@ -81,7 +81,7 @@ test('without chapterId/trainerId break-and-repair writes nothing to the store',
   fireEvent.click(screen.getByRole('button', { name: /Пересчитать цепь/ }));
   await waitFor(() => expect(okBlocks(container)).toBe(4));
 
-  expect(screen.getByText(/Цепь пересчитана/)).toBeTruthy();
+  await screen.findByText(/Цепь пересчитана/);
   expect(store.getProgress().trainers).toEqual({});
   expect(store.getXp()).toBe(0);
 });
