@@ -6,6 +6,7 @@
 const STORAGE_KEY = 'pgk-store';
 
 export type OsId = 'mac' | 'win' | 'linux';
+export type IdeId = 'android-studio' | 'webstorm' | 'vscode';
 export type BlockKind = 'trainer' | 'quiz' | 'breakdown' | 'vocab' | 'cheatsheet' | 'fact';
 
 // Содержимое, которое избранное сохраняет вместе со ссылкой, чтобы
@@ -60,7 +61,7 @@ type State = {
   dismissedHints: string[];
   xp: number;
   achievementsUnlocked: string[];
-  prefs: { os?: OsId; name?: string };
+  prefs: { os?: OsId; name?: string; ide?: IdeId };
   tocCollapsed: Record<string, boolean>;
   quizLog: QuizLogEntry[];
   blocksCollapsed: Record<string, boolean>;
@@ -274,6 +275,15 @@ function setName(name: string): void {
 
 function getName(): string | undefined {
   return state.prefs.name;
+}
+
+function setIde(ide: IdeId): void {
+  state.prefs = { ...state.prefs, ide };
+  persist();
+}
+
+function getIde(): IdeId | undefined {
+  return state.prefs.ide;
 }
 
 // --- тренировка слов (простое интервальное повторение) ---
@@ -491,7 +501,7 @@ export const store = {
   getXp,
   getXpMultiplier,
   achievements: { unlock: achUnlock, list: achList, isUnlocked: achIsUnlocked },
-  prefs: { setOs, getOs, setName, getName },
+  prefs: { setOs, getOs, setName, getName, setIde, getIde },
   words: { queue: wordsQueue, grade: gradeWord, weight: wordWeight },
   toc: { setCollapsed: setTocCollapsed, isCollapsed: isTocCollapsed },
   block: { setCollapsed: setBlockCollapsed, isCollapsed: isBlockCollapsed },

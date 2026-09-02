@@ -69,6 +69,12 @@ test('prefs setOs/getOs persists globally', () => {
   expect(store.prefs.getOs()).toBe('win');
 });
 
+test('prefs setIde/getIde persists globally', () => {
+  expect(store.prefs.getIde()).toBeUndefined();
+  store.prefs.setIde('webstorm');
+  expect(store.prefs.getIde()).toBe('webstorm');
+});
+
 test('toc setCollapsed/isCollapsed defaults to false', () => {
   expect(store.toc.isCollapsed('typing')).toBe(false);
   store.toc.setCollapsed('typing', true);
