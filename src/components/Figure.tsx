@@ -244,6 +244,40 @@ const SCHEMES: Record<string, (aria: string) => React.ReactNode> = {
       <text x={400} y={126} textAnchor="middle" fontSize={16} fontWeight={800} fill={ACCENT} fontFamily={MONO}>Super = Activities</text>
     </Panel>
   ),
+  /* дерево TS-проекта контракта (npm create we-contract) в панели Project слева, contract.ts открыт справа */
+  'webstorm-project-tree': (aria) => (
+    <Panel id="fig-g-webstorm" w={800} h={320} aria={aria}>
+      <text x={30} y={42} fontSize={13} letterSpacing={3} fontWeight={600} fill={FADE}>WEBSTORM · PROJECT</text>
+      {/* левая панель — дерево проекта */}
+      <rect x={30} y={64} width={330} height={230} rx={10} fill="rgba(0,0,0,0.22)" stroke={INK} strokeWidth={2.5} />
+      <g fontFamily={MONO} fontSize={16}>
+        <text x={50} y={92} fill="#fff" fontWeight={700}>▾ my-contract</text>
+        <path d="M62 100v176" stroke={FADE} strokeWidth={1.5} />
+        <text x={76} y={118} fill={FADE}>▸ node_modules</text>
+        <text x={76} y={144} fill="#fff" fontWeight={700}>▾ src</text>
+        <path d="M88 152v22" stroke={FADE} strokeWidth={1.5} />
+        <rect x={100} y={162} width={168} height={28} rx={6} fill={ACCENT} />
+        <text x={112} y={181} fill={DARK} fontWeight={800}>contract.ts</text>
+        <text x={76} y={214} fill="#fff">contract.config.js</text>
+        <text x={76} y={240} fill="#fff">package.json</text>
+        <text x={76} y={266} fill="#fff">tsconfig.json</text>
+      </g>
+      {/* стрелка от открытого файла к редактору справа */}
+      <Arrow x1={272} y1={176} x2={392} y2={130} color={ACCENT} w={4} />
+      {/* правая панель — редактор с декораторами контракта */}
+      <rect x={400} y={64} width={370} height={230} rx={10} fill="rgba(0,0,0,0.18)" stroke={INK} strokeWidth={2.5} />
+      <rect x={400} y={64} width={370} height={30} rx={10} fill={SOFT} />
+      <text x={416} y={85} fontFamily={MONO} fontSize={14} fill="#fff" fontWeight={700}>contract.ts</text>
+      <g fontFamily={MONO} fontSize={15}>
+        <text x={418} y={126} fill={ACCENT} fontWeight={800}>@Contract()</text>
+        <text x={418} y={150} fill="#fff">export default class MyContract {'{'}</text>
+        <text x={434} y={176} fill={ACCENT} fontWeight={800}>@Var()<tspan fill="#fff" fontWeight={400}> counter!: ContractValue&lt;number&gt;</tspan></text>
+        <text x={434} y={202} fill={ACCENT} fontWeight={800}>@Action()<tspan fill="#fff" fontWeight={400}> increment(...) {'{'}</tspan></text>
+        <text x={418} y={228} fill="#fff">{'}'}</text>
+      </g>
+      <text x={585} y={272} textAnchor="middle" fontSize={13} fill={FADE}>декораторы SDK — прямо в редакторе, без переключения окон</text>
+    </Panel>
+  ),
 };
 
 export const SCHEME_IDS = Object.keys(SCHEMES);

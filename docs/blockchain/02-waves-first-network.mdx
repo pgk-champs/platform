@@ -22,10 +22,15 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 import NodeNetSim from '@site/src/components/NodeNetSim';
 import ComposeBuilder from '@site/src/components/ComposeBuilder';
 import DockerCmdQuest from '@site/src/components/DockerCmdQuest';
+import ToolCard from '@site/src/components/ToolCard';
+import Figure from '@site/src/components/Figure';
+import IdeTabs from '@site/src/components/IdeTabs';
+import WizardOrder from '@site/src/components/WizardOrder';
+import HotkeyTrainer from '@site/src/components/HotkeyTrainer';
 
 # Первая сеть на Waves Enterprise
 
-<ChapterProgress chapterId="waves-first-network" totalSections={13} totalQuizzes={5} totalTrainers={8} />
+<ChapterProgress chapterId="waves-first-network" totalSections={15} totalQuizzes={5} totalTrainers={10} />
 
 ## Зачем это нужно
 
@@ -36,6 +41,38 @@ import DockerCmdQuest from '@site/src/components/DockerCmdQuest';
 <CollapsibleToc toc={toc} chapterId="waves-first-network" />
 
 <SectionAnchor chapterId="waves-first-network" sectionId="why" />
+
+## Что понадобится
+
+Прежде чем поднимать сеть и разворачивать первый контракт, нужны два инструмента: Docker — он запускает ноды и локальный registry, — и IDE с поддержкой TypeScript для кода самого контракта. Площадка чемпионата встречается на разных ОС — Windows, macOS и Ubuntu, — поэтому у Docker ниже три отдельные официальные ссылки, а не одна общая.
+
+<Block kind="cheatsheet" title="Docker: официальная установка по ОС" chapterId="waves-first-network" blockId="cheatsheet-docker-install">
+
+<ToolCard
+  name="Docker Desktop — macOS"
+  url="https://docs.docker.com/desktop/setup/install/mac-install/"
+  desc="Официальная инструкция для macOS: .dmg-установщик, отдельные сборки для Intel и Apple Silicon, системные требования."
+/>
+
+<ToolCard
+  name="Docker Desktop — Windows"
+  url="https://docs.docker.com/desktop/setup/install/windows-install/"
+  desc="Официальная инструкция для Windows: .exe-установщик, требования к WSL 2 или Hyper-V."
+/>
+
+<ToolCard
+  name="Docker Engine — Ubuntu"
+  url="https://docs.docker.com/engine/install/"
+  desc="Официальная инструкция для Linux-дистрибутивов, включая Ubuntu: движок и CLI через пакетный менеджер системы, без графической оболочки Desktop."
+/>
+
+</Block>
+
+<Hint id="waves-first-network-h-ide" type="tip">
+Код контракта в этой главе — TypeScript, и писать его можно в любой IDE с его поддержкой. В этой главе и на площадке используется **WebStorm** — специализированная IDE для JS/TS от JetBrains: понимает декораторы SDK из коробки, знает `package.json` и npm-скрипты без дополнительной настройки. Подойдёт и **VS Code** — более лёгкий редактор, который даёт тот же результат после установки расширения TypeScript, но часть возможностей WebStorm в нём нужно донастраивать руками.
+</Hint>
+
+<SectionAnchor chapterId="waves-first-network" sectionId="prereqs" />
 
 ## Что такое нода в Waves Enterprise
 
@@ -254,6 +291,60 @@ class ScoreCounter {
 
 <SectionAnchor chapterId="waves-first-network" sectionId="smart-contract" />
 
+## В WebStorm: где в проекте искать декораторы
+
+Все декораторы из прошлого раздела живут в одном конкретном файле — проще разобраться, когда видно, где он лежит среди остальных. Официальный CLI `create-we-contract` (часть того же `js-contract-sdk`) командой `npm create we-contract MyContract` разворачивает готовый каркас проекта — вот как он выглядит в панели **Project** слева и с открытым `contract.ts` справа.
+
+<Figure scheme="webstorm-project-tree" caption="Дерево TS-проекта контракта в WebStorm: src/contract.ts с декораторами SDK рядом с contract.config.js и package.json" />
+
+<IdeTabs defaultIde="webstorm" items={[
+  {
+    ide: 'webstorm',
+    content: (
+      <>
+        Панель <strong>Project</strong> слева открывается и прячется сочетанием <kbd className="keys-kbd">Alt+1</kbd> (Windows/Linux) или <kbd className="keys-kbd">⌘1</kbd> (macOS), без обращения к мыши. Встроенный терминал внизу — обычный терминал системы: команды <code>docker compose</code> из этой главы выполняются прямо в нём, без переключения окон.
+      </>
+    ),
+  },
+  {
+    ide: 'vscode',
+    content: (
+      <>
+        Тот же список файлов — в панели <strong>Explorer</strong> (значок листа слева), сочетание <kbd className="keys-kbd">Ctrl+Shift+E</kbd> (<kbd className="keys-kbd">⇧⌘E</kbd> на macOS). Встроенный терминал — <kbd className="keys-kbd">Ctrl+`</kbd>, тот же принцип: команды выполняются без выхода из IDE.
+      </>
+    ),
+  },
+]} />
+
+Порядок первого запуска один и тот же вне зависимости от IDE — от открытия папки до нажатия Run. Собери его сам.
+
+<Block kind="trainer" title="Порядок первого запуска проекта" chapterId="waves-first-network" blockId="trainer-webstorm-first-run">
+<WizardOrder chapterId="waves-first-network" trainerId="trainer-webstorm-first-run" steps={[
+  { text: 'Открыть папку проекта в IDE (File → Open)', why: 'без открытого корня проекта IDE не видит package.json целиком и не строит переходы по коду между файлами.' },
+  { text: 'Развернуть src/contract.ts в панели Project', why: 'весь код контракта и его декораторы — в этом файле; до него нужно физически добраться в дереве.' },
+  { text: 'Выполнить npm install во встроенном терминале', why: 'package.json только описывает зависимости — сами файлы появляются в node_modules лишь после install; без них IDE подчеркнёт импорты SDK как ошибку.' },
+  { text: 'Настроить run configuration на нужный npm-скрипт', why: 'Run/Debug запускает не файл, а сохранённую конфигурацию запуска — без неё нечего нажимать.' },
+  { text: 'Нажать Run/Debug и проверить результат', why: 'последний шаг цикла разработки — увидеть, что скрипт действительно отработал, а не просто существует в коде.' },
+]} />
+</Block>
+
+<Block kind="trainer" title="Хоткеи WebStorm" chapterId="waves-first-network" blockId="trainer-webstorm-hotkeys">
+<HotkeyTrainer chapterId="waves-first-network" trainerId="trainer-webstorm-hotkeys" items={[
+  { action: 'Показать/скрыть панель Project', mac: '⌘1', win: 'Alt+1', linux: 'Alt+1', browserReserved: true },
+  { action: 'Search Everywhere: найти файл, класс, действие или настройку — что угодно', mac: 'Shift, дважды', win: 'Shift, дважды', linux: 'Shift, дважды' },
+  { action: 'Базовое автодополнение кода', mac: '⌃Space', win: 'Ctrl+Space', linux: 'Ctrl+Space' },
+  { action: 'Закомментировать/раскомментировать строку', mac: '⌘/', win: 'Ctrl+/', linux: 'Ctrl+/' },
+  { action: 'Переформатировать код: расставить отступы и пробелы по стилю проекта', mac: '⌥⌘L', win: 'Ctrl+Alt+L', linux: 'Ctrl+Alt+L', browserReserved: true },
+  { action: 'Переименовать (Rename) — переименует символ везде, где он используется в проекте', mac: '⇧F6', win: 'Shift+F6', linux: 'Shift+F6' },
+]} />
+</Block>
+
+<Hint id="waves-first-network-h-run-config" type="tip">
+Run/Debug запускает не сам файл, а сохранённую **конфигурацию запуска** (run configuration) — какой именно npm-скрипт выполнить. В WebStorm открой `package.json`: рядом с каждым скриптом в разделе `scripts` (`build`, `deploy`, `deploy:testnet`) появляется значок ▶ — клик по нему создаёт конфигурацию автоматически и сразу запускает скрипт; повторный клик по кнопке Run просто перезапускает уже созданную конфигурацию, не создавая новую.
+</Hint>
+
+<SectionAnchor chapterId="waves-first-network" sectionId="webstorm" />
+
 ## Типичные ошибки
 
 Все четыре сообщения ниже — реальный вывод настоящего Docker Engine, снятый вживую в этой сессии, а не восстановленный по памяти.
@@ -321,6 +412,13 @@ Error response from daemon: pull access denied for wavesenterprise/nonexistent-d
   { term: 'deploy', translation: 'развернуть', note: 'загрузить и запустить что-либо в сети — контейнер, ноду или смарт-контракт' },
   { term: 'smart contract', translation: 'смарт-контракт', note: 'код, разворачиваемый в блокчейн-сеть, чьё состояние и вызовы проверяются теми же правилами, что и обычные транзакции' },
   { term: 'consensus', translation: 'консенсус', note: 'способ, которым независимые ноды соглашаются об одной и той же версии цепочки блоков' },
+  { term: 'npm', translation: 'npm', note: 'менеджер пакетов Node.js: устанавливает зависимости из package.json и запускает npm-скрипты' },
+  { term: 'package.json', translation: 'package.json', note: 'манифест проекта: имя, зависимости, npm-скрипты (build, deploy) — то, что видит и понимает npm' },
+  { term: 'node_modules', translation: 'node_modules', note: 'папка со скачанными зависимостями проекта; создаётся npm install, в git не попадает' },
+  { term: 'tsconfig.json', translation: 'tsconfig.json', note: 'файл настроек компилятора TypeScript: какую версию JS собирать, где искать исходники' },
+  { term: 'decorator', translation: 'декоратор', note: 'пометка над классом или методом вида @Имя, которая говорит платформе, как устроен код — без декораторов SDK контракта не работал бы' },
+  { term: 'IntelliSense', translation: 'автодополнение (IntelliSense)', note: 'подсказки IDE по ходу набора кода: имена, типы, параметры — на основе анализа проекта' },
+  { term: 'run configuration', translation: 'конфигурация запуска', note: 'сохранённая в IDE настройка «что и как запускать» — например, какой npm-скрипт выполнить' },
 ]} />
 </Block>
 
@@ -418,6 +516,9 @@ Error response from daemon: pull access denied for wavesenterprise/nonexistent-d
 - [Docker Compose overview](https://docs.docker.com/compose/) — что такое docker-compose.yml и зачем он нужен, официальными словами.
 - [docker compose up — CLI reference](https://docs.docker.com/reference/cli/docker/compose/up/) — все флаги команды up, включая -d, из первоисточника.
 - [docker compose down — CLI reference](https://docs.docker.com/reference/cli/docker/compose/down/) — все флаги команды down, включая -v, из первоисточника.
+- [Meet WebStorm — JetBrains](https://www.jetbrains.com/help/webstorm/meet-webstorm.html) — официальный обзор окна IDE: панель Project, редактор, встроенный терминал.
+- [WebStorm — карточка горячих клавиш (Windows/Linux, PDF)](https://resources.jetbrains.com/storage/products/webstorm/docs/WebStorm_ReferenceCard_Windows_Linux.pdf) — полный список сочетаний по умолчанию, откуда взяты хоткеи этой главы.
+- [WebStorm — карточка горячих клавиш (macOS, PDF)](https://resources.jetbrains.com/storage/products/webstorm/docs/WebStorm_ReferenceCard_macOS.pdf) — то же самое для раскладки macOS.
 
 </Block>
 
@@ -473,6 +574,7 @@ ports:
 - Разбирать по частям команды `docker compose up -d` и `docker compose down -v`, включая назначение каждого флага.
 - Объяснять, зачем локальной сети собственный Docker registry и чем он отличается от блокчейн-реестра (ledger) из прошлой главы.
 - Описывать концептуально, как устроен смарт-контракт на Waves Enterprise: назначение декораторов `@Contract`, `@State`, `@Action`, и разницу между CreateContractTx и CallContractTx.
+- Находить `src/contract.ts` в структуре TS-проекта контракта и пользоваться в WebStorm панелью Project, встроенным терминалом и run configuration для npm-скриптов.
 - Узнавать по тексту четыре типичные ошибки Docker — отсутствие конфигурационного файла, сбитый отступ YAML, занятый порт, опечатку в имени образа — и знать, как каждую починить.
 
 <SectionAnchor chapterId="waves-first-network" sectionId="what-you-should-know" />
