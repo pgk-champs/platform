@@ -150,7 +150,7 @@ export default function SubmitTrainer() {
           type="text"
           value={chapter}
           onChange={(e) => setChapter(e.target.value)}
-          placeholder="foundation/02-it-english"
+          placeholder="it-english"
         />
       </label>
       <label className="st-field">

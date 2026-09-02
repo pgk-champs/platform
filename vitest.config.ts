@@ -20,6 +20,10 @@ export default defineConfig({
         __dirname,
         './src/test/DocsClientStub.tsx',
       ),
+      '@docusaurus/useBrokenLinks': path.resolve(
+        __dirname,
+        './src/test/UseBrokenLinksStub.ts',
+      ),
     },
   },
   test: {

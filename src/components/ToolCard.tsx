@@ -7,6 +7,11 @@ import './trainers.css';
 // сервере и клиенте, так что гидратация не расходится (SSR-safe без эффектов).
 // Сервисы с X-Frame-Options (regex101, regexone) остаются как раньше —
 // целая карточка это ссылка, embeddable не передаётся.
+// Ревью цикла 5: iframe встраивал чужой JS без единого ограничения — сервис
+// мог перекинуть top-level страницу (редирект-угон) или скачать файл без
+// подтверждения. sandbox разрешает то, что реально нужно тренажёрам
+// (скрипты, свой origin для localStorage, формы explainshell, всплывашки/
+// модалки), но не top-navigation и не downloads.
 export default function ToolCard({
   name,
   url,
@@ -50,7 +55,15 @@ export default function ToolCard({
           Открыть в новой вкладке
         </a>
       </div>
-      {open ? <iframe className="tc-frame" src={url} title={name} loading="lazy" /> : null}
+      {open ? (
+        <iframe
+          className="tc-frame"
+          src={url}
+          title={name}
+          loading="lazy"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+        />
+      ) : null}
     </div>
   );
 }

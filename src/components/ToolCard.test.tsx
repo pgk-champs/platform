@@ -21,6 +21,11 @@ describe('ToolCard', () => {
     const frame = document.querySelector('iframe');
     expect(frame).toHaveAttribute('src', 'https://explainshell.com');
     expect(frame).toHaveAttribute('loading', 'lazy');
+    // sandbox не даёт встроенному сервису угнать top-level страницу или
+    // скачать файл без подтверждения — без allow-top-navigation/allow-downloads.
+    const sandbox = frame?.getAttribute('sandbox') ?? '';
+    expect(sandbox).toContain('allow-scripts');
+    expect(sandbox).not.toMatch(/allow-top-navigation|allow-downloads/);
     // кнопка открытия в новой вкладке остаётся доступной параллельно
     const external = screen.getByText('Открыть в новой вкладке').closest('a');
     expect(external).toHaveAttribute('href', 'https://explainshell.com');

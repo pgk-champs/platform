@@ -102,4 +102,10 @@ describe('SubmitTrainer — форма', () => {
     expect(screen.getByText('wordorder: phrase должна содержать минимум два слова.')).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /по-настоящему/ })).not.toBeInTheDocument();
   });
+
+  it('плейсхолдер поля «Глава» сам проходит проверку — учит правильному формату, а не бага i3', () => {
+    render(<SubmitTrainer />);
+    const chapterInput = screen.getByLabelText(/Глава/) as HTMLInputElement;
+    expect(chapterInput.placeholder).toMatch(/^[a-z0-9-]+$/);
+  });
 });
