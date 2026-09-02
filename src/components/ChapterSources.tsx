@@ -56,11 +56,11 @@ export default function ChapterSources({ chapterId }: { chapterId: string }) {
   }, [chapterId]);
 
   if (items.length === 0) return null;
+  // Якорь #community-sources для «видео и материалы сообщества — ниже» из
+  // «Куда дальше» — постоянный <span id> в Footer/index.tsx перед этим
+  // компонентом (эта секция клиентская и пуста при SSR, id тут не годится).
   return (
-    // id — якорь для «видео и материалы сообщества — ниже» в конце
-    // статичного блока «Куда дальше» каждой главы (см. SectionAnchor выше по
-    // тексту главы, не путать с этим id — этот держит саму секцию).
-    <section className="chsrc" id="community-sources">
+    <section className="chsrc">
       <h2 className="chsrc-title">Видео и источники по теме</h2>
       <div className="chsrc-grid">
         {items.map((item) => {

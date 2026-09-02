@@ -17,6 +17,11 @@ export default function FooterWrapper(props: Record<string, unknown>) {
   const chapterId = metadata.id.split('/').pop() ?? metadata.id;
   return (
     <>
+      {/* Якорь для «видео и материалы сообщества — ниже» в конце статичного
+          блока «Куда дальше» (цикл 5). Рендерится всегда, в том числе на
+          сервере — ChapterSources сама секция клиентская (пусто до fetch),
+          и без этого якоря Docusaurus считает ссылку на неё битой. */}
+      <span id="community-sources" />
       <ChapterSources chapterId={chapterId} />
       <Footer {...props} />
       <div className="se-row">
