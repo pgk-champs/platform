@@ -10,7 +10,7 @@ const ITEMS = [
     title: 'Kotlin с нуля — курс',
     author: 'pgk-champs',
     chapterId: 'kotlin-vars',
-    data: 'https://www.youtube.com/watch?v=abc123',
+    data: 'https://www.youtube.com/watch?v=I1M5aSadK_I',
     addedAt: '2026-09-01T10:00:00.000Z',
   },
   {
@@ -92,15 +92,41 @@ test('renders only video/source/link cards of its chapter', async () => {
   expect(screen.queryByText('Подозрительное')).not.toBeInTheDocument();
 });
 
-test('cards carry type label, author and open the link in a new tab', async () => {
+test('source/link cards carry type label, author and open the link in a new tab', async () => {
   mockFetch(() => okResponse(ITEMS));
   render(<ChapterSources chapterId="kotlin-vars" />);
-  const card = (await screen.findByText('Kotlin с нуля — курс')).closest('a');
-  expect(card).toHaveAttribute('href', 'https://www.youtube.com/watch?v=abc123');
+  const card = (await screen.findByText('Официальная документация Kotlin')).closest('a');
+  expect(card).toHaveAttribute('href', 'https://kotlinlang.org/docs/basic-syntax.html');
   expect(card).toHaveAttribute('target', '_blank');
-  expect(screen.getByText('Видео')).toBeInTheDocument();
   expect(screen.getByText('Источник')).toBeInTheDocument();
-  expect(screen.getByText('добавил: pgk-champs')).toBeInTheDocument();
+  expect(screen.getByText('добавил: masha')).toBeInTheDocument();
+});
+
+test('video with a parseable youtube id renders the SSR-safe facade, not a plain link', async () => {
+  mockFetch(() => okResponse(ITEMS));
+  render(<ChapterSources chapterId="kotlin-vars" />);
+  expect(await screen.findByText('Kotlin с нуля — курс')).toBeInTheDocument();
+  expect(document.querySelector('iframe')).not.toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Kotlin с нуля — курс/ })).toBeInTheDocument();
+  expect(screen.getByText('Kotlin с нуля — курс').closest('a')).not.toBeInTheDocument();
+  expect(screen.getAllByText('Видео')[0]).toBeInTheDocument();
+});
+
+test('video without a parseable id (playlist link) falls back to a plain link card', async () => {
+  const playlist = {
+    id: 's7',
+    type: 'video',
+    title: 'Kotlin плейлист-курс',
+    author: 'pgk-champs',
+    chapterId: 'kotlin-vars',
+    data: 'https://www.youtube.com/playlist?list=PLgPRahgE-Gcu4s-I9mrHUrKUp9dY6QcJC',
+    addedAt: '2026-09-01T16:00:00.000Z',
+  };
+  mockFetch(() => okResponse([...ITEMS, playlist]));
+  render(<ChapterSources chapterId="kotlin-vars" />);
+  const card = (await screen.findByText('Kotlin плейлист-курс')).closest('a');
+  expect(card).toHaveAttribute('href', playlist.data);
+  expect(card).toHaveAttribute('target', '_blank');
 });
 
 test('renders nothing when the chapter has no sources', async () => {

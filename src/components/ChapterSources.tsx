@@ -5,6 +5,7 @@ import {
   TYPE_LABELS,
   type CommunityItem,
 } from './CommunityCatalog';
+import YoutubeFacade, { extractYoutubeVideoId } from './YoutubeFacade';
 import './trainers.css';
 
 // Авто-блок «Видео и источники по теме» в конце каждой главы (пакет sources,
@@ -12,6 +13,11 @@ import './trainers.css';
 // по chapterId и типам video/source/link. Пусто или сеть недоступна — блок не
 // рендерится вовсе, глава остаётся как была. Вставляется общим футером глав
 // (src/theme/DocItem/Footer), chapterId берётся из id документа.
+//
+// Видео (цикл 5): карточка с video/id-совпадением рендерит SSR-safe
+// YoutubeFacade вместо прямой ссылки — превью и клик остаются на странице,
+// iframe не в SSR. Плейлисты (youtube.com/playlist?list=…) id не дают —
+// падают в обычную ссылку-карточку, как источники и ссылки.
 
 const SOURCE_TYPES: CommunityItem['type'][] = ['video', 'source', 'link'];
 const TYPE_ICONS: Partial<Record<CommunityItem['type'], string>> = {
@@ -51,25 +57,44 @@ export default function ChapterSources({ chapterId }: { chapterId: string }) {
 
   if (items.length === 0) return null;
   return (
-    <section className="chsrc">
+    // id — якорь для «видео и материалы сообщества — ниже» в конце
+    // статичного блока «Куда дальше» каждой главы (см. SectionAnchor выше по
+    // тексту главы, не путать с этим id — этот держит саму секцию).
+    <section className="chsrc" id="community-sources">
       <h2 className="chsrc-title">Видео и источники по теме</h2>
       <div className="chsrc-grid">
-        {items.map((item) => (
-          <a
-            key={item.id}
-            className="chsrc-card"
-            href={item.data as string}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <span className="chsrc-badge">
+        {items.map((item) => {
+          const videoId = item.type === 'video' ? extractYoutubeVideoId(item.data as string) : null;
+          const badge = (
+            <span className={`chsrc-badge${item.type === 'video' ? ' chsrc-badge-video' : ''}`}>
               <span aria-hidden="true">{TYPE_ICONS[item.type]} </span>
               {TYPE_LABELS[item.type]}
             </span>
-            <span className="chsrc-name">{item.title}</span>
-            <span className="chsrc-meta">добавил: {item.author}</span>
-          </a>
-        ))}
+          );
+          if (videoId) {
+            return (
+              <div key={item.id} className="chsrc-card chsrc-card-video">
+                {badge}
+                <YoutubeFacade videoId={videoId} title={item.title} />
+                <span className="chsrc-name">{item.title}</span>
+                <span className="chsrc-meta">добавил: {item.author}</span>
+              </div>
+            );
+          }
+          return (
+            <a
+              key={item.id}
+              className={`chsrc-card${item.type === 'video' ? ' chsrc-card-video' : ''}`}
+              href={item.data as string}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {badge}
+              <span className="chsrc-name">{item.title}</span>
+              <span className="chsrc-meta">добавил: {item.author}</span>
+            </a>
+          );
+        })}
       </div>
     </section>
   );

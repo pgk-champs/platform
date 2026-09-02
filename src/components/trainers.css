@@ -7787,6 +7787,54 @@
   color: var(--ifm-color-emphasis-600);
 }
 
+/* видео выделено красноватым — бейдж и левая полоса карточки (цикл 5) */
+.chsrc-badge-video {
+  color: var(--ifm-color-danger);
+}
+
+.chsrc-card-video {
+  border-left: 3px solid var(--ifm-color-danger);
+}
+
+/* facade YouTube (цикл 5): превью + play-кнопка до клика, iframe после */
+.chsrc-yt-facade {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: calc(var(--ifm-global-radius) - 2px);
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--ifm-color-emphasis-100);
+  aspect-ratio: 16 / 9;
+}
+
+.chsrc-yt-thumb {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.chsrc-yt-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+
+.chsrc-yt-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: calc(var(--ifm-global-radius) - 2px);
+}
+
 /* === wiki-flow (волна 7): SuggestEdit + Comments (giscus) в футере глав === */
 .se-row {
   margin-top: 0.75rem;
