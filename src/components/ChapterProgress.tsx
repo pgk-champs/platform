@@ -1,5 +1,6 @@
 import React, { useSyncExternalStore } from 'react';
 import { store } from '../lib/store';
+import { levelForXp } from '../lib/levels';
 import ChapterTour from './ChapterTour';
 import './trainers.css';
 
@@ -23,6 +24,7 @@ export default function ChapterProgress({ chapterId, totalSections, totalQuizzes
   const quizzesDone = Math.min(Object.keys(progress.quizzes[chapterId] ?? {}).length, totalQuizzes);
   const trainersDone = Math.min(Object.keys(progress.trainers[chapterId] ?? {}).length, totalTrainers);
   const pct = totalSections > 0 ? Math.round((100 * readSections) / totalSections) : 0;
+  const lvl = levelForXp(store.getXp());
 
   return (
     <>
@@ -39,6 +41,18 @@ export default function ChapterProgress({ chapterId, totalSections, totalQuizzes
         </span>
         <span className="cp-item">
           Тренажёры {trainersDone}/{totalTrainers}
+        </span>
+        <span className="cp-sep" aria-hidden="true">
+          ·
+        </span>
+        <span
+          className="cp-item cp-level"
+          title={lvl.maxLevel ? 'Максимальный уровень' : `До уровня ${lvl.level + 1}: ${lvl.xpToNext} XP`}
+        >
+          Уровень {lvl.level} · {lvl.title}
+          <span className="cp-level-bar">
+            <span className="cp-level-fill" style={{ width: `${Math.round(lvl.progress * 100)}%` }} />
+          </span>
         </span>
       </div>
       <ChapterTour />

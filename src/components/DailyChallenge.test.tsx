@@ -153,6 +153,22 @@ test('первый ответ фиксируется — перевыбрать 
   expect(screen.getByText(new RegExp(`Правильный ответ: `))).toBeTruthy();
 });
 
+test('активный стрик показывает XP-множитель рядом с огоньком', async () => {
+  const DAY_MS = 86400000;
+  const today = todayKey();
+  const daysAgo = (n: number) => new Date(new Date(`${today}T00:00:00Z`).getTime() - n * DAY_MS).toISOString().slice(0, 10);
+  for (let n = 3; n >= 1; n -= 1) store.completeDaily(daysAgo(n), { correct: 1, total: 1 });
+
+  render(<DailyChallenge />);
+  expect(await screen.findByText(/×1\.15 XP/)).toBeTruthy(); // 1 + 3×5%
+});
+
+test('без стрика множитель не показывается', async () => {
+  render(<DailyChallenge />);
+  await screen.findByText('Вызов дня');
+  expect(screen.queryByText(/XP$/)).toBeNull();
+});
+
 test('если день уже пройден — квиз не открывается, плашка показывает результат и серию', async () => {
   store.completeDaily(todayKey(), { correct: 3, total: 5 });
   render(<DailyChallenge />);

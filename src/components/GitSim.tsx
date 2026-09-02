@@ -9,13 +9,25 @@ import './trainers.css';
 // с упрощёнными push/pull и кнопкой «коммит коллеги» для рассинхрона.
 
 const QUEST_XP = 15;
+// Бонус только за 3★ (Zachtronics-style: сравнение необязательное и не
+// блокирует прохождение — база QUEST_XP даётся в любом случае).
+const STAR_BONUS_XP = 10;
 const SEED_TS = 1756723200000; // фиксированная дата стартовых коммитов — SSR-рендер совпадает с клиентским
 
 export type GitSimScenario = 'free' | 'first-commit' | 'branches' | 'remote-demo';
 export type GitSimQuest = {
   title: string;
   goal: 'commits>=3' | 'merged' | 'conflict-resolved' | 'ff-and-merge';
+  /** Эталонное число команд для 3★ (необязательно — без него звёзды не считаются). */
+  optimalCommands?: number;
 };
+
+/** 3★ — уложился в эталон, 2★ — не более чем в полтора раза больше, иначе 1★. */
+function starsFor(commands: number, optimal: number): 1 | 2 | 3 {
+  if (commands <= optimal) return 3;
+  if (commands <= Math.ceil(optimal * 1.5)) return 2;
+  return 1;
+}
 export type GitSimProps = {
   scenario?: GitSimScenario;
   quest?: GitSimQuest;
@@ -51,7 +63,14 @@ type Sim = {
   local: Repo;
   origin: Repo | null; // только в remote-demo
   lines: Line[];
-  counters: { commits: number; merged: boolean; conflictResolved: boolean; ff: boolean; mergeCommit: boolean };
+  counters: {
+    commits: number;
+    merged: boolean;
+    conflictResolved: boolean;
+    ff: boolean;
+    mergeCommit: boolean;
+    totalCommands: number;
+  };
 };
 
 const GOAL_LABELS: Record<GitSimQuest['goal'], string> = {
@@ -318,6 +337,7 @@ function exec(prev: Sim, raw: string): Sim {
   const sim = clone(prev);
   const line = raw.trim();
   sim.lines.push({ t: 'cmd', s: line });
+  sim.counters.totalCommands += 1; // для сравнения «твои команды vs эталон» — считает всё введённое, включая ошибки
   const out = (s: string) => sim.lines.push({ t: 'out', s });
   const hint = (s: string) => sim.lines.push({ t: 'hint', s: `подсказка: ${s}` });
   const tok = tokenize(line);
@@ -748,7 +768,7 @@ function makeInitial(scenario: GitSimScenario): Sim {
     local: emptyRepo(),
     origin: null,
     lines: [],
-    counters: { commits: 0, merged: false, conflictResolved: false, ff: false, mergeCommit: false },
+    counters: { commits: 0, merged: false, conflictResolved: false, ff: false, mergeCommit: false, totalCommands: 0 },
   };
   const greet = (s: string) => sim.lines.push({ t: 'hint', s });
 
@@ -928,7 +948,8 @@ export default function GitSim({ scenario = 'free', quest, chapterId, trainerId 
   const [sim, setSim] = useState<Sim>(() => makeInitial(scenario));
   const [input, setInput] = useState('');
   const [questDone, setQuestDone] = useState(false);
-  const [xpAwarded, setXpAwarded] = useState(false);
+  const [xpAwarded, setXpAwarded] = useState(0);
+  const [stars, setStars] = useState<1 | 2 | 3 | null>(null);
   const termRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -940,12 +961,20 @@ export default function GitSim({ scenario = 'free', quest, chapterId, trainerId 
     setSim(next);
     if (!quest || questDone || !goalMet(next, quest.goal)) return;
     setQuestDone(true);
+    const earnedStars = quest.optimalCommands ? starsFor(next.counters.totalCommands, quest.optimalCommands) : null;
+    setStars(earnedStars);
     if (chapterId && trainerId) {
       const prev = store.getProgress().trainers[chapterId]?.[trainerId];
-      store.markTrainerDone(chapterId, trainerId, { goal: quest.goal, scenario });
+      store.markTrainerDone(chapterId, trainerId, {
+        goal: quest.goal,
+        scenario,
+        commands: next.counters.totalCommands,
+        stars: earnedStars,
+      });
       if (!prev) {
-        store.addXp(QUEST_XP, `trainer:${chapterId}:${trainerId}`);
-        setXpAwarded(true);
+        const xp = QUEST_XP + (earnedStars === 3 ? STAR_BONUS_XP : 0);
+        store.addXp(xp, `trainer:${chapterId}:${trainerId}`);
+        setXpAwarded(xp);
       }
     }
   };
@@ -982,7 +1011,17 @@ export default function GitSim({ scenario = 'free', quest, chapterId, trainerId 
           {questDone ? (
             <>
               ✓ Квест выполнен: {quest.title}
-              {xpAwarded ? <span className="gs-xp"> +{QUEST_XP} XP</span> : null}
+              {stars !== null ? (
+                <span
+                  className="gs-stars"
+                  title={`Команд использовано: ${sim.counters.totalCommands}, эталон: ${quest.optimalCommands}`}
+                >
+                  {' '}
+                  {'★'.repeat(stars)}
+                  {'☆'.repeat(3 - stars)}
+                </span>
+              ) : null}
+              {xpAwarded ? <span className="gs-xp"> +{xpAwarded} XP</span> : null}
             </>
           ) : (
             <>

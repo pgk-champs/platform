@@ -229,6 +229,7 @@ export default function DailyChallenge() {
 
   const ds = store.dailyState(today);
   const fire = streakFire(ds.streak);
+  const multiplier = store.getXpMultiplier();
 
   return (
     <div className="dc">
@@ -236,6 +237,11 @@ export default function DailyChallenge() {
         <span className="dc-streak">
           {fire ? <span className="dc-fire">{fire}</span> : null} Серия: {ds.streak}{' '}
           {ds.streak === 1 ? 'день' : ds.streak >= 2 && ds.streak <= 4 ? 'дня' : 'дней'}
+          {multiplier > 1 ? (
+            <span className="dc-multiplier" title="Бонус к XP за серию вызовов дня — действует на любое начисление">
+              ×{multiplier.toFixed(2).replace(/\.?0+$/, '')} XP
+            </span>
+          ) : null}
         </span>
         {ds.done ? (
           <span className="dc-done">

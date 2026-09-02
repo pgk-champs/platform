@@ -901,6 +901,55 @@
   font-size: 1.2rem;
 }
 
+.xp-toast {
+  background: var(--ifm-hover-overlay);
+  color: var(--ifm-font-color-base);
+  border-color: var(--ifm-color-emphasis-300);
+  font-size: 0.85rem;
+  padding: 0.45rem 0.85rem;
+}
+
+.level-toast {
+  background: var(--ifm-color-warning-contrast-background);
+  color: var(--ifm-color-warning-contrast-foreground);
+  border-color: var(--ifm-color-warning);
+  font-weight: var(--ifm-font-weight-bold);
+  font-size: 1.05rem;
+  padding: 0.85rem 1.25rem;
+}
+
+.ach-level {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: var(--ifm-leading);
+}
+
+.ach-level-badge {
+  font-weight: var(--ifm-font-weight-bold);
+  font-size: var(--ifm-h4-font-size);
+}
+
+.ach-level-bar {
+  flex: 1 1 220px;
+  max-width: 320px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--ifm-color-emphasis-300);
+  overflow: hidden;
+}
+
+.ach-level-fill {
+  height: 100%;
+  background: var(--ifm-color-primary);
+  border-radius: 999px;
+}
+
+.ach-level-next {
+  font-size: 0.8rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
 .ach-records-note {
   color: var(--ifm-color-emphasis-700);
   font-size: 0.9rem;
@@ -1169,6 +1218,26 @@
 
 .cp-sep {
   color: var(--ifm-color-emphasis-500);
+}
+
+.cp-level {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cp-level-bar {
+  width: 60px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--ifm-color-emphasis-300);
+  overflow: hidden;
+}
+
+.cp-level-fill {
+  height: 100%;
+  background: var(--ifm-color-primary);
+  border-radius: 999px;
 }
 
 .rl-status {
@@ -2271,6 +2340,13 @@
 
 .gs-xp {
   color: var(--ifm-color-success);
+}
+
+.gs-stars {
+  margin-left: 0.4rem;
+  color: var(--ifm-color-warning-dark);
+  letter-spacing: 1px;
+  cursor: help;
 }
 
 .gs-cols {
@@ -6229,6 +6305,12 @@
 
 .dc-fire {
   margin-right: 0.25rem;
+}
+
+.dc-multiplier {
+  margin-left: 0.4rem;
+  font-weight: var(--ifm-font-weight-bold);
+  color: var(--ifm-color-warning-dark);
 }
 
 .dc-done {

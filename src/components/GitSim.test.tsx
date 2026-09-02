@@ -173,6 +173,67 @@ test('ff-and-merge: один fast-forward квест не закрывает, me
   expect(screen.queryByText(/Квест выполнен/)).toBeNull();
 });
 
+test('квест со звёздами: уложился в эталон — 3★ и бонус-XP', () => {
+  const { container } = render(
+    <GitSim
+      scenario="branches"
+      quest={{ title: 'Слияние', goal: 'merged', optimalCommands: 6 }}
+      chapterId="git"
+      trainerId="sim-stars"
+    />,
+  );
+  const text = () => container.textContent ?? '';
+
+  // ровно 6 команд — оптимум
+  run('git switch -c feature');
+  run('edit feature.txt новая фича');
+  run('git add .');
+  run('git commit -m "фича"');
+  run('git switch main');
+  run('git merge feature');
+
+  expect(text()).toContain('★★★');
+  expect(text()).toContain('+25 XP'); // 15 база + 10 бонус за 3★
+});
+
+test('квест со звёздами: перерасход команд даёт меньше звёзд и без бонуса', () => {
+  const { container } = render(
+    <GitSim
+      scenario="branches"
+      quest={{ title: 'Слияние', goal: 'merged', optimalCommands: 2 }}
+      chapterId="git"
+      trainerId="sim-stars-over"
+    />,
+  );
+  const text = () => container.textContent ?? '';
+
+  // 6 команд при эталоне 2: 6 > ceil(2*1.5)=3 → 1★
+  run('git switch -c feature');
+  run('edit feature.txt новая фича');
+  run('git add .');
+  run('git commit -m "фича"');
+  run('git switch main');
+  run('git merge feature');
+
+  expect(text()).toContain('★☆☆');
+  expect(text()).toContain('+15 XP'); // без бонуса за звёзды
+});
+
+test('квест без optimalCommands не показывает звёзды (обратная совместимость)', () => {
+  const { container } = render(<GitSim scenario="branches" quest={{ title: 'Слияние', goal: 'merged' }} />);
+  const text = () => container.textContent ?? '';
+
+  run('git switch -c feature');
+  run('edit feature.txt новая фича');
+  run('git add .');
+  run('git commit -m "фича"');
+  run('git switch main');
+  run('git merge feature');
+
+  expect(text()).toContain('Квест выполнен');
+  expect(text()).not.toContain('★');
+});
+
 test('remote-demo: push после коммита коллеги отклоняется, после pull проходит', () => {
   const { container } = render(<GitSim scenario="remote-demo" />);
   const text = () => container.textContent ?? '';

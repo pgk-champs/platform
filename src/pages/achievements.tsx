@@ -1,6 +1,7 @@
 import React, { useState, useSyncExternalStore } from 'react';
 import Layout from '@theme/Layout';
 import { store, type TrainerResult } from '../lib/store';
+import { levelForXp } from '../lib/levels';
 import {
   ACHIEVEMENTS,
   ACHIEVEMENT_CATEGORIES,
@@ -76,6 +77,28 @@ export default function Achievements() {
       <main className="container margin-vert--lg">
         <h1>Достижения</h1>
         <div className="ach-xp">XP: {xp}</div>
+        {(() => {
+          const lvl = levelForXp(xp);
+          return (
+            <div className="ach-level">
+              <span className="ach-level-badge">
+                Уровень {lvl.level} · {lvl.title}
+              </span>
+              <span
+                className="ach-level-bar"
+                role="progressbar"
+                aria-valuenow={Math.round(lvl.progress * 100)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              >
+                <span className="ach-level-fill" style={{ width: `${Math.round(lvl.progress * 100)}%` }} />
+              </span>
+              <span className="ach-level-next">
+                {lvl.maxLevel ? 'Максимальный уровень' : `до уровня ${lvl.level + 1}: ${lvl.xpToNext} XP`}
+              </span>
+            </div>
+          );
+        })()}
         <div className="ach-filters" role="group" aria-label="Фильтр по категориям">
           {(['все', ...ACHIEVEMENT_CATEGORIES] as const).map((cat) => (
             <button

@@ -201,9 +201,32 @@ function isHintDismissed(hintId: string): boolean {
 }
 
 // --- xp ---
+// Стрик-множитель (Duolingo combo-bonus): 1 + min(стрик, 10) × 5%, потолок
+// +50%. Считается СТРОГО от вчера назад, не включая сегодня — иначе XP за
+// самый первый вызов дня, продлевающий стрик именно сегодня, сам себе же
+// поднимал бы множитель (self-reference). addXp вызывается только из
+// обработчиков/эффектов на клиенте (как и Date.now() уже везде в этом файле),
+// поэтому new Date() здесь не ломает SSR.
+const STREAK_MULTIPLIER_CAP_DAYS = 10;
+const STREAK_MULTIPLIER_STEP = 0.05;
+
+function streakDaysBeforeToday(): number {
+  let key = prevDayKey(new Date().toISOString().slice(0, 10));
+  let streak = 0;
+  while (state.daily[key]) {
+    streak += 1;
+    key = prevDayKey(key);
+  }
+  return streak;
+}
+
+function currentXpMultiplier(): number {
+  return 1 + Math.min(streakDaysBeforeToday(), STREAK_MULTIPLIER_CAP_DAYS) * STREAK_MULTIPLIER_STEP;
+}
+
 function addXp(amount: number, reason: string): void {
   if (!amount) return;
-  state.xp += amount;
+  state.xp += Math.round(amount * currentXpMultiplier());
   persist();
   // ponytail: причина пока не логируется отдельным списком — незачем, пока
   // никто её не читает; добавить xpLog, когда появится отчёт/лента событий.
@@ -212,6 +235,10 @@ function addXp(amount: number, reason: string): void {
 
 function getXp(): number {
   return state.xp;
+}
+
+function getXpMultiplier(): number {
+  return currentXpMultiplier();
 }
 
 // --- achievements ---
@@ -339,11 +366,19 @@ function prevDayKey(dateKey: string): string {
   return new Date(new Date(`${dateKey}T00:00:00Z`).getTime() - DAY_MS).toISOString().slice(0, 10);
 }
 
+// Вехи-сундучки: разовый бонус XP за серию вызовов дня — 7 и 30 дней подряд.
+// Срабатывает ровно один раз за каждый заход серии в эту длину (стрик,
+// оборвавшись и набравшись заново, снова пройдёт через 7 — это честно).
+const STREAK_MILESTONE_XP: Record<number, number> = { 7: 50, 30: 200 };
+
 /** Записывает прохождение вызова дня. Второй раз за тот же день — false. */
 function completeDaily(dateKey: string, score: { correct: number; total: number }): boolean {
   if (state.daily[dateKey]) return false;
   state.daily = { ...state.daily, [dateKey]: { ...score, ts: Date.now() } };
   persist();
+  const streak = dailyState(dateKey).streak;
+  const bonus = STREAK_MILESTONE_XP[streak];
+  if (bonus) addXp(bonus, `streak-milestone:${streak}`);
   return true;
 }
 
@@ -454,6 +489,7 @@ export const store = {
   isHintDismissed,
   addXp,
   getXp,
+  getXpMultiplier,
   achievements: { unlock: achUnlock, list: achList, isUnlocked: achIsUnlocked },
   prefs: { setOs, getOs, setName, getName },
   words: { queue: wordsQueue, grade: gradeWord, weight: wordWeight },

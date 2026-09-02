@@ -194,6 +194,57 @@ test('dailyState keeps yesterday-ending streak alive while today is not yet done
   expect(ds.streak).toBe(2);
 });
 
+// --- streak-множитель XP (Duolingo combo-bonus) ---
+
+/** N-й день до сегодняшнего (относительно реальных часов, как считает store). */
+function daysAgoKey(n: number): string {
+  const DAY_MS = 86400000;
+  const today = new Date().toISOString().slice(0, 10);
+  return new Date(new Date(`${today}T00:00:00Z`).getTime() - n * DAY_MS).toISOString().slice(0, 10);
+}
+
+test('addXp applies no bonus with no streak yet (fresh state)', () => {
+  store.addXp(100, 'test');
+  expect(store.getXp()).toBe(100);
+  expect(store.getXpMultiplier()).toBe(1);
+});
+
+test('addXp multiplies by the streak leading INTO today (yesterday backward, today excluded)', () => {
+  // 4 дня подряд, заканчивающиеся вчера — стрик до начала сегодняшней сессии.
+  for (let n = 4; n >= 1; n -= 1) store.completeDaily(daysAgoKey(n), { correct: 1, total: 1 });
+  expect(store.getXpMultiplier()).toBeCloseTo(1.2, 5); // 1 + 4×5%
+  store.addXp(100, 'test');
+  expect(store.getXp()).toBe(120);
+});
+
+test('addXp multiplier caps at +50% (10 days)', () => {
+  // 15 дней подряд по пути проходят через веху в 7 дней (см. тест ниже) — она
+  // тоже начисляет XP, поэтому сверяем прирост от addXp, а не итоговый счёт.
+  for (let n = 15; n >= 1; n -= 1) store.completeDaily(daysAgoKey(n), { correct: 1, total: 1 });
+  expect(store.getXpMultiplier()).toBeCloseTo(1.5, 5);
+  const before = store.getXp();
+  store.addXp(100, 'test');
+  expect(store.getXp() - before).toBe(150);
+});
+
+test('completing today does not retroactively inflate the multiplier used for today XP', () => {
+  // Стрик пуст — сегодняшнее прохождение вызова дня не должно поднять себе
+  // же множитель (иначе первый день серии платил бы сам себе бонус).
+  store.completeDaily(daysAgoKey(0), { correct: 5, total: 5 });
+  expect(store.getXp()).toBe(0); // completeDaily сам по себе не начисляет XP за ответы
+  store.addXp(20, 'test');
+  expect(store.getXp()).toBe(20);
+});
+
+test('streak milestones (7 and 30 days) pay a one-off XP bonus via completeDaily', () => {
+  for (let n = 6; n >= 1; n -= 1) store.completeDaily(daysAgoKey(n), { correct: 1, total: 1 });
+  expect(store.getXp()).toBe(0);
+  store.completeDaily(daysAgoKey(0), { correct: 1, total: 1 }); // 7-й день подряд
+  expect(store.dailyState(daysAgoKey(0)).streak).toBe(7);
+  // множитель за 6 предыдущих дней (1 + 6×5% = 1.3) применяется и к бонусу 50 XP
+  expect(store.getXp()).toBe(65);
+});
+
 // --- cert-words (wave 4): имя для сертификата + тренировка слов ---
 
 test('prefs.setName persists the certificate name', () => {

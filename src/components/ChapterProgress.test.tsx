@@ -55,6 +55,16 @@ test('quizzes/trainers counters are clamped at the declared total (mismatch insu
   expect(screen.getByText('Тренажёры 1/1')).toBeTruthy();
 });
 
+test('shows the level badge derived from total XP', () => {
+  render(<ChapterProgress chapterId="typing" totalSections={4} totalQuizzes={2} totalTrainers={3} />);
+  expect(screen.getByText(/Уровень 1 · Новичок/)).toBeTruthy();
+
+  act(() => {
+    store.addXp(60, 'test'); // порог 2-го уровня — 50 XP
+  });
+  expect(screen.getByText(/Уровень 2 · Стажёр/)).toBeTruthy();
+});
+
 test('progress is scoped per chapterId', () => {
   render(<ChapterProgress chapterId="typing" totalSections={2} totalQuizzes={1} totalTrainers={1} />);
   act(() => {
