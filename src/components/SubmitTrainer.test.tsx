@@ -60,6 +60,17 @@ describe('validateSubmission — те же правила, что у бота', 
   it('слишком длинный заголовок отклоняется', () => {
     expect(validateSubmission(draft({ title: 'а'.repeat(121) }))).toContain('Заголовок длиннее 120 символов.');
   });
+
+  it('глава: короткий id проходит, полный путь и заглавные буквы отклоняются', () => {
+    expect(validateSubmission(draft({ chapter: 'git-first-commit' }))).toEqual([]);
+    expect(validateSubmission(draft({ chapter: '' }))).toEqual([]);
+    expect(validateSubmission(draft({ chapter: 'foundation/05-git-first-commit' }))).toContain(
+      'Глава должна быть коротким id главы: строчные латинские буквы, цифры и дефис (например git-first-commit), без раздела и номера.',
+    );
+    expect(validateSubmission(draft({ chapter: 'Kotlin-Vars' }))).toContain(
+      'Глава должна быть коротким id главы: строчные латинские буквы, цифры и дефис (например git-first-commit), без раздела и номера.',
+    );
+  });
 });
 
 describe('SubmitTrainer — форма', () => {

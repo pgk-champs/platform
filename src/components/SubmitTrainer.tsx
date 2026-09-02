@@ -27,6 +27,8 @@ export function validateSubmission({ type, title, chapter, dataRaw }: Submission
   if (!title.trim()) reasons.push('Заголовок не может быть пустым.');
   if (title.trim().length > 120) reasons.push('Заголовок длиннее 120 символов.');
   if (chapter.trim().length > 100) reasons.push('Глава длиннее 100 символов.');
+  if (chapter.trim() && !/^[a-z0-9-]+$/.test(chapter.trim()))
+    reasons.push('Глава должна быть коротким id главы: строчные латинские буквы, цифры и дефис (например git-first-commit), без раздела и номера.');
   if (dataRaw.length > 20000) reasons.push('Данные больше 20 КБ — каталог такое не примет.');
 
   if (type === 'preset') {
