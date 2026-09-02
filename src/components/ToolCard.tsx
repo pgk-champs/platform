@@ -1,11 +1,56 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './trainers.css';
 
-export default function ToolCard({ name, url, desc }: { name: string; url: string; desc: string }) {
+// embeddable (цикл 5): сервисы без X-Frame-Options/CSP (explainshell,
+// cmdchallenge, play.kotlinlang.org) можно встроить — кнопка «Открыть здесь»
+// монтирует iframe по клику, состояние по умолчанию false и одинаково на
+// сервере и клиенте, так что гидратация не расходится (SSR-safe без эффектов).
+// Сервисы с X-Frame-Options (regex101, regexone) остаются как раньше —
+// целая карточка это ссылка, embeddable не передаётся.
+export default function ToolCard({
+  name,
+  url,
+  desc,
+  embeddable = false,
+}: {
+  name: string;
+  url: string;
+  desc: string;
+  embeddable?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+
+  if (!embeddable) {
+    return (
+      <a className="tc" href={url} target="_blank" rel="noreferrer noopener">
+        <div className="tc-name">{name}</div>
+        <div className="tc-desc">{desc}</div>
+      </a>
+    );
+  }
+
   return (
-    <a className="tc" href={url} target="_blank" rel="noreferrer noopener">
+    <div className="tc tc-embeddable">
       <div className="tc-name">{name}</div>
       <div className="tc-desc">{desc}</div>
-    </a>
+      <div className="tc-actions">
+        <button
+          type="button"
+          className="button button--sm button--primary"
+          onClick={() => setOpen((v) => !v)}
+        >
+          {open ? 'Скрыть' : 'Открыть здесь'}
+        </button>
+        <a
+          className="button button--sm button--secondary"
+          href={url}
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          Открыть в новой вкладке
+        </a>
+      </div>
+      {open ? <iframe className="tc-frame" src={url} title={name} loading="lazy" /> : null}
+    </div>
   );
 }

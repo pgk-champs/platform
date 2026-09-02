@@ -18,6 +18,7 @@ import SelfCheck from '@site/src/components/SelfCheck';
 import ChapterExam from '@site/src/components/ChapterExam';
 import Block from '@site/src/components/Block';
 import Hint from '@site/src/components/Hint';
+import ToolCard from '@site/src/components/ToolCard';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
@@ -543,7 +544,13 @@ Unresolved reference 'scre'.
 
 <Block kind="cheatsheet" title="Потренироваться" chapterId="kotlin-vars" blockId="cheatsheet-resources-practice">
 
-- [play.kotlinlang.org](https://play.kotlinlang.org) — та же песочница, что встроена в эту главу, но во весь экран: экспериментируй без установки чего-либо.
+<ToolCard
+  name="play.kotlinlang.org"
+  url="https://play.kotlinlang.org"
+  desc="Та же песочница, что встроена в эту главу, но во весь экран: экспериментируй без установки чего-либо."
+  embeddable
+/>
+
 - [Kotlin Koans](https://kotlinlang.org/docs/koans.html) — интерактивные задачи; новичку стоит брать точечно только Introduction: Hello world и String templates, остальное рассчитано на переходящих с Java.
 - [Hyperskill: Kotlin variables](https://hyperskill.org/university/kotlin/kotlin-variables) — бесплатные упражнения именно на переменные с автопроверкой.
 

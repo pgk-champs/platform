@@ -17,6 +17,7 @@ import KotlinPlay from '@site/src/components/KotlinPlay';
 import SelfCheck from '@site/src/components/SelfCheck';
 import Block from '@site/src/components/Block';
 import Hint from '@site/src/components/Hint';
+import ToolCard from '@site/src/components/ToolCard';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
@@ -824,7 +825,13 @@ Initializer type mismatch: expected 'Int', actual 'Int?'.
 
 <Block kind="cheatsheet" title="Потренироваться" chapterId="classes-collections" blockId="cheatsheet-resources-practice">
 
-- [play.kotlinlang.org](https://play.kotlinlang.org) — та же песочница, что работает в кнопках Run этой главы, но во весь экран.
+<ToolCard
+  name="play.kotlinlang.org"
+  url="https://play.kotlinlang.org"
+  desc="Та же песочница, что работает в кнопках Run этой главы, но во весь экран."
+  embeddable
+/>
+
 - [Kotlin Koans: Classes / Collections](https://play.kotlinlang.org/koans/overview) — в общем списке разделов Koans есть отдельные категории Classes и Collections — задачи с автопроверкой именно на темы этой главы.
 
 </Block>

@@ -15,6 +15,7 @@ import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import TerminalSim from '@site/src/components/TerminalSim';
+import ToolCard from '@site/src/components/ToolCard';
 
 # Регулярные выражения для grep
 
@@ -259,8 +260,17 @@ grep error app.log
 
 - [GNU Grep Manual](https://www.gnu.org/software/grep/manual/grep.html) — первоисточник: все флаги и все три диалекта регулярных выражений в одном документе.
 - [man grep (Ubuntu)](https://manpages.ubuntu.com/manpages/noble/en/man1/grep.1.html) — официальная man-страница: краткая версия того же, всегда под рукой по команде `man grep`.
-- [regex101.com](https://regex101.com/) — интерактивная песочница: вставляешь шаблон и текст, видишь совпадения подсвеченными и с пояснением каждого оператора. Выбирай flavor PCRE и проверяй свои шаблоны перед запуском.
-- [RegexOne](https://regexone.com/) — пошаговый интерактивный курс регулярных выражений с упражнениями, от точки до групп.
+
+<ToolCard
+  name="regex101.com"
+  url="https://regex101.com/"
+  desc="Интерактивная песочница: вставляешь шаблон и текст, видишь совпадения подсвеченными и с пояснением каждого оператора. Выбирай flavor PCRE и проверяй свои шаблоны перед запуском. Сайт запрещает встраивание — открывается в новой вкладке."
+/>
+<ToolCard
+  name="RegexOne"
+  url="https://regexone.com/"
+  desc="Пошаговый интерактивный курс регулярных выражений с упражнениями, от точки до групп. Сайт запрещает встраивание — открывается в новой вкладке."
+/>
 
 </Block>
 
