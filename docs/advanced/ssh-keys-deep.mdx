@@ -20,11 +20,12 @@ import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import TerminalSim from '@site/src/components/TerminalSim';
+import SshQuest from '@site/src/components/SshQuest';
 import Figure from '@site/src/components/Figure';
 
 # SSH-ключи глубоко
 
-<ChapterProgress chapterId="ssh-keys-deep" totalSections={9} totalQuizzes={3} totalTrainers={2} />
+<ChapterProgress chapterId="ssh-keys-deep" totalSections={9} totalQuizzes={3} totalTrainers={3} />
 
 ## Зачем это нужно
 
@@ -96,6 +97,14 @@ import Figure from '@site/src/components/Figure';
 Доставить публичный ключ на сервер проще всего командой `ssh-copy-id student@192.168.1.10`: она сама допишет твой `.pub` в `~/.ssh/authorized_keys` на сервере с правильными правами. Руками это то же самое, что дописать одну строку в тот файл.
 
 <Figure scheme="ssh-key-locations" caption="Приватный ключ остаётся дома под правами 600; публичный уезжает командой ssh-copy-id в authorized_keys на каждый сервер." />
+
+<Block kind="trainer" title="Квест: подключись к серверу по ключу" chapterId="ssh-keys-deep" blockId="trainer-ssh-connect">
+
+Ключ у тебя уже есть, но `ssh island@server` почему-то не пускает. Разберись, что отвечает сервер, и почини причину — как в реальной жизни. Нужны всего две вещи из этой главы: правильные права на приватный ключ и публичный ключ на сервере.
+
+<SshQuest chapterId="ssh-keys-deep" trainerId="ssh-connect" />
+
+</Block>
 
 А `known_hosts` решает обратную задачу — проверяет *сервер*: при первом подключении ssh показывает отпечаток (fingerprint) ключа сервера и спрашивает `Are you sure you want to continue connecting?`. После твоего `yes` отпечаток запоминается, и если однажды сервер ответит другим ключом, ssh поднимет тревогу `REMOTE HOST IDENTIFICATION HAS CHANGED!` — либо сервер переустановили, либо кто-то притворяется им.
 
