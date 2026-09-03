@@ -19,19 +19,21 @@ jobs:
     runs-on: ubuntu-latest
     environment: { name: github-pages }
     steps: [{ id: d, uses: actions/deploy-pages@v4 }]
-  # Второй адрес: тот же собранный сайт на своём сервере под edu.alspio.com.
-  # Зеркало к GitHub Pages — если один адрес недоступен, работает другой.
+  # Второй адрес: тот же сайт + сервис кабинета на своём сервере под edu.alspio.com.
   # Секреты EDU_HOST и EDU_SSH_KEY заданы в настройках репозитория.
   edu-mirror:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4 # ради server/
       - uses: actions/download-artifact@v4
         with: { name: site, path: build }
-      - name: rsync build to server and refresh
+      - name: rsync site + service to server and refresh
         run: |
           install -m 600 /dev/stdin "$HOME/edu_key" <<< "${{ secrets.EDU_SSH_KEY }}"
           SSH="ssh -o StrictHostKeyChecking=accept-new -o BatchMode=yes -i $HOME/edu_key"
-          $SSH root@${{ secrets.EDU_HOST }} 'rm -rf /tmp/edu-alspio-incoming && mkdir -p /tmp/edu-alspio-incoming'
-          rsync -az --delete -e "$SSH" build/ root@${{ secrets.EDU_HOST }}:/tmp/edu-alspio-incoming/
-          $SSH root@${{ secrets.EDU_HOST }} '/opt/edu-alspio/deploy.sh'
+          H=root@${{ secrets.EDU_HOST }}
+          $SSH $H 'rm -rf /tmp/edu-alspio-incoming && mkdir -p /tmp/edu-alspio-incoming/site /tmp/edu-alspio-incoming/server'
+          rsync -az --delete -e "$SSH" build/ $H:/tmp/edu-alspio-incoming/site/
+          rsync -az --delete --exclude node_modules --exclude '*.db*' -e "$SSH" server/ $H:/tmp/edu-alspio-incoming/server/
+          $SSH $H '/opt/edu-alspio/deploy.sh'
