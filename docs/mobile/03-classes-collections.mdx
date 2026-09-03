@@ -101,6 +101,8 @@ class Competitor(val name: String, var score: Int)`} />
 ```
 Первая строка — свойство `name` объекта `alice`, вторая — свойство `score` объекта `bogdan`. Каждый объект хранит свою собственную копию свойств: значения `alice` никак не влияют на `bogdan`.
 
+<Figure scheme="class-blueprint-instances" caption="Один класс — чертёж; alice и bogdan — конкретные объекты по этому чертежу, каждый со своими значениями полей." />
+
 Раз `score` объявлен через `var`, его можно менять после создания объекта — снаружи, через точку, точно так же, как меняли обычную `var`-переменную в главе 1.
 
 <KotlinPlay code={`fun main() {
@@ -175,6 +177,8 @@ class Competitor(val name: String, var score: Int = 0) {
 <Hint id="classes-collections-h2" type="important">
 Правило, о котором легко забыть: у `data class` в основном конструкторе должен быть хотя бы один параметр, и каждый параметр обязан быть `val` или `var` — иначе он не станет свойством и не попадёт ни в один из сгенерированных методов.
 </Hint>
+
+<Figure scheme="data-class-codegen" caption="Одно слово data перед class — и компилятор сам дописывает toString, equals, hashCode, copy и componentN." />
 
 ### toString(): как объект печатает себя
 
@@ -673,6 +677,8 @@ Initializer type mismatch: expected 'Int', actual 'Int?'.
 **Перевод:** «Несовпадение типа начального значения: ожидался Int, а по факту Int?». Обращение к карте по ключу через `[ ]` всегда возвращает «может быть Int, а может быть ничего» (`Int?` — nullable-тип, потому что ключа могло и не быть) — даже если ключ в этот раз точно есть. Компилятор судит по типу, а не по конкретным данным, а тип `scores["Алиса"]` — всегда `Int?`, не `Int`.
 
 **Как починить:** либо изменить тип переменной на `Int?` — `val aliceScore: Int? = scores["Алиса"]`, — либо использовать `getOrDefault("Алиса", 0)` или оператор `!!` (разберём в будущей главе про null-безопасность), если ты точно уверен, что ключ есть.
+
+<Figure scheme="nullable-box" caption="Обращение к Map по ключу возвращает Int?, а не Int: значение может быть, а может — не быть, и тип честно об этом предупреждает." />
 
 <Block kind="quiz" title="Типичные ошибки" chapterId="classes-collections" blockId="quiz-typical-errors">
 <SelfCheck chapterId="classes-collections" quizId="q6" questions={[

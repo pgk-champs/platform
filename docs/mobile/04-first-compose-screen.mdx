@@ -343,6 +343,8 @@ fun main() {
 - если `.clickable(...)` стоит **перед** `.padding(...)` — кликабельной становится вся область, включая отступ;
 - если `.clickable(...)` стоит **после** `.padding(...)` — область отступа в клик не попадает, реагирует только внутренняя часть.
 
+<Figure scheme="modifier-order-matters" caption="Порядок модификаторов меняет результат: clickable перед padding делает кликабельным всё вместе с отступом, после — только внутреннюю часть." />
+
 <Hint id="first-compose-screen-h2" type="important">
 Каждый модификатор «оборачивает» результат предыдущего, как слои: `Modifier.a().b()` значит «сначала оберни элемент в `a`, потом результат — в `b`», и от этого порядка меняется итоговая форма и поведение, совсем как в цепочке `.withPadding(...)` из демо выше, где порядок вызовов определял, какой объект получится на выходе.
 </Hint>
@@ -432,6 +434,8 @@ fun WelcomeScreenPreview() {
 <Hint id="first-compose-screen-h3" type="tip">
 Импорты (например, `androidx.compose.material3.Button` или `androidx.compose.ui.Modifier`) здесь не показаны — Android Studio добавляет их сама через автодополнение, ровно как это уже было с `MainActivity.kt` в главе Фундамента про Android Studio.
 </Hint>
+
+<Figure scheme="composable-tree" caption="Дерево вызовов: WelcomeScreen вызывает Column, а тот — Text, Text и Button; Button вызывает свой собственный Text." />
 
 ### Разбор по строкам
 

@@ -20,6 +20,7 @@ import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import TerminalSim from '@site/src/components/TerminalSim';
 import ToolCard from '@site/src/components/ToolCard';
+import Figure from '@site/src/components/Figure';
 
 # Регулярные выражения для grep
 
@@ -44,6 +45,8 @@ import ToolCard from '@site/src/components/ToolCard';
 ```bash
 grep error app.log
 ```
+
+<Figure scheme="grep-line-scan" caption="Grep сравнивает с шаблоном каждую строку файла отдельно — совпавшую печатает, остальные молча пропускает." />
 
 Наведи курсор на части команды посложнее — с флагами, которые понадобятся в первую очередь:
 
@@ -86,6 +89,8 @@ grep error app.log
 
 Второй оператор — **класс символов**: квадратные скобки со списком допустимых символов внутри. `[abc]` — «один символ: a, b или c». Внутри класса работает диапазон через дефис: `[0-9]` — любая цифра, `[a-z]` — любая строчная латинская буква, `[A-Za-z0-9]` — буква или цифра. А если первый символ в скобках — крышка, класс инвертируется: `[^0-9]` — «один любой символ, *кроме* цифры».
 
+<Figure scheme="char-class" caption="Точка без экрана — любой символ; с обратной косой — буквально точка; квадратные скобки задают набор, крышка первой — инверсию." />
+
 <Block kind="breakdown" title="Разбор по частям: grep 'v[0-9]\.[0-9]' versions.txt" chapterId="grep-regex" blockId="breakdown-class">
 <SyntaxBreakdown parts={[
   { text: 'grep ', label: 'команда', note: 'ищем строки по шаблону' },
@@ -113,6 +118,8 @@ grep error app.log
 - `grep -v '^#' config.txt` — фильтр комментариев поточнее, чем раньше: выкидываются только строки, где `#` стоит первым символом, а строки, где решётка встречается в середине, остаются.
 
 Якорь — не символ строки, а *позиция*: `^` не ищет никакую «крышку» в тексте, он утверждает «здесь начало». Поэтому шаблон `^$` находит строку нулевой длины, хотя в нём два символа.
+
+<Figure scheme="anchor-position" caption="^ и $ не совпадают ни с одним символом строки — они утверждают позицию: здесь начало, здесь конец." />
 
 <Block kind="quiz" title="Классы и якоря" chapterId="grep-regex" blockId="quiz-anchors">
 <SelfCheck chapterId="grep-regex" quizId="quiz-anchors" questions={[
@@ -149,6 +156,8 @@ grep error app.log
   { text: ' codes.txt', label: 'аргумент', note: 'где искать' },
 ]} />
 </Block>
+
+<Figure scheme="regex-anatomy" caption="Четыре разных элемента сцепляются в один шаблон: позиция, повторяемый класс, обычный символ, снова класс с повторением." />
 
 <Block kind="quiz" title="Квантификаторы" chapterId="grep-regex" blockId="quiz-quant">
 <SelfCheck chapterId="grep-regex" quizId="quiz-quant" questions={[

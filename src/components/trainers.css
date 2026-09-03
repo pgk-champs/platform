@@ -8747,3 +8747,16 @@
   display: block;
   height: 1px;
 }
+
+/* Появление иллюстрации при подходе к ней. Классы вешает JS: без скриптов
+   картинка видна сразу, прятать её стилями нельзя. */
+.fig-hidden {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.fig-shown {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.5s var(--pgk-ease), transform 0.5s var(--pgk-ease);
+}

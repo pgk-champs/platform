@@ -19,6 +19,7 @@ import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import TerminalSim from '@site/src/components/TerminalSim';
+import Figure from '@site/src/components/Figure';
 
 # SSH-ключи глубоко
 
@@ -61,6 +62,8 @@ import TerminalSim from '@site/src/components/TerminalSim';
 
 Сервер присылает случайные данные, твоя машина подписывает их приватным ключом, сервер проверяет подпись публичным. Подпись, созданную приватным ключом, может проверить только парный публичный — и наоборот, по публичному ключу восстановить приватный практически невозможно. Поэтому перехват публичного ключа злоумышленнику ничего не даёт, а приватный ключ даже не передаётся по сети — сервер его никогда не видит.
 
+<Figure scheme="ssh-handshake" caption="Приватный ключ подписывает случайный вызов сервера; сервер проверяет подпись публичным — сам приватный ключ по сети не передаётся." />
+
 Сгенерировать пару мы уже умеем, теперь прочитаем команду целиком:
 
 <Block kind="breakdown" title="Разбор по частям: ssh-keygen -t ed25519 -C 'oleg@laptop'" chapterId="ssh-keys-deep" blockId="breakdown-keygen">
@@ -91,6 +94,8 @@ import TerminalSim from '@site/src/components/TerminalSim';
 
 Доставить публичный ключ на сервер проще всего командой `ssh-copy-id student@192.168.1.10`: она сама допишет твой `.pub` в `~/.ssh/authorized_keys` на сервере с правильными правами. Руками это то же самое, что дописать одну строку в тот файл.
 
+<Figure scheme="ssh-key-locations" caption="Приватный ключ остаётся дома под правами 600; публичный уезжает командой ssh-copy-id в authorized_keys на каждый сервер." />
+
 А `known_hosts` решает обратную задачу — проверяет *сервер*: при первом подключении ssh показывает отпечаток (fingerprint) ключа сервера и спрашивает `Are you sure you want to continue connecting?`. После твоего `yes` отпечаток запоминается, и если однажды сервер ответит другим ключом, ssh поднимет тревогу `REMOTE HOST IDENTIFICATION HAS CHANGED!` — либо сервер переустановили, либо кто-то притворяется им.
 
 <Block kind="quiz" title="Пара ключей и файлы" chapterId="ssh-keys-deep" blockId="quiz-pair">
@@ -115,6 +120,8 @@ ssh-add -l                 # список ключей, которые аген�
 ```
 
 Странная на вид первая строка объясняется просто: `ssh-agent -s` печатает команды настройки переменных окружения, а `eval` их выполняет в текущей оболочке — так остальные команды узнают, где искать агента. В Ubuntu с графическим входом агент, как правило, уже запущен, и остаётся только `ssh-add`.
+
+<Figure scheme="ssh-agent-flow" caption="ssh-add расшифровывает ключ один раз за сеанс; агент держит его в памяти — дальше подключения проходят без вопросов." />
 
 <Block kind="quiz" title="ssh-agent" chapterId="ssh-keys-deep" blockId="quiz-agent">
 <SelfCheck chapterId="ssh-keys-deep" quizId="quiz-agent" questions={[
@@ -169,6 +176,8 @@ Host github.com
     User git
     IdentityFile ~/.ssh/github_key
 ```
+
+<Figure scheme="ssh-config-alias" caption="ssh читает config по алиасу Host и сам подставляет нужный IdentityFile — короткое имя тянет за собой весь блок." />
 
 Для GitHub псевдоним совпадает с настоящим адресом — так git, который ходит на `github.com`, автоматически подхватит нужный ключ. Обрати внимание на `User git`: на GitHub все подключаются пользователем `git`, а *кто именно* ты — сервер понимает по предъявленному ключу. Именно поэтому команда проверки выглядит так:
 

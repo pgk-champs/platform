@@ -11,6 +11,7 @@ import ChapterCover from '@site/src/components/ChapterCover';
 <ChapterCover chapterId="02b-english-practice" />
 
 import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import Figure from '@site/src/components/Figure';
 import ToolCard from '@site/src/components/ToolCard';
 import SelfCheck from '@site/src/components/SelfCheck';
 import ChapterExam from '@site/src/components/ChapterExam';
@@ -74,6 +75,8 @@ import TranslatorBox from '@site/src/components/TranslatorBox';
 Ключевые слова читаются как английские слова: `var` — «вар», `val` — «вэл», `fun` — «фан», `if` — «иф», `else` — «элс», `while` — «уа́йл». Составные имена читают по частям: `println` — «принт-лайн» (print line — «печатай строку»), а не «принтлн». Знак `=` в объявлении читают «и́квалз» (equals — «равно»), а по-русски просто говорят «равно».
 
 Скобки тоже имеют имена: `( )` — parentheses (пэрэ́нтэсиз, «круглые»), `{ }` — curly braces (кёрли бре́йсиз, «фигурные»), `[ ]` — square brackets (сквэа брэ́кетс, «квадратные»). В русской речи так и говорят: «открой фигурную», «в квадратных скобках».
+
+<Figure scheme="en2-bracket-names" caption="Три пары скобок и их английские имена: parentheses, curly braces, square brackets." />
 
 Разбери, как произносится вслух строка Kotlin-кода — наведи курсор на каждую часть:
 
@@ -165,6 +168,8 @@ import TranslatorBox from '@site/src/components/TranslatorBox';
 Произношение — не про «красивый акцент», а про то, чтобы тебя поняли. «Хейт» вместо «хайт» (height) — это буквально другое слово (hate — «ненависть»), и слушатель честно зависнет.
 </Hint>
 
+<Figure scheme="en2-spelling-vs-sound" caption="Написание и звучание расходятся: height — «хайт», queue — «кью», cache — «кэш»." />
+
 <Block kind="quiz" title="Ловушки произношения" chapterId="02b-english-practice" blockId="quiz-pronunciation">
 <SelfCheck chapterId="02b-english-practice" quizId="quiz-pronunciation" questions={[
   { q: 'Как звучит height (высота)?', options: ['«хейт»', '«хайт»', '«хейгхт»', '«хигхт»'], correct: 1, why: 'height — «хайт». «Хейт» — это hate, «ненависть»: перепутаешь — получится другое слово.' },
@@ -179,6 +184,8 @@ import TranslatorBox from '@site/src/components/TranslatorBox';
 ## Стратегия переводчиков
 
 Переводчик — легальный и правильный инструмент программиста. Неправильно им пользоваться только одним способом: переводить **по одному слову**. Слово вне фразы — многозначно: переводчик, получив «журнал», честно предложит magazine (глянцевый журнал), хотя ты имел в виду log (журнал событий). Дай ему целую фразу — и по контексту он выберет верное значение.
+
+<Figure scheme="en2-word-vs-phrase" caption="Слово «журнал» само по себе многозначно; фраза «журнал ошибок сервера» переводится однозначно — server error log." />
 
 Три правила, которые превращают переводчик из генератора чуши в рабочий инструмент:
 
@@ -282,6 +289,8 @@ import TranslatorBox from '@site/src/components/TranslatorBox';
 **Почему так выходит:** у общего языка и у индустрии разные словари. Переводчик по умолчанию отвечает общим.
 
 **Как починить:** термины сверять по реальным текстам — сообщениям ошибок, командам, документации. Если слово не встречается в выводе git или в меню IDE — это не термин.
+
+<Figure scheme="en2-term-vs-dictionary" caption="Словарь предлагает bough (ботаника); реальный термин — branch, потому что так называется команда git branch." />
 
 ### 4. Молчать из-за стеснения за акцент
 

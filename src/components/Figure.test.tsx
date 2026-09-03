@@ -1,5 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import Figure, { SCHEME_IDS } from './Figure';
+import { coreSchemes } from './figures/core';
+import { foundationSchemes } from './figures/foundation';
+import { foundationBSchemes } from './figures/foundationB';
+import { mobileSchemes } from './figures/mobile';
+import { blockchainSchemes } from './figures/blockchain';
+import { advancedSchemes } from './figures/advanced';
 
 test('renders caption and source line', () => {
   render(
@@ -13,33 +19,28 @@ test('renders caption and source line', () => {
   expect(screen.getByText('Фото: Pexels — свободная лицензия')).toBeTruthy();
 });
 
-test('every scheme renders an svg with the caption as accessible name', () => {
-  expect(SCHEME_IDS).toEqual([
-    'git-three-zones',
-    'git-local-remote',
-    'linux-fs-tree',
-    'blockchain-chain',
-    'compose-layout',
-    'ui-kit-modules',
-    'ubuntu-windows',
-    'webstorm-project-tree',
-    'branch-tree',
-    'rwx-bits',
-    'memory-boxes',
-    'lambda-box',
-    'collections-shelf',
-    'state-flow',
-    'error-anatomy',
-    'android-studio-panels',
-    'compose-preview',
-    'dp-vs-sp',
-    'aar-vs-jar',
-  ]);
+test('каждая схема рисует svg, доступное имя которого — подпись', () => {
+  expect(SCHEME_IDS.length).toBeGreaterThan(0);
   for (const id of SCHEME_IDS) {
     const { unmount } = render(<Figure scheme={id} caption={`схема ${id}`} />);
     expect(screen.getByRole('img', { name: `схема ${id}` })).toBeTruthy();
     unmount();
   }
+});
+
+test('имена схем не повторяются между модулями треков', () => {
+  // Модули пишутся параллельно; одинаковый id молча затирал бы чужую схему.
+  const all = [
+    ...Object.keys(coreSchemes),
+    ...Object.keys(foundationSchemes),
+    ...Object.keys(foundationBSchemes),
+    ...Object.keys(mobileSchemes),
+    ...Object.keys(blockchainSchemes),
+    ...Object.keys(advancedSchemes),
+  ];
+  const duplicates = all.filter((id, i) => all.indexOf(id) !== i);
+  expect(duplicates).toEqual([]);
+  expect(SCHEME_IDS.length).toBe(all.length);
 });
 
 test('новые схемы несут осмысленный текст, а не только рамку', () => {

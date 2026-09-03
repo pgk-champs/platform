@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import { coreSchemes } from './figures/core';
 import { foundationSchemes } from './figures/foundation';
+import { foundationBSchemes } from './figures/foundationB';
+import { advancedSchemes } from './figures/advanced';
 import { mobileSchemes } from './figures/mobile';
 import { blockchainSchemes } from './figures/blockchain';
 import './trainers.css';
@@ -12,6 +14,8 @@ import './trainers.css';
 const SCHEMES = {
   ...coreSchemes,
   ...foundationSchemes,
+  ...foundationBSchemes,
+  ...advancedSchemes,
   ...mobileSchemes,
   ...blockchainSchemes,
 };
@@ -32,8 +36,30 @@ export default function Figure({
   children?: React.ReactNode;
 }) {
   const imgUrl = useBaseUrl(img ?? '/');
+  const ref = useRef<HTMLElement | null>(null);
+
+  // Появление иллюстрации при подходе к ней. Класс вешает JS, поэтому без
+  // скриптов и при отключённой анимации картинка просто видна сразу —
+  // прятать её css-ом «на всякий случай» нельзя, это скроет контент.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return undefined;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined;
+    el.classList.add('fig-hidden');
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        el.classList.add('fig-shown');
+        observer.disconnect();
+      },
+      { threshold: 0.12 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <figure className="fig">
+    <figure className="fig" ref={ref}>
       <div className="fig-media">
         {scheme && SCHEMES[scheme] ? SCHEMES[scheme](caption) : null}
         {img ? <img src={imgUrl} alt={alt ?? caption} loading="lazy" /> : null}
