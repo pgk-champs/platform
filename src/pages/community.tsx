@@ -9,7 +9,7 @@ export default function Community() {
   return (
     <Layout
       title="Сообщество"
-      description="Каталог материалов от студентов: пресеты тренажёров, репозитории и полезные ссылки"
+      description="Каталог материалов от студентов: видео и источники по темам глав, пресеты тренажёров, репозитории и полезные ссылки"
     >
       <main className="container margin-vert--lg">
         <h1>Сообщество</h1>

@@ -449,10 +449,6 @@
   overflow: hidden;
 }
 
-.block:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-}
-
 .block-header {
   display: flex;
   align-items: center;
@@ -953,7 +949,7 @@
   background: var(--ifm-color-success-contrast-background);
   color: var(--ifm-color-success-contrast-foreground);
   border: 1px solid var(--ifm-color-success);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--pgk-shadow-raised);
   animation: ach-toast-in 0.25s ease-out;
 }
 
@@ -3576,7 +3572,7 @@
 }
 
 .nns-node-off text {
-  fill: var(--ifm-color-emphasis-500);
+  fill: var(--ifm-color-emphasis-700);
 }
 
 .nns-controls {
@@ -5200,7 +5196,7 @@
 
 .edp-badge-text,
 .edp-btn-text {
-  fill: var(--ifm-color-white);
+  fill: var(--ifm-button-color);
 }
 
 .edp-text {
@@ -5226,7 +5222,7 @@
 }
 
 .edp-marker text {
-  fill: var(--ifm-color-white);
+  fill: var(--ifm-button-color);
   font-weight: var(--ifm-font-weight-bold);
 }
 
@@ -5643,7 +5639,7 @@
 }
 
 .csm-pill-label {
-  fill: var(--ifm-color-white);
+  fill: var(--ifm-button-color);
 }
 
 .csm-sketch-no {
@@ -7563,10 +7559,6 @@
   box-shadow: var(--pgk-shadow-raised);
 }
 
-.block:hover {
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-}
-
 .hh-hero {
   padding: 4rem 1rem 3rem;
   text-align: center;
@@ -8918,7 +8910,7 @@
 .mn-heat th, .mn-heat td { border: 1px solid var(--ifm-color-emphasis-200); text-align: center; }
 .mn-heat-name { position: sticky; left: 0; background: var(--ifm-background-surface-color); text-align: left !important; padding: 0.3rem 0.6rem; max-width: 9rem; overflow: hidden; text-overflow: ellipsis; }
 .mn-heat-col { padding: 0.3rem 0.35rem; font-weight: 700; color: var(--ifm-color-emphasis-700); }
-.mn-cell { width: 1.9rem; height: 1.9rem; color: var(--ifm-color-emphasis-600); font-variant-numeric: tabular-nums; }
+.mn-cell { width: 1.9rem; height: 1.9rem; color: var(--ifm-color-emphasis-700); font-variant-numeric: tabular-nums; }
 .mn-cell-on { background: color-mix(in srgb, var(--ifm-color-primary) 22%, transparent); color: var(--ifm-font-color-base); font-weight: 700; }
 .mn-track-mobile { color: var(--ifm-color-primary); }
 
@@ -9007,7 +8999,7 @@
 .sshq { border: 1px solid var(--ifm-color-emphasis-300); border-radius: var(--ifm-card-border-radius); overflow: hidden; background: #0b0e14; }
 .sshq-status { display: flex; flex-wrap: wrap; gap: 0.8rem; padding: 0.5rem 0.9rem; background: var(--ifm-background-surface-color); border-bottom: 1px solid var(--ifm-color-emphasis-200); font-size: 0.82rem; font-weight: 600; }
 .sshq-ok { color: var(--pgk-text-success); }
-.sshq-todo { color: var(--ifm-color-emphasis-600); }
+.sshq-todo { color: var(--ifm-color-emphasis-700); }
 .sshq-screen { max-height: 320px; overflow-y: auto; padding: 0.8rem 0.9rem; font-family: var(--ifm-font-family-monospace); font-size: 0.85rem; line-height: 1.5; color: #d6deeb; }
 .sshq-line { white-space: pre-wrap; word-break: break-word; }
 .sshq-cmd { color: #e6f0ff; }

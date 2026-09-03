@@ -1,4 +1,4 @@
-import React, { useState, useSyncExternalStore } from 'react';
+import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import { store, type BlockKind, type FavPayload } from '../lib/store';
 import './trainers.css';
 
@@ -27,10 +27,15 @@ export default function Block({ kind, title, chapterId, blockId, favPayload, chi
   // страницы «Избранное» в другой вкладке того же приложения, или блок
   // свернули/развернули на другой странице с тем же blockId).
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
+  // store поднимает localStorage ещё при импорте на клиенте, поэтому «избранное»
+  // и «свёрнутость» читаем только после монтирования — иначе первый клиентский
+  // рендер разойдётся с серверным (пустым) и React выдаст hydration mismatch.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const meta = KIND_META[kind];
   const favId = chapterId && blockId ? `${chapterId}:${blockId}` : undefined;
-  const isFav = favId ? store.favorites.isFavorite(favId) : false;
+  const isFav = mounted && favId ? store.favorites.isFavorite(favId) : false;
 
   // Без blockId сворачивание работает, но не переживает перезагрузку —
   // персистить в store нечем ключевать. С blockId (плюс chapterId, если
@@ -38,7 +43,7 @@ export default function Block({ kind, title, chapterId, blockId, favPayload, chi
   // запоминается per-blockId, по умолчанию развёрнуто.
   const collapseKey = favId ?? blockId;
   const [localCollapsed, setLocalCollapsed] = useState(false);
-  const collapsed = collapseKey ? store.block.isCollapsed(collapseKey) : localCollapsed;
+  const collapsed = collapseKey ? (mounted ? store.block.isCollapsed(collapseKey) : false) : localCollapsed;
   const toggleCollapsed = () => {
     if (collapseKey) {
       store.block.setCollapsed(collapseKey, !collapsed);

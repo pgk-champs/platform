@@ -1,4 +1,4 @@
-import React, { useState, useSyncExternalStore } from 'react';
+import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import { store } from '../lib/store';
 import SpeakButton from './SpeakButton';
 import './trainers.css';
@@ -11,6 +11,8 @@ export default function Flashcards({ cards, chapterId }: { cards: Card[]; chapte
   // всегда; без chapterId это просто лишняя (и дешёвая) подписка.
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const [i, setI] = useState(0);
   const [flipped, setFlipped] = useState(false);
 
@@ -35,7 +37,9 @@ export default function Flashcards({ cards, chapterId }: { cards: Card[]; chapte
   };
 
   const favId = chapterId ? `${chapterId}:word:${card.term}` : undefined;
-  const isFav = favId ? store.favorites.isFavorite(favId) : false;
+  // Избранное читаем только после монтирования — иначе hydration mismatch у
+  // вернувшегося ученика (store поднимает localStorage при импорте).
+  const isFav = mounted && favId ? store.favorites.isFavorite(favId) : false;
   const toggleFav = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!favId || !chapterId) return;
