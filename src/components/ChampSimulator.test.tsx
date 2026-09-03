@@ -1,9 +1,19 @@
-import { render, screen, fireEvent, act, within } from '@testing-library/react';
+import { render, screen, fireEvent, act, within, waitFor } from '@testing-library/react';
 import { store } from '../lib/store';
+import { isLoggedIn, submitResult } from '../lib/account';
 import ChampSimulator from './ChampSimulator';
+
+// Кабинет мокаем: тест управляет «вошёл/не вошёл» и ловит отправку результата,
+// не поднимая сеть.
+vi.mock('../lib/account', () => ({
+  isLoggedIn: vi.fn(() => false),
+  submitResult: vi.fn(async () => true),
+}));
 
 beforeEach(() => {
   store.__resetForTests();
+  vi.mocked(isLoggedIn).mockReturnValue(false);
+  vi.mocked(submitResult).mockClear();
 });
 
 afterEach(() => {
@@ -111,31 +121,39 @@ test('finishing a perfect module scores full marks, "Отлично" and XP once
   expect(store.sim.stats('g').count).toBe(2);
 });
 
-test('"Отправить в лидерборд" opens a leaderboard issue with the correct JSON', () => {
+test('без входа симулятор зовёт войти, а не отправляет результат', () => {
+  vi.mocked(isLoggedIn).mockReturnValue(false);
+  render(<ChampSimulator />);
+  startModule('Ж. Подготовка продукта');
+  fireEvent.click(criteriaCheckboxes()[0]);
+  fireEvent.click(screen.getByText('Завершить спринт'));
+  expect(screen.getByText(/Войди через GitHub/)).toBeTruthy();
+  expect(screen.queryByText(/Отправить в рейтинг/)).toBeNull();
+});
+
+test('вошедший ученик отправляет результат в рейтинг от аккаунта', async () => {
+  vi.mocked(isLoggedIn).mockReturnValue(true);
   vi.useFakeTimers();
-  const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
   render(<ChampSimulator />);
   startModule('Ж. Подготовка продукта');
   fireEvent.click(criteriaCheckboxes()[0]); // 0.4 из 7
   act(() => {
-    vi.advanceTimersByTime(10_000); // 10с прошло из отведённого часа
+    vi.advanceTimersByTime(10_000); // 10с из отведённого часа
   });
   fireEvent.click(screen.getByText('Завершить спринт'));
+  vi.useRealTimers();
 
-  fireEvent.click(screen.getByText('Отправить в лидерборд 🏆'));
-  expect(openSpy).toHaveBeenCalledTimes(1);
-  const url = new URL(openSpy.mock.calls[0][0] as string);
-  expect(url.origin + url.pathname).toBe('https://github.com/pgk-champs/leaderboard/issues/new');
-  expect(url.searchParams.get('template')).toBe('result.yml');
-  expect(url.searchParams.get('title')).toBe('Результат: Ж. Подготовка продукта');
-  const payload = JSON.parse(url.searchParams.get('result') as string);
-  expect(payload.module).toBe('zh');
-  expect(payload.score).toBe(0.4);
-  expect(payload.maxScore).toBe(7);
-  expect(payload.durationSec).toBe(10);
-  expect(payload.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-
-  openSpy.mockRestore();
+  fireEvent.click(screen.getByText('Отправить в рейтинг 🏆'));
+  await waitFor(() => expect(submitResult).toHaveBeenCalledTimes(1));
+  expect(vi.mocked(submitResult).mock.calls[0][0]).toMatchObject({
+    module: 'zh',
+    title: 'Ж. Подготовка продукта',
+    score: 0.4,
+    maxScore: 7,
+    durationSec: 10,
+  });
+  // после успешной отправки кнопка сообщает об этом и блокируется
+  expect(await screen.findByText('Результат в рейтинге ✓')).toBeTruthy();
 });
 
 test('"Выбрать другой модуль" returns to the module grid', () => {

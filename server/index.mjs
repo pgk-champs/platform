@@ -45,6 +45,37 @@ const upsertUser = db.prepare(`INSERT INTO users (gh_id, login, name, avatar, pr
 const getUser = db.prepare('SELECT * FROM users WHERE gh_id = ?');
 const saveProgress = db.prepare('UPDATE users SET progress=?, updated_at=? WHERE gh_id=?');
 
+// Рейтинг: лучший результат ученика по каждому модулю симулятора чемпионата.
+db.exec(`CREATE TABLE IF NOT EXISTS results (
+  gh_id        INTEGER NOT NULL,
+  module       TEXT NOT NULL,
+  title        TEXT,
+  score        REAL NOT NULL,
+  max_score    REAL NOT NULL,
+  duration_sec INTEGER NOT NULL DEFAULT 0,
+  ts           INTEGER NOT NULL,
+  PRIMARY KEY (gh_id, module)
+)`);
+// Обновляем строку, только если новый результат лучше: выше балл, а при равном —
+// быстрее. Так «Отправить» можно жать сколько угодно, рекорд не ухудшится.
+const upsertResult = db.prepare(`INSERT INTO results (gh_id, module, title, score, max_score, duration_sec, ts)
+  VALUES (@gh_id, @module, @title, @score, @max_score, @duration_sec, @ts)
+  ON CONFLICT(gh_id, module) DO UPDATE SET
+    title=excluded.title, score=excluded.score, max_score=excluded.max_score,
+    duration_sec=excluded.duration_sec, ts=excluded.ts
+  WHERE excluded.score > results.score
+     OR (excluded.score = results.score AND excluded.duration_sec < results.duration_sec)`);
+const boardByModule = db.prepare(`SELECT r.gh_id, u.login, u.name, u.avatar, r.score, r.max_score, r.duration_sec, r.ts
+  FROM results r JOIN users u ON u.gh_id = r.gh_id
+  WHERE r.module = ? ORDER BY r.score DESC, r.duration_sec ASC, r.ts ASC LIMIT 200`);
+const boardOverall = db.prepare(`SELECT r.gh_id, u.login, u.name, u.avatar,
+    ROUND(SUM(r.score), 2) AS score, ROUND(SUM(r.max_score), 2) AS max_score,
+    SUM(r.duration_sec) AS duration_sec, COUNT(*) AS modules, MAX(r.ts) AS ts
+  FROM results r JOIN users u ON u.gh_id = r.gh_id
+  GROUP BY r.gh_id ORDER BY score DESC, duration_sec ASC LIMIT 200`);
+const modulesList = db.prepare('SELECT module, title, COUNT(*) AS players FROM results GROUP BY module ORDER BY module');
+const myResults = db.prepare('SELECT module, title, score, max_score, duration_sec, ts FROM results WHERE gh_id = ? ORDER BY module');
+
 // --- сессии: подписанный токен, без кук; клиент шлёт его в Authorization ---
 const b64u = (buf) => Buffer.from(buf).toString('base64url');
 function sign(payload) {
@@ -232,6 +263,69 @@ const server = http.createServer(async (req, res) => {
       const now = Date.now();
       saveProgress.run(JSON.stringify(merged), now, s.id);
       return json(res, 200, { progress: merged, updated_at: now });
+    }
+
+    // --- Рейтинг ---
+    // Приём результата симулятора от вошедшего ученика.
+    if (path === '/leaderboard' && req.method === 'PUT') {
+      const s = bearer(req);
+      if (!s) return json(res, 401, { error: 'unauthorized' });
+      if (!getUser.get(s.id)) return json(res, 401, { error: 'unauthorized' });
+      let body;
+      try {
+        body = JSON.parse(await readBody(req, 10_000));
+      } catch {
+        return json(res, 400, { error: 'bad json' });
+      }
+      const module = String(body.module || '').slice(0, 64);
+      const score = Number(body.score);
+      const maxScore = Number(body.maxScore);
+      // Доверять клиентскому баллу нельзя вслепую, но и судейство тут условное:
+      // ограничиваем диапазон здравыми рамками, чтобы нельзя было прислать 10^9.
+      if (!module || !Number.isFinite(score) || !Number.isFinite(maxScore) || maxScore <= 0 || score < 0 || score > maxScore) {
+        return json(res, 400, { error: 'bad result' });
+      }
+      upsertResult.run({
+        gh_id: s.id,
+        module,
+        title: String(body.title || module).slice(0, 200),
+        score: Math.round(score * 100) / 100,
+        max_score: Math.round(maxScore * 100) / 100,
+        duration_sec: Math.max(0, Math.min(24 * 3600, Math.round(Number(body.durationSec) || 0))),
+        ts: Date.now(),
+      });
+      return json(res, 200, { ok: true });
+    }
+
+    // Таблица лидеров: ?module=<id> или overall (по умолчанию). Публичная.
+    if (path === '/leaderboard' && req.method === 'GET') {
+      const module = url.searchParams.get('module');
+      const rows =
+        module && module !== 'overall' ? boardByModule.all(module) : boardOverall.all();
+      const me = bearer(req);
+      return json(res, 200, {
+        module: module || 'overall',
+        modules: modulesList.all(),
+        rows: rows.map((r, i) => ({ ...r, place: i + 1, me: !!(me && me.id === r.gh_id) })),
+      });
+    }
+
+    // Мои результаты и места — для профиля.
+    if (path === '/leaderboard/me') {
+      const s = bearer(req);
+      if (!s) return json(res, 401, { error: 'unauthorized' });
+      const mine = myResults.all(s.id);
+      const withPlace = mine.map((r) => {
+        const board = boardByModule.all(r.module);
+        const place = board.findIndex((b) => b.gh_id === s.id) + 1;
+        return { ...r, place, players: board.length };
+      });
+      const overall = boardOverall.all();
+      const overallPlace = overall.findIndex((b) => b.gh_id === s.id) + 1;
+      return json(res, 200, {
+        modules: withPlace,
+        overall: overallPlace ? { place: overallPlace, players: overall.length } : null,
+      });
     }
 
     return json(res, 404, { error: 'not found' });

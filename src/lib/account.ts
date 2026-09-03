@@ -138,6 +138,70 @@ export async function sync(): Promise<boolean> {
   }
 }
 
+// --- Рейтинг ---
+export type BoardRow = {
+  gh_id: number;
+  login: string;
+  name: string;
+  avatar: string;
+  score: number;
+  max_score: number;
+  duration_sec: number;
+  modules?: number;
+  place: number;
+  me: boolean;
+};
+export type Board = {
+  module: string;
+  modules: { module: string; title: string; players: number }[];
+  rows: BoardRow[];
+};
+export type MyPlaces = {
+  modules: { module: string; title: string; score: number; max_score: number; duration_sec: number; place: number; players: number }[];
+  overall: { place: number; players: number } | null;
+};
+
+/** Отправить результат симулятора в рейтинг от имени вошедшего ученика.
+ *  Возвращает true при успехе; молча false, если не вошёл или сеть недоступна. */
+export async function submitResult(r: {
+  module: string;
+  title: string;
+  score: number;
+  maxScore: number;
+  durationSec: number;
+}): Promise<boolean> {
+  if (!getToken()) return false;
+  try {
+    const res = await api('/leaderboard', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(r),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function fetchBoard(module = 'overall'): Promise<Board | null> {
+  try {
+    const r = await api(`/leaderboard?module=${encodeURIComponent(module)}`);
+    return r.ok ? ((await r.json()) as Board) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchMyPlaces(): Promise<MyPlaces | null> {
+  if (!getToken()) return null;
+  try {
+    const r = await api('/leaderboard/me');
+    return r.ok ? ((await r.json()) as MyPlaces) : null;
+  } catch {
+    return null;
+  }
+}
+
 // --- подписка на изменения состояния кабинета (для кнопки в шапке и страницы) ---
 const bus = typeof EventTarget !== 'undefined' ? new EventTarget() : null;
 function notify() {

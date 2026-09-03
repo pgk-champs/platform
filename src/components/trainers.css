@@ -8865,3 +8865,44 @@
   cursor: pointer; padding: 0.4rem 0; font-size: 0.92rem;
 }
 .ac-logout:hover { text-decoration: underline; }
+
+/* === Рейтинг (лидерборд) === */
+.lb-wrap { margin-top: 1rem; }
+.lb-tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+.lb-tab {
+  padding: 0.4rem 0.9rem; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: var(--ifm-background-surface-color); color: var(--ifm-color-emphasis-800);
+  font-size: 0.9rem; font-weight: 600;
+  transition: background var(--pgk-dur-fast) var(--pgk-ease), border-color var(--pgk-dur-fast) var(--pgk-ease);
+}
+.lb-tab-active { background: var(--ifm-color-primary); color: var(--ifm-button-color); border-color: var(--ifm-color-primary); }
+.lb-table-wrap { overflow-x: auto; }
+.lb-table { width: 100%; border-collapse: collapse; }
+.lb-table th, .lb-table td { padding: 0.6rem 0.75rem; text-align: left; border-bottom: 1px solid var(--ifm-color-emphasis-200); }
+.lb-table th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ifm-color-emphasis-700); }
+.lb-place { font-family: var(--pgk-font-display); font-weight: 700; font-size: 1.1rem; width: 2.5rem; }
+.lb-place[data-medal="1"]::before { content: "🥇 "; }
+.lb-place[data-medal="2"]::before { content: "🥈 "; }
+.lb-place[data-medal="3"]::before { content: "🥉 "; }
+.lb-place[data-medal] { font-size: 0; }
+.lb-place[data-medal]::before { font-size: 1.2rem; }
+.lb-user { display: inline-flex; align-items: center; gap: 0.55rem; min-width: 0; }
+.lb-avatar { border-radius: 50%; flex: none; }
+.lb-avatar-empty { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: var(--ifm-color-primary); color: var(--ifm-button-color); font-weight: 700; font-size: 0.85rem; }
+.lb-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-you { margin-left: 0.4rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; background: var(--ifm-color-primary); color: var(--ifm-button-color); padding: 0.1rem 0.4rem; border-radius: 999px; }
+.lb-score { font-weight: 700; font-variant-numeric: tabular-nums; }
+.lb-max { font-weight: 400; color: var(--ifm-color-emphasis-700); }
+.lb-secondary { color: var(--ifm-color-emphasis-800); font-variant-numeric: tabular-nums; }
+.lb-me { background: color-mix(in srgb, var(--ifm-color-primary) 10%, transparent); }
+.sim-submit-err { color: var(--pgk-text-danger); }
+
+/* Место в рейтинге в профиле кабинета */
+.ac-places-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 0.6rem; }
+.ac-places-link { font-size: 0.88rem; }
+.ac-place-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0; border-top: 1px solid var(--ifm-color-emphasis-200); }
+.ac-place-overall { font-weight: 700; }
+.ac-place-mod { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ac-place-secondary { color: var(--ifm-color-emphasis-700); font-variant-numeric: tabular-nums; font-size: 0.9rem; }
+.ac-place-badge { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; background: color-mix(in srgb, var(--ifm-color-primary) 14%, transparent); color: var(--ifm-color-primary); padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.85rem; white-space: nowrap; }

@@ -118,6 +118,7 @@ const config: Config = {
             {to: '/gym', label: 'Зал — все тренажёры'},
             {to: '/words', label: 'Слова — английский по карточкам'},
             {to: '/simulator', label: 'Симулятор чемпионата'},
+            {to: '/leaderboard', label: 'Рейтинг'},
           ],
         },
         {

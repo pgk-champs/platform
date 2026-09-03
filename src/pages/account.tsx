@@ -3,8 +3,10 @@ import Layout from '@theme/Layout';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import { store } from '../lib/store';
 import { levelForXp } from '../lib/levels';
+import Link from '@docusaurus/Link';
 import {
   apiAvailable,
+  fetchMyPlaces,
   fetchProfile,
   isLoggedIn,
   isSyncing,
@@ -12,6 +14,7 @@ import {
   logout,
   subscribe,
   sync,
+  type MyPlaces,
 } from '../lib/account';
 import '../components/trainers.css';
 
@@ -21,6 +24,7 @@ function Cabinet() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [online, setOnline] = useState(true);
+  const [places, setPlaces] = useState<MyPlaces | null>(null);
   const [, force] = useState(0);
   const [lastSync, setLastSync] = useState<string | null>(null);
 
@@ -34,6 +38,10 @@ function Cabinet() {
       if (alive) {
         setProfile(p);
         setLoading(false);
+      }
+      if (p) {
+        const pl = await fetchMyPlaces();
+        if (alive) setPlaces(pl);
       }
     })();
     const off = subscribe(() => force((n) => n + 1));
@@ -115,6 +123,36 @@ function Cabinet() {
           <span className="ac-stat-label">Очков опыта</span>
         </div>
       </div>
+
+      {places && (places.overall || places.modules.length > 0) && (
+        <div className="ac-card ac-places">
+          <div className="ac-places-head">
+            <strong>Место в рейтинге</strong>
+            <Link to="/leaderboard" className="ac-places-link">
+              Вся таблица →
+            </Link>
+          </div>
+          {places.overall && (
+            <div className="ac-place-row ac-place-overall">
+              <span>Общий зачёт</span>
+              <span className="ac-place-badge">
+                {places.overall.place} из {places.overall.players}
+              </span>
+            </div>
+          )}
+          {places.modules.map((m) => (
+            <div key={m.module} className="ac-place-row">
+              <span className="ac-place-mod">{m.title}</span>
+              <span className="ac-place-secondary">
+                {m.score} из {m.max_score}
+              </span>
+              <span className="ac-place-badge">
+                {m.place} из {m.players}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="ac-card ac-sync">
         <div>

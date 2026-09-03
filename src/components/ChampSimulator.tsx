@@ -3,8 +3,10 @@
 // Данные — src/data/champ-criteria.json (см. заголовок файла на источник).
 import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import criteria from '../data/champ-criteria.json';
+import Link from '@docusaurus/Link';
 import { store } from '../lib/store';
 import { simShareText } from '../lib/integrations';
+import { isLoggedIn, submitResult } from '../lib/account';
 import ShareResult from './ShareResult';
 import './trainers.css';
 
@@ -69,30 +71,6 @@ function beep(): void {
 
 const BREAK_PRESETS = [10, 15, 30];
 
-const LEADERBOARD_REPO = 'pgk-champs/leaderboard';
-
-// Строит ссылку на предзаполненную issue-форму лидерборда: GitHub issue forms
-// принимают предзаполнение полей через query-параметры, у которых имя
-// совпадает с `id` поля формы (см. .github/ISSUE_TEMPLATE/result.yml в репо
-// лидерборда — там текстовое поле имеет id="result"). Логин студента для
-// таблицы бот берёт из github.event.issue.user.login на своей стороне, не из
-// этого JSON — подделать чужой результат отсюда нельзя.
-export function buildLeaderboardUrl(mod: SimModule, score: number, timeLeft: number): string {
-  const durationSec = Math.max(0, Math.round((mod.timeLimitMinutes ?? 60) * 60 - timeLeft));
-  const payload = {
-    module: mod.id,
-    score: Math.round(score * 100) / 100,
-    maxScore: mod.maxTotal,
-    durationSec,
-    date: new Date().toISOString().slice(0, 10),
-  };
-  const params = new URLSearchParams({
-    template: 'result.yml',
-    title: `Результат: ${mod.title}`,
-    result: JSON.stringify(payload),
-  });
-  return `https://github.com/${LEADERBOARD_REPO}/issues/new?${params.toString()}`;
-}
 
 type Phase = 'select' | 'run' | 'done';
 
@@ -112,6 +90,8 @@ export default function ChampSimulator() {
   // «Чистый таймер»: полноэкранный оверлей с огромными цифрами.
   const [zen, setZen] = useState(false);
   const rewardedRef = useRef<Set<string>>(new Set());
+  // Статус отправки результата в рейтинг: idle → sending → sent | error.
+  const [submitState, setSubmitState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
   // Время считаем по моменту окончания, а не по числу тиков: в фоновой вкладке
   // (студент ушёл в Android Studio) браузер режет setInterval до одного тика в
@@ -277,9 +257,18 @@ export default function ChampSimulator() {
     setModuleId(null);
   };
 
-  const submitToLeaderboard = () => {
+  const sendToLeaderboard = async () => {
     if (!mod) return;
-    window.open(buildLeaderboardUrl(mod, score, timeLeft), '_blank', 'noopener,noreferrer');
+    setSubmitState('sending');
+    const durationSec = Math.max(0, Math.round((mod.timeLimitMinutes ?? 60) * 60 - timeLeft));
+    const ok = await submitResult({
+      module: mod.id,
+      title: mod.title,
+      score: Math.round(score * 100) / 100,
+      maxScore: mod.maxTotal,
+      durationSec,
+    });
+    setSubmitState(ok ? 'sent' : 'error');
   };
 
   const toggleMeasurable = (key: string, maxScore: number) => {
@@ -353,15 +342,34 @@ export default function ChampSimulator() {
             )}
           </div>
           <div className="sim-leaderboard">
-            <button type="button" className="sim-submit" onClick={submitToLeaderboard}>
-              Отправить в лидерборд 🏆
-            </button>
-            <div className="sim-leaderboard-hint">
-              Нужен доступ к репозиторию лидерборда (выдаёт наставник) ·{' '}
-              <a href={`https://github.com/${LEADERBOARD_REPO}#readme`} target="_blank" rel="noopener noreferrer">
-                Таблица лидеров
-              </a>
-            </div>
+            {isLoggedIn() ? (
+              <>
+                <button
+                  type="button"
+                  className="sim-submit"
+                  onClick={sendToLeaderboard}
+                  disabled={submitState === 'sending' || submitState === 'sent'}
+                >
+                  {submitState === 'sent'
+                    ? 'Результат в рейтинге ✓'
+                    : submitState === 'sending'
+                      ? 'Отправляем…'
+                      : 'Отправить в рейтинг 🏆'}
+                </button>
+                <div className="sim-leaderboard-hint">
+                  {submitState === 'error' ? (
+                    <span className="sim-submit-err">Не удалось отправить — попробуй ещё раз.</span>
+                  ) : (
+                    <Link to="/leaderboard">Таблица лидеров →</Link>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="sim-leaderboard-hint">
+                <Link to="/account">Войди через GitHub</Link>, чтобы результат попал в{' '}
+                <Link to="/leaderboard">рейтинг</Link>.
+              </div>
+            )}
           </div>
           <ShareResult text={simShareText(Math.round(score * 100) / 100, mod.maxTotal)} />
           <div className="sim-done-actions">
