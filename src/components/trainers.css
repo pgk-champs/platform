@@ -8712,3 +8712,10 @@
   border-left: 3px solid var(--ifm-color-success);
   font-size: 0.9rem;
 }
+
+/* Маркер прочитанности секции: пустой, но с реальной высотой — у элемента
+   нулевой площади геометрия для IntersectionObserver неоднозначна. */
+.section-anchor {
+  display: block;
+  height: 1px;
+}

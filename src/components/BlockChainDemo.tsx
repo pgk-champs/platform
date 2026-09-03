@@ -58,15 +58,20 @@ export default function BlockChainDemo({
   const [rewarded, setRewarded] = useState(false);
   const brokeRef = useRef(false);
   const rewardedRef = useRef(false);
+  // Печать цепи асинхронная. На медленной машине первичный расчёт может
+  // завершиться уже после того, как ученик испортил данные и нажал
+  // «Пересчитать» — и затереть свежую цепь исходной. Тогда блоки выглядят
+  // целыми, а объяснение и награда не появляются.
+  const sealedRef = useRef(false);
 
   // Первичная печать цепи — только в браузере (WebCrypto нет на SSR).
   useEffect(() => {
     let cancelled = false;
     void sealChain(INITIAL_DATA).then((chain) => {
-      if (!cancelled) {
-        setSealed(chain);
-        setLive(chain);
-      }
+      if (cancelled || sealedRef.current) return;
+      sealedRef.current = true;
+      setSealed(chain);
+      setLive(chain);
     });
     return () => {
       cancelled = true;
@@ -106,6 +111,7 @@ export default function BlockChainDemo({
 
   const mine = async () => {
     const chain = await sealChain(data);
+    sealedRef.current = true;
     setSealed(chain);
     setLive(chain);
     if (brokeRef.current) {
