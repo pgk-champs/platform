@@ -60,6 +60,8 @@ type State = {
   favorites: FavoriteItem[];
   dismissedHints: string[];
   xp: number;
+  /** Уже оплаченные разовые начисления — reason из addXp (см. addXp). */
+  xpAwarded: string[];
   achievementsUnlocked: string[];
   prefs: { os?: OsId; name?: string; ide?: IdeId };
   tocCollapsed: Record<string, boolean>;
@@ -82,6 +84,7 @@ function emptyState(): State {
     favorites: [],
     dismissedHints: [],
     xp: 0,
+    xpAwarded: [],
     achievementsUnlocked: [],
     prefs: {},
     tocCollapsed: {},
@@ -101,20 +104,59 @@ function emptyState(): State {
 // а knowledge-map (как и Docusaurus) префикс «00-» срезает — переносим прогресс.
 const CHAPTER_ID_RENAMES: Record<string, string> = { '00-github-start': 'github-start' };
 
+// Поля, индексированные chapterId: секции (массив id), квизы и тренажёры
+// (карта по id блока), экзамены (массив попыток) и флаг свёрнутого оглавления.
+const CHAPTER_KEYED = ['sections', 'quizzes', 'trainers', 'exams', 'tocCollapsed'] as const;
+
+// Старая запись + новая под тем же chapterId: массивы склеиваем (старое
+// первым — так порядок попыток экзамена остаётся хронологическим), карты
+// сливаем, скаляр (флаг оглавления) берём новый, если он есть.
+function mergeChapterValue(old: unknown, current: unknown): unknown {
+  if (Array.isArray(old)) return [...new Set([...old, ...(Array.isArray(current) ? current : [])])];
+  if (old && typeof old === 'object') return { ...(old as object), ...((current as object) ?? {}) };
+  return current ?? old;
+}
+
 function migrateChapterIds(st: State): State {
   for (const [from, to] of Object.entries(CHAPTER_ID_RENAMES)) {
-    for (const key of ['sections', 'quizzes', 'trainers'] as const) {
+    for (const key of CHAPTER_KEYED) {
       const map = st[key] as Record<string, unknown>;
       if (!(from in map)) continue;
-      const a = map[from];
-      const b = map[to];
-      map[to] = Array.isArray(a)
-        ? [...new Set([...(Array.isArray(b) ? b : []), ...a])]
-        : { ...(a as object), ...((b as object) ?? {}) };
+      map[to] = mergeChapterValue(map[from], map[to]);
       delete map[from];
     }
+    // Свёрнутые блоки ключуются как `${chapterId}:${blockId}` (см. Block.tsx).
+    const prefix = `${from}:`;
+    for (const key of Object.keys(st.blocksCollapsed)) {
+      if (!key.startsWith(prefix)) continue;
+      const next = `${to}:${key.slice(prefix.length)}`;
+      if (st.blocksCollapsed[next] === undefined) st.blocksCollapsed[next] = st.blocksCollapsed[key];
+      delete st.blocksCollapsed[key];
+    }
+    // Записи, где chapterId — поле: журнал квизов и избранное. У избранного
+    // старый chapterId зашит ещё и в id блока — без переноса звёздочка в
+    // главе не горит, а на /favorites группа висит под сырым id.
+    st.quizLog = st.quizLog.map((e) => (e?.chapterId === from ? { ...e, chapterId: to } : e));
+    st.favorites = st.favorites.map((f) =>
+      f?.chapterId === from
+        ? { ...f, chapterId: to, id: f.id.startsWith(prefix) ? `${to}:${f.id.slice(prefix.length)}` : f.id }
+        : f,
+    );
   }
   return st;
+}
+
+// Форма поля из localStorage против дефолта: массив к массиву, объект к
+// объекту, число к числу. Сохранённый JSON — данные пользователя, а не
+// гарантия (правка руками, старый формат, оборванная запись), и один null
+// вместо массива роняет проверку достижений, а с ней — весь сайт: watcher
+// смонтирован в Root на каждой странице.
+function sameShape(value: unknown, def: unknown): boolean {
+  if (Array.isArray(def)) return Array.isArray(value);
+  if (def !== null && typeof def === 'object') {
+    return value !== null && typeof value === 'object' && !Array.isArray(value);
+  }
+  return typeof value === typeof def;
 }
 
 function loadState(): State {
@@ -122,7 +164,15 @@ function loadState(): State {
     if (typeof localStorage === 'undefined') return emptyState();
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return emptyState();
-    return migrateChapterIds({ ...emptyState(), ...JSON.parse(raw) });
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    const st = emptyState();
+    for (const key of Object.keys(st) as (keyof State)[]) {
+      if (sameShape(parsed[key], st[key])) (st as Record<string, unknown>)[key] = parsed[key];
+    }
+    // easter — единственный вложенный объект с обязательными полями.
+    st.easter = { ...emptyState().easter, ...st.easter };
+    if (!Array.isArray(st.easter.historyOpened)) st.easter.historyOpened = [];
+    return migrateChapterIds(st);
   } catch {
     return emptyState();
   }
@@ -245,13 +295,18 @@ function currentXpMultiplier(): number {
   return 1 + Math.min(streakDaysBeforeToday(), STREAK_MULTIPLIER_CAP_DAYS) * STREAK_MULTIPLIER_STEP;
 }
 
+// reason — адрес события, за которое платят: 'quiz:глава:квиз',
+// 'exam:глава', 'sim:модуль', 'trainer:глава:тренажёр'. За один адрес XP
+// начисляется ровно один раз за всю историю: раньше защита от повтора жила
+// в useRef компонента и умирала вместе со страницей — квиз, экзамен и
+// симулятор фармились обычным F5. Уже накопленный XP не трогаем: список
+// оплаченных стартует пустым, так что ничего не сгорает.
 function addXp(amount: number, reason: string): void {
   if (!amount) return;
+  if (state.xpAwarded.includes(reason)) return;
+  state.xpAwarded = [...state.xpAwarded, reason];
   state.xp += Math.round(amount * currentXpMultiplier());
   persist();
-  // ponytail: причина пока не логируется отдельным списком — незачем, пока
-  // никто её не читает; добавить xpLog, когда появится отчёт/лента событий.
-  void reason;
 }
 
 function getXp(): number {
@@ -408,7 +463,9 @@ function completeDaily(dateKey: string, score: { correct: number; total: number 
   persist();
   const streak = dailyState(dateKey).streak;
   const bonus = STREAK_MILESTONE_XP[streak];
-  if (bonus) addXp(bonus, `streak-milestone:${streak}`);
+  // Дата в reason — потому что addXp платит за адрес один раз, а веха
+  // честно повторяется: оборвал серию, набрал заново — снова заслужил.
+  if (bonus) addXp(bonus, `streak-milestone:${streak}:${dateKey}`);
   return true;
 }
 

@@ -222,11 +222,15 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'экзамен-на-отлично',
     title: 'Экзамен на отлично',
-    desc: 'Экзамен главы сдан на 90% и выше',
+    desc: 'Экзамен главы сдан на «Отлично» — 80% и выше',
     icon: '🏅',
     category: 'обучение',
     rarity: 'редкое',
-    check: (s) => anyExamRatioAtLeast(s, 0.9),
+    // Порог — тот же, с которого сам экзамен ставит «Отлично» (PASS_PCT в
+    // ChapterExam). При 90% и экзаменах на 6–8 вопросов достижение требовало
+    // фактически безошибочной работы (7 из 8 — это 87,5%): студент видел
+    // «Отлично», а достижение не приходило.
+    check: (s) => anyExamRatioAtLeast(s, 0.8),
   },
   {
     id: 'весь-фундамент',
@@ -348,11 +352,13 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'терминал-прокачан',
     title: 'Терминал прокачан',
-    desc: 'Пройдены все 4 тренажёра главы про Linux и терминал',
+    desc: 'Пройдены все 6 тренажёров главы про Linux и терминал',
     icon: '🧙',
     category: 'терминал',
     rarity: 'эпическое',
-    check: (s) => chapterTrainerCount(s, 'linux-terminal') >= 4,
+    // В главе 6 тренажёров (totalTrainers={6} в 03-linux-terminal.mdx):
+    // с порогом 4 «эпическое» достижение выдавалось за две трети главы.
+    check: (s) => chapterTrainerCount(s, 'linux-terminal') >= 6,
   },
 
   // --- язык ---

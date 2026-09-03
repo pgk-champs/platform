@@ -42,3 +42,24 @@ test('B/A нечувствительны к регистру, код можно 
   feedAll(feed, KONAMI_SEQUENCE);
   expect(hits).toBe(2);
 });
+
+test('русская раскладка: физические B и A дают «и» и «ф» — код всё равно засчитан', () => {
+  let hits = 0;
+  const feed = makeKonamiDetector(() => (hits += 1));
+  feedAll(feed, [...KONAMI_SEQUENCE.slice(0, 8), 'и', 'ф']);
+  expect(hits).toBe(1);
+});
+
+test('e.code вместо e.key: KeyB/KeyA засчитываются наравне с b/a', () => {
+  let hits = 0;
+  const feed = makeKonamiDetector(() => (hits += 1));
+  feedAll(feed, [...KONAMI_SEQUENCE.slice(0, 8), 'KeyB', 'KeyA']);
+  expect(hits).toBe(1);
+});
+
+test('русские буквы с других клавиш последовательность по-прежнему сбивают', () => {
+  let hits = 0;
+  const feed = makeKonamiDetector(() => (hits += 1));
+  feedAll(feed, [...KONAMI_SEQUENCE.slice(0, 8), 'ы', 'ф']);
+  expect(hits).toBe(0);
+});

@@ -98,8 +98,11 @@ export function buildIcs(plan: SchedulePlan): string {
   }
 
   const end = new Date(first.getTime() + plan.sessionMinutes * 60000);
+  // UNTIL в RFC 5545 включительный, поэтому окно — «weeks недель минус день»:
+  // ровно на первое занятие через N×7 дней он захватывал лишнюю тренировку
+  // (2 недели по Пн+Ср давали 5 занятий вместо 4).
   const until = new Date(first);
-  until.setDate(until.getDate() + plan.weeks * 7);
+  until.setDate(until.getDate() + plan.weeks * 7 - 1);
 
   return [
     'BEGIN:VCALENDAR',

@@ -58,7 +58,9 @@ test('ICS: VEVENT с RRULE по выбранным дням, DTSTART в перв
   expect(ics).toContain('SUMMARY:Тренировка PGK Champs');
   expect(ics).toContain('DTSTART:20260902T193000');
   expect(ics).toContain('DTEND:20260902T201500');
-  expect(ics).toContain('RRULE:FREQ=WEEKLY;BYDAY=MO,WE;UNTIL=20260916T193000');
+  // UNTIL включительный: окно 02–15.09 — это Ср 02, Пн 07, Ср 09, Пн 14,
+  // ровно 4 тренировки за 2 недели (до правки 16.09 давало пятую).
+  expect(ics).toContain('RRULE:FREQ=WEEKLY;BYDAY=MO,WE;UNTIL=20260915T193000');
   // RFC 5545: строки разделяются CRLF
   expect(ics).toContain('\r\nBEGIN:VEVENT\r\n');
 });
@@ -78,4 +80,18 @@ test('ICS: день start подходит сам — DTSTART в этот же �
   });
   expect(ics).toContain('DTSTART:20260901T080000');
   expect(ics).toContain('BYDAY=TU');
+});
+
+test('ICS: окно RRULE — ровно `weeks` недель, без лишней тренировки в конце', () => {
+  // 2026-09-01 — вторник, занятия по вторникам, 3 недели: 01, 08, 15.09.
+  // UNTIL 21.09 (пн) закрывает окно до вторника 22.09 — четвёртой тренировки нет.
+  const ics = buildIcs({
+    days: [1],
+    time: '08:00',
+    sessionMinutes: 60,
+    weeks: 3,
+    start: new Date(2026, 8, 1, 12, 0, 0),
+  });
+  expect(ics).toContain('DTSTART:20260901T080000');
+  expect(ics).toContain('UNTIL=20260921T080000');
 });

@@ -8,7 +8,7 @@ import {
   type AchievementCategory,
   type AchievementRarity,
 } from '../lib/achievements';
-import knowledgeMap from '../data/knowledge-map.json';
+import { chapterTitle, taskLabel } from '../components/chapterLabels';
 import '../components/trainers.css';
 
 // Классы редкости — латиницей, чтобы не тащить кириллицу в CSS-селекторы.
@@ -17,10 +17,6 @@ const RARITY_CLASS: Record<AchievementRarity, string> = {
   редкое: 'ach-card-rare',
   эпическое: 'ach-card-epic',
 };
-
-const CHAPTER_TITLES: Record<string, string> = Object.fromEntries(
-  (knowledgeMap as { id: string; title: string }[]).map((e) => [e.id, e.title]),
-);
 
 type QuizRecord = { chapterId: string; quizId: string; best: number; total: number; attempts: number };
 
@@ -153,8 +149,8 @@ export default function Achievements() {
             <tbody>
               {quizRows.map((r) => (
                 <tr key={`${r.chapterId}:${r.quizId}`}>
-                  <td>{CHAPTER_TITLES[r.chapterId] ?? r.chapterId}</td>
-                  <td>{r.quizId}</td>
+                  <td>{chapterTitle(r.chapterId)}</td>
+                  <td>{taskLabel(r.quizId)}</td>
                   <td>
                     {r.best} из {r.total}
                   </td>
@@ -180,8 +176,8 @@ export default function Achievements() {
             <tbody>
               {trainerRows.map((r) => (
                 <tr key={`${r.chapterId}:${r.trainerId}`}>
-                  <td>{CHAPTER_TITLES[r.chapterId] ?? r.chapterId}</td>
-                  <td>{r.trainerId}</td>
+                  <td>{chapterTitle(r.chapterId)}</td>
+                  <td>{taskLabel(r.trainerId)}</td>
                   <td>{r.cpm} зн/мин</td>
                 </tr>
               ))}

@@ -178,12 +178,32 @@ test('"весь-фундамент" needs a started section in every foundation 
   expect(evaluate().map((a) => a.id)).toContain('весь-фундамент');
 });
 
-test('exam at 90%+ unlocks "экзамен-на-отлично", 80% does not', () => {
-  store.markExamDone('typing', { correct: 8, total: 10 });
+test('"экзамен-на-отлично" unlocks at the exam own «Отлично» threshold (80%), not at «Хорошо»', () => {
+  store.markExamDone('typing', { correct: 5, total: 8 }); // 62,5% — «Хорошо»
   expect(evaluate().map((a) => a.id)).not.toContain('экзамен-на-отлично');
 
-  store.markExamDone('typing', { correct: 9, total: 10 });
+  // 7 из 8 — 87,5%: экзамен показывает «Отлично», значит и достижение должно прийти.
+  store.markExamDone('typing', { correct: 7, total: 8 });
   expect(evaluate().map((a) => a.id)).toContain('экзамен-на-отлично');
+});
+
+test('"терминал-прокачан" needs all 6 trainers of the Linux chapter, 4 is not enough', () => {
+  for (let i = 1; i <= 4; i += 1) store.markTrainerDone('linux-terminal', `trainer-${i}`, { ok: true });
+  expect(evaluate().map((a) => a.id)).not.toContain('терминал-прокачан');
+
+  store.markTrainerDone('linux-terminal', 'trainer-5', { ok: true });
+  store.markTrainerDone('linux-terminal', 'trainer-6', { ok: true });
+  expect(evaluate().map((a) => a.id)).toContain('терминал-прокачан');
+});
+
+test('evaluate survives a corrupted localStorage payload instead of blanking every page', () => {
+  // Watcher смонтирован в Root, поэтому исключение здесь — белый экран на всём сайте.
+  localStorage.setItem(
+    'pgk-store',
+    JSON.stringify({ quizLog: null, favorites: null, easter: null, sections: 'мусор' }),
+  );
+  store.__reloadForTests();
+  expect(() => evaluate()).not.toThrow();
 });
 
 test('50 graded words unlock "50-слов", sim run records "место-в-лидерборде"', () => {

@@ -14,15 +14,28 @@ export const KONAMI_SEQUENCE = [
   'a',
 ] as const;
 
+// У первокурсников раскладка по умолчанию русская, и физические B и A дают
+// e.key «и» и «ф» — код в ЙЦУКЕН был невводим вовсе. Поэтому нажатие
+// приводим к «b»/«a» тремя путями: латиница как есть, кириллица с тех же
+// клавиш и код клавиши (e.code: KeyB/KeyA) — детектору можно скармливать и
+// e.key, и e.code. Стрелки в e.key и e.code называются одинаково.
+const KEY_ALIASES: Record<string, string> = {
+  KeyB: 'b',
+  KeyA: 'a',
+  и: 'b',
+  ф: 'a',
+};
+
 /**
- * Возвращает обработчик нажатий: скармливай ему e.key, на полном совпадении
- * последовательности вызовется onMatch (и детектор начнёт сначала —
+ * Возвращает обработчик нажатий: скармливай ему e.key (или e.code), на полном
+ * совпадении последовательности вызовется onMatch (и детектор начнёт сначала —
  * код можно вводить сколько угодно раз).
  */
 export function makeKonamiDetector(onMatch: () => void): (key: string) => void {
   let pos = 0;
   return (key: string) => {
-    const k = key.length === 1 ? key.toLowerCase() : key;
+    const low = key.length === 1 ? key.toLowerCase() : key;
+    const k = KEY_ALIASES[low] ?? low;
     if (k === KONAMI_SEQUENCE[pos]) {
       pos += 1;
       if (pos === KONAMI_SEQUENCE.length) {

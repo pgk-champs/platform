@@ -50,8 +50,8 @@ test('dismissHint persists and isHintDismissed reflects it', () => {
 
 test('addXp accumulates and getXp reads current total', () => {
   expect(store.getXp()).toBe(0);
-  store.addXp(10, 'test');
-  store.addXp(5, 'test');
+  store.addXp(10, 'test-a');
+  store.addXp(5, 'test-b');
   expect(store.getXp()).toBe(15);
 });
 
@@ -119,7 +119,7 @@ test('subscribe notifies on every mutation and unsubscribe stops it', () => {
   store.dismissHint('a');
   expect(calls).toBe(2);
   unsubscribe();
-  store.addXp(1, 'x');
+  store.addXp(1, 'y');
   expect(calls).toBe(2);
 });
 
@@ -342,8 +342,132 @@ test('migrates progress saved under the old prefixed id of the GitHub chapter', 
   store.__reloadForTests();
   const p = store.getProgress();
   expect(p.sections['00-github-start']).toBeUndefined();
-  expect(p.sections['github-start']).toEqual(['b', 'c', 'a']);
+  expect(p.sections['github-start']).toEqual(['a', 'b', 'c']);
   expect(p.quizzes['github-start']?.q1).toMatchObject({ correct: 1, total: 2 });
   expect(p.trainers['github-start']?.t1).toBeTruthy();
   expect(p.trainers['00-github-start']).toBeUndefined();
+});
+
+// --- XP платится за адрес ровно один раз (иначе квиз/экзамен/симулятор фармятся F5) ---
+
+test('addXp pays for the same reason only once, even after a page reload', () => {
+  store.addXp(20, 'quiz:github-start:q1');
+  store.addXp(20, 'quiz:github-start:q1');
+  expect(store.getXp()).toBe(20);
+
+  // Перезагрузка страницы: rewardedRef в компонентах пуст, но store помнит.
+  store.__reloadForTests();
+  store.addXp(20, 'quiz:github-start:q1');
+  expect(store.getXp()).toBe(20);
+});
+
+test('addXp keeps paying different reasons and a zero-XP call does not burn its reason', () => {
+  store.addXp(0, 'sim:mobile'); // прогон симулятора на 0 баллов
+  store.addXp(30, 'sim:mobile');
+  store.addXp(40, 'exam:github-start');
+  expect(store.getXp()).toBe(70);
+});
+
+test('paid reasons are persisted, so a fresh load still refuses to pay twice', () => {
+  store.addXp(40, 'exam:typing');
+  expect(JSON.parse(localStorage.getItem('pgk-store')!).xpAwarded).toEqual(['exam:typing']);
+});
+
+test('streak milestones stay repeatable: a rebuilt 7-day streak pays again', () => {
+  for (const d of ['2026-01-01', '2026-01-02', '2026-01-03', '2026-01-04', '2026-01-05', '2026-01-06', '2026-01-07']) {
+    store.completeDaily(d, { correct: 1, total: 1 });
+  }
+  const afterFirst = store.getXp();
+  expect(afterFirst).toBeGreaterThan(0); // веха 7 дней заплатила
+
+  // разрыв 08–09 января, затем снова 7 дней подряд
+  for (const d of ['2026-01-10', '2026-01-11', '2026-01-12', '2026-01-13', '2026-01-14', '2026-01-15', '2026-01-16']) {
+    store.completeDaily(d, { correct: 1, total: 1 });
+  }
+  expect(store.getXp()).toBeGreaterThan(afterFirst);
+});
+
+// --- миграция chapterId: не только sections/quizzes/trainers ---
+
+test('migration moves quizLog, favorites, exams, toc and block state to the new chapter id', () => {
+  localStorage.setItem(
+    'pgk-store',
+    JSON.stringify({
+      quizLog: [
+        { chapterId: '00-github-start', quizId: 'q1', correct: 1, total: 2, ts: 1 },
+        { chapterId: 'typing', quizId: 'q1', correct: 2, total: 2, ts: 2 },
+      ],
+      favorites: [
+        { id: '00-github-start:block-1', type: 'trainer', chapterId: '00-github-start', title: 'Блок', ts: 1 },
+      ],
+      exams: { '00-github-start': [{ correct: 5, total: 7, ts: 1 }] },
+      tocCollapsed: { '00-github-start': true },
+      blocksCollapsed: { '00-github-start:block-1': true },
+    }),
+  );
+  store.__reloadForTests();
+
+  expect(store.quiz.attempts('github-start', 'q1')).toHaveLength(1);
+  expect(store.quiz.attempts('00-github-start', 'q1')).toHaveLength(0);
+  expect(store.quiz.attempts('typing', 'q1')).toHaveLength(1); // чужая глава не тронута
+
+  expect(store.favorites.isFavorite('github-start:block-1')).toBe(true);
+  expect(store.favorites.list({ chapterId: 'github-start' })).toHaveLength(1);
+  expect(store.favorites.list({ chapterId: '00-github-start' })).toHaveLength(0);
+
+  expect(store.getExamStats('github-start').count).toBe(1);
+  expect(store.getExamStats('00-github-start').count).toBe(0);
+
+  expect(store.toc.isCollapsed('github-start')).toBe(true);
+  expect(store.block.isCollapsed('github-start:block-1')).toBe(true);
+  expect(store.block.isCollapsed('00-github-start:block-1')).toBe(false);
+});
+
+test('migration merges exam attempts of both ids, old ones first', () => {
+  localStorage.setItem(
+    'pgk-store',
+    JSON.stringify({
+      exams: {
+        '00-github-start': [{ correct: 3, total: 7, ts: 1 }],
+        'github-start': [{ correct: 6, total: 7, ts: 2 }],
+      },
+    }),
+  );
+  store.__reloadForTests();
+  const stats = store.getExamStats('github-start');
+  expect(stats.attempts.map((a) => a.correct)).toEqual([3, 6]);
+  expect(stats.best).toMatchObject({ correct: 6, total: 7 });
+});
+
+// --- битый localStorage не должен ронять страницы ---
+
+test('a broken payload falls back to defaults field by field and keeps the good ones', () => {
+  localStorage.setItem(
+    'pgk-store',
+    JSON.stringify({
+      xp: 120,
+      quizLog: null,
+      favorites: 'сломано',
+      sections: [], // массив вместо карты
+      easter: { konami: true }, // без historyOpened
+      prefs: { os: 'linux' },
+    }),
+  );
+  store.__reloadForTests();
+  const s = store.snapshot();
+
+  expect(s.xp).toBe(120); // целое поле пережило
+  expect(s.quizLog).toEqual([]);
+  expect(s.favorites).toEqual([]);
+  expect(s.sections).toEqual({});
+  expect(s.easter.konami).toBe(true);
+  expect(s.easter.historyOpened).toEqual([]);
+  expect(store.prefs.getOs()).toBe('linux');
+});
+
+test('a payload that is valid JSON but not an object falls back to the empty state', () => {
+  localStorage.setItem('pgk-store', '"строка вместо объекта"');
+  store.__reloadForTests();
+  expect(store.getXp()).toBe(0);
+  expect(store.snapshot().favorites).toEqual([]);
 });
