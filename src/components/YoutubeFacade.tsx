@@ -47,7 +47,7 @@ export default function YoutubeFacade({ videoId, title }: { videoId: string; tit
         loading="lazy"
       />
       <span className="chsrc-yt-play" aria-hidden="true">
-        ▶
+        <span className="chsrc-yt-disc">▶</span>
       </span>
     </button>
   );

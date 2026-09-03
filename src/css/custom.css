@@ -40,6 +40,15 @@
   --pgk-shadow-raised: 0 2px 4px rgba(23, 23, 40, 0.07), 0 12px 28px rgba(23, 23, 40, 0.1);
   --pgk-shadow-ring: 0 0 0 1px rgba(23, 23, 40, 0.07);
 
+  /* Успех и опасность как ЦВЕТ ТЕКСТА: сами токены Infima одинаковы в обеих
+     темах и на светлом фоне слишком светлы, поэтому держим отдельную пару. */
+  --pgk-text-success: #007a00;
+  --pgk-text-danger: #c9161c;
+  --pgk-text-warning: #8a6100;
+  /* Подпись поверх заливок success/warning/danger: они светлые, белым по ним
+     не прочитать (жёлтый с белым даёт 1.7:1). */
+  --pgk-on-accent: #16161a;
+
   /* Акцент для SVG-иллюстраций: заливки, а не текст. */
   --pgk-art-accent: var(--ifm-color-primary-lightest);
   --pgk-art-ink: var(--ifm-color-primary-darkest);
@@ -55,18 +64,19 @@
 }
 
 [data-theme='dark'] {
-  /* Тёмная тема. Основание #818cf8 светлее фона, поэтому подписи на кнопках
-     здесь ТЁМНЫЕ (6.05:1), а не белые — это и была та самая ошибка 2.26:1.
-     Ссылка этим цветом на фоне #1b1b1d даёт 5.77:1. */
-  --ifm-color-primary: #818cf8;
-  --ifm-color-primary-dark: #747edf;
-  --ifm-color-primary-darker: #6e77d3;
-  --ifm-color-primary-darkest: #5a62ae;
-  --ifm-color-primary-light: #8b95f9;
-  --ifm-color-primary-lighter: #939cf9;
-  --ifm-color-primary-lightest: #a7aefa;
+  /* Тёмная тема. Основание светлее фона, поэтому подписи на кнопках здесь
+     ТЁМНЫЕ (7.73:1). Оттенок подобран так, чтобы ссылка проходила норму не
+     только на фоне страницы, но и на приподнятых поверхностях — на карточке
+     6.58:1, на плашке кода 4.81:1; прежний #818cf8 давал там 3.76:1. */
+  --ifm-color-primary: #9aa3fa;
+  --ifm-color-primary-dark: #8b93e1;
+  --ifm-color-primary-darker: #838bd4;
+  --ifm-color-primary-darkest: #6c72af;
+  --ifm-color-primary-light: #a2aafa;
+  --ifm-color-primary-lighter: #a8b0fb;
+  --ifm-color-primary-lightest: #b8bffc;
 
-  --docusaurus-highlighted-code-line-bg: rgba(129, 140, 248, 0.16);
+  --docusaurus-highlighted-code-line-bg: rgba(154, 163, 250, 0.16);
   --ifm-button-color: #16161a;
 
   /* На тёмном фоне чёрная тень невидима. Поднятость даёт светлое кольцо по
@@ -75,6 +85,12 @@
   --pgk-shadow-raised: 0 0 0 1px rgba(255, 255, 255, 0.09), 0 8px 28px rgba(0, 0, 0, 0.5),
     0 0 32px color-mix(in srgb, var(--ifm-color-primary) 10%, transparent);
   --pgk-shadow-ring: 0 0 0 1px rgba(255, 255, 255, 0.08);
+
+  /* На тёмном фоне те же роли требуют светлых оттенков. */
+  --pgk-text-success: #5ddc7a;
+  --pgk-text-danger: #ff8a8f;
+  --pgk-text-warning: #f0b429;
+  --pgk-on-accent: #16161a;
 }
 
 /* ==========================================================================

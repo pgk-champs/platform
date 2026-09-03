@@ -174,8 +174,41 @@ const config: Config = {
       copyright: `Copyright © ${new Date().getFullYear()} PGK Champs. Built with Docusaurus.`,
     },
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      // Светлая тема github красит комментарии в #999988 (2.71:1 на фоне блока),
+      // числа в #36acaa (2.58) и строки в #e3116c (4.32) — для чтения кода это
+      // мало, а комментарии в учебнике несут половину смысла. Подменяем только
+      // провальные цвета, остальную палитру темы оставляем как есть.
+      theme: {
+        ...prismThemes.github,
+        styles: prismThemes.github.styles.map((rule) => {
+          const recolor: Record<string, string> = {
+            comment: '#57606a',
+            prolog: '#57606a',
+            doctype: '#57606a',
+            cdata: '#57606a',
+            number: '#0550ae',
+            boolean: '#0550ae',
+            function: '#6f42c1',
+            string: '#0a3069',
+            'attr-value': '#0a3069',
+            char: '#0a3069',
+            builtin: '#0a3069',
+            inserted: '#0a3069',
+          };
+          const hit = rule.types.find((t) => recolor[t]);
+          return hit ? { ...rule, style: { ...rule.style, color: recolor[hit] } } : rule;
+        }),
+      },
+      // dracula красит комментарии в #6272a4 — 3.03:1 на своём же фоне.
+      // Осветляем только их, остальная палитра темы не трогается.
+      darkTheme: {
+        ...prismThemes.dracula,
+        styles: prismThemes.dracula.styles.map((rule) =>
+          rule.types.some((t) => ['comment', 'prolog', 'doctype', 'cdata'].includes(t))
+            ? { ...rule, style: { ...rule.style, color: '#9aa6cf' } }
+            : rule,
+        ),
+      },
     },
   } satisfies Preset.ThemeConfig,
 };
