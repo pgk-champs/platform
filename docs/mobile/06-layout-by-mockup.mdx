@@ -16,6 +16,7 @@ import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
 import ComposePreview from '@site/src/components/ComposePreview';
 import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
 import Block from '@site/src/components/Block';
 import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
@@ -884,6 +885,18 @@ Row(
 </details>
 
 <SectionAnchor chapterId="layout-by-mockup" sectionId="challenge" />
+
+<Block kind="quiz" title="Экзамен главы" chapterId="layout-by-mockup" blockId="exam">
+<ChapterExam chapterId="layout-by-mockup" questions={[
+  { q: 'Для Color(0xFF4CAF50) в схеме ARGB, разобранной в главе, — какая пара чисел (в десятичной записи) верна для каналов alpha и green?', options: ['alpha=255, green=175', 'alpha=76, green=175', 'alpha=255, green=80', 'alpha=255, green=76'], correct: 0, why: 'Порядок каналов — alpha, red, green, blue: FF=255 (alpha), 4C=76 (red), AF=175 (green), 50=80 (blue) — та же арифметика shr/and, что и в демо с 0xFFE53935.' },
+  { q: 'В коде написано Box(Alignment.Center) { Text("Привет") } вместо именованного аргумента. Что скажет компилятор?', options: ['Ничего, Alignment.Center — верный первый аргумент Box', 'Argument type mismatch: actual type is Alignment, but Modifier was expected', 'Box вообще не принимает Alignment ни в каком виде', 'Text должен быть первым аргументом, а не Alignment'], correct: 1, why: 'У Box первый позиционный (безымянный) параметр — modifier, а не contentAlignment. Без явного имени компилятор пытается подставить Alignment.Center на место Modifier — вторая типичная ошибка главы.' },
+  { q: 'Почему у fontSize используют .sp, а не .dp, хотя оба по умолчанию дают одно и то же число?', options: ['.dp работает только с целыми числами, а .sp — с дробными', 'sp дополнительно учитывает системную настройку размера шрифта пользователя; если использовать dp, эта настройка перестанет работать именно для этого текста', 'Это просто соглашение об именовании без разницы в поведении', '.sp работает быстрее, чем .dp, при отрисовке текста'], correct: 1, why: 'sp равен dp один в один по умолчанию, но масштабируется вместе с системной настройкой размера шрифта (например, для людей с плохим зрением) — dp эту настройку игнорирует.' },
+  { q: 'Ряд шириной 200 с двумя элементами по 40 (свободного места — 120). Какой зазор получится МЕЖДУ элементами при Arrangement.SpaceBetween?', options: ['60', '120', '40', '30'], correct: 1, why: 'SpaceBetween делит свободное место на itemCount - 1 = 1 промежуток между элементами и ничего не оставляет по краям: весь зазор 120 достаётся единственному промежутку.' },
+  { q: 'Внутри Box { Image(...); Badge(...) } порядок вызова — сначала Image, потом Badge. Как они расположатся на экране?', options: ['Рядом друг с другом по горизонтали', 'Друг под другом, Image сверху', 'Друг на друге, Badge поверх Image', 'Порядок вызова не имеет значения для Box'], correct: 2, why: 'Box кладёт детей друг на друга по порядку вызова: первый вызванный элемент рисуется первым, а каждый следующий — поверх уже нарисованных.' },
+  { q: 'В object Dimens кто-то написал const val CardPadding = 12.dp вместо val CardPadding = 12.dp. Что скажет компилятор?', options: ['Ничего, const val работает одинаково с val для любых типов', "Const 'val' has type 'Dp'. Only primitive types and 'String' are allowed.", "'val' cannot be reassigned.", 'Unresolved reference: dp'], correct: 1, why: 'const val требует значения, вычислимого на этапе компиляции, — только примитивы и String. 12.dp — результат вызова свойства-расширения, вычисляемый во время выполнения, поэтому не подходит под const val.' },
+  { q: 'Почему Modifier.align(Alignment.TopEnd) можно написать внутри Box { ... }, но нельзя вызвать в произвольном месте кода, например прямо в main()?', options: ['align — обычная функция, просто не импортированная по умолчанию', 'align объявлена как функция-расширение специально для BoxScope, а BoxScope существует только внутри трейлинг-лямбды Box { ... }, куда его подставляет сам Compose', 'align работает только с значением Alignment.TopEnd, но не с другими', 'Это ограничение IDE, а не компилятора Kotlin'], correct: 1, why: 'align — функция-расширение с типом-получателем BoxScope; вызвать её можно только там, где есть подходящий receiver-объект, то есть внутри Box { ... }, ровно как показано на самодельном аналоге BoxScope/place в этой главе.' },
+]} />
+</Block>
 
 ## Что должен уметь
 

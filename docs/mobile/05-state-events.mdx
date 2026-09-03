@@ -16,6 +16,7 @@ import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
 import PredictOutput from '@site/src/components/PredictOutput';
 import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
 import Block from '@site/src/components/Block';
 import RememberSim from '@site/src/components/RememberSim';
 import RecompositionCounter from '@site/src/components/RecompositionCounter';
@@ -849,6 +850,18 @@ fun TrainingScreen() {
 </details>
 
 <SectionAnchor chapterId="state-events" sectionId="challenge" />
+
+<Block kind="quiz" title="Экзамен главы" chapterId="state-events" blockId="exam">
+<ChapterExam chapterId="state-events" questions={[
+  { q: 'var counter = 0 объявлена СНАРУЖИ функции tick(), которая делает counter++ и возвращает counter. Что напечатают подряд println(tick()) и println(tick())?', options: ['1, 1', '1, 2', '0, 1', 'Ошибку компиляции'], correct: 1, why: 'counter живёт на уровне файла, а не внутри тела функции — как savedCount в разделе про remember: значение не создаётся заново при каждом вызове, а растёт от вызова к вызову.' },
+  { q: 'Внутри дочерней composable-функции fun ScoreBadge(score: Int) кнопка сделана так: Button(onClick = { score++ }) { Text("$score") }. Что скажет компилятор про строку score++?', options: ["'val' cannot be reassigned. — score это параметр функции, неявный val", 'Unresolved reference: score', 'Assignment type mismatch: expected Int, actual Unit', 'Никакой ошибки — score благополучно увеличится на экране'], correct: 0, why: 'Параметры функций в Kotlin — всегда val, даже без явного слова val. Менять их напрямую нельзя: нужен подъём состояния — обработчик вроде onIncrement: () -> Unit, вызываемый из родителя, которому принадлежит настоящее remember-состояние.' },
+  { q: 'Глава честно предупреждает: настоящий remember устроен не как простая глобальная переменная файла. Если бы это было не так и на экране было два разных счётчика через var by remember { mutableStateOf(0) }, что бы произошло?', options: ['Ничего особенного — оба счётчика работали бы независимо, как и должны', 'Оба счётчика делили бы одно и то же значение, потому что var уровня файла существует в единственном экземпляре на всю программу', 'Compose выдал бы ошибку компиляции при повторном вызове remember', 'Второй счётчик автоматически получил бы значение первого, умноженное на два'], correct: 1, why: 'Хинт в разделе про remember прямо об этом: настоящий remember хранит значение отдельно для каждого места вызова в дереве композиции, а обычная глобальная переменная была бы одна на все места сразу.' },
+  { q: 'onIncrement имеет тип () -> Unit, а onNicknameChange — (String) -> Unit. Чем объясняется именно такой выбор типов?', options: ['Обработчик получает параметр только тогда, когда событие обязано сообщить какие-то данные о произошедшем — например, новый текст; для простого факта "нажали" достаточно () -> Unit', 'Тип обработчика зависит от того, объявлена ли переменная как val или var', 'Обработчики с параметром работают быстрее во время выполнения', '(String) -> Unit используют только у Button, а () -> Unit — только у TextField'], correct: 0, why: 'Клик — просто факт "нажали", ему нечего передавать. Изменение текста обязано сообщить, ЧТО теперь написано в поле, — отсюда параметр String именно у onValueChange/onNicknameChange.' },
+  { q: 'Что из перечисленного само по себе НЕ запускает рекомпозицию?', options: ['Запись нового значения через by в переменную, делегированную remember { mutableStateOf(...) }', 'Обычный println(...) внутри тела composable-функции', 'count++ у делегированной by remember переменной', 'Прямая запись в .value объекта MutableState'], correct: 1, why: 'Рекомпозицию запускает именно запись (setValue) в наблюдаемое Compose состояние. println — побочный эффект без State, он ничего не сообщает Compose и рекомпозицию не планирует.' },
+  { q: 'Делегат считает так же, как Loud из этой главы: getValue печатает "get" плюс имя, setValue печатает "set" плюс имя. Код: var lives by Counter(3); lives = lives - 1; println(lives). В каком порядке идёт печать?', options: ['get lives, set lives, get lives, 2', 'set lives, get lives, 2', 'get lives, get lives, set lives, 2', 'set lives, set lives, 2'], correct: 0, why: 'lives - 1 сначала читает текущее значение через getValue, затем результат записывается через setValue; println(lives) — снова чтение через getValue. Итог: 3 - 1 = 2.' },
+  { q: 'Почему var count by mutableStateOf(0) не скомпилируется без import androidx.compose.runtime.getValue и import androidx.compose.runtime.setValue, хотя MutableState создан ровно для такого использования?', options: ['MutableState вообще не поддерживает делегирование через by', 'getValue/setValue для MutableState в реальном Compose — не методы самого класса, а функции-расширения из отдельного пакета; без импорта компилятор их не находит', 'mutableStateOf можно вызывать только внутри remember, а не отдельно', 'count должен быть объявлен через val, а не var'], correct: 1, why: 'Как разобрано в третьей типичной ошибке главы: getValue/setValue для MutableState существуют как функции-расширения в androidx.compose.runtime, а не как методы самого класса — без явного импорта делегат остаётся "пустым".' },
+]} />
+</Block>
 
 ## Что должен уметь
 

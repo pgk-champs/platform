@@ -28,3 +28,18 @@ test('every chapterId literal in docs matches the knowledge-map id of its file',
   }
   assert.deepEqual(problems, []);
 });
+
+// У каждой главы должен быть финальный экзамен (ChapterExam) — для единообразия
+// и чтобы дашборд наставника видел «экзамен сдан». Пробел раньше появлялся
+// незаметно (9 глав без экзамена), теперь он ловится тестом.
+test('every chapter has a final exam (ChapterExam)', () => {
+  const walk = d =>
+    fs.readdirSync(d, { withFileTypes: true }).flatMap(e =>
+      e.isDirectory() ? walk(path.join(d, e.name)) : /\.mdx?$/.test(e.name) ? [path.join(d, e.name)] : [],
+    );
+  // index.* — страницы-разделы трека, а не главы; экзамен им не нужен.
+  const missing = walk('docs')
+    .filter((f) => !/(^|\/)index\.mdx?$/.test(f))
+    .filter((f) => !fs.readFileSync(f, 'utf8').includes('<ChapterExam'));
+  assert.deepEqual(missing, []);
+});

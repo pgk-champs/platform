@@ -16,6 +16,7 @@ import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
 import PredictOutput from '@site/src/components/PredictOutput';
 import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
 import Block from '@site/src/components/Block';
 import Hint from '@site/src/components/Hint';
 import ToolCard from '@site/src/components/ToolCard';
@@ -689,6 +690,18 @@ fun main() {
 </details>
 
 <SectionAnchor chapterId="functions-lambdas" sectionId="challenge" />
+
+<Block kind="quiz" title="Экзамен главы" chapterId="functions-lambdas" blockId="exam">
+<ChapterExam chapterId="functions-lambdas" questions={[
+  { q: 'Что выведет код: greet(name = "Марина", greeting = "Добрый день"), если fun greet(name: String, greeting: String = "Привет") печатает "$greeting, $name!"?', options: ['Марина, Добрый день!', 'Привет, Марина!', 'Добрый день, Марина!', 'Ошибка: перепутан порядок именованных аргументов'], correct: 2, why: 'Именованные аргументы расставляются по имени параметра независимо от порядка вызова; greeting передан явно как "Добрый день", поэтому значение по умолчанию не используется.' },
+  { q: 'Что выведет println(distances.filter { it > 4 }.map { it * 1000 }), если distances = listOf(2, 7, 4, 9, 1)?', options: ['[7000, 9000]', '[2000, 7000, 4000, 9000, 1000]', '[7, 9]', 'Ошибка компиляции: filter и map нельзя объединять в одну цепочку'], correct: 0, why: 'filter сначала оставляет элементы больше 4 — [7, 9], затем map переводит каждый в метры, умножая на 1000.' },
+  { q: 'fun double(x: Int): Int { x * 2 } — что скажет компилятор и почему?', options: ['Скомпилируется и вернёт x * 2 — тело-блок возвращает последнее выражение само', "Missing return statement — тело-блок не возвращает значение автоматически, нужен явный return", "Return type mismatch: expected 'Unit', actual 'Int' — надо убрать : Int из сигнатуры", "Unresolved reference 'x' — параметр не объявлен"], correct: 1, why: 'В отличие от тела-выражения, тело-блок в фигурных скобках никогда не возвращает последнее выражение автоматически — нужен явный return x * 2.' },
+  { q: 'fun describe(name: String, score: Int, isChampion: Boolean = false) вызвана как describe(name = "Игорь") — что произойдёт?', options: ['Скомпилируется: score получит значение 0 по умолчанию', "No value passed for parameter 'isChampion' — он обязателен всегда, даже со значением по умолчанию", "No value passed for parameter 'score' — у score нет значения по умолчанию, а передан только name", 'Missing return statement — describe должна что-то возвращать'], correct: 2, why: 'score — обязательный параметр без значения по умолчанию; именованный вызов не отменяет обязательности: name передан, а score — нет.' },
+  { q: 'Почему в fun square(x: Int) = x * x можно не писать : Int для типа возврата?', options: ['Потому что все функции в Kotlin возвращают Int по умолчанию', 'Потому что Kotlin выводит тип возврата по типу выражения справа от = — тот же вывод типов, что и у переменных', 'Потому что тип возврата вообще не обязателен ни для одной функции', 'Потому что x уже объявлен как Int, и функция автоматически получает то же имя типа'], correct: 1, why: 'Тело-выражение — это одно выражение справа от =; компилятор смотрит на его тип и присваивает такой же тип возврата функции, как и при выводе типов у переменных.' },
+  { q: 'Почему filter считается функцией высшего порядка (higher-order function)?', options: ['Потому что вызывается через точку после списка', 'Потому что работает только со списками чисел', 'Потому что принимает лямбду (функцию) как параметр — это и есть определение функции высшего порядка', 'Потому что она всегда возвращает Boolean'], correct: 2, why: 'Функция высшего порядка — та, что принимает функцию параметром или возвращает функцию. filter принимает лямбду-предикат, поэтому это функция высшего порядка.' },
+  { q: 'Чем параметр (parameter) отличается от аргумента (argument)?', options: ['Это два разных слова для одного и того же понятия', 'Параметр — имя в объявлении функции, аргумент — конкретное значение, переданное при вызове', 'Параметр — только у функций высшего порядка, аргумент — у обычных функций', 'Аргумент задаёт тип, параметр — имя переменной'], correct: 1, why: 'Параметр (x в fun square(x: Int)) — это место в сигнатуре; аргумент (4 в square(4)) — то, что туда передают при вызове.' },
+]} />
+</Block>
 
 ## Что должен уметь
 

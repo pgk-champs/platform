@@ -13,6 +13,7 @@ import ChapterCover from '@site/src/components/ChapterCover';
 import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
 import CodeTyping from '@site/src/components/CodeTyping';
 import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
 import Block from '@site/src/components/Block';
 import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
@@ -282,6 +283,18 @@ b2593cf HEAD@{5}: checkout: moving from main to feature   ← сюда возв�
 </details>
 
 <SectionAnchor chapterId="git-rebase" sectionId="deep" />
+
+<Block kind="quiz" title="Экзамен главы" chapterId="git-rebase" blockId="exam">
+<ChapterExam chapterId="git-rebase" questions={[
+  { q: 'Что делает команда git rebase main, выполненная на ветке feature?', options: ['Сливает main в feature, создавая merge-коммит', 'Берёт коммиты feature и создаёт их копии поверх свежего main — с другим родителем и новыми хешами', 'Удаляет из feature все коммиты main', 'Переименовывает ветку feature в main'], correct: 1, why: 'Rebase не двигает коммиты, а копирует: берёт твои коммиты и кладёт их копии поверх новой базы. У копии другой родитель — значит, другой хеш.' },
+  { q: 'Вчера ты уже отправлял в PR свою ветку, над которой работаешь один. Сегодня сделал git rebase main, и теперь обычный git push пишет rejected. Что произошло и как быть?', options: ['Rebase вообще нельзя было делать на ветке из PR — придётся создавать новый PR', 'Ничего не сломано: история на сервере разошлась после rebase намеренно, нужен git push --force-with-lease', 'Нужно откатить rebase командой git reset --hard HEAD~3 и push будет работать', 'Ошибка сервера, нужно повторить push ещё раз'], correct: 1, why: 'По золотому правилу свою ветку в PR, где работаешь один, перебазировать можно — но после этого обычный push получит rejected, потому что сервер видит несовпадение истории. Нужен --force-with-lease.' },
+  { q: 'Над веткой feature кроме тебя вчера коммитил и пушил ещё один человек. Можно ли безопасно сделать на ней git rebase main?', options: ['Да, rebase всегда безопасен для любой ветки', 'Нет: у коллеги останутся старые хеши коммитов, и его следующий pull устроит кашу из дублей и лишних merge-коммитов', 'Да, но только если предупредить в чате', 'Нет, потому что git физически запретит выполнить такую команду'], correct: 1, why: 'Золотое правило: не перебазируй то, что уже есть у других. У коллеги в репозитории остаются старые коммиты, у тебя — новые копии с другими хешами; git обеих сторон видит «две разные истории» и предлагает их слить.' },
+  { q: 'git reflog показывает: HEAD@{4}: rebase (start): checkout main, затем HEAD@{5}: checkout: moving from main to feature, затем HEAD@{6}: commit: правка в main. Нужно вернуть ветку в состояние ДО начала rebase. Какую команду выполнить?', options: ['git reset --hard HEAD@{4}', 'git reset --hard HEAD@{5}', 'git reset --hard HEAD@{6}', 'git rebase --continue'], correct: 1, why: 'Reflog печатает записи от новых к старым. Строка rebase (start) — это уже первый шаг rebase; состояние ДО него записано строкой ниже — в этом примере ровно HEAD@{5}.' },
+  { q: 'Коллега советует после rebase на всякий случай сделать git push --force вместо --force-with-lease. В чём риск этого совета?', options: ['--force работает заметно медленнее', '--force молча затирает чужие коммиты на сервере, если кто-то успел туда запушить, пока ты перебазировался; --force-with-lease в этом случае откажется', '--force требует отдельных прав администратора репозитория', 'Риска нет, это два названия одной и той же опции'], correct: 1, why: 'force-with-lease сверяет своё представление о ветке на сервере с реальностью и не даст молча затереть чужую работу. Голый --force просто перезаписывает — в командной работе он практически не нужен.' },
+  { q: 'В середине git rebase -i HEAD~3 возник конфликт, и ты понял, что вообще не хотел трогать историю — нужно вернуть ветку ровно в состояние до запуска rebase, прямо сейчас. Какая команда сделает это быстрее всего?', options: ['git rebase --continue', 'git rebase --skip', 'git rebase --abort', 'git reflog'], correct: 2, why: '--abort — аварийный выход, который работает в любой момент rebase: возвращает ветку в состояние до его начала, без необходимости искать что-либо в reflog.' },
+  { q: 'Команда сознательно хочет, чтобы история проекта сохраняла честные merge-коммиты «слияние ветки X» — так виднее, что и когда сливалось. Подходит ли этой команде rebase перед каждым вливанием веток?', options: ['Да, это единственно верный подход, других git не поддерживает', 'Нет — распрямление истории через rebase убирает как раз те merge-коммиты, которые команда хочет сохранить; выбор между rebase и merge — соглашение конкретной команды', 'Да, потому что современный git больше не создаёт merge-коммиты', 'Нет, потому что rebase технически невозможен при включённых merge-коммитах'], correct: 1, why: 'Часть команд требует прямую историю, другие принципиально хранят merge-коммиты как летопись слияний. Правильного ответа нет — есть соглашение конкретного проекта.' },
+]} />
+</Block>
 
 ## Что должен уметь
 

@@ -16,6 +16,7 @@ import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
 import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
 import Block from '@site/src/components/Block';
 import Hint from '@site/src/components/Hint';
 import ToolCard from '@site/src/components/ToolCard';
@@ -921,6 +922,18 @@ data class Competitor(val name: String, var score: Int)
 </details>
 
 <SectionAnchor chapterId="classes-collections" sectionId="challenge" />
+
+<Block kind="quiz" title="Экзамен главы" chapterId="classes-collections" blockId="exam">
+<ChapterExam chapterId="classes-collections" questions={[
+  { q: 'data class Competitor(val name: String, var score: Int). val a = Competitor("Марат", 88); val b = a.copy(score = 95); println(a.score) — что выведет?', options: ['95', 'null', '88', 'Ошибка компиляции: copy() требует все аргументы'], correct: 2, why: 'copy() создаёт новый объект b с изменённым score, а исходный объект a не меняется — его score остаётся 88.' },
+  { q: 'val place = 5; when (place) { 1 -> "Золото"; 2, 3 -> "Призёр"; in 4..10 -> "Финалист"; else -> "Участник" } — что окажется в medal?', options: ['Финалист', 'Призёр', 'Золото', 'Участник'], correct: 0, why: 'place = 5 не равно 1, не входит в {2, 3}, но входит в диапазон 4..10 — сработает ветка "Финалист".' },
+  { q: 'class Competitor(val name: String, var score: Int). Есть alice = Competitor("Алиса", 82), и код alice.name = "Аля" — что скажет компилятор?', options: ['Скомпилируется — свойства объектов всегда можно менять', "No value passed for parameter 'name' — name обязателен", "Unresolved reference 'name' — такого свойства нет", "'val' cannot be reassigned — name объявлен через val, у него нет сеттера"], correct: 3, why: 'name объявлен как val в конструкторе — это свойство без сеттера, переприсвоить его нельзя, как и обычную val-переменную.' },
+  { q: 'val scores = mapOf("Алиса" to 82, "Богдан" to 91); val bogdanScore: Int = scores["Богдан"] — почему это не скомпилируется?', options: ['Доступ к Map по ключу через [ ] всегда возвращает Int?, а не гарантированный Int — типы не совпадают', 'scores — не Map, а List, поэтому [ ] не работает', 'Ключа "Богдан" не существует в scores', 'mapOf нельзя использовать с числовыми значениями'], correct: 0, why: 'scores["Богдан"] имеет тип Int?, потому что ключ теоретически мог отсутствовать. Присвоить это val типа Int напрямую нельзя без явной обработки возможного отсутствия значения.' },
+  { q: 'Зачем классу нужно ключевое слово data, если обычный class уже умеет хранить свойства?', options: ['data ускоряет создание объектов', 'data — единственный способ добавить в класс методы', 'data запрещает изменять свойства объекта', 'data заставляет компилятор сгенерировать toString(), equals(), hashCode(), copy() и componentN() на основе свойств конструктора'], correct: 3, why: 'Без data класс наследует только стандартный toString()/equals() от Any (печать адреса, сравнение по ссылке). data дописывает читаемый toString, сравнение по содержимому и copy().' },
+  { q: 'Почему каждый параметр основного конструктора data class обязан быть val или var?', options: ['Иначе конструктор не будет исполняться во время выполнения', 'Это ограничение только для конструкторов с более чем двумя параметрами', 'Параметр без val/var не становится свойством и не попадёт в сгенерированные toString/equals/copy/componentN', 'На самом деле это не обязательно — правило только для обычных классов'], correct: 2, why: 'data class генерирует свои методы на основе свойств конструктора. Параметр без val/var — не свойство, а временное значение, поэтому в сгенерированный код он не попадёт.' },
+  { q: 'Чем List отличается от MutableList на уровне доступных методов?', options: ['List хранит только строки, MutableList — любые типы', 'У List нет методов изменения содержимого (add/remove), у MutableList они есть', 'Это два названия одного и того же типа', 'List работает быстрее, MutableList — медленнее'], correct: 1, why: 'List — интерфейс только для чтения. MutableList расширяет его методами add/remove и другими для изменения содержимого.' },
+]} />
+</Block>
 
 ## Что должен уметь
 

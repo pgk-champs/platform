@@ -13,6 +13,7 @@ import ChapterCover from '@site/src/components/ChapterCover';
 import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
 import CodeTyping from '@site/src/components/CodeTyping';
 import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
 import Block from '@site/src/components/Block';
 import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
@@ -255,6 +256,18 @@ grep error app.log
 </details>
 
 <SectionAnchor chapterId="grep-regex" sectionId="deep" />
+
+<Block kind="quiz" title="Экзамен главы" chapterId="grep-regex" blockId="exam">
+<ChapterExam chapterId="grep-regex" questions={[
+  { q: 'Файл access.log содержит четыре строки: "2026-01-01 INFO start", "2026-01-02 ERROR disk full", "2026-01-03 info retry", "2026-01-04 error timeout". Что напечатает grep -in error access.log?', options: ['Только строку с ERROR', 'Только строку с error', 'Обе строки — и с ERROR, и с error', 'Ни одной строки: регистр не совпадает'], correct: 2, why: 'Флаг -i отключает учёт регистра, поэтому шаблон error совпадёт и с ERROR, и с error — обе строки содержат это слово в каком-то регистре.' },
+  { q: 'Нужно найти версию 1.5 в versions.txt и только её — не 105 и не 1x5. Написали: grep 1.5 versions.txt. Команда находит лишнее. В чём ошибка и как починить?', options: ['Всё верно, эта команда и так найдёт только "1.5"', 'Точка без экранирования означает «любой символ», поэтому заодно находятся 105 и 1x5; нужно экранировать: grep \'1\\.5\' versions.txt', 'Нужно добавить флаг -w', 'Нужно добавить флаг -v'], correct: 1, why: 'Неэкранированная точка — оператор «один любой символ». Чтобы искать точку буквально, её экранируют обратной косой чертой: 1\\.5 найдёт только «1.5».' },
+  { q: 'Нужно посчитать, сколько строк-комментариев (строка начинается с #) в config.txt, не выводя сами строки. Какая команда это сделает?', options: ["grep -c '#' config.txt", "grep -c '^#' config.txt", "grep -v '^#' config.txt", "grep -w '#' config.txt"], correct: 1, why: 'Якорь ^ привязывает # к самому началу строки, а -c считает совпадения, не печатая их. Без ^ посчитались бы и строки, где # встречается в середине; -v вместо счёта напечатал бы строки без #.' },
+  { q: 'Файл words.txt содержит четыре строки: color, colour, colouur, colr. Что найдёт grep -E \'colou?r\' words.txt?', options: ['Только "color"', 'Только "colour"', '"color" и "colour", но не "colouur" и не "colr"', 'Все четыре строки'], correct: 2, why: '? значит «предыдущий символ 0 или 1 раз»: colou?r совпадает с «color» (u отсутствует) и «colour» (одна u). В «colouur» подряд идут две u — ни «color», ни «colour» там не встречается как непрерывный кусок; в «colr» вообще нет второй «o» перед r.' },
+  { q: 'Нужно найти в codes.txt строки с ровно четырьмя цифрами подряд. Написали: grep \'[0-9]{4}\' codes.txt — и не получили ожидаемых строк, хотя они точно есть в файле. В чём ошибка?', options: ['Класс [0-9] в принципе не работает с числами длиннее одной цифры', 'Без флага -E фигурные скобки в базовом диалекте (BRE) — обычные символы, а не квантификатор; нужно grep -E \'[0-9]{4}\' или экранировать: grep \'[0-9]\\{4\\}\'', 'Нужно добавить флаг -c', 'Регулярные выражения не умеют искать «ровно n раз»'], correct: 1, why: 'По умолчанию grep работает в базовом диалекте BRE, где {4} без обратных косых — обычный текст. Флаг -E включает расширенный диалект ERE, где {4} сразу работает как квантификатор.' },
+  { q: 'Файл access.txt содержит четыре строки: ac, abc, abbc, abbbc. Что напечатает grep -E \'ab+c\' access.txt?', options: ['Все четыре строки', '"abc", "abbc", "abbbc", но не "ac"', 'Только "abc"', 'Только "ac"'], correct: 1, why: '+ требует хотя бы одно повторение предыдущего элемента — здесь буквы b. В "ac" ни одной b нет, поэтому строка не подходит; в остальных трёх b встречается один и более раз.' },
+  { q: 'Нужно найти точные упоминания слова log (не login, не catalog) во всех файлах внутри src/, включая вложенные подкаталоги. Какая команда справится?', options: ['grep log src/', 'grep -w log src/', 'grep -rw log src/', 'grep -r log src/'], correct: 2, why: '-r обходит каталог рекурсивно, включая вложенные подкаталоги, а -w ограничивает совпадение целым словом, чтобы не подхватить login или catalog. Без -r grep откажется читать каталог как файл; без -w найдёт и login, и catalog.' },
+]} />
+</Block>
 
 ## Что должен уметь
 

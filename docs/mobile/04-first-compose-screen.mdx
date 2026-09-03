@@ -14,6 +14,7 @@ import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
 import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
 import Block from '@site/src/components/Block';
 import Hint from '@site/src/components/Hint';
 import CollapsibleToc from '@site/src/components/CollapsibleToc';
@@ -723,6 +724,18 @@ Column(
 </details>
 
 <SectionAnchor chapterId="first-compose-screen" sectionId="challenge" />
+
+<Block kind="quiz" title="Экзамен главы" chapterId="first-compose-screen" blockId="exam">
+<ChapterExam chapterId="first-compose-screen" questions={[
+  { q: 'class Box(val width: Int, val height: Int, val padding: Int = 0) { fun withPadding(dp: Int): Box = Box(width, height, dp) }. val original = Box(200, 100); val padded = original.withPadding(24); println(original.padding) — что выведет?', options: ['0', '24', '200', 'Ошибка компиляции'], correct: 0, why: 'withPadding не меняет original — она возвращает НОВЫЙ Box; original.padding остаётся значением по умолчанию 0.' },
+  { q: 'fun myColumn(content: () -> Unit) { println("A"); content(); println("B") }. Вызов myColumn { println("C") } — в каком порядке напечатаются строки?', options: ['A, B, C', 'C, A, B', 'A, C, B', 'B, C, A'], correct: 2, why: 'myColumn сначала печатает A, потом вызывает content() — печатает C, — и только потом B: контейнер сам решает, когда выполнить переданный код.' },
+  { q: 'fun onCreate() { Text(text = "Привет!") } — без аннотации @Composable у onCreate. Почему это не скомпилируется?', options: ['Text требует параметр onClick', 'Строка в кавычках должна начинаться с заглавной буквы', 'Функция onCreate должна возвращать Unit явно', 'onCreate не помечена @Composable, а Text — composable-функция, которую можно вызвать только из composable-контекста'], correct: 3, why: 'Composable-функции (как Text) можно вызывать только из других composable-функций. onCreate — обычная функция без @Composable, поэтому вызов Text здесь запрещён.' },
+  { q: 'Modifier.padding(16) без .dp — какую ошибку покажет компилятор и почему?', options: ["No value passed for parameter 'text' — text не передан", "Unresolved reference 'padding' — такого метода нет у Modifier", "Argument type mismatch: actual type is 'Int', but 'Dp' was expected — padding ждёт Dp, а 16 без .dp остаётся Int", 'Скомпилируется без ошибок — 16 автоматически станет Dp'], correct: 2, why: 'padding принимает значение типа Dp. Число 16 без .dp — обычный Int, поэтому типы не совпадают.' },
+  { q: 'Почему @Composable сама по себе ничего не меняет в выполнении программы — как показало демо с самодельной аннотацией @Important?', options: ['Потому что аннотация — пассивная метка-метаданные; на поведение функции влияет не сама аннотация, а инструмент (плагин компилятора), который её читает', 'Потому что аннотации в Kotlin вообще запрещены', 'Потому что @Composable работает только внутри Column', 'Потому что аннотации выполняются только на реальном устройстве, а не в редакторе'], correct: 0, why: '@Important в демо ничего не изменило в выполнении — аннотации инертны сами по себе. @Composable работает только потому, что Compose compiler plugin читает её и переписывает функцию.' },
+  { q: 'Почему у @Preview-функции (например, GreetingPreview()) не может быть обязательного параметра без значения по умолчанию?', options: ['Потому что Preview-функции вообще не могут вызывать другие composable', 'Потому что параметры разрешены только у Button', 'Это не ограничение — так писать можно, просто не рекомендуется', 'Потому что Android Studio рисует Preview без запуска приложения, и ей неоткуда взять значение для параметра — Preview-функция должна быть самодостаточной'], correct: 3, why: 'Preview рисуется прямо в редакторе без сборки приложения. Раз данные негде взять, Preview-функция обязана сама передавать готовые значения в настоящий composable.' },
+  { q: 'Чем именованный аргумент onClick = { ... } у Button отличается от трейлинг-лямбды { Text("Начать") } после скобок Button(...)?', options: ['Это одно и то же — компилятор не различает их', 'onClick рисует содержимое кнопки, а трейлинг-лямбда обрабатывает клик', 'onClick описывает реакцию на нажатие, а трейлинг-лямбда после скобок — что нарисовано внутри самой кнопки', 'Трейлинг-лямбда допустима только для Column и Row, но не для Button'], correct: 2, why: 'У Button два разных места для кода: именованный параметр onClick (что делать по клику) и отдельная трейлинг-лямбда содержимого (что видно на кнопке).' },
+]} />
+</Block>
 
 ## Что должен уметь
 
