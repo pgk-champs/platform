@@ -142,7 +142,7 @@ export const blockchainSchemes: Schemes = {
       <Arrow x1={300} y1={226} x2={368} y2={226} color={ACCENT} w={5} />
       <rect x={378} y={204} width={210} height={44} rx={10} fill={SOFT} stroke={INK} strokeWidth={2.5} />
       <text x={483} y={232} textAnchor="middle" fontSize={13.5} fontWeight={700} fill={ACCENT} fontFamily={MONO}>SCORE: 0 → 1 → 2…</text>
-      <text x={400} y={290} textAnchor="middle" fontSize={14} fill={FADE}>CreateContractTx регистрирует контракт один раз и выдаёт id; CallContractTx вызывает его действия — сколько угодно раз после</text>
+      <text x={400} y={290} textAnchor="middle" fontSize={14} fill={FADE}>Create разворачивает контракт один раз, Call вызывает его действия сколько угодно раз</text>
     </Panel>
   ),
 };

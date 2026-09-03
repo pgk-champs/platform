@@ -7,6 +7,15 @@ import { mobileSchemes } from './figures/mobile';
 import { blockchainSchemes } from './figures/blockchain';
 import { advancedSchemes } from './figures/advanced';
 
+// jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
+// текста здесь — оценка с запасом, откалиброванная по трём случаям
+// обрезания, пойманным живым браузером (getBBox): ~0.51 px на символ на
+// единицу fontSize, здесь взято 0.55 — с запасом, чтобы не пропустить.
+const centeredTextOverflow = (text: string, x: number, fontSize: number, viewBoxWidth: number) => {
+  const half = (text.length * fontSize * 0.55) / 2;
+  return Math.max(0, half - x) + Math.max(0, x + half - viewBoxWidth);
+};
+
 test('renders caption and source line', () => {
   render(
     <Figure
@@ -61,6 +70,26 @@ test('новые схемы несут осмысленный текст, а н�
     const { container, unmount } = render(<Figure scheme={id} caption={`схема ${id}`} />);
     for (const label of labels) {
       expect(container.textContent).toContain(label);
+    }
+    unmount();
+  }
+});
+
+test('collections-shelf и compose-preview: центрированные подписи умещаются в viewBox (было 810px и 879px при ширине 800)', () => {
+  for (const id of ['collections-shelf', 'compose-preview']) {
+    const { container, unmount } = render(<Figure scheme={id} caption={`схема ${id}`} />);
+    const svg = container.querySelector('svg')!;
+    const viewBoxWidth = Number(svg.getAttribute('viewBox')!.split(' ')[2]);
+    const texts = [...container.querySelectorAll('text[text-anchor="middle"]')];
+    expect(texts.length).toBeGreaterThan(0);
+    for (const t of texts) {
+      const overflow = centeredTextOverflow(
+        t.textContent || '',
+        Number(t.getAttribute('x')),
+        Number(t.getAttribute('font-size')),
+        viewBoxWidth,
+      );
+      expect(overflow).toBe(0);
     }
     unmount();
   }

@@ -340,7 +340,7 @@ export const coreSchemes: Schemes = {
       <text x={715} y={166} textAnchor="middle" fontSize={16} fontWeight={800} fill="#fff" fontFamily={MONO}>77</text>
       <circle cx={615} cy={190} r={20} fill="none" stroke={ACCENT} strokeWidth={3} strokeDasharray="4 4" opacity={0.7} />
       <text x={615} y={195} textAnchor="middle" fontSize={12} fontWeight={700} fill={ACCENT} fontFamily={MONO} opacity={0.7}>82</text>
-      <text x={660} y={232} textAnchor="middle" fontSize={13} fill={FADE}>повтор 82 внутрь не попал — набор без дублей</text>
+      <text x={650} y={232} textAnchor="middle" fontSize={11.5} fill={FADE}>повтор 82 внутрь не попал — набор без дублей</text>
     </Panel>
   ),
   /* Event → State → Recomposition по кругу */
@@ -430,7 +430,7 @@ export const coreSchemes: Schemes = {
       <text x={486} y={89} fontSize={12.5} fontWeight={700} fill="#fff" fontFamily={MONO}>GreetingPreview</text>
       <rect x={486} y={116} width={248} height={100} rx={8} fill="#fff" />
       <text x={510} y={172} fontSize={17} fontWeight={700} fill={DARK}>Привет, Олег!</text>
-      <text x={610} y={264} textAnchor="middle" fontSize={14} fill={FADE}>Android Studio рисует composable прямо в IDE — эмулятор для этого не нужен</text>
+      <text x={400} y={264} textAnchor="middle" fontSize={14} fill={FADE}>Android Studio рисует composable прямо в IDE — эмулятор для этого не нужен</text>
     </Panel>
   ),
   /* dp игнорирует системный размер шрифта, sp растёт вместе с ним */

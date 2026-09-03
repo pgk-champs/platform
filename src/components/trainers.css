@@ -552,9 +552,15 @@
 .block-trainer .block-header {
   background: var(--ifm-color-success-contrast-background);
 }
+/* Бейдж красится сплошным акцентным цветом (не бледной contrast-background
+   плашкой, как header) — поэтому ему нужен текст, который реально контрастен
+   именно с этим сплошным цветом. -contrast-foreground рассчитан Infima в пару
+   к -contrast-background, а не к сплошному акценту: измерение в живом DOM
+   дало 1.6-2.7:1 в тёмной теме (норма 4.5). --ifm-color-black проверен
+   расчётом контраста против всех пяти акцентов в обеих темах. */
 .block-trainer .block-badge {
   background: var(--ifm-color-success);
-  color: var(--ifm-color-success-contrast-foreground);
+  color: var(--ifm-color-black);
 }
 
 .block-quiz {
@@ -565,7 +571,10 @@
 }
 .block-quiz .block-badge {
   background: var(--ifm-color-primary);
-  color: var(--ifm-color-primary-contrast-foreground);
+  /* primary — единственный акцент, чей цвет меняется между темами, поэтому
+     ему нужна не постоянная чёрная, а уже готовая тёмная/светлая по теме —
+     та же, что и у кнопки primary (тот же фон, тот же расчёт контраста). */
+  color: var(--ifm-button-color);
 }
 
 .block-breakdown {
@@ -576,7 +585,7 @@
 }
 .block-breakdown .block-badge {
   background: var(--ifm-color-info);
-  color: var(--ifm-color-info-contrast-foreground);
+  color: var(--ifm-color-black);
 }
 
 .block-vocab {
@@ -587,7 +596,7 @@
 }
 .block-vocab .block-badge {
   background: var(--ifm-color-warning);
-  color: var(--ifm-color-warning-contrast-foreground);
+  color: var(--ifm-color-black);
 }
 
 .block-cheatsheet {
@@ -598,7 +607,7 @@
 }
 .block-cheatsheet .block-badge {
   background: var(--ifm-color-secondary-darker);
-  color: var(--ifm-color-secondary-contrast-foreground);
+  color: var(--ifm-color-black);
 }
 
 .block-fact {
@@ -609,7 +618,7 @@
 }
 .block-fact .block-badge {
   background: var(--ifm-color-danger);
-  color: var(--ifm-color-danger-contrast-foreground);
+  color: var(--ifm-color-black);
 }
 
 .hint {
@@ -8148,7 +8157,10 @@
   margin-top: 0.65rem;
   text-align: center;
   font-size: 0.9rem;
-  color: var(--ifm-color-emphasis-600);
+  /* emphasis-600 замерен в живом DOM на белом фоне светлой темы — 3.06:1,
+     норма 4.5. emphasis-700 (как у .fig-source ниже) держит норму в обеих
+     темах. */
+  color: var(--ifm-color-emphasis-700);
 }
 
 .fig-source {
@@ -8759,4 +8771,21 @@
   opacity: 1;
   transform: none;
   transition: opacity 0.5s var(--pgk-ease), transform 0.5s var(--pgk-ease);
+}
+
+/* Печать: Docusaurus прячет шапку (@media print .navbar{display:none} в
+   Infima), а .cp остаётся position:sticky и печатается приклеенной к той же
+   точке страницы поверх текста — проверено в print-эмуляции браузера.
+   Заодно .fig-hidden печаталась бы пустым местом у любой схемы, которую
+   не успели докрутить в поле зрения: подтверждено — печать сразу после
+   загрузки давала opacity:0 у всех схем ниже экрана. */
+@media print {
+  .cp {
+    position: static;
+  }
+
+  .fig-hidden {
+    opacity: 1;
+    transform: none;
+  }
 }
