@@ -133,6 +133,7 @@ const config: Config = {
           items: [
             {to: '/account', label: 'Личный кабинет'},
             {to: '/achievements', label: 'Достижения и рекорды'},
+            {to: '/mentor', label: 'Дашборд наставника'},
             {to: '/favorites', label: 'Избранное'},
           ],
         },

@@ -17,7 +17,24 @@ function apiBase(): string {
 }
 
 const TOKEN_KEY = 'pgk-account-token';
-type Profile = { id: number; login: string; name: string; avatar: string };
+export type Profile = { id: number; login: string; name: string; avatar: string; mentor?: boolean };
+
+export type MentorStudent = {
+  gh_id: number;
+  login: string;
+  name: string;
+  avatar: string;
+  xp: number;
+  chaptersStarted: number;
+  sectionsRead: number;
+  quizzesDone: number;
+  trainersDone: number;
+  examsDone: number;
+  achievements: number;
+  coverage: Record<string, number>;
+  updatedAt: number;
+  bestScore: number | null;
+};
 
 function getToken(): string | null {
   try {
@@ -187,6 +204,18 @@ export async function fetchBoard(module = 'overall'): Promise<Board | null> {
   try {
     const r = await api(`/leaderboard?module=${encodeURIComponent(module)}`);
     return r.ok ? ((await r.json()) as Board) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchMentorStudents(): Promise<MentorStudent[] | null> {
+  if (!getToken()) return null;
+  try {
+    const r = await api('/mentor/students');
+    if (!r.ok) return null;
+    const data = await r.json();
+    return (data.students as MentorStudent[]) ?? [];
   } catch {
     return null;
   }

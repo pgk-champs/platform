@@ -23,6 +23,12 @@ const ORIGINS = (process.env.ALLOW_ORIGINS || BASE_URL)
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);
+// Наставники (по GitHub-логину) видят дашборд группы. Список — в .env.
+const MENTORS = (process.env.MENTORS || '')
+  .split(',')
+  .map((s) => s.trim().toLowerCase())
+  .filter(Boolean);
+const isMentor = (u) => !!u && MENTORS.includes(String(u.login).toLowerCase());
 
 if (!SESSION_SECRET) {
   console.error('SESSION_SECRET обязателен'); // подпись токенов без него небезопасна
@@ -75,6 +81,7 @@ const boardOverall = db.prepare(`SELECT r.gh_id, u.login, u.name, u.avatar,
   GROUP BY r.gh_id ORDER BY score DESC, duration_sec ASC LIMIT 200`);
 const modulesList = db.prepare('SELECT module, title, COUNT(*) AS players FROM results GROUP BY module ORDER BY module');
 const myResults = db.prepare('SELECT module, title, score, max_score, duration_sec, ts FROM results WHERE gh_id = ? ORDER BY module');
+const allUsers = db.prepare('SELECT gh_id, login, name, avatar, progress, updated_at FROM users');
 
 // --- сессии: подписанный токен, без кук; клиент шлёт его в Authorization ---
 const b64u = (buf) => Buffer.from(buf).toString('base64url');
@@ -235,7 +242,7 @@ const server = http.createServer(async (req, res) => {
       if (!s) return json(res, 401, { error: 'unauthorized' });
       const u = getUser.get(s.id);
       if (!u) return json(res, 401, { error: 'unauthorized' });
-      return json(res, 200, { id: u.gh_id, login: u.login, name: u.name, avatar: u.avatar });
+      return json(res, 200, { id: u.gh_id, login: u.login, name: u.name, avatar: u.avatar, mentor: isMentor(u) });
     }
 
     if (path === '/progress' && req.method === 'GET') {
@@ -326,6 +333,55 @@ const server = http.createServer(async (req, res) => {
         modules: withPlace,
         overall: overallPlace ? { place: overallPlace, players: overall.length } : null,
       });
+    }
+
+    // --- Дашборд наставника: сводка по всей группе. Только для наставников. ---
+    if (path === '/mentor/students') {
+      const s = bearer(req);
+      if (!s) return json(res, 401, { error: 'unauthorized' });
+      const me = getUser.get(s.id);
+      if (!isMentor(me)) return json(res, 403, { error: 'forbidden' });
+      const overall = new Map(boardOverall.all().map((r) => [r.gh_id, r]));
+      const students = allUsers.all().map((row) => {
+        let p = {};
+        try {
+          p = JSON.parse(row.progress || '{}');
+        } catch {
+          p = {};
+        }
+        const sections = p.sections && typeof p.sections === 'object' ? p.sections : {};
+        const coverage = {};
+        let sectionsRead = 0;
+        for (const [ch, list] of Object.entries(sections)) {
+          const n = Array.isArray(list) ? list.length : 0;
+          if (n > 0) coverage[ch] = n;
+          sectionsRead += n;
+        }
+        const countInner = (m) =>
+          m && typeof m === 'object'
+            ? Object.values(m).reduce((a, v) => a + (v && typeof v === 'object' ? Object.keys(v).length : 0), 0)
+            : 0;
+        const examsDone = p.exams && typeof p.exams === 'object' ? Object.keys(p.exams).length : 0;
+        const best = overall.get(row.gh_id);
+        return {
+          gh_id: row.gh_id,
+          login: row.login,
+          name: row.name,
+          avatar: row.avatar,
+          xp: Number(p.xp) || 0,
+          chaptersStarted: Object.keys(coverage).length,
+          sectionsRead,
+          quizzesDone: countInner(p.quizzes),
+          trainersDone: countInner(p.trainers),
+          examsDone,
+          achievements: Array.isArray(p.achievementsUnlocked) ? p.achievementsUnlocked.length : 0,
+          coverage,
+          updatedAt: row.updated_at || 0,
+          bestScore: best ? best.score : null,
+        };
+      });
+      students.sort((a, b) => b.xp - a.xp || b.sectionsRead - a.sectionsRead);
+      return json(res, 200, { students, count: students.length });
     }
 
     return json(res, 404, { error: 'not found' });

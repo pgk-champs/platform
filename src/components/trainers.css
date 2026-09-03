@@ -8906,3 +8906,18 @@
 .ac-place-mod { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ac-place-secondary { color: var(--ifm-color-emphasis-700); font-variant-numeric: tabular-nums; font-size: 0.9rem; }
 .ac-place-badge { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; background: color-mix(in srgb, var(--ifm-color-primary) 14%, transparent); color: var(--ifm-color-primary); padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.85rem; white-space: nowrap; }
+
+/* === Дашборд наставника === */
+.mn-page { max-width: 1000px; }
+.mn-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin: 1rem 0 1.5rem; }
+.mn-h { margin-top: 2rem; }
+.mn-legend { margin-top: -0.5rem; }
+.mn-table td, .mn-table th { white-space: nowrap; }
+.mn-stale { opacity: 0.6; }
+.mn-heat { border-collapse: collapse; font-size: 0.8rem; }
+.mn-heat th, .mn-heat td { border: 1px solid var(--ifm-color-emphasis-200); text-align: center; }
+.mn-heat-name { position: sticky; left: 0; background: var(--ifm-background-surface-color); text-align: left !important; padding: 0.3rem 0.6rem; max-width: 9rem; overflow: hidden; text-overflow: ellipsis; }
+.mn-heat-col { padding: 0.3rem 0.35rem; font-weight: 700; color: var(--ifm-color-emphasis-700); }
+.mn-cell { width: 1.9rem; height: 1.9rem; color: var(--ifm-color-emphasis-600); font-variant-numeric: tabular-nums; }
+.mn-cell-on { background: color-mix(in srgb, var(--ifm-color-primary) 22%, transparent); color: var(--ifm-font-color-base); font-weight: 700; }
+.mn-track-mobile { color: var(--ifm-color-primary); }
