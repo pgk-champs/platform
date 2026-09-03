@@ -6,10 +6,12 @@ import knowledgeMap from '../data/knowledge-map.json';
 import { levelForXp } from '../lib/levels';
 import { ACHIEVEMENTS } from '../lib/achievements';
 import {
+  addGroupComentor,
   addMentor,
   createGroup,
   deleteGroup,
   fetchMentorStudents,
+  fetchNotifications,
   fetchPendingCommunity,
   fetchProfile,
   fetchStudentDetail,
@@ -17,11 +19,14 @@ import {
   listGroups,
   listMentors,
   login,
+  markNotificationsSeen,
+  removeGroupComentor,
   removeMentor,
   removeStudent,
   reviewCommunity,
   type MentorEntry,
   type MentorGroup,
+  type MentorNotifications,
   type MentorStudent,
   type PendingItem,
   type StudentDetail,
@@ -211,6 +216,15 @@ function shortLabel(id: string): string {
     .toUpperCase();
 }
 
+// Русское склонение числительного: 1 материал / 2 материала / 5 материалов.
+function plural(n: number, one: string, few: string, many: string): string {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return few;
+  return many;
+}
+
 function ago(ts: number): string {
   if (!ts) return '—';
   const d = Math.floor((Date.now() - ts) / 86400000);
@@ -229,6 +243,7 @@ function Dashboard() {
   const [busy, setBusy] = useState(false);
   const [isRoot, setIsRoot] = useState(false);
   const [openStudent, setOpenStudent] = useState<number | null>(null);
+  const [notif, setNotif] = useState<MentorNotifications | null>(null);
 
   const reloadStudents = async (groupId: number) => {
     const list = await fetchMentorStudents(groupId || undefined);
@@ -248,8 +263,12 @@ function Dashboard() {
       }
       setAllowed(true);
       setIsRoot(!!p.root);
+      const n = await fetchNotifications();
+      if (alive) setNotif(n);
       await Promise.all([reloadStudents(0), reloadGroups()]);
       if (alive) setLoading(false);
+      // Открыл дашборд — считаем, что увидел новое.
+      void markNotificationsSeen();
     })();
     return () => {
       alive = false;
@@ -283,6 +302,21 @@ function Dashboard() {
     await Promise.all([reloadGroups(), reloadStudents(activeGroup === g.id ? 0 : activeGroup)]);
   };
 
+  const onAddComentor = async (g: MentorGroup) => {
+    const login = window.prompt(`GitHub-логин со-наставника для группы «${g.name}»:`);
+    if (!login || !login.trim()) return;
+    setBusy(true);
+    await addGroupComentor(g.id, login.trim());
+    setBusy(false);
+    await reloadGroups();
+  };
+
+  const onRemoveComentor = async (g: MentorGroup, login: string) => {
+    if (!window.confirm(`Снять @${login} с со-наставников группы «${g.name}»?`)) return;
+    await removeGroupComentor(g.id, login);
+    await reloadGroups();
+  };
+
   const onRemoveStudent = async (s: MentorStudent) => {
     if (!activeGroup) return;
     if (!window.confirm(`Убрать ${s.name || s.login} из группы? Аккаунт и прогресс ученика останутся.`)) return;
@@ -313,9 +347,27 @@ function Dashboard() {
   const totSections = list.reduce((a, s) => a + s.sectionsRead, 0);
   const active = list.filter((s) => Date.now() - s.updatedAt < 7 * 86400000).length;
 
+  const hasNotif = notif && (notif.pendingMaterials > 0 || notif.newMembers > 0);
+
   return (
     <div className="mn-wrap">
-      {/* Группы: выбор, создание, код, удаление */}
+      {hasNotif && (
+        <div className="mn-notif" role="status">
+          🔔{' '}
+          {notif!.pendingMaterials > 0 && (
+            <span>
+              {notif!.pendingMaterials} {plural(notif!.pendingMaterials, 'материал', 'материала', 'материалов')} на проверку
+            </span>
+          )}
+          {notif!.pendingMaterials > 0 && notif!.newMembers > 0 && ' · '}
+          {notif!.newMembers > 0 && (
+            <span>
+              {notif!.newMembers} {plural(notif!.newMembers, 'новый ученик', 'новых ученика', 'новых учеников')} с прошлого визита
+            </span>
+          )}
+        </div>
+      )}
+      {/* Группы: выбор, создание, код, со-наставники, удаление */}
       <div className="mn-groups">
         <button
           type="button"
@@ -328,6 +380,7 @@ function Dashboard() {
           <span key={g.id} className={`mn-group-chip ${activeGroup === g.id ? 'mn-group-active' : ''}`.trim()}>
             <button type="button" className="mn-group-name" onClick={() => selectGroup(g.id)}>
               {g.name} <span className="mn-group-count">{g.members}</span>
+              {g.owner === false && <span className="mn-group-co" title="Вы со-наставник этой группы">со-наст.</span>}
             </button>
             <button
               type="button"
@@ -339,15 +392,49 @@ function Dashboard() {
             >
               {g.code} ⧉
             </button>
-            <button type="button" className="mn-group-del" title="Удалить группу" onClick={() => onDeleteGroup(g)}>
-              ✕
-            </button>
+            {g.owner !== false && (
+              <button
+                type="button"
+                className="mn-group-co-add"
+                title={
+                  g.comentors && g.comentors.length
+                    ? `Со-наставники: ${g.comentors.join(', ')} · нажми, чтобы добавить`
+                    : 'Добавить со-наставника'
+                }
+                onClick={() => onAddComentor(g)}
+              >
+                +👤{g.comentors && g.comentors.length ? ` ${g.comentors.length}` : ''}
+              </button>
+            )}
+            {g.owner !== false && (
+              <button type="button" className="mn-group-del" title="Удалить группу" onClick={() => onDeleteGroup(g)}>
+                ✕
+              </button>
+            )}
           </span>
         ))}
         <button type="button" className="mn-group-new" onClick={onCreateGroup} disabled={busy}>
           + Создать группу
         </button>
       </div>
+
+      {(() => {
+        const ag = groups.find((g) => g.id === activeGroup);
+        if (!ag || ag.owner === false || !ag.comentors || ag.comentors.length === 0) return null;
+        return (
+          <p className="mn-co-line">
+            Со-наставники группы:{' '}
+            {ag.comentors.map((login) => (
+              <span key={login} className="mn-co-chip">
+                @{login}
+                <button type="button" className="mn-co-del" title="Снять" onClick={() => onRemoveComentor(ag, login)}>
+                  ✕
+                </button>
+              </span>
+            ))}
+          </p>
+        );
+      })()}
 
       {list.length === 0 ? (
         <div className="ac-card">

@@ -31,6 +31,9 @@ const MENTORS = (process.env.MENTORS || '')
 const isRootMentor = (u) => !!u && MENTORS.includes(String(u.login).toLowerCase());
 // Наставник = корневой из env ИЛИ добавленный со-наставник из таблицы mentors.
 const isMentor = (u) => isRootMentor(u) || (!!u && !!mentorRow.get(String(u.login).toLowerCase()));
+// Управлять группой может её владелец или со-наставник этой группы.
+const canManageGroup = (u, g) =>
+  !!u && !!g && (g.owner === u.gh_id || !!isGroupMentor.get(g.id, String(u.login).toLowerCase()));
 
 if (!SESSION_SECRET) {
   console.error('SESSION_SECRET обязателен'); // подпись токенов без него небезопасна
@@ -106,6 +109,24 @@ const groupsByOwner = db.prepare(`SELECT g.*, (SELECT COUNT(*) FROM group_member
   FROM groups g WHERE g.owner = ? ORDER BY g.created_at DESC`);
 const deleteGroup = db.prepare('DELETE FROM groups WHERE id = ? AND owner = ?');
 const deleteGroupMembers = db.prepare('DELETE FROM group_members WHERE group_id = ?');
+
+// Со-наставничество: у группы, помимо владельца, могут быть со-наставники —
+// они видят и ведут группу, но удалить её и менять состав со-наставников может
+// только владелец.
+db.exec(`CREATE TABLE IF NOT EXISTS group_mentors (
+  group_id INTEGER NOT NULL, login TEXT NOT NULL, added_at INTEGER NOT NULL,
+  PRIMARY KEY (group_id, login)
+)`);
+const addGroupMentor = db.prepare('INSERT OR IGNORE INTO group_mentors (group_id, login, added_at) VALUES (?, ?, ?)');
+const removeGroupMentor = db.prepare('DELETE FROM group_mentors WHERE group_id = ? AND login = ?');
+const groupMentorsOf = db.prepare('SELECT login FROM group_mentors WHERE group_id = ?');
+const deleteGroupMentors = db.prepare('DELETE FROM group_mentors WHERE group_id = ?');
+const isGroupMentor = db.prepare('SELECT 1 FROM group_mentors WHERE group_id = ? AND login = ?');
+// Группы, которыми наставник управляет: свои + где он со-наставник.
+const groupsIManage = db.prepare(`SELECT g.*, (SELECT COUNT(*) FROM group_members m WHERE m.group_id = g.id) AS members
+  FROM groups g
+  WHERE g.owner = @gh_id OR EXISTS (SELECT 1 FROM group_mentors gm WHERE gm.group_id = g.id AND gm.login = @login)
+  ORDER BY g.created_at DESC`);
 const addMember = db.prepare('INSERT OR IGNORE INTO group_members (group_id, gh_id, joined_at) VALUES (?, ?, ?)');
 const removeMember = db.prepare('DELETE FROM group_members WHERE group_id = ? AND gh_id = ?');
 const memberIds = db.prepare('SELECT gh_id FROM group_members WHERE group_id = ?');
@@ -150,6 +171,16 @@ const setCommunityStatus = db.prepare('UPDATE community SET status = ?, reviewed
 const pendingCountForUser = db.prepare("SELECT COUNT(*) AS n FROM community WHERE author_gh_id = ? AND status = 'pending'");
 
 const COMMUNITY_TYPES = new Set(['preset', 'repo', 'link', 'video', 'source']);
+
+// Уведомления наставнику: с какого момента он «всё видел». Считаем, что нового
+// появилось после этой отметки.
+db.exec(`CREATE TABLE IF NOT EXISTS mentor_seen (login TEXT PRIMARY KEY, last_seen INTEGER NOT NULL)`);
+const getSeen = db.prepare('SELECT last_seen FROM mentor_seen WHERE login = ?');
+const setSeen = db.prepare('INSERT INTO mentor_seen (login, last_seen) VALUES (?, ?) ON CONFLICT(login) DO UPDATE SET last_seen = excluded.last_seen');
+const pendingCount = db.prepare("SELECT COUNT(*) AS n FROM community WHERE status = 'pending'");
+const newMembersCount = db.prepare(`SELECT COUNT(*) AS n FROM group_members m JOIN groups g ON g.id = m.group_id
+  WHERE m.joined_at > @since AND (g.owner = @gh_id
+    OR EXISTS (SELECT 1 FROM group_mentors gm WHERE gm.group_id = g.id AND gm.login = @login))`);
 
 // Код присоединения: 6 символов без похожих (0/O, 1/I) — диктовать голосом легко.
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -427,7 +458,7 @@ const server = http.createServer(async (req, res) => {
       let roster = allUsers.all();
       if (groupId) {
         const g = groupById.get(groupId);
-        if (!g || g.owner !== me.gh_id) return json(res, 403, { error: 'forbidden' });
+        if (!canManageGroup(me, g)) return json(res, 403, { error: 'forbidden' });
         const ids = new Set(memberIds.all(groupId).map((r) => r.gh_id));
         roster = roster.filter((u) => ids.has(u.gh_id));
       }
@@ -512,9 +543,10 @@ const server = http.createServer(async (req, res) => {
       const groups = db
         .prepare(
           `SELECT g.id, g.name FROM groups g JOIN group_members m ON m.group_id = g.id
-           WHERE m.gh_id = ? AND g.owner = ?`,
+           WHERE m.gh_id = @sid AND (g.owner = @gh_id
+             OR EXISTS (SELECT 1 FROM group_mentors gm WHERE gm.group_id = g.id AND gm.login = @login))`,
         )
-        .all(row.gh_id, me.gh_id);
+        .all({ sid: row.gh_id, gh_id: me.gh_id, login: String(me.login).toLowerCase() });
       return json(res, 200, {
         student: {
           gh_id: row.gh_id,
@@ -561,7 +593,16 @@ const server = http.createServer(async (req, res) => {
     if (path === '/mentor/groups' && req.method === 'GET') {
       const g = mentorGuard();
       if (g.err) return json(res, g.err[0], { error: g.err[1] });
-      return json(res, 200, { groups: groupsByOwner.all(g.u.gh_id) });
+      const rows = groupsIManage.all({ gh_id: g.u.gh_id, login: String(g.u.login).toLowerCase() });
+      const groups = rows.map((row) => ({
+        id: row.id,
+        name: row.name,
+        code: row.code,
+        members: row.members,
+        owner: row.owner === g.u.gh_id,
+        comentors: groupMentorsOf.all(row.id).map((r) => r.login),
+      }));
+      return json(res, 200, { groups });
     }
 
     if (path === '/mentor/groups' && req.method === 'POST') {
@@ -580,20 +621,25 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, { id: info.lastInsertRowid, name, code, members: 0 });
     }
 
-    // /mentor/groups/<id>  и  /mentor/groups/<id>/remove
-    const gm = path.match(/^\/mentor\/groups\/(\d+)(\/remove)?$/);
+    // /mentor/groups/<id> · /remove · /comentor · /comentor/<login>
+    const gm = path.match(/^\/mentor\/groups\/(\d+)(\/remove|\/comentor(?:\/([A-Za-z\d-]+))?)?$/);
     if (gm) {
       const guard = mentorGuard();
       if (guard.err) return json(res, guard.err[0], { error: guard.err[1] });
       const id = Number(gm[1]);
       const g = groupById.get(id);
-      if (!g || g.owner !== guard.u.gh_id) return json(res, 404, { error: 'not found' });
+      if (!g || !canManageGroup(guard.u, g)) return json(res, 404, { error: 'not found' });
+      const isOwner = g.owner === guard.u.gh_id;
 
+      // Удалить группу — только владелец.
       if (!gm[2] && req.method === 'DELETE') {
+        if (!isOwner) return json(res, 403, { error: 'удалить группу может только владелец' });
         deleteGroupMembers.run(id);
+        deleteGroupMentors.run(id);
         deleteGroup.run(id, guard.u.gh_id);
         return json(res, 200, { ok: true });
       }
+      // Убрать ученика — любой управляющий группой.
       if (gm[2] === '/remove' && req.method === 'POST') {
         let body;
         try {
@@ -602,6 +648,26 @@ const server = http.createServer(async (req, res) => {
           return json(res, 400, { error: 'bad json' });
         }
         removeMember.run(id, Number(body.gh_id));
+        return json(res, 200, { ok: true });
+      }
+      // Добавить со-наставника группы — только владелец.
+      if (gm[2] === '/comentor' && req.method === 'POST') {
+        if (!isOwner) return json(res, 403, { error: 'добавить со-наставника может только владелец' });
+        let body;
+        try {
+          body = JSON.parse(await readBody(req, 1000));
+        } catch {
+          return json(res, 400, { error: 'bad json' });
+        }
+        const login = String(body.login || '').trim().toLowerCase().replace(/^@/, '');
+        if (!/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i.test(login)) return json(res, 400, { error: 'нужен GitHub-логин' });
+        addGroupMentor.run(id, login, Date.now());
+        return json(res, 200, { ok: true });
+      }
+      // Снять со-наставника группы — только владелец.
+      if (gm[3] && req.method === 'DELETE') {
+        if (!isOwner) return json(res, 403, { error: 'только владелец' });
+        removeGroupMentor.run(id, gm[3].toLowerCase());
         return json(res, 200, { ok: true });
       }
     }
@@ -704,6 +770,23 @@ const server = http.createServer(async (req, res) => {
       if (!action) return json(res, 400, { error: 'action: approve|reject' });
       setCommunityStatus.run(action, g.u.login, Date.now(), Number(cm[1]));
       return json(res, 200, { ok: true, status: action });
+    }
+
+    // --- Уведомления наставнику ---
+    if (path === '/mentor/notifications' && req.method === 'GET') {
+      const g = mentorGuard();
+      if (g.err) return json(res, g.err[0], { error: g.err[1] });
+      const login = String(g.u.login).toLowerCase();
+      const since = getSeen.get(login)?.last_seen ?? 0;
+      const pending = pendingCount.get().n;
+      const newMembers = newMembersCount.get({ since, gh_id: g.u.gh_id, login }).n;
+      return json(res, 200, { pendingMaterials: pending, newMembers, since });
+    }
+    if (path === '/mentor/notifications/seen' && req.method === 'POST') {
+      const g = mentorGuard();
+      if (g.err) return json(res, g.err[0], { error: g.err[1] });
+      setSeen.run(String(g.u.login).toLowerCase(), Date.now());
+      return json(res, 200, { ok: true });
     }
 
     // --- Со-наставники ---

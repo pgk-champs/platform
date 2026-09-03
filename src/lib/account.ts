@@ -246,8 +246,57 @@ export async function fetchStudentDetail(ghId: number): Promise<StudentDetail | 
   }
 }
 
+// --- Уведомления наставнику ---
+export type MentorNotifications = { pendingMaterials: number; newMembers: number; since: number };
+
+export async function fetchNotifications(): Promise<MentorNotifications | null> {
+  try {
+    const r = await api('/mentor/notifications');
+    return r.ok ? ((await r.json()) as MentorNotifications) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function markNotificationsSeen(): Promise<void> {
+  try {
+    await api('/mentor/notifications/seen', { method: 'POST' });
+  } catch {
+    // не критично
+  }
+}
+
 // --- Группы (потоки/классы) ---
-export type MentorGroup = { id: number; name: string; code: string; members: number };
+export type MentorGroup = {
+  id: number;
+  name: string;
+  code: string;
+  members: number;
+  owner?: boolean;
+  comentors?: string[];
+};
+
+export async function addGroupComentor(groupId: number, login: string): Promise<boolean> {
+  try {
+    return (
+      await api(`/mentor/groups/${groupId}/comentor`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ login }),
+      })
+    ).ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function removeGroupComentor(groupId: number, login: string): Promise<boolean> {
+  try {
+    return (await api(`/mentor/groups/${groupId}/comentor/${encodeURIComponent(login)}`, { method: 'DELETE' })).ok;
+  } catch {
+    return false;
+  }
+}
 
 export async function listGroups(): Promise<MentorGroup[]> {
   try {
