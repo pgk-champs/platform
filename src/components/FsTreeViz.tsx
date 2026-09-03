@@ -24,7 +24,9 @@ const TREE: FsNode = {
   ],
 };
 
-const START: string[] = ['student', 'project'];
+// Старт совпадает с условием мини-квеста («ты стоишь в src»): иначе дерево
+// показывало бы «← ты здесь» у project, а квест требовал ответ из src.
+const START: string[] = ['student', 'project', 'src'];
 const QUEST_ANSWER = 'cd ../docs';
 const XP = 20;
 
@@ -112,6 +114,8 @@ export default function FsTreeViz({
       }
     } else if (norm === 'cd /home/student/project/docs') {
       setQFb('Сработает, но это длинный абсолютный путь. Есть короче: поднимись к родителю через .. и сразу спустись в docs.');
+    } else if (norm === 'cd docs') {
+      setQFb('Из src каталога docs не видно — он лежит рядом, в project. Сначала поднимись к родителю: ..');
     } else if (norm === 'cd ..') {
       setQFb('Это только поднимет тебя в project. Нужно одной командой и подняться, и спуститься в docs — продолжи путь через /.');
     } else {

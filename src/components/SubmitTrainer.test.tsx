@@ -47,14 +47,35 @@ describe('validateSubmission — те же правила, что у бота', 
     ).toEqual([]);
   });
 
-  it('repo и link принимают только один https-адрес', () => {
+  it('repo, link, video и source принимают только один https-адрес', () => {
     expect(validateSubmission(draft({ type: 'link', dataRaw: 'http://example.com' }))).toContain(
-      'Для repo и link данные — это один https-адрес.',
+      'Для repo, link, video и source данные — это один https-адрес.',
     );
     expect(validateSubmission(draft({ type: 'link', dataRaw: 'просто текст' }))).toContain(
-      'Для repo и link данные — это один https-адрес.',
+      'Для repo, link, video и source данные — это один https-адрес.',
     );
     expect(validateSubmission(draft({ type: 'repo', dataRaw: 'https://github.com/petya/app' }))).toEqual([]);
+    expect(validateSubmission(draft({ type: 'source', dataRaw: 'https://kotlinlang.org/docs/home.html' }))).toEqual(
+      [],
+    );
+  });
+
+  it('video принимает только YouTube — как и бот на настоящей форме', () => {
+    expect(validateSubmission(draft({ type: 'video', dataRaw: 'https://youtu.be/dQw4w9WgXcQ' }))).toEqual([]);
+    expect(
+      validateSubmission(draft({ type: 'video', dataRaw: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' })),
+    ).toEqual([]);
+    expect(validateSubmission(draft({ type: 'video', dataRaw: 'https://rutube.ru/video/123/' }))).toContain(
+      'video: ссылка должна вести на YouTube (youtube.com или youtu.be).',
+    );
+    // не YouTube, но и не video — источник такую ссылку принимает
+    expect(validateSubmission(draft({ type: 'source', dataRaw: 'https://rutube.ru/video/123/' }))).toEqual([]);
+  });
+
+  it('неизвестный тип отклоняется сообщением бота со всеми пятью типами', () => {
+    expect(
+      validateSubmission(draft({ type: 'книга' as never, dataRaw: 'https://example.com/book' })),
+    ).toContain('Тип должен быть preset, repo, link, video или source.');
   });
 
   it('слишком длинный заголовок отклоняется', () => {
@@ -107,5 +128,31 @@ describe('SubmitTrainer — форма', () => {
     render(<SubmitTrainer />);
     const chapterInput = screen.getByLabelText(/Глава/) as HTMLInputElement;
     expect(chapterInput.placeholder).toMatch(/^[a-z0-9-]+$/);
+  });
+});
+
+describe('SubmitTrainer — паритет с настоящей формой', () => {
+  it('в списке типов есть все пять вариантов issue-формы', () => {
+    render(<SubmitTrainer />);
+    const select = screen.getByLabelText(/Тип/) as HTMLSelectElement;
+    expect([...select.options].map((o) => o.value)).toEqual(['preset', 'repo', 'link', 'video', 'source']);
+  });
+
+  it('video с не-YouTube ссылкой показывает сообщение бота про YouTube', () => {
+    render(<SubmitTrainer />);
+    fireEvent.change(screen.getByLabelText(/Тип/), { target: { value: 'video' } });
+    fireEvent.change(screen.getByLabelText(/Заголовок/), { target: { value: 'Курс по Kotlin' } });
+    fireEvent.change(screen.getByLabelText(/Данные/), { target: { value: 'https://vimeo.com/12345' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Проверить' }));
+
+    expect(
+      screen.getByText('video: ссылка должна вести на YouTube (youtube.com или youtu.be).'),
+    ).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText(/Данные/), {
+      target: { value: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Проверить' }));
+    expect(screen.getByText(/Прошло бы проверку/)).toBeInTheDocument();
   });
 });

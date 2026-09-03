@@ -1,4 +1,7 @@
 import { render, screen, act } from '@testing-library/react';
+// @ts-ignore — в проекте нет @types/react-dom; серверный рендер нужен,
+// чтобы проверить: первый рендер не заглядывает в store (hydration mismatch).
+import { renderToStaticMarkup } from 'react-dom/server';
 import { store } from '../lib/store';
 import ChapterProgress from './ChapterProgress';
 
@@ -71,4 +74,28 @@ test('progress is scoped per chapterId', () => {
     store.setSectionRead('git-first-commit', 'intro');
   });
   expect(screen.getByText('Прочитано 0%')).toBeTruthy();
+});
+
+test('первый (серверный) рендер не зависит от store — иначе у вернувшегося студента hydration mismatch', () => {
+  // Сервер собирает страницу с пустым прогрессом, а store на клиенте
+  // поднимает localStorage ещё при импорте модуля: если читать его прямо в
+  // рендере, первая клиентская отрисовка разойдётся с серверной разметкой.
+  store.setSectionRead('typing', 'intro');
+  store.markQuizDone('typing', 'q1', { correct: 2, total: 2 });
+  store.markTrainerDone('typing', 't1', { cpm: 100, accuracy: 90 });
+  store.addXp(60, 'test');
+
+  const html = renderToStaticMarkup(
+    <ChapterProgress chapterId="typing" totalSections={4} totalQuizzes={2} totalTrainers={3} />,
+  );
+  expect(html).toContain('Прочитано 0%');
+  expect(html).toContain('Квизы 0/2');
+  expect(html).toContain('Тренажёры 0/3');
+  expect(html).toContain('Уровень 1');
+
+  // ...а после монтирования числа настоящие
+  render(<ChapterProgress chapterId="typing" totalSections={4} totalQuizzes={2} totalTrainers={3} />);
+  expect(screen.getByText('Прочитано 25%')).toBeTruthy();
+  expect(screen.getByText('Квизы 1/2')).toBeTruthy();
+  expect(screen.getByText(/Уровень 2/)).toBeTruthy();
 });

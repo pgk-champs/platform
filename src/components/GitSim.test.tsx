@@ -325,3 +325,61 @@ test('дружелюбные ошибки: неизвестная команда
   expect(text()).toContain('fatal: invalid reference: nope');
   expect(text()).toContain('список веток покажет git branch');
 });
+
+test('git config --global user.name/email принимается и подписывает коммиты в git log', () => {
+  const { container } = render(<GitSim scenario="first-commit" />);
+  const text = () => container.textContent ?? '';
+
+  // Глава просит представиться ДО git init — тренажёр не должен ругаться
+  run('git config --global user.name "Ivan Petrov"');
+  expect(text()).not.toContain("is not a git command");
+  expect(text()).not.toContain('fatal: not a git repository');
+  run('git config --global user.email "ivan@example.com"');
+
+  run('git init');
+  run('git add README.md');
+  run('git commit -m "первый коммит"');
+  run('git log');
+  expect(text()).toContain('Author: Ivan Petrov <ivan@example.com>');
+
+  // чтение настройки без значения — как у настоящего git
+  run('git config user.name');
+  expect(text()).toContain('Ivan Petrov');
+});
+
+test('настройка автора не съедает звёзды: git config не идёт в счёт команд', () => {
+  render(
+    <GitSim
+      scenario="first-commit"
+      quest={{ title: 'Три коммита', goal: 'commits>=3', optimalCommands: 9 }}
+      chapterId="git-first-commit"
+      trainerId="sim"
+    />,
+  );
+  run('git config --global user.name "Ivan Petrov"');
+  run('git config --global user.email "ivan@example.com"');
+  run('git init');
+  run('git add README.md');
+  run('git commit -m "коммит 1"');
+  for (let i = 2; i <= 3; i += 1) {
+    run(`edit README.md версия ${i}`);
+    run('git add README.md');
+    run(`git commit -m "коммит ${i}"`);
+  }
+  expect(screen.getByText(/Квест выполнен/)).toBeTruthy();
+  expect(screen.getByText('★★★')).toBeTruthy();
+});
+
+test('сценарий first-commit сразу рассказывает про edit, и тупик «коммитить нечего» подсказывает его же', () => {
+  const { container } = render(<GitSim scenario="first-commit" />);
+  const text = () => container.textContent ?? '';
+  expect(text()).toContain('edit README.md');
+  // и в строке-шпаргалке под терминалом, а не только в help
+  expect(text()).toContain('edit <файл> <текст> — изменить файл');
+
+  run('git init');
+  run('git add README.md');
+  run('git commit -m "первый коммит"');
+  run('git commit -m "второй коммит"'); // менять нечего — раньше молча печатался status
+  expect(text()).toContain('коммитить нечего: сначала измени файл');
+});

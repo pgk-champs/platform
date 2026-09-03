@@ -57,9 +57,15 @@ type Repo = {
 
 type Line = { t: 'cmd' | 'out' | 'hint'; s: string };
 
+// Подпись автора коммитов: то, что настоящий git спрашивает через
+// git config --global user.name / user.email до первого коммита.
+type GitUser = { name: string; email: string };
+const DEFAULT_USER: GitUser = { name: 'student', email: 'student@pgk.local' };
+
 type Sim = {
   commits: Record<string, Commit>;
   order: string[]; // hash-и в порядке создания — раскладка графа и сортировка log
+  user: GitUser;
   local: Repo;
   origin: Repo | null; // только в remote-demo
   lines: Line[];
@@ -214,7 +220,7 @@ function logText(sim: Sim, repo: Repo, oneline: boolean): string {
     const deco = decorations(repo, h);
     if (oneline) return `${h}${deco} ${c.message}`;
     const d = new Date(c.ts);
-    return `commit ${h}${deco}\nAuthor: student <student@pgk.local>\nDate:   ${d.toLocaleString('ru-RU')}\n\n    ${c.message}`;
+    return `commit ${h}${deco}\nAuthor: ${sim.user.name} <${sim.user.email}>\nDate:   ${d.toLocaleString('ru-RU')}\n\n    ${c.message}`;
   });
   return entries.join(oneline ? '\n' : '\n\n');
 }
@@ -311,6 +317,7 @@ function tokenize(line: string): string[] {
 function helpText(hasRemote: boolean): string {
   const L = [
     'Поддерживаемые команды:',
+    '  git config --global user.name "Имя"  — подпись автора коммитов (и user.email)',
     '  git init                      — создать репозиторий',
     '  git status                    — состояние файлов',
     '  git add <файл|.>              — добавить изменения в индекс',
@@ -370,6 +377,32 @@ function exec(prev: Sim, raw: string): Sim {
   const sub = tok[1];
   if (!sub) {
     out("usage: git <команда> — например, git status");
+    return sim;
+  }
+
+  // config — до проверки на репозиторий: настоящий git config --global
+  // работает в любой папке, и глава просит представиться ДО git init.
+  if (sub === 'config') {
+    const args = tok.slice(2).filter((a) => a !== '--global' && a !== '--local');
+    const key = args[0];
+    const value = args.slice(1).join(' ');
+    const field = key === 'user.name' ? 'name' : key === 'user.email' ? 'email' : null;
+    if (!field) {
+      out(`error: тренажёр знает только git config user.name и git config user.email`);
+      hint('например: git config --global user.name "Ivan Petrov"');
+      return sim;
+    }
+    if (!value) {
+      out(sim.user[field]); // чтение настройки — как у настоящего git
+      return sim;
+    }
+    sim.user[field] = value;
+    // Настройка автора — разовая подготовка, а не часть цикла init → add →
+    // commit: в счёт команд для звёзд не идёт, иначе студент, честно
+    // повторивший главу, терял бы звезду на ровном месте.
+    sim.counters.totalCommands -= 1;
+    // настоящий git при записи молчит — поясняем происходящее подсказкой
+    hint(`${key} теперь ${value} — эта подпись встанет под коммитами (её видно в git log)`);
     return sim;
   }
 
@@ -445,6 +478,9 @@ function exec(prev: Sim, raw: string): Sim {
       const staged = Object.keys(repo.index).filter((f) => repo.index[f] !== snap[f]);
       if (!staged.length) {
         out(statusText(sim, repo));
+        // Тупик «коммитить нечего»: без этой подсказки следующий коммит
+        // собрать не из чего — про псевдоредактор edit студент ещё не знает.
+        hint('коммитить нечего: сначала измени файл — edit <файл> <новый текст>, потом git add <файл>');
         return sim;
       }
       const parent = repo.branches[repo.head];
@@ -765,6 +801,7 @@ function makeInitial(scenario: GitSimScenario): Sim {
   const sim: Sim = {
     commits: {},
     order: [],
+    user: { ...DEFAULT_USER },
     local: emptyRepo(),
     origin: null,
     lines: [],
@@ -781,7 +818,9 @@ function makeInitial(scenario: GitSimScenario): Sim {
     greet('Пустая папка проекта. Начни с git init. Полный список команд — help.');
   } else if (scenario === 'first-commit') {
     sim.local.files['README.md'] = 'Мой первый проект';
-    greet('В папке уже лежит README.md. Доведи его до первого коммита: git init → git add → git commit. Список команд — help.');
+    greet(
+      'В папке уже лежит README.md. Доведи его до первого коммита: git init → git add → git commit. Чтобы сделать следующий коммит, файл надо сначала изменить — здесь это команда edit: например edit README.md Мой проект на Kotlin. Полный список команд — help.',
+    );
   } else if (scenario === 'branches') {
     seed('e7c9a4b', 'начало проекта', { 'README.md': 'Проект PGK' });
     sim.local = {
@@ -1066,8 +1105,10 @@ export default function GitSim({ scenario = 'free', quest, chapterId, trainerId 
             </button>
           </form>
           <div className="gs-help-line">
-            Команды: git init · status · add · commit -m · diff · log · branch · switch · merge · restore
-            {sim.origin ? ' · push · pull' : ''} · edit · help · clear
+            Команды: git config · init · status · add · commit -m · diff · log · branch · switch · merge ·
+            restore
+            {sim.origin ? ' · push · pull' : ''} · edit &lt;файл&gt; &lt;текст&gt; — изменить файл · help ·
+            clear
           </div>
           <FilesPanel sim={sim} repo={sim.local} />
         </div>

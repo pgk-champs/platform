@@ -32,24 +32,35 @@ export default function SelfCheck({
 
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [wrongCounts, setWrongCounts] = useState<Record<number, number>>({});
-  const rewardedRef = useRef(false);
+  const [xpAwarded, setXpAwarded] = useState(0);
+  const recordedRef = useRef(false);
 
   const answeredCount = Object.keys(answers).length;
   const correctCount = Object.entries(answers).filter(
     ([qi, oi]) => oi === questions[Number(qi)].correct,
   ).length;
   const allAnswered = questions.length > 0 && answeredCount === questions.length;
-  const perfect = allAnswered && correctCount === questions.length;
+  // В зачёт идёт ПЕРВАЯ попытка: вопрос без единого промаха. Иначе любой
+  // перебор вариантов (неверные ответы можно менять) записывался бы как
+  // идеальное прохождение — и достижения «Квиз на 100%» брались бы перебором.
+  const firstTryCorrect = questions.filter((_, qi) => (wrongCounts[qi] ?? 0) === 0).length;
+  const perfect = allAnswered && firstTryCorrect === questions.length;
 
   useEffect(() => {
-    if (!chapterId || !quizId || !allAnswered) return;
-    store.markQuizDone(chapterId, quizId, { correct: correctCount, total: questions.length });
-    if (perfect && !rewardedRef.current) {
-      rewardedRef.current = true;
+    // Одна запись в quizLog на одно прохождение: раньше эффект срабатывал на
+    // каждое исправление и «Попыток всего» росло на 1 за каждую правку.
+    if (!chapterId || !quizId || !allAnswered || recordedRef.current) return;
+    recordedRef.current = true;
+    const firstRun = !store.getProgress().quizzes[chapterId]?.[quizId];
+    store.markQuizDone(chapterId, quizId, { correct: firstTryCorrect, total: questions.length });
+    // XP — только за первое прохождение квиза, иначе перезагрузка страницы и
+    // повтор давали бы +20 XP снова.
+    if (perfect && firstRun) {
       store.addXp(PERFECT_XP, `quiz:${chapterId}:${quizId}`);
+      setXpAwarded(PERFECT_XP);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allAnswered, correctCount]);
+  }, [allAnswered]);
 
   const pick = (qi: number, oi: number) => {
     if (answers[qi] === questions[qi].correct) return;
@@ -125,9 +136,20 @@ export default function SelfCheck({
       {allAnswered ? (
         <div className="sc-result">
           Пройдено: {correctCount} из {questions.length}
+          {firstTryCorrect < correctCount ? (
+            // Без своего класса: наследует оформление плашки результата —
+            // трогать общий trainers.css ради одной строки незачем.
+            <div>
+              С первой попытки: {firstTryCorrect} из {questions.length} — в зачёт идёт этот результат.
+            </div>
+          ) : null}
         </div>
       ) : null}
-      {perfect ? <div className="sc-result-perfect">+{PERFECT_XP} XP за идеальное прохождение</div> : null}
+      {perfect ? (
+        <div className="sc-result-perfect">
+          Идеально — все ответы с первой попытки!{xpAwarded ? ` +${xpAwarded} XP` : ''}
+        </div>
+      ) : null}
       {chapterId && quizId && allAnswered
         ? (() => {
             const stats = store.quiz.stats(chapterId, quizId);

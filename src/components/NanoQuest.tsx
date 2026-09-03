@@ -219,7 +219,9 @@ export default function NanoQuest({
           ) : expected === 'n' ? (
             <>
               <span className="nq-prompt">Save modified buffer?</span>
-              <button type="button" className="nq-key" onClick={() => pressVirtual('n', 'Y')}>
+              {/* Y ведёт к сохранению — задача обратная, поэтому это промах,
+                  а не шаг сценария (кнопка рисует настоящий вопрос nano). */}
+              <button type="button" className="nq-key" onClick={() => miss('Y')}>
                 Y Yes
               </button>
               <button type="button" className="nq-key" onClick={() => pressVirtual('n', 'N')}>

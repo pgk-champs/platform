@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from '@docusaurus/Link';
 import { decodePreset, encodePreset, ENGINE_LABELS, type SharedPreset } from './GymBuilder';
+import { chapterHref, chapterTitle } from './chapterLabels';
 import './trainers.css';
 
 // Каталог контента от студентов (/community, пакет community): клиентский
@@ -101,9 +102,9 @@ export default function CommunityCatalog() {
     <section className="cc">
       <div className="cc-head">
         <p>
-          Здесь собрано то, что сделали сами студенты: наборы для тренажёров, ссылки на свои
-          репозитории и полезные инструменты. Пресеты запускаются прямо в зале, остальное открывается
-          в новой вкладке.
+          Здесь собрано то, что сделали и нашли сами студенты: видео и источники по темам глав,
+          наборы для тренажёров, ссылки на свои репозитории и полезные инструменты. Пресеты
+          запускаются прямо в зале, остальное открывается в новой вкладке.
         </p>
         <p>
           Хочешь добавить своё? Возьми у наставника секретный код и заполни форму — после проверки
@@ -144,7 +145,7 @@ export default function CommunityCatalog() {
                 <option value={ALL}>все</option>
                 {chapters.map((c) => (
                   <option key={c} value={c}>
-                    {c}
+                    {chapterTitle(c)}
                   </option>
                 ))}
               </select>
@@ -174,6 +175,7 @@ export default function CommunityCatalog() {
                 const url = item.type !== 'preset' ? externalUrl(item) : null;
                 const engine =
                   item.type === 'preset' ? (item.data as SharedPreset | null)?.engine : undefined;
+                const chapterTo = item.chapterId ? chapterHref(item.chapterId) : null;
                 return (
                   <article key={item.id} className="cc-card">
                     <span className={`cc-badge cc-badge-${item.type}`}>
@@ -183,7 +185,16 @@ export default function CommunityCatalog() {
                     <h3 className="cc-title">{item.title}</h3>
                     <p className="cc-meta">
                       автор: {item.author}
-                      {item.chapterId ? ` · глава: ${item.chapterId}` : ''}
+                      {item.chapterId ? (
+                        <>
+                          {' · глава: '}
+                          {chapterTo ? (
+                            <Link to={chapterTo}>«{chapterTitle(item.chapterId)}»</Link>
+                          ) : (
+                            chapterTitle(item.chapterId)
+                          )}
+                        </>
+                      ) : null}
                     </p>
                     {hash ? (
                       <Link className="button button--sm button--primary" to={`/gym${hash}`}>

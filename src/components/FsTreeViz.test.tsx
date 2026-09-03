@@ -13,22 +13,22 @@ test('relPath: вверх, вниз, смешанно, на месте', () => {
   expect(relPath(['a', 'b'], ['a', 'b'])).toBe('.');
 });
 
-test('рисует дерево практикума и отметку текущего каталога в project', () => {
+test('рисует дерево практикума и отметку текущего каталога в src — там же, где стоит квест', () => {
   render(<FsTreeViz />);
   expect(screen.getByText('/home/student')).toBeTruthy();
   expect(screen.getByText(/^project\//)).toBeTruthy();
   expect(screen.getByText('docs/')).toBeTruthy();
-  expect(screen.getByText('src/')).toBeTruthy();
+  expect(screen.getByText(/^src\//)).toBeTruthy();
   expect(screen.getAllByText('README.md')).toHaveLength(2);
   expect(screen.getByText('main.py')).toBeTruthy();
-  expect(screen.getByText('← ты здесь')).toBeTruthy();
+  expect(screen.getByText(/^src\//).textContent).toContain('← ты здесь');
 });
 
 test('клик по каталогу: pwd, относительный и абсолютный cd, подсветка пути', () => {
   render(<FsTreeViz />);
   fireEvent.click(screen.getByText('docs/'));
   expect(screen.getByText('/home/student/project/docs')).toBeTruthy();
-  expect(screen.getByText('cd docs')).toBeTruthy();
+  expect(screen.getByText('cd ../docs')).toBeTruthy(); // из src до docs — через родителя
   expect(screen.getByText('cd /home/student/project/docs')).toBeTruthy();
   // подсветка: docs выбран, project — на пути к нему
   expect(screen.getByText('docs/').className).toContain('ftv-sel');
@@ -38,7 +38,7 @@ test('клик по каталогу: pwd, относительный и абс�
 test('следующий клик считает cd уже от нового текущего каталога', () => {
   render(<FsTreeViz />);
   fireEvent.click(screen.getByText('docs/'));
-  fireEvent.click(screen.getByText('src/'));
+  fireEvent.click(screen.getByText(/^src\//));
   expect(screen.getByText('cd ../src')).toBeTruthy();
 });
 
@@ -49,12 +49,12 @@ test('клик по файлу: путь и объяснение, что cd ра
   expect(screen.getByText(/cd работает только с каталогами/)).toBeTruthy();
   // текущий каталог не сменился
   fireEvent.click(screen.getByText('docs/'));
-  expect(screen.getByText('cd docs')).toBeTruthy();
+  expect(screen.getByText('cd ../docs')).toBeTruthy();
 });
 
 test('клик по текущему каталогу: «ты уже здесь»', () => {
   render(<FsTreeViz />);
-  fireEvent.click(screen.getByText(/^project\//));
+  fireEvent.click(screen.getByText(/^src\//));
   expect(screen.getByText(/Ты уже здесь/)).toBeTruthy();
 });
 
@@ -65,8 +65,10 @@ const answerQuest = (cmd: string) => {
 
 test('квест: неверная команда и подсказки для cd .. и абсолютного пути', () => {
   render(<FsTreeViz />);
-  answerQuest('cd docs');
+  answerQuest('cd nope');
   expect(screen.getByText(/Не то/)).toBeTruthy();
+  answerQuest('cd docs'); // «правильно по картинке», но docs не внутри src
+  expect(screen.getByText(/Из src каталога docs не видно/)).toBeTruthy();
   answerQuest('cd ..');
   expect(screen.getByText(/только поднимет тебя в project/)).toBeTruthy();
   answerQuest('cd /home/student/project/docs');

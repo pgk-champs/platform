@@ -76,3 +76,25 @@ test('empty rounds render nothing without crashing', () => {
   const { container } = render(<BugHunt rounds={[]} />);
   expect(container.innerHTML).toBe('');
 });
+
+test('повторное прохождение (как после перезагрузки страницы) XP больше не начисляет', () => {
+  const perfectRun = () => {
+    fireEvent.click(screen.getByText('record = 120'));
+    fireEvent.click(screen.getByText('Дальше →'));
+    fireEvent.click(screen.getByText('val points: Int = "5"'));
+    fireEvent.click(screen.getByText('Показать результат'));
+  };
+
+  const first = render(<BugHunt rounds={rounds} chapterId="kotlin-vars" trainerId="trainer-bug-hunt" />);
+  perfectRun();
+  expect(store.getXp()).toBe(25);
+  expect(screen.getByText(/\+25 XP/)).toBeTruthy();
+  first.unmount();
+
+  // второй заход на ту же страницу: результат пишется, XP — нет, и плашка не врёт
+  render(<BugHunt rounds={rounds} chapterId="kotlin-vars" trainerId="trainer-bug-hunt" />);
+  perfectRun();
+  expect(store.getXp()).toBe(25);
+  expect(screen.queryByText(/\+25 XP/)).toBeNull();
+  expect(screen.getByText(/Выполнено! С первого клика найдено 2 из 2/)).toBeTruthy();
+});

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { store } from '../lib/store';
 import './trainers.css';
 
@@ -57,7 +57,8 @@ export default function PRTrainer({
 }) {
   const [found, setFound] = useState<ProblemId[]>([]);
   const [missed, setMissed] = useState<number[]>([]);
-  const rewardedRef = useRef(false);
+  // XP реально начислен в этом прохождении — только по нему пишем «+25 XP».
+  const [gotXp, setGotXp] = useState(false);
 
   const finished = found.length === PROBLEMS.length;
 
@@ -68,16 +69,21 @@ export default function PRTrainer({
       if (found.includes(p)) return;
       const nextFound = [...found, p];
       setFound(nextFound);
-      if (nextFound.length === PROBLEMS.length && !rewardedRef.current) {
-        rewardedRef.current = true;
-        if (chapterId && trainerId) {
-          store.markTrainerDone(chapterId, trainerId, {
-            found: nextFound.length,
-            misses: missed.length,
-          });
-          if (missed.length === 0) {
-            store.addXp(XP, `trainer:${chapterId}:${trainerId}`);
-          }
+      if (nextFound.length === PROBLEMS.length && chapterId && trainerId) {
+        const prev = store.getProgress().trainers[chapterId]?.[trainerId]?.result as
+          | { misses?: number }
+          | undefined;
+        // Результат — лучший за всё время (меньше промахов), поэтому повтор
+        // с промахами не затирает чистое прохождение...
+        store.markTrainerDone(chapterId, trainerId, {
+          found: nextFound.length,
+          misses: Math.min(missed.length, prev?.misses ?? missed.length),
+        });
+        // ...а XP даётся за первое чистое прохождение — в том числе после
+        // «Попробовать ещё раз», когда с первого раза были промахи.
+        if (missed.length === 0 && prev?.misses !== 0) {
+          store.addXp(XP, `trainer:${chapterId}:${trainerId}`);
+          setGotXp(true);
         }
       }
     } else if (!missed.includes(i)) {
@@ -88,6 +94,7 @@ export default function PRTrainer({
   const retry = () => {
     setFound([]);
     setMissed([]);
+    setGotXp(false);
   };
 
   return (
@@ -123,7 +130,7 @@ export default function PRTrainer({
         <>
           <div className="prt-done">
             ✓ Выполнено! Все {PROBLEMS.length} проблемы найдены
-            {missed.length === 0 ? (chapterId && trainerId ? ` без промахов +${XP} XP` : ' без промахов') : `, промахов: ${missed.length}`}
+            {missed.length === 0 ? (gotXp ? ` без промахов +${XP} XP` : ' без промахов') : `, промахов: ${missed.length}`}
           </div>
           <div className="prt-review">
             {PROBLEMS.map((p) => (

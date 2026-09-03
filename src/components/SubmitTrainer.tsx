@@ -7,15 +7,20 @@ import './trainers.css';
 // «Проверить» гоняет валидацию ЛОКАЛЬНО, ничего никуда не отправляя.
 // Правила и тексты ошибок продублированы 1-в-1 из
 // leaderboard/scripts/validate-content.mjs — студент видит те же сообщения,
-// что написал бы бот. Секретный код тренажёр НЕ проверяет (его знает только
+// что написал бы бот. Типы и подписи — из формы
+// leaderboard/.github/ISSUE_TEMPLATE/submit-content.yml (preset, repo, link,
+// video, source): расходиться этим трём файлам нельзя. Секретный код тренажёр НЕ проверяет (его знает только
 // бот) — только напоминает, что поле должно быть заполнено.
 
 export type SubmissionDraft = {
-  type: 'preset' | 'repo' | 'link';
+  type: 'preset' | 'repo' | 'link' | 'video' | 'source';
   title: string;
   chapter: string;
   dataRaw: string;
 };
+
+const TYPES: SubmissionDraft['type'][] = ['preset', 'repo', 'link', 'video', 'source'];
+const YOUTUBE_HOST = /^(www\.|m\.)?(youtube\.com|youtu\.be)$/;
 
 const str = (v: unknown) => typeof v === 'string' && v.trim() !== '';
 
@@ -23,7 +28,7 @@ const str = (v: unknown) => typeof v === 'string' && v.trim() !== '';
 // Копия правил validate-content.mjs (без секретного кода и автора).
 export function validateSubmission({ type, title, chapter, dataRaw }: SubmissionDraft): string[] {
   const reasons: string[] = [];
-  if (!['preset', 'repo', 'link'].includes(type)) reasons.push('Тип должен быть preset, repo или link.');
+  if (!TYPES.includes(type)) reasons.push('Тип должен быть preset, repo, link, video или source.');
   if (!title.trim()) reasons.push('Заголовок не может быть пустым.');
   if (title.trim().length > 120) reasons.push('Заголовок длиннее 120 символов.');
   if (chapter.trim().length > 100) reasons.push('Глава длиннее 100 символов.');
@@ -75,7 +80,11 @@ export function validateSubmission({ type, title, chapter, dataRaw }: Submission
     } catch {
       /* ниже */
     }
-    if (!url || url.protocol !== 'https:') reasons.push('Для repo и link данные — это один https-адрес.');
+    if (!url || url.protocol !== 'https:') {
+      reasons.push('Для repo, link, video и source данные — это один https-адрес.');
+    } else if (type === 'video' && !YOUTUBE_HOST.test(url.hostname)) {
+      reasons.push('video: ссылка должна вести на YouTube (youtube.com или youtu.be).');
+    }
   }
   return reasons;
 }
@@ -84,6 +93,8 @@ const PLACEHOLDERS: Record<SubmissionDraft['type'], string> = {
   preset: '{"engine": "wordorder", "phrase": "please review my pull request"}',
   repo: 'https://github.com/твой-логин/твой-репозиторий',
   link: 'https://адрес-полезной-страницы',
+  video: 'https://www.youtube.com/watch?v=...',
+  source: 'https://адрес-статьи-или-документации',
 };
 
 type Result = { reasons: string[] } | null;
@@ -133,6 +144,8 @@ export default function SubmitTrainer() {
           <option value="preset">preset — набор для тренажёра из конструктора /gym</option>
           <option value="repo">repo — ссылка на свой репозиторий</option>
           <option value="link">link — полезная ссылка или инструмент</option>
+          <option value="video">video — YouTube-видео или курс по теме главы</option>
+          <option value="source">source — статья или документация по теме главы</option>
         </select>
       </label>
       <label className="st-field">

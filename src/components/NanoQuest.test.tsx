@@ -83,3 +83,24 @@ test('matchesStep distinguishes modifiers', () => {
   expect(matchesStep('enter', { ...base, ctrlKey: true, code: 'Enter' })).toBe(false);
   expect(matchesStep('n', { ...base, code: 'KeyN' })).toBe(true);
 });
+
+test('кнопка «Y Yes» — промах: подсказка про Y, квест не пройден и XP не начислен', () => {
+  render(<NanoQuest chapterId="c1" trainerId="t1" />);
+  // сценарий 1 целиком, чтобы дойти до вопроса «Save modified buffer?»
+  fireEvent.click(screen.getByText('^O Write Out'));
+  fireEvent.click(screen.getByText('Enter'));
+  fireEvent.click(screen.getByText('^X Exit'));
+  fireEvent.click(screen.getByText('Сценарий 2 →'));
+  fireEvent.click(screen.getByText('^X Exit'));
+  expect(screen.getByText('Save modified buffer?')).toBeTruthy();
+
+  fireEvent.click(screen.getByText('Y Yes'));
+  expect(screen.getByText(/Y сохранит изменения/)).toBeTruthy();
+  expect(screen.queryByText(/Выполнено!/)).toBeNull();
+  expect(store.getXp()).toBe(0);
+
+  // N — верный шаг, он и завершает квест
+  fireEvent.click(screen.getByText('N No'));
+  expect(screen.getByText(/Выполнено!/)).toBeTruthy();
+  expect(store.getXp()).toBe(25);
+});

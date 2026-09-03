@@ -1,5 +1,6 @@
-import React, { useState, useSyncExternalStore } from 'react';
+import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import { store, type OsId } from '../lib/store';
+import { detectOs, OS_FALLBACK, useResolvedOs } from '../lib/os';
 import './trainers.css';
 
 const FIRST_XP = 10;
@@ -140,10 +141,9 @@ function describeEvent(e: React.KeyboardEvent): string {
 const OS_LABELS: Record<OsId, string> = { mac: 'macOS', win: 'Windows', linux: 'Ubuntu' };
 const OS_ORDER: OsId[] = ['mac', 'win', 'linux'];
 const PURE_MODIFIER_KEYS = ['Control', 'Shift', 'Alt', 'Meta', 'CapsLock'];
-
 export default function HotkeyTrainer({ items, chapterId, trainerId }: HotkeyTrainerProps) {
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
-  const os = store.prefs.getOs() ?? 'mac';
+  const os: OsId = useResolvedOs();
 
   const [index, setIndex] = useState(0);
   const [mistakes, setMistakes] = useState(0);
@@ -255,12 +255,14 @@ export default function HotkeyTrainer({ items, chapterId, trainerId }: HotkeyTra
 
           {manual ? (
             <div className="hk-reserved">
+              {/* Без слова «IDE»: тренажёр стоит и в главе про печать, где IDE
+                  ещё не объясняли — там это пустой звук для первокурсника. */}
               <p>
                 Сочетание <kbd className="keys-kbd">{currentComboText}</kbd> перехватит браузер —
-                здесь его не проверить. Потренируй его в самой IDE.
+                здесь его не проверить. Потренируй его в той программе, где оно нужно.
               </p>
               <button type="button" className="hk-btn" onClick={advance}>
-                Потренирую в IDE — дальше
+                Понятно — дальше
               </button>
             </div>
           ) : (

@@ -99,3 +99,16 @@ test('star reflects the favorite state of the current card when navigating', () 
   fireEvent.click(screen.getByText('Назад'));
   expect(screen.getByRole('button', { name: 'Убрать слово из избранного' })).toBeTruthy();
 });
+
+test('Enter на звёздочке не переворачивает карточку (нажатие достаётся кнопке)', () => {
+  render(<Flashcards cards={cards} chapterId="typing" />);
+  const star = screen.getByRole('button', { name: 'Слово в избранное' });
+  const notPrevented = fireEvent.keyDown(star, { key: 'Enter' });
+  expect(notPrevented).toBe(true); // preventDefault не вызван — браузер сам нажмёт кнопку
+  expect(screen.queryByText('переменная')).toBeNull();
+  expect(screen.getByText('variable')).toBeTruthy();
+
+  // сама карточка на Enter по-прежнему переворачивается
+  fireEvent.keyDown(screen.getByRole('button', { name: /variable/ }), { key: 'Enter' });
+  expect(screen.getByText('переменная')).toBeTruthy();
+});

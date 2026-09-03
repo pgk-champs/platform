@@ -8,7 +8,14 @@ const GOAL_XP = 15;
 
 // timeline/snippet появляются у рекорда в режиме ghost: позиции по секундам
 // и фрагмент, на котором рекорд поставлен (гонка честная только на нём же).
-type TypingResult = { cpm: number; accuracy: number; timeline?: number[]; snippet?: string };
+// goalMet — цель тренажёра была взята в одном прогоне (XP за неё даётся раз).
+type TypingResult = {
+  cpm: number;
+  accuracy: number;
+  goalMet?: boolean;
+  timeline?: number[];
+  snippet?: string;
+};
 
 export type CodeTypingPool = { label: string; snippets: string[] };
 export type CodeTypingPreset = 'latin' | 'symbols' | 'code' | 'git';
@@ -146,6 +153,7 @@ export default function CodeTyping({
   const startRef = useRef<number | null>(null);
   const samplesRef = useRef<{ t: number; pos: number }[]>([]);
   const [record, setRecord] = useState(false);
+  const [pasteBlocked, setPasteBlocked] = useState(false);
   const [, setTick] = useState(0);
   const done = result !== null;
 
@@ -155,6 +163,7 @@ export default function CodeTyping({
     setResult(null);
     setLastKey(null);
     setRecord(false);
+    setPasteBlocked(false);
     startRef.current = null;
     samplesRef.current = [];
   };
@@ -176,7 +185,9 @@ export default function CodeTyping({
     const correct = countCorrect(finalValue, activeSnippet);
     const accuracy = activeSnippet.length > 0 ? Math.round((100 * correct) / activeSnippet.length) : 0;
     const minutes = Math.max(elapsedMs, 1) / 60000;
-    const cpm = Math.round(activeSnippet.length / minutes);
+    // Скорость — по ВЕРНЫМ символам: иначе быстрая бессмыслица ставила бы
+    // рекорд, который потом не побить нормальным набором.
+    const cpm = Math.round(correct / minutes);
     const finalResult: TypingResult = { cpm, accuracy };
     setElapsed(Math.round(elapsedMs / 1000));
     setResult(finalResult);
@@ -184,31 +195,45 @@ export default function CodeTyping({
     if (!chapterId || !trainerId) return;
     const prevBest = store.getProgress().trainers[chapterId]?.[trainerId]?.result as TypingResult | undefined;
     const hasGoal = targetCpm !== undefined || targetAccuracy !== undefined;
-    const prevMetGoal = !!prevBest && meetsTargets(prevBest, targetCpm, targetAccuracy);
+    const metGoalNow = meetsTargets(finalResult, targetCpm, targetAccuracy);
+    const cpmRecord = !prevBest || cpm > prevBest.cpm;
 
-    if (!prevBest || cpm > prevBest.cpm) {
-      let stored: TypingResult = finalResult;
-      if (ghost) {
-        // Таймлайн рекорда: сколько символов было набрано к каждой секунде.
-        // Из него при следующем прохождении строится «призрак» для гонки с собой.
-        const seconds = Math.max(1, Math.ceil(elapsedMs / 1000));
-        const timeline: number[] = [];
-        for (let s = 0; s <= seconds; s += 1) {
-          let pos = 0;
-          for (const sample of samplesRef.current) {
-            if (sample.t <= s * 1000) pos = sample.pos;
-          }
-          timeline.push(pos);
+    // Рекорд хранит лучшее по каждой оси отдельно: аккуратный медленный прогон
+    // не теряет точность (иначе достижение «ни одной опечатки» недостижимо),
+    // а быстрый — скорость.
+    const stored: TypingResult = {
+      cpm: Math.max(cpm, prevBest?.cpm ?? 0),
+      accuracy: Math.max(accuracy, prevBest?.accuracy ?? 0),
+    };
+    if (hasGoal && (metGoalNow || prevBest?.goalMet)) stored.goalMet = true;
+    if (ghost && cpmRecord) {
+      // Таймлайн рекорда: сколько символов было набрано к каждой секунде.
+      // Из него при следующем прохождении строится «призрак» для гонки с собой.
+      const seconds = Math.max(1, Math.ceil(elapsedMs / 1000));
+      const timeline: number[] = [];
+      for (let s = 0; s <= seconds; s += 1) {
+        let pos = 0;
+        for (const sample of samplesRef.current) {
+          if (sample.t <= s * 1000) pos = sample.pos;
         }
-        stored = { ...finalResult, timeline, snippet: activeSnippet };
-        if (prevBest) setRecord(true);
+        timeline.push(pos);
       }
-      store.markTrainerDone(chapterId, trainerId, stored);
+      stored.timeline = timeline;
+      stored.snippet = activeSnippet;
+      if (prevBest) setRecord(true);
+    } else if (ghost && prevBest?.timeline) {
+      // Прогон не побил скорость — призрак остаётся от прежнего рекорда.
+      stored.timeline = prevBest.timeline;
+      stored.snippet = prevBest.snippet;
     }
+    store.markTrainerDone(chapterId, trainerId, stored);
+
     if (!prevBest) {
       store.addXp(FIRST_XP, `trainer:${chapterId}:${trainerId}`);
     }
-    if (hasGoal && !prevMetGoal && meetsTargets(finalResult, targetCpm, targetAccuracy)) {
+    // XP за цель — по факту взятой цели в одном прогоне, а не по «лучшему»
+    // результату: иначе её можно было получать снова и снова.
+    if (hasGoal && metGoalNow && !prevBest?.goalMet) {
       store.addXp(GOAL_XP, `trainer-goal:${chapterId}:${trainerId}`);
     }
   };
@@ -241,7 +266,8 @@ export default function CodeTyping({
   const liveCorrect = countCorrect(value, activeSnippet);
   const liveAccuracy = value.length > 0 ? Math.round((100 * liveCorrect) / activeSnippet.length) : 0;
   const liveElapsedMs = startRef.current !== null ? Date.now() - startRef.current : 0;
-  const liveCpm = value.length > 0 && liveElapsedMs > 0 ? Math.round(value.length / (liveElapsedMs / 60000)) : 0;
+  // Как и в итоге — по верным символам, чтобы живое число не расходилось с ним.
+  const liveCpm = value.length > 0 && liveElapsedMs > 0 ? Math.round(liveCorrect / (liveElapsedMs / 60000)) : 0;
 
   const best =
     chapterId && trainerId
@@ -273,6 +299,30 @@ export default function CodeTyping({
 
   const hasGoal = targetCpm !== undefined || targetAccuracy !== undefined;
   const goalMet = result ? meetsTargets(result, targetCpm, targetAccuracy) : false;
+
+  // Цель нужно видеть ДО набора, иначе «Цель пока не достигнута» ничего не
+  // объясняет: к какой скорости и точности стремиться и сколько не хватило.
+  const goalText = [
+    targetCpm !== undefined ? `скорость ≥ ${targetCpm} зн/мин` : null,
+    targetAccuracy !== undefined ? `точность ≥ ${targetAccuracy}%` : null,
+  ]
+    .filter(Boolean)
+    .join(', ');
+  const missingText = result
+    ? [
+        targetCpm !== undefined && result.cpm < targetCpm ? `${targetCpm - result.cpm} зн/мин` : null,
+        targetAccuracy !== undefined && result.accuracy < targetAccuracy
+          ? `${targetAccuracy - result.accuracy}% точности`
+          : null,
+      ]
+        .filter(Boolean)
+        .join(' и ')
+    : '';
+  const NOTE_STYLE: React.CSSProperties = {
+    margin: '0.4rem 0',
+    fontSize: '0.85rem',
+    color: 'var(--ifm-color-emphasis-700)',
+  };
 
   const nextChar = !done ? activeSnippet[value.length] : undefined;
   const nextKeyInfo = nextChar !== undefined ? charToKey(nextChar) : null;
@@ -310,13 +360,20 @@ export default function CodeTyping({
           {record ? <p className="ct-record">Новый рекорд! Призрак обновлён 👻</p> : null}
           {hasGoal ? (
             <p className={goalMet ? 'ct-goal-ok' : 'ct-goal-no'}>
-              {goalMet ? 'Цель достигнута!' : 'Цель пока не достигнута'}
+              {goalMet
+                ? `Цель достигнута! (${goalText})`
+                : `Цель пока не достигнута: ${goalText}. Не хватило ${missingText}.`}
             </p>
           ) : null}
           <button onClick={reset}>Ещё раз</button>
         </div>
       ) : (
         <>
+          {hasGoal ? (
+            <p className="ct-goal" style={NOTE_STYLE}>
+              Цель: {goalText}
+            </p>
+          ) : null}
           <pre className="ct-code">
             {activeSnippet.split('').map((ch, i) => {
               const cls = i >= value.length ? '' : value[i] === ch ? 'ct-ok' : 'ct-err';
@@ -354,11 +411,21 @@ export default function CodeTyping({
           ) : null}
           <textarea
             aria-label="Печатай код здесь"
+            placeholder="Кликни сюда и набери строку выше"
             spellCheck={false}
             value={value}
             onChange={onChange}
-            onPaste={(e) => e.preventDefault()}
+            onPaste={(e) => {
+              e.preventDefault();
+              setPasteBlocked(true);
+            }}
           />
+          {pasteBlocked ? (
+            <p className="ct-paste-note" style={NOTE_STYLE} role="status">
+              Вставка здесь отключена — тренируем пальцы, набери руками. Ctrl+V пригодится в других
+              местах.
+            </p>
+          ) : null}
         </>
       )}
       {best ? (

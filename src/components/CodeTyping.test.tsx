@@ -52,7 +52,7 @@ test('"Ещё раз" resets the input but keeps the best result visible', () =>
 test('reaching the target shows "Цель достигнута!" and grants goal XP once', () => {
   render(<CodeTyping snippet="ab" chapterId="typing" trainerId="t1" targetAccuracy={50} />);
   fireEvent.change(screen.getByRole('textbox'), { target: { value: 'ab' } });
-  expect(screen.getByText('Цель достигнута!')).toBeTruthy();
+  expect(screen.getByText(/Цель достигнута!/)).toBeTruthy();
   // first-completion XP (10) + goal XP (15)
   expect(store.getXp()).toBe(25);
 
@@ -65,7 +65,7 @@ test('reaching the target shows "Цель достигнута!" and grants goal
 test('missing the target shows "Цель пока не достигнута"', () => {
   render(<CodeTyping snippet="ab" chapterId="typing" trainerId="t1" targetAccuracy={999} />);
   fireEvent.change(screen.getByRole('textbox'), { target: { value: 'ab' } });
-  expect(screen.getByText('Цель пока не достигнута')).toBeTruthy();
+  expect(screen.getByText(/Цель пока не достигнута/)).toBeTruthy();
 });
 
 test('preset pool starts on the first fragment deterministically (no pool-switch button for a single pool)', () => {
@@ -189,4 +189,109 @@ test('без ghost таймлайн не пишется (обратная сов
   const saved = store.getProgress().trainers.c.t.result as { timeline?: number[] };
   expect(saved.timeline).toBeUndefined();
   expect(document.querySelector('.ct-ghost')).toBeNull();
+});
+
+// --- скорость и рекорд ---
+
+test('скорость считается по верным символам: бессмысленный набор даёт 0 зн/мин', () => {
+  vi.useFakeTimers();
+  render(<CodeTyping snippet="abcd" />);
+  const input = screen.getByRole('textbox');
+  fireEvent.change(input, { target: { value: 'z' } });
+  act(() => {
+    vi.advanceTimersByTime(60_000); // ровно минута на 4 символа
+  });
+  fireEvent.change(input, { target: { value: 'zzzz' } });
+  expect(screen.getByText('Точность: 0%')).toBeTruthy();
+  expect(screen.getByText('Скорость: 0 зн/мин')).toBeTruthy();
+});
+
+test('рекорд держит лучшую точность отдельно от лучшей скорости', () => {
+  vi.useFakeTimers();
+  render(<CodeTyping snippet="abcd" chapterId="typing" trainerId="t1" />);
+  const input = screen.getByRole('textbox');
+
+  // быстрый неряшливый прогон — ставит скорость
+  fireEvent.change(input, { target: { value: 'a' } });
+  act(() => {
+    vi.advanceTimersByTime(100);
+  });
+  fireEvent.change(input, { target: { value: 'abcx' } });
+  const fast = store.getProgress().trainers.typing.t1.result as { cpm: number; accuracy: number };
+  expect(fast.accuracy).toBe(75);
+
+  // медленный безошибочный — скорость ниже, но точность обязана сохраниться
+  fireEvent.click(screen.getByText('Ещё раз'));
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'a' } });
+  act(() => {
+    vi.advanceTimersByTime(10_000);
+  });
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'abcd' } });
+
+  const best = store.getProgress().trainers.typing.t1.result as { cpm: number; accuracy: number };
+  expect(best.accuracy).toBe(100); // достижение «ни одной опечатки» достижимо
+  expect(best.cpm).toBe(fast.cpm); // рекорд скорости не потерян
+});
+
+test('XP за цель даётся один раз, даже если цельный прогон медленнее рекорда', () => {
+  vi.useFakeTimers();
+  render(<CodeTyping snippet="abcd" chapterId="typing" trainerId="t1" targetAccuracy={100} />);
+  const typeRun = (text: string, ms: number) => {
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: text[0] } });
+    act(() => {
+      vi.advanceTimersByTime(ms);
+    });
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: text } });
+    fireEvent.click(screen.getByText('Ещё раз'));
+  };
+
+  typeRun('abcx', 100); // быстрый прогон с опечаткой: цель не взята
+  expect(store.getXp()).toBe(10); // только XP за первое прохождение
+
+  typeRun('abcd', 10_000); // медленный безошибочный: цель взята
+  expect(store.getXp()).toBe(25);
+
+  typeRun('abcd', 10_000); // ещё раз — повторной награды быть не должно
+  expect(store.getXp()).toBe(25);
+});
+
+// --- цель и вставка ---
+
+test('цель тренажёра видна до набора и объясняет, сколько не хватило', () => {
+  render(<CodeTyping snippet="ab" targetCpm={9000} targetAccuracy={100} />);
+  expect(screen.getByText('Цель: скорость ≥ 9000 зн/мин, точность ≥ 100%')).toBeTruthy();
+
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'ax' } });
+  expect(screen.getByText(/Не хватило 50% точности/)).toBeTruthy();
+});
+
+test('попытка вставить текст объясняет, почему вставка не сработала', () => {
+  render(<CodeTyping snippet="ab" />);
+  const input = screen.getByRole('textbox');
+  expect(input.getAttribute('placeholder')).toBe('Кликни сюда и набери строку выше');
+  expect(screen.queryByText(/Вставка здесь отключена/)).toBeNull();
+  fireEvent.paste(input);
+  expect(screen.getByText(/Вставка здесь отключена/)).toBeTruthy();
+});
+
+test('«лучшее по осям» не крадёт XP: цель, взятая в одном прогоне, оплачивается', () => {
+  vi.useFakeTimers();
+  render(
+    <CodeTyping snippet="abcd" chapterId="typing" trainerId="t1" targetCpm={1000} targetAccuracy={100} />,
+  );
+  const typeRun = (text: string, ms: number) => {
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: text[0] } });
+    act(() => {
+      vi.advanceTimersByTime(ms);
+    });
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: text } });
+    fireEvent.click(screen.getByText('Ещё раз'));
+  };
+
+  typeRun('abcx', 100); // быстро, но с опечаткой — цель не взята
+  typeRun('abcd', 60_000); // без опечаток, но медленно — тоже не взята
+  expect(store.getXp()).toBe(10); // только XP за первое прохождение
+
+  typeRun('abcd', 100); // быстро И без опечаток — вот теперь цель взята
+  expect(store.getXp()).toBe(25);
 });

@@ -126,3 +126,34 @@ test('preset with unreadable data gets a note instead of a launch button', async
   expect(await screen.findByText(/не читаются/)).toBeInTheDocument();
   expect(screen.queryByText('Запустить')).not.toBeInTheDocument();
 });
+
+test('глава показана названием и ведёт на саму главу, незнакомый id остаётся как есть', async () => {
+  mockFetch(() =>
+    okResponse([
+      {
+        id: 'i4',
+        type: 'video',
+        title: 'Видео про переменные',
+        author: 'kolya',
+        chapterId: 'kotlin-vars',
+        data: 'https://youtu.be/abc',
+        addedAt: '2026-09-02T10:00:00.000Z',
+      },
+      ITEMS[0],
+    ]),
+  );
+  render(<CommunityCatalog />);
+
+  const link = await screen.findByText('«Переменные и типы»');
+  expect(link).toHaveAttribute('href', '/docs/mobile/kotlin-vars');
+  // Фильтр «Глава» — тоже названием, а не сырым id.
+  expect(screen.getByRole('option', { name: 'Переменные и типы' })).toBeInTheDocument();
+  // Незнакомой главы в карте знаний нет — показываем id как есть, без ссылки.
+  expect(screen.getByText(/глава: foundation\/02-it-english/)).toBeInTheDocument();
+});
+
+test('вступление называет видео и источники — основной контент каталога', async () => {
+  mockFetch(() => okResponse(ITEMS));
+  render(<CommunityCatalog />);
+  expect(await screen.findByText(/видео и источники по темам глав/)).toBeInTheDocument();
+});

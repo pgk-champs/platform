@@ -275,3 +275,88 @@ test('clean timer works during a break: shows the break countdown', () => {
   });
   expect(within(zen).getByText('14:00')).toBeTruthy();
 });
+
+// --- таймер по часам, а не по числу тиков ---
+
+test('фоновая вкладка: время идёт по часам, возврат на вкладку сразу пересчитывает остаток', () => {
+  vi.useFakeTimers();
+  render(<ChampSimulator />);
+  startModule('Ж. Подготовка продукта');
+  act(() => {
+    vi.advanceTimersByTime(5_000);
+  });
+  expect(screen.getByText('59:55')).toBeTruthy();
+
+  // вкладка ушла в фон: реальное время идёт, а тики браузер зажал
+  act(() => {
+    vi.setSystemTime(Date.now() + 10 * 60_000);
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  expect(screen.getByText('49:55')).toBeTruthy();
+});
+
+test('фоновая вкладка: один запоздалый тик тоже даёт верный остаток', () => {
+  vi.useFakeTimers();
+  render(<ChampSimulator />);
+  startModule('Ж. Подготовка продукта');
+  act(() => {
+    vi.setSystemTime(Date.now() + 120_000); // две минуты реального времени
+    vi.advanceTimersByTime(1_000); // а тик всего один
+  });
+  expect(screen.getByText('57:59')).toBeTruthy();
+});
+
+test('на паузе часы не съедают время спринта', () => {
+  vi.useFakeTimers();
+  render(<ChampSimulator />);
+  startModule('Ж. Подготовка продукта');
+  act(() => {
+    vi.advanceTimersByTime(5_000);
+  });
+  fireEvent.click(screen.getByText('Пауза'));
+
+  act(() => {
+    vi.setSystemTime(Date.now() + 30 * 60_000); // полчаса на паузе
+    document.dispatchEvent(new Event('visibilitychange'));
+    vi.advanceTimersByTime(1_000);
+  });
+  expect(screen.getByText('59:55')).toBeTruthy();
+
+  fireEvent.click(screen.getByText('Продолжить'));
+  act(() => {
+    vi.advanceTimersByTime(5_000);
+  });
+  expect(screen.getByText('59:50')).toBeTruthy(); // отсчёт продолжился с остатка
+});
+
+test('перерыв в фоновой вкладке тоже считается по часам', () => {
+  vi.useFakeTimers();
+  render(<ChampSimulator />);
+  startModule('Ж. Подготовка продукта');
+  fireEvent.click(screen.getByText('Перерыв 10 мин'));
+
+  act(() => {
+    vi.setSystemTime(Date.now() + 4 * 60_000); // студент ушёл пить чай на 4 минуты
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  expect(screen.getByText('Перерыв: 6:00')).toBeTruthy();
+
+  fireEvent.click(screen.getByText('Завершить перерыв'));
+  fireEvent.click(screen.getByText('Завершить спринт'));
+  expect(screen.getByText(/Перерывы: 1, суммарно 4:00/)).toBeTruthy();
+});
+
+test('время, вышедшее в фоне, завершает спринт при возврате на вкладку', () => {
+  vi.useFakeTimers();
+  render(<ChampSimulator />);
+  startModule('Ж. Подготовка продукта');
+  fireEvent.click(criteriaCheckboxes()[0]); // 0.4 из 7
+  act(() => {
+    vi.setSystemTime(Date.now() + 2 * 60 * 60_000); // два часа при лимите в час
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  expect(screen.getByText('Потренируйся ещё')).toBeTruthy();
+  expect(store.sim.stats('zh').count).toBe(1);
+  // длительность для лидерборда — весь лимит, а не «сколько успело тикнуть»
+  expect(store.sim.stats('zh').runs[0]).toMatchObject({ score: 0.4 });
+});

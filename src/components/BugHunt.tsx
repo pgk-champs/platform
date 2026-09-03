@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { store } from '../lib/store';
 import './trainers.css';
 
@@ -32,7 +32,7 @@ export default function BugHunt({
   const [missedThisRound, setMissedThisRound] = useState(false);
   const [firstTry, setFirstTry] = useState(0);
   const [finished, setFinished] = useState(false);
-  const rewardedRef = useRef(false);
+  const [xpAwarded, setXpAwarded] = useState(0);
 
   const total = rounds.length;
   if (total === 0) return null;
@@ -61,10 +61,13 @@ export default function BugHunt({
     }
     setFinished(true);
     if (chapterId && trainerId) {
+      // XP — только за первое прохождение тренажёра: иначе перезагрузка
+      // страницы и повтор давали бы +25 XP снова и снова.
+      const first = !store.getProgress().trainers[chapterId]?.[trainerId];
       store.markTrainerDone(chapterId, trainerId, { firstTry, total });
-      if (firstTry === total && !rewardedRef.current) {
-        rewardedRef.current = true;
+      if (first && firstTry === total) {
         store.addXp(PERFECT_XP, `trainer:${chapterId}:${trainerId}`);
+        setXpAwarded(PERFECT_XP);
       }
     }
   };
@@ -84,7 +87,7 @@ export default function BugHunt({
       <div className="bh">
         <div className={`bh-final ${perfect ? 'bh-final-perfect' : ''}`.trim()}>
           ✓ Выполнено! С первого клика найдено {firstTry} из {total}.
-          {perfect && chapterId && trainerId ? ` +${PERFECT_XP} XP` : ''}
+          {xpAwarded ? ` +${xpAwarded} XP` : ''}
         </div>
         {!perfect ? (
           <button type="button" className="bh-next" onClick={retry}>

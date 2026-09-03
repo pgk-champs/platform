@@ -81,3 +81,20 @@ test('stop button cancels mining', async () => {
   await waitFor(() => expect(screen.getByText('Майнить')).toBeTruthy());
   expect(screen.queryByText(/Выполнено!/)).toBeNull();
 });
+
+test('уход со страницы (unmount) останавливает перебор', async () => {
+  const digest = vi.fn(fakeDigest);
+  vi.stubGlobal('crypto', { subtle: { digest } });
+  const { unmount } = render(<PowMiner />);
+  fireEvent.change(screen.getByLabelText('Данные блока'), { target: { value: 'test' } });
+  // сложность 4: с мок-хешами ff… решение не найдётся никогда — цикл вечный
+  fireEvent.click(screen.getByText(/4 нуля/));
+  fireEvent.click(screen.getByText('Майнить'));
+  await waitFor(() => expect(digest.mock.calls.length).toBeGreaterThan(64));
+
+  unmount();
+  await new Promise((r) => setTimeout(r, 5)); // даём циклу дойти до проверки отмены
+  const after = digest.mock.calls.length;
+  await new Promise((r) => setTimeout(r, 50));
+  expect(digest.mock.calls.length).toBe(after);
+});

@@ -88,16 +88,40 @@ test('final result plate appears once every question has been attempted', () => 
   expect(screen.getByText('Пройдено: 2 из 2')).toBeTruthy();
 });
 
-test('a full run with chapterId/quizId records the quiz in store and awards xp only on a perfect run', () => {
+test('в зачёт идёт первая попытка: исправление неверного ответа не переписывает запись и не даёт XP', () => {
   render(<SelfCheck questions={questions} chapterId="typing" quizId="basics" />);
   fireEvent.click(screen.getByText('3')); // wrong
   fireEvent.click(screen.getByText('Москва')); // correct
   expect(store.getProgress().quizzes.typing?.basics).toMatchObject({ correct: 1, total: 2 });
   expect(store.getXp()).toBe(0);
 
-  fireEvent.click(screen.getByText('4')); // fix the wrong one -> perfect run
+  fireEvent.click(screen.getByText('4')); // исправил — но первая попытка уже записана
+  expect(store.getProgress().quizzes.typing?.basics).toMatchObject({ correct: 1, total: 2 });
+  expect(store.getXp()).toBe(0);
+  expect(screen.queryByText(/Идеально/)).toBeNull();
+  expect(screen.getByText(/С первой попытки: 1 из 2/)).toBeTruthy();
+  // одна попытка на одно прохождение, а не запись на каждое исправление
+  expect(store.quiz.stats('typing', 'basics').count).toBe(1);
+});
+
+test('прохождение без единой ошибки даёт XP, повторное (после перезагрузки) — уже нет', () => {
+  const perfectRun = () => {
+    fireEvent.click(screen.getByText('4'));
+    fireEvent.click(screen.getByText('Москва'));
+  };
+
+  const first = render(<SelfCheck questions={questions} chapterId="typing" quizId="basics" />);
+  perfectRun();
   expect(store.getProgress().quizzes.typing?.basics).toMatchObject({ correct: 2, total: 2 });
-  expect(store.getXp()).toBeGreaterThan(0);
+  const earned = store.getXp();
+  expect(earned).toBeGreaterThan(0);
+  expect(screen.getByText(/Идеально/)).toBeTruthy();
+  first.unmount();
+
+  render(<SelfCheck questions={questions} chapterId="typing" quizId="basics" />);
+  perfectRun();
+  expect(store.getXp()).toBe(earned);
+  expect(store.quiz.stats('typing', 'basics').count).toBe(2); // попытка засчитана, XP — нет
 });
 
 test('without chapterId/quizId no store write happens (works as before)', () => {

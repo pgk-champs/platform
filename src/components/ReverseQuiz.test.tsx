@@ -74,3 +74,24 @@ test('меньше 4 слов — дружелюбная заглушка', () =
   render(<ReverseQuiz cards={CARDS.slice(0, 2)} />);
   expect(screen.getByText('Нужно минимум 4 слова')).toBeTruthy();
 });
+
+test('после «Пройти ещё раз» итог с ошибкой не хвастается XP', () => {
+  const { container } = render(<ReverseQuiz cards={CARDS} chapterId="c" trainerId="rq1" />);
+  for (const card of CARDS) {
+    answer(container, card.term);
+    fireEvent.click(screen.getByText(/Дальше|Показать результат/));
+  }
+  expect(screen.getByText(/Верно 4 из 4 · \+10 XP/)).toBeTruthy();
+  expect(store.getXp()).toBe(10);
+
+  fireEvent.click(screen.getByText('Пройти ещё раз'));
+  answer(container, 'file'); // «ошибка» — это error, отвечаем неверно
+  fireEvent.click(screen.getByText('Дальше'));
+  for (const card of CARDS.slice(1)) {
+    answer(container, card.term);
+    fireEvent.click(screen.getByText(/Дальше|Показать результат/));
+  }
+  expect(screen.getByText('Верно 3 из 4')).toBeTruthy();
+  expect(screen.queryByText(/\+10 XP/)).toBeNull();
+  expect(store.getXp()).toBe(10); // XP не изменился
+});

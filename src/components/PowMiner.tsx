@@ -41,6 +41,10 @@ export default function PowMiner({ chapterId, trainerId }: { chapterId?: string;
     });
   }, [data, nonce]);
 
+  // Уход со страницы (SPA-навигация Docusaurus) отменяет перебор — иначе цикл
+  // SHA-256 продолжал бы крутиться в фоне до самой находки nonce.
+  useEffect(() => () => { runRef.current += 1; }, []);
+
   const mine = async () => {
     const run = ++runRef.current;
     setMining(true);

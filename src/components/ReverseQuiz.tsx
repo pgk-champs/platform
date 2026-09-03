@@ -82,6 +82,9 @@ export default function ReverseQuiz({ cards, chapterId, trainerId }: ReverseQuiz
     setPicked(null);
     setCorrectCount(0);
     setDone(false);
+    // Без сброса «+10 XP» осталась бы висеть на каждом следующем итоге,
+    // хотя XP даётся только за первый безошибочный круг.
+    setGotXp(false);
   };
 
   if (done) {

@@ -113,6 +113,22 @@ export default function ChampSimulator() {
   const [zen, setZen] = useState(false);
   const rewardedRef = useRef<Set<string>>(new Set());
 
+  // Время считаем по моменту окончания, а не по числу тиков: в фоновой вкладке
+  // (студент ушёл в Android Studio) браузер режет setInterval до одного тика в
+  // минуту, и спринт на 8 часов отстал бы от реального времени на часы.
+  const deadlineRef = useRef(0); // момент окончания спринта, мс
+  const timeLeftRef = useRef(0); // остаток на момент заморозки (пауза/перерыв)
+  const brkDeadlineRef = useRef(0);
+
+  const secondsUntil = (deadline: number) => Math.max(0, Math.round((deadline - Date.now()) / 1000));
+
+  // Единственная точка правды по времени спринта: остаток + его дедлайн.
+  const setSprintTime = (sec: number) => {
+    timeLeftRef.current = sec;
+    deadlineRef.current = Date.now() + sec * 1000;
+    setTimeLeft(sec);
+  };
+
   const mod = MODULES.find((m) => m.id === moduleId) ?? null;
   const onBreak = brk !== null;
 
@@ -161,16 +177,39 @@ export default function ChampSimulator() {
   };
 
   useEffect(() => {
-    if (phase !== 'run' || !running || onBreak) return;
-    const id = setInterval(() => setTimeLeft((t) => t - 1), 1000);
-    return () => clearInterval(id);
+    if (phase !== 'run' || !running || onBreak) return undefined;
+    // Запуск, снятие паузы, конец перерыва: новый дедлайн от остатка.
+    deadlineRef.current = Date.now() + timeLeftRef.current * 1000;
+    const tick = () => {
+      const left = secondsUntil(deadlineRef.current);
+      timeLeftRef.current = left;
+      setTimeLeft(left);
+    };
+    const id = setInterval(tick, 1000);
+    // Возврат на вкладку — пересчёт сразу, не дожидаясь следующего тика.
+    document.addEventListener('visibilitychange', tick);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', tick);
+    };
   }, [phase, running, onBreak]);
 
-  // Тик перерыва: отдельный интервал, основной таймер в это время замер.
+  // Тик перерыва: отдельный интервал (и тот же дедлайн вместо декремента),
+  // основной таймер в это время замер.
   useEffect(() => {
-    if (phase !== 'run' || !onBreak) return;
-    const id = setInterval(() => setBrk((b) => (b && b.left > 0 ? { ...b, left: b.left - 1 } : b)), 1000);
-    return () => clearInterval(id);
+    if (phase !== 'run' || !onBreak) return undefined;
+    const tick = () =>
+      setBrk((b) => {
+        if (!b) return b;
+        const left = secondsUntil(brkDeadlineRef.current);
+        return left === b.left ? b : { ...b, left };
+      });
+    const id = setInterval(tick, 1000);
+    document.addEventListener('visibilitychange', tick);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', tick);
+    };
   }, [phase, onBreak]);
 
   // Окончание перерыва: лог + оповещение (beep — опционально по чекбоксу).
@@ -203,7 +242,7 @@ export default function ChampSimulator() {
     if (!m) return;
     setModuleId(id);
     setChecks({});
-    setTimeLeft((m.timeLimitMinutes ?? 60) * 60);
+    setSprintTime((m.timeLimitMinutes ?? 60) * 60);
     setRunning(true);
     setBrk(null);
     setBreakLog({ count: 0, totalSec: 0 });
@@ -213,7 +252,7 @@ export default function ChampSimulator() {
   const resetRun = () => {
     if (!mod) return;
     setChecks({});
-    setTimeLeft((mod.timeLimitMinutes ?? 60) * 60);
+    setSprintTime((mod.timeLimitMinutes ?? 60) * 60);
     setRunning(true);
     setBrk(null);
     setBreakLog({ count: 0, totalSec: 0 });
@@ -222,6 +261,7 @@ export default function ChampSimulator() {
   const startBreak = (minutes: number) => {
     const m = Math.round(minutes);
     if (!m || m <= 0) return;
+    brkDeadlineRef.current = Date.now() + m * 60 * 1000;
     setBrk({ left: m * 60, planned: m * 60 });
   };
 

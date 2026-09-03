@@ -21,6 +21,9 @@ export default function Flashcards({ cards, chapterId }: { cards: Card[]; chapte
   const card = cards[i];
   const flip = () => setFlipped((f) => !f);
   const onKeyDown = (e: React.KeyboardEvent) => {
+    // Enter/Space на вложенной кнопке (★, озвучка) — её нажатие, а не переворот
+    // карточки: без этой проверки preventDefault съедал бы нажатие кнопки.
+    if (e.target !== e.currentTarget) return;
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       flip();

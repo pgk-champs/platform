@@ -1,5 +1,6 @@
 import React, { useSyncExternalStore } from 'react';
 import { store, type OsId } from '../lib/store';
+import { useResolvedOs } from '../lib/os';
 import './trainers.css';
 
 export type KeyCombo = { mac: string; win: string; linux: string };
@@ -10,7 +11,7 @@ const OS_ORDER: OsId[] = ['mac', 'win', 'linux'];
 
 export default function KeysTabs({ items }: { items: KeyItem[] }) {
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
-  const os = store.prefs.getOs() ?? 'mac';
+  const os = useResolvedOs();
 
   return (
     <div className="keys-tabs">

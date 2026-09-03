@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { store } from '../lib/store';
 import PRTrainer from './PRTrainer';
 
@@ -68,4 +68,56 @@ test('run with misses records them, gives no xp and offers a retry', () => {
 
   fireEvent.click(screen.getByText('Попробовать ещё раз'));
   expect(screen.getByText('Найдено: 0 из 3 · Промахи: 0')).toBeTruthy();
+});
+
+test('чистое прохождение после «Попробовать ещё раз» даёт XP и обновляет результат', () => {
+  render(<PRTrainer chapterId="git-remote" trainerId="pr-review" />);
+  fireEvent.click(screen.getByText(LINE_CLEAN)); // промах
+  fireEvent.click(screen.getByText(LINE_NULL));
+  fireEvent.click(screen.getByText(LINE_HARDCODE));
+  fireEvent.click(screen.getByText(LINE_TYPO));
+  expect(store.getXp()).toBe(0);
+
+  fireEvent.click(screen.getByText('Попробовать ещё раз'));
+  fireEvent.click(screen.getByText(LINE_NULL));
+  fireEvent.click(screen.getByText(LINE_HARDCODE));
+  fireEvent.click(screen.getByText(LINE_TYPO));
+
+  expect(screen.getByText(/без промахов \+25 XP/)).toBeTruthy();
+  expect(store.getXp()).toBe(25);
+  expect(store.getProgress().trainers['git-remote']?.['pr-review']).toMatchObject({
+    result: { found: 3, misses: 0 },
+  });
+});
+
+test('второе чистое прохождение не даёт XP второй раз и не хвастается им', () => {
+  const { unmount } = render(<PRTrainer chapterId="git-remote" trainerId="pr-review" />);
+  fireEvent.click(screen.getByText(LINE_NULL));
+  fireEvent.click(screen.getByText(LINE_HARDCODE));
+  fireEvent.click(screen.getByText(LINE_TYPO));
+  expect(store.getXp()).toBe(25);
+  unmount();
+
+  render(<PRTrainer chapterId="git-remote" trainerId="pr-review" />);
+  fireEvent.click(screen.getByText(LINE_NULL));
+  fireEvent.click(screen.getByText(LINE_HARDCODE));
+  fireEvent.click(screen.getByText(LINE_TYPO));
+  expect(store.getXp()).toBe(25);
+  expect(screen.getByText(/Все 3 проблемы найдены без промахов$/)).toBeTruthy();
+});
+
+test('повтор с промахами не затирает чистый результат в store', () => {
+  render(<PRTrainer chapterId="git-remote" trainerId="pr-review" />);
+  fireEvent.click(screen.getByText(LINE_NULL));
+  fireEvent.click(screen.getByText(LINE_HARDCODE));
+  fireEvent.click(screen.getByText(LINE_TYPO));
+  expect(store.getProgress().trainers['git-remote']['pr-review'].result).toMatchObject({ misses: 0 });
+
+  cleanup();
+  render(<PRTrainer chapterId="git-remote" trainerId="pr-review" />);
+  fireEvent.click(screen.getByText(LINE_CLEAN)); // промах во втором заходе
+  fireEvent.click(screen.getByText(LINE_NULL));
+  fireEvent.click(screen.getByText(LINE_HARDCODE));
+  fireEvent.click(screen.getByText(LINE_TYPO));
+  expect(store.getProgress().trainers['git-remote']['pr-review'].result).toMatchObject({ misses: 0 });
 });
