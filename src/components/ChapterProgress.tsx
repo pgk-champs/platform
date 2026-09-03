@@ -63,6 +63,9 @@ export default function ChapterProgress({ chapterId, totalSections, totalQuizzes
             <span className="cp-level-fill" style={{ width: `${Math.round(lvl.progress * 100)}%` }} />
           </span>
         </span>
+        <span className="cp-read-bar" aria-hidden="true">
+          <span className="cp-read-fill" style={{ width: `${pct}%` }} />
+        </span>
       </div>
       <ChapterTour />
     </>

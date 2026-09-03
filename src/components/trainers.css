@@ -1243,13 +1243,41 @@
 .cp {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.5rem;
   margin-bottom: var(--ifm-leading);
   padding: 0.5rem 0.9rem;
-  border-radius: var(--ifm-code-border-radius);
-  background: var(--ifm-hover-overlay);
+  border-radius: var(--ifm-card-border-radius);
+  background: var(--ifm-background-surface-color);
+  box-shadow: var(--pgk-shadow-card);
   font-size: 0.85rem;
   color: var(--ifm-color-emphasis-700);
+  /* Липкий: пока ученик читает, счётчик остаётся на виду и проценты растут у
+     него на глазах. Иначе прогресс не заметен — виджет уезжает вверх вместе
+     с началом главы, и кажется, что «прочитано» вообще не работает. */
+  position: sticky;
+  top: calc(var(--ifm-navbar-height) + 0.5rem);
+  z-index: 2;
+}
+
+/* Доля прочитанного — тонкой полосой по низу плашки, чтобы рост был виден
+   боковым зрением, без чтения цифр. */
+.cp-read-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  border-radius: 0 0 var(--ifm-card-border-radius) var(--ifm-card-border-radius);
+  background: var(--ifm-color-emphasis-200);
+  overflow: hidden;
+}
+
+.cp-read-fill {
+  display: block;
+  height: 100%;
+  background: var(--ifm-color-primary);
+  transition: width var(--pgk-dur) var(--pgk-ease);
 }
 
 .cp-item {
