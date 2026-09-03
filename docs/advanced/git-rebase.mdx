@@ -18,7 +18,7 @@ import GitSim from '@site/src/components/GitSim';
 
 # Rebase мастерски
 
-<ChapterProgress chapterId="git-rebase" totalSections={9} totalQuizzes={3} totalTrainers={2} />
+<ChapterProgress chapterId="git-rebase" totalSections={10} totalQuizzes={3} totalTrainers={2} />
 
 ## Зачем это нужно
 
@@ -151,14 +151,18 @@ hint: To abort and get back to the state before "git rebase", run "git rebase --
 Остановка на конфликтующем коммите — git сам перечисляет три выхода: разрешить и `--continue`, пропустить коммит через `--skip` (нужен редко), отменить всё через `--abort`. Хеш и сообщение в строке `error` говорят, *какой именно* из твоих коммитов не лёг.
 
 ```text
-interactive rebase in progress; onto a1f9c3d
+interactive rebase in progress; onto 3b7e0aa
 Last command done (1 command done):
-   pick a1f9c3d добавил парсер конфига
+   pick a1f9c3d # добавил парсер конфига
 Next commands to do (2 remaining commands):
-   reword 4e21b77 поправил парсер
+   reword 4e21b77 # поправил парсер
+   pick 90cc102 # опечатка в README
+  (use "git rebase --edit-todo" to view and edit)
 ```
 
 Так `git status` отчитывается посреди интерактивного rebase: что уже сделано, что впереди. Потерялся — `git status` всегда расскажет, где ты и что git от тебя ждёт.
+
+Одна деталь, которая сбивает с толку: хеш после `onto` (`3b7e0aa`) — не из плана. Это **база**, тот самый коммит, поверх которого всё перекладывается: для `git rebase -i HEAD~3` это коммит, стоявший перед тремя пересобираемыми. А решётка перед сообщением коммита — просто разделитель во внутреннем файле плана, который git показывает как есть; в редакторе плана её не видно.
 
 <SectionAnchor chapterId="git-rebase" sectionId="messages" />
 
@@ -197,8 +201,22 @@ Next commands to do (2 remaining commands):
 Последний страх, который стоит снять: «а вдруг rebase потеряет мои коммиты». Почти никогда не потеряет — а на «почти» есть `git reflog`: журнал всех перемещений HEAD за последние недели. Старые, «ничьи» коммиты после rebase остаются в репозитории, и reflog показывает их хеши. Вернуться к состоянию до неудачного rebase можно всегда:
 
 ```bash
-git reflog                    # найти строку вида "rebase (start)" — хеш перед ней
+git reset --hard ORIG_HEAD    # самый короткий путь: git сам запомнил, где ветка была до rebase
+```
+
+`ORIG_HEAD` — служебная ссылка, которую git ставит перед каждой «крупной» операцией вроде rebase или merge. Если она уже затёрта следующей операцией, состояние ищут глазами в журнале:
+
+```bash
+git reflog                    # найти строку "rebase (start)" — нужна строка СРАЗУ ПОД ней
 git reset --hard HEAD@{5}     # вернуть ветку на состояние из журнала
+```
+
+Читать журнал нужно аккуратно: reflog печатает записи от самых новых к старым, сверху вниз. Строка `rebase (start)` — это уже первый шаг самого rebase, и хеш на ней — новая база, а не то, что тебе нужно. Состояние ветки **до** rebase записано строкой ниже:
+
+```text
+2673310 HEAD@{4}: rebase (start): checkout main
+b2593cf HEAD@{5}: checkout: moving from main to feature   ← сюда возвращаться
+2673310 HEAD@{6}: commit: правка в main
 ```
 
 `reset --hard` — команда без сети безопасности (она затирает незакоммиченные изменения), поэтому пользуйся ей осознанно и только по хешу, который ты глазами увидел в reflog. Но сам факт, что она существует, меняет отношение к rebase: это не хождение по канату, а редактор с кнопкой отмены.
@@ -228,6 +246,7 @@ git reset --hard HEAD@{5}     # вернуть ветку на состояни�
 | `git pull --rebase` | забрать чужое, переложив свои неотправленные коммиты наверх |
 | `git push --force-with-lease` | отправить переписанную ветку со страховкой от затирания чужого |
 | `git reflog` | журнал перемещений HEAD — найти «потерянный» коммит |
+| `git reset --hard ORIG_HEAD` | вернуть ветку туда, где она была до rebase (или merge) |
 | Золотое правило | не перебазировать то, что уже есть у других (и никогда — общие ветки) |
 
 </Block>
