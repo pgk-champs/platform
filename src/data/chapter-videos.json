@@ -1,0 +1,556 @@
+{
+  "github-start": [
+    {
+      "videoId": "I1M5aSadK_I",
+      "title": "GitHub регистрация: аккаунт за 2 минуты для новичка",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    },
+    {
+      "videoId": "9dkzbSnN2FQ",
+      "title": "#3 Уроки Git+GitHub - Регистрация на GitHub и наш первый онлайн репозиторий",
+      "channel": "ITDoctor"
+    },
+    {
+      "videoId": "zbg39ink85Q",
+      "title": "#2 GIT для тестировщика / Установка GIT / Регистрация в GitHub / Первый репозиторий",
+      "channel": "Artsiom Rusau QA Life"
+    },
+    {
+      "videoId": "da3Kpc0UNjU",
+      "title": "Как пользоваться GitHub | Часть 1",
+      "channel": "Айтигенио: международная онлайн-школа"
+    }
+  ],
+  "typing": [
+    {
+      "videoId": "Lc03HxjD-68",
+      "title": "Что такое \"СЛЕПАЯ ПЕЧАТЬ\". Как научиться БЫСТРО ПЕЧАТАТЬ за 2 недели",
+      "channel": "DonEx Code"
+    },
+    {
+      "videoId": "v3YH8RimTTU",
+      "title": "Соло на клавиатуре 9. Видео обзор программы",
+      "channel": "Анатолий Викторович"
+    },
+    {
+      "videoId": "TGVoOBmvTJs",
+      "title": "Как научиться печатать быстро? Подробный гайд! (140 WPM)",
+      "channel": "Сергей Константинов"
+    },
+    {
+      "videoId": "rcrcV97V6GY",
+      "title": "Как научиться слепому методу печати. Начать использовать 10 пальцев, а не два!",
+      "channel": "Ruslan Scherbakov"
+    },
+    {
+      "videoId": "edRI0wGbNII",
+      "title": "Слепая печать - это того стоит! | Как печатать быстрее",
+      "channel": "ЧЕФИ"
+    }
+  ],
+  "it-english": [
+    {
+      "videoId": "1Mp2CXSN8Fg",
+      "title": "УРОК 3 - Английский для айтишников | Основные термины из сферы IT",
+      "channel": "Войти в IT"
+    },
+    {
+      "videoId": "QO2EkfxKdAE",
+      "title": "Английский для программистов и IT специалистов: мой опыт + словарь",
+      "channel": "Диджитализируй!"
+    },
+    {
+      "videoId": "lKEnfEd62jw",
+      "title": "Технический английский для IT | Английские слова для программистов",
+      "channel": "Языковая школа Диалог"
+    },
+    {
+      "videoId": "9yKjJD11uhM",
+      "title": "Английский для IT специалистов",
+      "channel": "ENGLISH TOCHKA, школа английского языка"
+    }
+  ],
+  "02b-english-practice": [
+    {
+      "videoId": "wuD_8bx5Aeg",
+      "title": "УРОК 1 - Английский для айтишников | Приветствие, представление себя, прощание",
+      "channel": "Войти в IT"
+    },
+    {
+      "videoId": "9jKGLuMoXDg",
+      "title": "Английский для собеседования в IT-компанию. Как готовиться и что отвечать?",
+      "channel": "Serhii Nemchynskyi"
+    },
+    {
+      "videoId": "jwwc9HW3uks",
+      "title": "Как прокачать английский для собеседования в IT-компанию",
+      "channel": "ITVDN"
+    },
+    {
+      "videoId": "JYG57o_g1rI",
+      "title": "Как пройти IT собеседование на английском: советы и рекомендации",
+      "channel": "GeekBrains"
+    }
+  ],
+  "linux-terminal": [
+    {
+      "videoId": "fE1VG1gpXjU",
+      "title": "Linux для начинающих / Урок #1 – Что такое дистрибутивы, Bash Shell и Ubuntu?",
+      "channel": "Гоша Дударь"
+    },
+    {
+      "videoId": "h-6wLxGsFmo",
+      "title": "3. Linux для начинающих. Файловая система и основные команды",
+      "channel": "NetSkills. Видеоуроки. Cisco, zabbix, linux"
+    },
+    {
+      "videoId": "jifzdBvUmEs",
+      "title": "Linux для начинающих / Урок #5 – Работа с файлами и директориями",
+      "channel": "Гоша Дударь"
+    },
+    {
+      "videoId": "mD9o15x20Og",
+      "title": "6. Структура файловой системы - GNU/Linux для начинающих",
+      "channel": "Дневник UNIX'оида"
+    }
+  ],
+  "files-packages-ssh": [
+    {
+      "videoId": "I4ff1HCrpsg",
+      "title": "Как устроена файловая система в Linux",
+      "channel": "Поясни за DevOps"
+    },
+    {
+      "videoId": "sbVYRf_6Hvg",
+      "title": "Основы SSH | Хекслет",
+      "channel": "Хекслет - нормальные it-курсы"
+    },
+    {
+      "videoId": "Q6E34VpLqKM",
+      "title": "Администрирование Linux - Урок 19 - Обеспечиваем доступ по SSH",
+      "channel": "Новая образовательная система"
+    },
+    {
+      "videoId": "ruEQwI26tgE",
+      "title": "Linux от Никиты. Урок 4. Доступ через терминал SSH",
+      "channel": "Никита Агатьев"
+    },
+    {
+      "videoId": "JdpcvDCxGfQ",
+      "title": "Linux - SSH подключение к удаленному Linux с Linux и Windows",
+      "channel": "ADV-IT"
+    }
+  ],
+  "git-first-commit": [
+    {
+      "videoId": "iCswbUkRILY",
+      "title": "GIT. Урок 3. Git init, status, remote, add, commit, push",
+      "channel": "Serhii Hlivinskyi - QA START UP"
+    },
+    {
+      "videoId": "yZISr7LtlKQ",
+      "title": "Базовая работа с GIT. Команды git add, git commit",
+      "channel": "alishev"
+    },
+    {
+      "videoId": "9d5bJc8o7MA",
+      "title": "Git - для новичков - #2 - первые коммиты",
+      "channel": "loftblog"
+    },
+    {
+      "videoId": "DMQA0BhVDZk",
+      "title": "Git: Урок 1. Первый коммит",
+      "channel": "Devcolibri"
+    }
+  ],
+  "git-branches": [
+    {
+      "videoId": "yJ6NhwSA8ow",
+      "title": "Git - branch (ветки) и merge на практике",
+      "channel": "Тимофей Коваленко"
+    },
+    {
+      "videoId": "by-Wj1VbWyU",
+      "title": "Git - лекция по branch (ветки) и merge",
+      "channel": "Тимофей Коваленко"
+    },
+    {
+      "videoId": "JF69x66NVeM",
+      "title": "GIT. Урок 6. Слияние веток (Merge Branches). Merge Request",
+      "channel": "Serhii Hlivinskyi - QA START UP"
+    },
+    {
+      "videoId": "aYN9BC8T2Vo",
+      "title": "Git merge: слияние веток (объединение), \"закрытие\" веток (удаление влитых)",
+      "channel": "letsCode"
+    }
+  ],
+  "git-remote": [
+    {
+      "videoId": "G_HKJJLozUc",
+      "title": "Git - Pull request на практике / GitHub",
+      "channel": "Тимофей Коваленко"
+    },
+    {
+      "videoId": "JE8EqY1o3pA",
+      "title": "Git Tutorial: Remotes, Push, Fetch & Pull, Pull Requests",
+      "channel": "Cloud With VarJosh"
+    },
+    {
+      "videoId": "jfmDy2U7Yao",
+      "title": "How to Push & Create Pull Request in Github",
+      "channel": "The Code City"
+    },
+    {
+      "videoId": "s7vm9LSyW5g",
+      "title": "Git Tutorial for Beginners – Git Push & Pull Explained | Tutorial 5",
+      "channel": "Turtle Code"
+    },
+    {
+      "videoId": "yxvqLBHZfXk",
+      "title": "How to clone, push, and pull with git (beginners GitHub tutorial)",
+      "channel": "Tony Teaches Tech"
+    }
+  ],
+  "android-studio": [
+    {
+      "videoId": "2mCXcQJJ2mg",
+      "title": "Android Studio для начинающих: первое знакомство с IDE и первое приложение",
+      "channel": "MiruS"
+    },
+    {
+      "videoId": "zzV2aML_zNg",
+      "title": "Изучение Android Studio за час в одном видео! Создание погодного приложения с API",
+      "channel": "Гоша Дударь"
+    },
+    {
+      "videoId": "Ex8duHa3RC4",
+      "title": "Android Studio Уроки Для Начинающих | Урок 1 | Создание Программы На Андроид",
+      "channel": "Gargo Iv"
+    },
+    {
+      "videoId": "fdFRgco-6fU",
+      "title": "Уроки Android Studio с нуля / #2 – Интерфейс программы и работа с Андроид эмулятор",
+      "channel": "Школа itProger / Программирование"
+    },
+    {
+      "videoId": "AfbBTQLxNfE",
+      "title": "Уроки Android Studio с нуля / #1 – Разработка Андроид приложений для начинающих",
+      "channel": "Школа itProger / Программирование"
+    }
+  ],
+  "kotlin-vars": [
+    {
+      "videoId": "Ke_TKZaZGSI",
+      "title": "Изучение Kotlin | #2 - Переменные и типы данных",
+      "channel": "Гоша Дударь"
+    },
+    {
+      "videoId": "QKH13qZVKO8",
+      "title": "Урок 1: Что такое переменные и их типы, val и var // Котлин курс с нуля",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    },
+    {
+      "videoId": "2vhO1mnQdhY",
+      "title": "Kotlin: Урок 3. Типы данных Kotlin",
+      "channel": "Devcolibri"
+    },
+    {
+      "videoId": "XpWzjYcsfZg",
+      "title": "Kotlin. Урок 5. Типы данных в котлин: числа, строки",
+      "channel": "altCodePro"
+    },
+    {
+      "videoId": "u5YwYGVosF0",
+      "title": "Основы Kotlin. Урок 31. Примитивные типы данных",
+      "channel": "Хьюстон у нас проблемы!"
+    }
+  ],
+  "functions-lambdas": [
+    {
+      "videoId": "S9aG2nflKKA",
+      "title": "Kotlin: Урок 4. Функции",
+      "channel": "Devcolibri"
+    },
+    {
+      "videoId": "UMvhLSCYz2E",
+      "title": "Урок 20: Лямбда-функции (лямбды), анонимные функции // Курс по Kotlin с нуля",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    },
+    {
+      "videoId": "fuzoxgdoZQM",
+      "title": "Kotlin: лямбды",
+      "channel": "Seems Nerdy"
+    },
+    {
+      "videoId": "CC0qGXIn7QQ",
+      "title": "ЛЯМБДА В KOTLIN: как они работают (2024)",
+      "channel": "FunDroid"
+    },
+    {
+      "videoId": "3v_QlWC63Pw",
+      "title": "#7. Kotlin в картинках. Лямбда выражения. Функции высшего порядка",
+      "channel": "Юрий Петров | Flutter"
+    }
+  ],
+  "classes-collections": [
+    {
+      "videoId": "krAEwGXo5Tg",
+      "title": "Kotlin: Урок 6. Работа с классами и их свойствами",
+      "channel": "Devcolibri"
+    },
+    {
+      "videoId": "f7ZQkMZ_ZDk",
+      "title": "Урок 11: ООП. Классы и свойства. Создание объектов (экземпляров класса)",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    },
+    {
+      "videoId": "oYA2InjQ4WQ",
+      "title": "Урок 9: Коллекции: списки (List). Функции для работы с коллекциями",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    },
+    {
+      "videoId": "R8f-LCu2BWs",
+      "title": "Урок 22: Data class (дата классы) copy, toString, equals, hashCode",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    },
+    {
+      "videoId": "kPmoZ9CIM9c",
+      "title": "KOTLIN и ANDROID STUDIO для начинающих. Классы || Урок 22",
+      "channel": "Neco Ru"
+    }
+  ],
+  "first-compose-screen": [
+    {
+      "videoId": "wgXW7zST0lE",
+      "title": "Урок 1: Введение и подготовка окружения | Курс Android Jetpack Compose",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    },
+    {
+      "videoId": "4qbMPaV1fXI",
+      "title": "Jetpack Compose - Hello World! - Android Studio",
+      "channel": "happyCoding!"
+    },
+    {
+      "videoId": "6_wK_Ud8--0",
+      "title": "The Jetpack Compose Beginner Crash Course (Android Studio Tutorial)",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "zrGBNZFg6tE",
+      "title": "Пишем интерфейс в Jetpack Compose. Интенсив по программированию",
+      "channel": "Skillbox Программирование"
+    }
+  ],
+  "state-events": [
+    {
+      "videoId": "ND-OA_9L1vo",
+      "title": "Jetpack Compose. Основы. State [Ru, Kotlin/Android]",
+      "channel": "Алексей Гладков"
+    },
+    {
+      "videoId": "SGZmc8sUudI",
+      "title": "Урок 4: @Composable функции | Курс Android Jetpack Compose",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    },
+    {
+      "videoId": "7jsTN7jqkYQ",
+      "title": "State in Jetpack Compose - remember & mutableStateOf",
+      "channel": "Konstantinos Reppas"
+    },
+    {
+      "videoId": "GT1VJweyNr0",
+      "title": "State Hoisting with Jetpack Compose",
+      "channel": "CodingWithMitch"
+    }
+  ],
+  "layout-by-mockup": [
+    {
+      "videoId": "Vn0J0IJiaiM",
+      "title": "Урок 5: Column & Row – позиционирование | Курс Android Jetpack Compose",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    },
+    {
+      "videoId": "YbVm9Ue_J7E",
+      "title": "Row, Column & Box Layouts in Jetpack Compose | Android Studio",
+      "channel": "Android Knowledge"
+    },
+    {
+      "videoId": "AGXJIBY81DI",
+      "title": "Row Layouts with Jetpack Compose",
+      "channel": "CodingWithMitch"
+    },
+    {
+      "videoId": "G9wK7b8s7nw",
+      "title": "Column Layouts with Jetpack Compose",
+      "channel": "CodingWithMitch"
+    },
+    {
+      "videoId": "kg7EWKOberk",
+      "title": "Rows and Columns - Jetpack Compose",
+      "channel": "Stevdza-San"
+    }
+  ],
+  "ui-kit": [
+    {
+      "videoId": "PZBg5DIzNww",
+      "title": "Build a modular Android app architecture (Google I/O'19)",
+      "channel": "Android Developers"
+    },
+    {
+      "videoId": "16SwTvzDO0A",
+      "title": "By layer or feature? Why not both?! Guide to Android app modularization",
+      "channel": "Android Developers"
+    },
+    {
+      "videoId": "4wTq3mbaYic",
+      "title": "Custom Design Systems In Jetpack Compose - THESE Are My Best Practices",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "tLFkkEURzvI",
+      "title": "Android Build Variants & Flavors in Multi Module App - Tutorial",
+      "channel": "Memory Leak"
+    },
+    {
+      "videoId": "lAsTaUdOUpQ",
+      "title": "Android Build Logic & Convention Plugins | The Right Way to Configure Multi Module Projects",
+      "channel": "Himanshu Gaur"
+    }
+  ],
+  "git-rebase": [
+    {
+      "videoId": "BliHs_4R33Y",
+      "title": "GIT. Rebase and SQUASH. Делаем красивые лаконичные commit-ы",
+      "channel": "Аргументика"
+    },
+    {
+      "videoId": "smUBOQhG1IM",
+      "title": "Git rebase interactive: интерактивный ребейз",
+      "channel": "letsCode"
+    },
+    {
+      "videoId": "m-GIJOEh798",
+      "title": "GIT. Интерактивный Rebase. Как с ним работать?",
+      "channel": "Front-end Science із Сергієм Пузанковим"
+    },
+    {
+      "videoId": "M0Zql7TW7Ds",
+      "title": "Git Rebase Interactive (squash)",
+      "channel": "Steven Lee"
+    },
+    {
+      "videoId": "42392W7SgnE",
+      "title": "git interactive rebase - Undo, Edit & Squash git commits with a single command",
+      "channel": "Philomatics"
+    }
+  ],
+  "grep-regex": [
+    {
+      "videoId": "Y1fjIG7S_F0",
+      "title": "Линукс для Девопс | Команда grep | Регулярные Выражения regex",
+      "channel": "ADV-IT"
+    },
+    {
+      "videoId": "_pLpx6btq6U",
+      "title": "Не бойтесь регулярных выражений. Regex за 20 минут!",
+      "channel": "WebDev с нуля. Канал Алекса Лущенко"
+    },
+    {
+      "videoId": "sXQxhojSdZM",
+      "title": "Regular Expressions (RegEx) in 100 Seconds",
+      "channel": "Fireship"
+    },
+    {
+      "videoId": "izOdJH4fsUs",
+      "title": "Regular Expressions in Linux | Intro to GREP and RegEx",
+      "channel": "KodeKloud"
+    },
+    {
+      "videoId": "VNVjPuLdb64",
+      "title": "Linux Regular Expressions (Regex) Tutorial: grep, sed, & awk for Beginners",
+      "channel": "CodeLucky"
+    }
+  ],
+  "ssh-keys-deep": [
+    {
+      "videoId": "dy_XaQOJnPw",
+      "title": "Создание SSH ключа, настройка SSH-сервера, клиента, проброс портов",
+      "channel": "Yuriy Semyenkov"
+    },
+    {
+      "videoId": "DjTBQykeg0c",
+      "title": "Creating SSH Keys",
+      "channel": "ACCESSforCI"
+    },
+    {
+      "videoId": "vINn1MIrf7o",
+      "title": "How To Generate Ed25519 SSH Keys, Install Them, and Configure Secure Passwordless Authentication",
+      "channel": "Lawrence Systems"
+    },
+    {
+      "videoId": "bjIHBxenGU4",
+      "title": "SSH with ED25519 ultimate security key | easy tutorial | Ditch RSA",
+      "channel": "Aryan kaushik"
+    },
+    {
+      "videoId": "jmuH-vKSz5U",
+      "title": "How to Generate Keys with SSH Keygen for Github",
+      "channel": "hUndefined"
+    }
+  ],
+  "what-is-blockchain": [
+    {
+      "videoId": "w2Fk7VA9qZk",
+      "title": "Что такое Блокчейн простыми словами? Как работает Блокчейн?",
+      "channel": "blockchain24 - Ведущий криптохаб"
+    },
+    {
+      "videoId": "qhtHI1yu910",
+      "title": "Что такое Блокчейн (Blockchain) | принцип работы",
+      "channel": "Altcoinlog Media"
+    },
+    {
+      "videoId": "qQ_62cYYD6c",
+      "title": "Что такое блокчейн - простыми словами",
+      "channel": "Pack Money"
+    },
+    {
+      "videoId": "-p2dRJoV10M",
+      "title": "Блокчейн и криптовалюта на пальцах",
+      "channel": "Listen IT"
+    },
+    {
+      "videoId": "kCmZTNUCguM",
+      "title": "Простым языком, что такое блокчейн и где он используется",
+      "channel": "НаучДок"
+    }
+  ],
+  "waves-first-network": [
+    {
+      "videoId": "GKgaCSOLgA0",
+      "title": "Введение в блокчейн и алгоритмы консенсуса / Филипп Филиппак (Waves Platform)",
+      "channel": "HighLoad Channel"
+    },
+    {
+      "videoId": "l3Ud-CBofIE",
+      "title": "Экосистема контейнеров. Опыт блокчейн-платформы Waves Enterprise",
+      "channel": "Yandex Cloud"
+    },
+    {
+      "videoId": "nBpBthOEIBg",
+      "title": "Waves // Блокчейн выборы и умное голосование // Блокчейн в государстве и бизнесе",
+      "channel": "Медиа про технологии"
+    },
+    {
+      "videoId": "MBCTQN-RJws",
+      "title": "Waves Platform. Блокчейн - это просто. Инкубатор криптопроектов",
+      "channel": "Blockchain TV"
+    },
+    {
+      "videoId": "UuE4a1NDO8U",
+      "title": "Как работают смарт-контракты? Простое объяснение",
+      "channel": "EMCD in Russian"
+    }
+  ]
+}

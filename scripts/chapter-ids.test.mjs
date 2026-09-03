@@ -43,3 +43,31 @@ test('every chapter has a final exam (ChapterExam)', () => {
     .filter((f) => !fs.readFileSync(f, 'utf8').includes('<ChapterExam'));
   assert.deepEqual(missing, []);
 });
+
+// 2-5 иллюстраций на главу — держит текст читаемым, но не голым (ночная
+// директива: «на статьи было 2-5 картинок»).
+test('every chapter has 2-5 <Figure> illustrations', () => {
+  const walk = d =>
+    fs.readdirSync(d, { withFileTypes: true }).flatMap(e =>
+      e.isDirectory() ? walk(path.join(d, e.name)) : /\.mdx?$/.test(e.name) ? [path.join(d, e.name)] : [],
+    );
+  const problems = walk('docs')
+    .filter((f) => !/(^|\/)index\.mdx?$/.test(f))
+    .map((f) => [f, (fs.readFileSync(f, 'utf8').match(/<Figure\b/g) ?? []).length])
+    .filter(([, n]) => n < 2 || n > 5)
+    .map(([f, n]) => `${f}: ${n}`);
+  assert.deepEqual(problems, []);
+});
+
+// 4-5 куратор-видео на главу (src/data/chapter-videos.json, рендерятся
+// ChapterVideos в футере) — та же ночная директива, «по 4-5 видео».
+test('every chapter has 4-5 curated videos in chapter-videos.json', () => {
+  const byPath = new Map(buildMap('docs').map(e => [e.path.replace(/\.mdx?$/, ''), e.id]));
+  const videos = JSON.parse(fs.readFileSync('src/data/chapter-videos.json', 'utf8'));
+  const problems = [];
+  for (const id of new Set(byPath.values())) {
+    const n = (videos[id] ?? []).length;
+    if (n < 4 || n > 5) problems.push(`${id}: ${n}`);
+  }
+  assert.deepEqual(problems, []);
+});

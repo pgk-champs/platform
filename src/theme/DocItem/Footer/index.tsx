@@ -5,6 +5,7 @@ import useBrokenLinks from '@docusaurus/useBrokenLinks';
 import SuggestEdit from '../../../components/SuggestEdit';
 import Comments from '../../../components/Comments';
 import ChapterSources from '../../../components/ChapterSources';
+import ChapterVideos from '../../../components/ChapterVideos';
 
 // Swizzle-safe обёртка футера главы: авто-блок «Видео и источники по теме»
 // (пакет sources) + оригинальный футер (с «Редактировать страницу» от editUrl)
@@ -32,6 +33,7 @@ export default function FooterWrapper(props: Record<string, unknown>) {
           сервере — ChapterSources сама секция клиентская (пусто до fetch),
           и без этого якоря Docusaurus считает ссылку на неё битой. */}
       <span id="community-sources" />
+      <ChapterVideos chapterId={chapterId} />
       <ChapterSources chapterId={chapterId} />
       <Footer {...props} />
       <div className="se-row">
