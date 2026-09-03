@@ -65,6 +65,19 @@ order: 1
 ## Смежные репозитории
 
 - [track-mobile-01-kotlin-basics](https://github.com/pgk-champs/track-mobile-01-kotlin-basics) —
-  шаблон практикума, из которого студентам создаются приватные копии.
+  шаблон практикума (основы Kotlin), из которого студентам создаются приватные
+  копии. Требует JDK 21, проверка через GitHub Actions внутри шаблона.
+- [track-mobile-02-collections](https://github.com/pgk-champs/track-mobile-02-collections) —
+  второй шаблон практикума (коллекции), тот же формат и та же проверка.
+- [ide-course](https://github.com/pgk-champs/ide-course) — курс в формате
+  JetBrains Academy: те же темы, что в главах `docs/mobile/01-03`, но задачами
+  с автопроверкой прямо в IDE (плагин JetBrains Academy → Get from VCS).
+- [leaderboard](https://github.com/pgk-champs/leaderboard) — **приватный**:
+  приём результатов симулятора (`ChampSimulator` открывает там issue по
+  шаблону `result.yml`) и заявок в каталог сообщества (`submit-content.yml`).
+  Студенту доступ выдаёт наставник, см. `ops/provision.sh`.
+- [community](https://github.com/pgk-champs/community) — публичный каталог
+  материалов от студентов: страница `/community` и блок «Видео и источники»
+  в главах читают из него `community.json` напрямую.
 - [ops](https://github.com/pgk-champs/ops) — провижининг и очистка
   студенческих репозиториев в организации.
