@@ -9,6 +9,7 @@ import ChapterCover from '@site/src/components/ChapterCover';
 
 <ChapterCover chapterId="layout-by-mockup" />
 
+import Figure from '@site/src/components/Figure';
 import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
 import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
@@ -125,6 +126,8 @@ HEX-код вроде `#E53935` — это то же самое, что числ
 **dp** (density-independent pixels, «пиксели, независимые от плотности экрана») — единица для всего, что НЕ текст: отступы, ширина, высота, размер иконки. Официальная документация Android определяет dp как виртуальный пиксель, примерно равный одному физическому пикселю на экране с базовой плотностью 160 dpi (точек на дюйм); на экране с другой плотностью Android сам пересчитывает dp в нужное количество настоящих пикселей, поэтому один и тот же `16.dp` выглядит одинакового физического размера что на дешёвом, что на дорогом телефоне.
 
 **sp** (scale-independent pixels, «пиксели, независимые от масштаба») — единица только для размера текста. По умолчанию sp равен dp один в один, но с одним важным отличием: sp дополнительно учитывает системную настройку размера шрифта, которую пользователь выставляет в настройках телефона для себя (например, человеку с плохим зрением). Если для текста использовать `dp` вместо `sp`, эта настройка перестанет работать именно для этого текста — он останется мелким, даже если пользователь специально увеличил шрифт во всей системе.
+
+<Figure scheme="dp-vs-sp" caption="dp игнорирует системную настройку размера шрифта — отступ и иконка остаются прежними. sp растёт вместе с ней — так и должен вести себя текст." />
 
 <Block kind="breakdown" title="Разбор по частям: fontSize = 16.sp" chapterId="layout-by-mockup" blockId="breakdown-fontsize-sp">
 <SyntaxBreakdown parts={[

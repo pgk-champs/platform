@@ -78,15 +78,23 @@ test('is expanded by default and the header toggle collapses/expands the body fo
       </Block>,
     );
     const body = screen.getByText('Тело блока');
-    expect(body).toBeVisible();
+    expect(collapsedState(body)).toBe(false);
     const toggle = screen.getByRole('button', { name: 'Свернуть блок' });
     fireEvent.click(toggle);
-    expect(body).not.toBeVisible();
+    expect(collapsedState(body)).toBe(true);
     fireEvent.click(screen.getByRole('button', { name: 'Развернуть блок' }));
-    expect(body).toBeVisible();
+    expect(collapsedState(body)).toBe(false);
     unmount();
   }
 });
+
+/** Свёрнутость: тело схлопывается треком грида (0fr) и глушится через inert,
+ *  поэтому проверяем состояние обёртки, а не CSS-видимость узла с текстом. */
+function collapsedState(node: HTMLElement): boolean {
+  const wrap = node.closest('.block-body');
+  const inner = node.closest('.block-body-inner');
+  return !!wrap?.classList.contains('block-body--collapsed') && inner?.hasAttribute('inert') === true;
+}
 
 test('collapsed state persists per blockId in the store across remounts', () => {
   const { unmount } = render(
@@ -102,7 +110,7 @@ test('collapsed state persists per blockId in the store across remounts', () => 
       <p>Тело</p>
     </Block>,
   );
-  expect(screen.getByText('Тело')).not.toBeVisible();
+  expect(collapsedState(screen.getByText('Тело'))).toBe(true);
   expect(store.block.isCollapsed('typing:collapse-1')).toBe(true);
 });
 

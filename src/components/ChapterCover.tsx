@@ -1,11 +1,12 @@
 import React from 'react';
 
-type Track = 'foundation' | 'mobile' | 'blockchain';
+type Track = 'foundation' | 'mobile' | 'blockchain' | 'advanced';
 
 const TRACK_LABEL: Record<Track, string> = {
   foundation: 'Фундамент',
   mobile: 'Мобилка',
   blockchain: 'Блокчейн',
+  advanced: 'Отдельные темы',
 };
 
 const ACCENT = 'var(--ifm-color-primary-lightest)';
@@ -221,6 +222,45 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <rect x="84" y="42" width="72" height="30" rx="6" fill={ACCENT} transform="rotate(-6 120 57)" />
     </g>
   ),
+  /* лестница коммитов: один переставлен наверх, на новую базу (арт «rebase-ladder») */
+  'git-rebase': () => (
+    <g strokeLinecap="round">
+      <path d="M10 160H55V130H100V100H145V70H190" fill="none" stroke={INK} strokeWidth={5} strokeLinejoin="round" />
+      <circle cx="32" cy="160" r="10" fill="none" stroke={INK} strokeWidth={4} />
+      <circle cx="77" cy="130" r="10" fill="none" stroke={INK} strokeWidth={4} />
+      <circle cx="122" cy="100" r="10" fill="none" stroke={INK} strokeWidth={4} />
+      <circle cx="167" cy="70" r="13" fill={ACCENT} />
+      <path d="M25 178C70 195 130 150 152 78" fill="none" stroke={ACCENT} strokeWidth={4} strokeDasharray="3 8" />
+      <circle cx="25" cy="178" r="9" fill="none" stroke={ACCENT} strokeWidth={4} />
+    </g>
+  ),
+  /* лупа над строкой лога — регулярка находит совпадения по шаблону (арт «regex-magnifier») */
+  'grep-regex': () => (
+    <g strokeLinecap="round">
+      <rect x="10" y="70" width="176" height="40" rx="10" fill={SOFT} stroke={INK} strokeWidth={2.5} />
+      <path d="M24 90h18M78 90h18M150 90h20" stroke="rgba(255,255,255,0.4)" strokeWidth={7} />
+      <rect x="46" y="78" width="28" height="24" rx="5" fill={ACCENT} />
+      <text x="60" y="96" textAnchor="middle" fontSize="13" fontWeight={800} fill={DARK} fontFamily={MONO}>404</text>
+      <rect x="100" y="78" width="44" height="24" rx="5" fill={ACCENT} />
+      <text x="122" y="96" textAnchor="middle" fontSize="13" fontWeight={800} fill={DARK} fontFamily={MONO}>error</text>
+      <circle cx="122" cy="90" r="38" fill="rgba(0,0,0,0.15)" stroke={INK} strokeWidth={6} />
+      <path d="M148 116l30 30" stroke={INK} strokeWidth={9} />
+    </g>
+  ),
+  /* пара ключей: приватный остаётся у тебя (сплошной), публичный отдаётся серверу (контур) — арт «ssh-key-pair» */
+  'ssh-keys-deep': () => (
+    <g strokeLinecap="round">
+      <circle cx="40" cy="50" r="19" fill={ACCENT} />
+      <circle cx="40" cy="50" r="7" fill={DARK} />
+      <path d="M54 64l44 44" stroke={ACCENT} strokeWidth={9} fill="none" />
+      <path d="M77 87l-12 12M94 104l-12 12" stroke={ACCENT} strokeWidth={9} fill="none" />
+      <text x="40" y="150" textAnchor="middle" fontSize="14" fontWeight={700} fill={ACCENT} fontFamily={MONO}>private</text>
+      <circle cx="160" cy="50" r="19" fill="none" stroke={INK} strokeWidth={6} />
+      <path d="M146 64l-44 44" stroke={INK} strokeWidth={6} fill="none" />
+      <path d="M123 87l12 12M106 104l12 12" stroke={INK} strokeWidth={6} fill="none" />
+      <text x="160" y="150" textAnchor="middle" fontSize="14" fontWeight={700} fill="#fff" fontFamily={MONO}>public</text>
+    </g>
+  ),
 };
 
 const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
@@ -243,6 +283,9 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'ui-kit': { track: 'mobile', num: '07', title: 'Многомодульность и UI Kit' },
   'what-is-blockchain': { track: 'blockchain', num: '01', title: 'Что такое блокчейн' },
   'waves-first-network': { track: 'blockchain', num: '02', title: 'Первая сеть на Waves Enterprise' },
+  'grep-regex': { track: 'advanced', num: '01', title: 'Регулярные выражения для grep' },
+  'ssh-keys-deep': { track: 'advanced', num: '02', title: 'SSH-ключи глубоко' },
+  'git-rebase': { track: 'advanced', num: '03', title: 'Rebase мастерски' },
 };
 
 export const CHAPTER_IDS = Object.keys(CHAPTERS);
@@ -251,6 +294,7 @@ const TRACK_ART: Record<Track, string> = {
   foundation: 'track-foundation',
   mobile: 'first-compose-screen',
   blockchain: 'what-is-blockchain',
+  advanced: 'grep-regex',
 };
 
 function Frame({

@@ -9,6 +9,7 @@ import ChapterCover from '@site/src/components/ChapterCover';
 
 <ChapterCover chapterId="state-events" />
 
+import Figure from '@site/src/components/Figure';
 import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
 import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
@@ -264,6 +265,8 @@ fun main() {
 ## Рекомпозиция: что перерисуется и почему
 
 Прошлая глава уже определила рекомпозицию (recomposition) как повторный вызов composable-функции с новыми данными, когда что-то изменилось. Теперь понятно, что именно запускает этот повторный вызов: запись в `.value` объекта `MutableState` (то есть `setValue` делегата) не просто меняет число — она сообщает системе Compose «то место экрана, что читало это значение, устарело, перерисуй его заново».
+
+<Figure scheme="state-flow" caption="Цикл состояния в Compose: событие меняет state, state запускает рекомпозицию — и перерисовывается только то, что его читало." />
 
 Важная деталь, которую легко упустить: перерисовывается не весь экран целиком, а только те composable-функции, которые ДЕЙСТВИТЕЛЬНО читали именно то состояние, которое изменилось. Если на экране есть текст с именем пользователя и отдельно — счётчик, а меняется только счётчик, то текст с именем не перерисовывается: он же не читал переменную счётчика, значит для него ничего не устарело.
 

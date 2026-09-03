@@ -9,6 +9,7 @@ import ChapterCover from '@site/src/components/ChapterCover';
 
 <ChapterCover chapterId="classes-collections" />
 
+import Figure from '@site/src/components/Figure';
 import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
 import PredictOutput from '@site/src/components/PredictOutput';
 import CodeTyping from '@site/src/components/CodeTyping';
@@ -296,6 +297,8 @@ data class Competitor(val name: String, var score: Int)`} />
 ## Списки: `List` и `MutableList`
 
 Теперь, когда есть тип для одного участника, соберём их в команду. `List` — упорядоченная коллекция элементов одного типа: у каждого элемента есть индекс (номер позиции), начиная с `0`.
+
+<Figure scheme="collections-shelf" caption="Три полки для данных: List хранит по порядку и номеру, Map — по ключу, Set — только уникальные значения без порядка." />
 
 <Block kind="breakdown" title="Разбор по символам: цикл for" chapterId="classes-collections" blockId="breakdown-for-loop">
 <SyntaxBreakdown parts={[

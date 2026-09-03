@@ -9,6 +9,7 @@ import ChapterCover from '@site/src/components/ChapterCover';
 
 <ChapterCover chapterId="it-english" />
 
+import Figure from '@site/src/components/Figure';
 import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
 import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
@@ -42,6 +43,8 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 ## Анатомия сообщения об ошибке
 
 Когда программа ломается, она не ругается — она оставляет записку: что пыталась сделать и что пошло не так. У записки есть строение, и в разных инструментах оно чуть отличается — но принцип общий: **источник** (кто говорит), **виновник** (к чему относится проблема) и **суть** (что именно случилось), разделённые двоеточиями.
+
+<Figure scheme="error-anatomy" caption="Анатомия типичного сообщения об ошибке: источник, виновник и суть — три части через двоеточие." />
 
 <Hint id="it-english-h1" type="tip">
 Новички закрывают эту записку не читая, а зря: в ней почти всегда написано, как всё починить.

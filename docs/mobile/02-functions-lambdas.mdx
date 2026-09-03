@@ -9,6 +9,7 @@ import ChapterCover from '@site/src/components/ChapterCover';
 
 <ChapterCover chapterId="functions-lambdas" />
 
+import Figure from '@site/src/components/Figure';
 import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
 import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
@@ -43,6 +44,8 @@ import CallTracer from '@site/src/components/CallTracer';
 ## Функция по кусочкам: `fun square(x: Int): Int`
 
 Вот функция, которая возводит число в квадрат. Разберём сигнатуру — первую строку, где объявлены имя, параметры и тип возврата, — по символам.
+
+<Figure scheme="lambda-box" caption="Функция — коробка: вход слева, тело внутри, выход справа. Лямбда — та же коробка без имени." />
 
 <Block kind="breakdown" title="Разбор по символам: сигнатура fun square" chapterId="functions-lambdas" blockId="breakdown-square-signature">
 <SyntaxBreakdown parts={[

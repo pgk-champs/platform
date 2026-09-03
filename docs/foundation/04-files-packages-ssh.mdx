@@ -9,6 +9,7 @@ import ChapterCover from '@site/src/components/ChapterCover';
 
 <ChapterCover chapterId="files-packages-ssh" />
 
+import Figure from '@site/src/components/Figure';
 import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
 import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
@@ -57,6 +58,8 @@ ls -l hello.sh
 ```
 
 Строка `-rw-r--r--` — это ровно десять символов, и в них зашифрован весь ответ на вопрос «кто и что может». Разберём каждый:
+
+<Figure scheme="rwx-bits" caption="Три тройки прав rwx: владелец, группа, остальные. У hello.sh — 644: владелец читает и пишет, группа и остальные только читают." />
 
 <Block kind="breakdown" title="Строка прав -rw-r--r-- по символам" chapterId="files-packages-ssh" blockId="breakdown-rwx-string">
 <SyntaxBreakdown parts={[

@@ -1,0 +1,16 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PGK Champs">
+  <title>PGK Champs</title>
+  <defs>
+    <linearGradient id="pgk-mark-dark" x1="4" y1="4" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a7aefa"/>
+      <stop offset="1" stop-color="#5a62ae"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="36" height="36" rx="11" fill="url(#pgk-mark-dark)"/>
+  <!-- Восхождение: три ступени вверх — путь от нуля до чемпиона. -->
+  <path d="M10 27.5h4.5v-5H10zM17.75 27.5h4.5V17h-4.5zM25.5 27.5H30V11.5h-4.5z" fill="#16161a" fill-opacity="0.32"/>
+  <path d="M10 27.5h4.5v-5H10z" fill="#16161a" fill-opacity="0.55"/>
+  <!-- Курсор терминала на вершине. -->
+  <path d="M25.5 11.5H30v4.2h-4.5z" fill="#16161a"/>
+  <path d="M11.6 15.4l3.4 3.4-3.4 3.4" stroke="#16161a" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85"/>
+</svg>

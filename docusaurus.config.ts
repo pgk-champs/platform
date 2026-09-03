@@ -7,7 +7,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'PGK Champs',
   tagline: 'От нуля до чемпиона: мобильная разработка и блокчейн',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.svg',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -44,7 +44,7 @@ const config: Config = {
       tagName: 'link',
       attributes: {
         rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Onest:wght@700;800&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap',
+        href: 'https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700&family=Onest:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap',
       },
     },
   ],
@@ -86,39 +86,39 @@ const config: Config = {
     navbar: {
       title: 'PGK Champs',
       logo: {
-        alt: 'PGK Champs Logo',
+        alt: 'PGK Champs',
         src: 'img/logo.svg',
+        srcDark: 'img/logo-dark.svg',
+        width: 32,
+        height: 32,
       },
       items: [
+        {
+          type: 'dropdown',
+          label: 'Учебник',
+          position: 'left',
+          items: [
+            {to: '/docs/foundation', label: 'Фундамент — с нуля'},
+            {to: '/docs/mobile', label: 'Мобилка — Kotlin и Compose'},
+            {to: '/docs/blockchain', label: 'Блокчейн — смарт-контракты'},
+            {to: '/docs/advanced/git-rebase', label: 'Отдельные темы'},
+          ],
+        },
         {
           to: '/route',
           label: 'Маршрут',
           position: 'left',
         },
         {
-          to: '/playground',
-          label: 'Песочница',
+          type: 'dropdown',
+          label: 'Тренажёры',
           position: 'left',
-        },
-        {
-          to: '/gym',
-          label: 'Зал',
-          position: 'left',
-        },
-        {
-          to: '/simulator',
-          label: 'Симулятор',
-          position: 'left',
-        },
-        {
-          to: '/favorites',
-          label: 'Избранное',
-          position: 'left',
-        },
-        {
-          to: '/achievements',
-          label: 'Достижения',
-          position: 'left',
+          items: [
+            {to: '/playground', label: 'Песочница — попробовать сразу'},
+            {to: '/gym', label: 'Зал — все тренажёры'},
+            {to: '/words', label: 'Слова — английский по карточкам'},
+            {to: '/simulator', label: 'Симулятор чемпионата'},
+          ],
         },
         {
           to: '/community',
@@ -126,19 +126,13 @@ const config: Config = {
           position: 'left',
         },
         {
-          to: '/docs/foundation',
-          label: 'Фундамент',
-          position: 'left',
-        },
-        {
-          to: '/docs/mobile',
-          label: 'Мобилка',
-          position: 'left',
-        },
-        {
-          to: '/docs/blockchain',
-          label: 'Блокчейн',
-          position: 'left',
+          type: 'dropdown',
+          label: 'Мои успехи',
+          position: 'right',
+          items: [
+            {to: '/achievements', label: 'Достижения и рекорды'},
+            {to: '/favorites', label: 'Избранное'},
+          ],
         },
         {
           href: 'https://github.com/pgk-champs/platform',

@@ -368,6 +368,8 @@ fun main() {
 
 Собирать проект и запускать эмулятор ради каждой мелкой правки — долго. Аннотация `@Preview` решает эту проблему: она просит Android Studio нарисовать composable-функцию прямо в редакторе, без сборки всего приложения и без эмулятора.
 
+<Figure scheme="compose-preview" caption="@Preview рисует composable-функцию прямо в IDE — ни сборки всего приложения, ни эмулятора не нужно." />
+
 ```kotlin
 @Composable
 fun Greeting(name: String) {

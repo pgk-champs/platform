@@ -94,8 +94,14 @@ export default function Block({ kind, title, chapterId, blockId, favPayload, chi
           </button>
         ) : null}
       </div>
-      <div className="block-body" hidden={collapsed}>
-        {children}
+      {/* Схлопывание анимируется треком грида 1fr → 0fr: высота содержимого
+          заранее неизвестна, а так переход работает без замеров в JS.
+          Свёрнутое содержимое убирается из фокуса и с чтения экранным
+          диктором через inert — раньше это делал атрибут hidden. */}
+      <div className={`block-body ${collapsed ? 'block-body--collapsed' : ''}`.trim()}>
+        <div className="block-body-inner" inert={collapsed}>
+          {children}
+        </div>
       </div>
     </div>
   );

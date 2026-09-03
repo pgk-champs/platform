@@ -9,6 +9,7 @@ import ChapterCover from '@site/src/components/ChapterCover';
 
 <ChapterCover chapterId="kotlin-vars" />
 
+import Figure from '@site/src/components/Figure';
 import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
 import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
@@ -89,6 +90,8 @@ import HistoryNote from '@site/src/components/HistoryNote';
 ## val и var: что можно менять
 
 `val` (от value) объявляет неизменяемую (immutable) переменную: значение задаётся один раз, и переприсвоить его нельзя — попытка не пройдёт компиляцию. `var` (от variable) объявляет изменяемую: перезаписывай сколько угодно.
+
+<Figure scheme="memory-boxes" caption="val — запечатанная ячейка памяти: положил значение один раз, и всё. var — открытая: переписывай сколько угодно раз." />
 
 <Hint id="kotlin-vars-h1" type="tip">
 Хорошее правило для новичка: по умолчанию бери `val` и переключайся на `var` только тогда, когда точно знаешь, что значение будет меняться. Так меньше шанс случайно испортить данные, на которые полагается остальной код.

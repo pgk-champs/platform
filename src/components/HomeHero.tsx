@@ -2,6 +2,12 @@ import React from 'react';
 import Link from '@docusaurus/Link';
 import './trainers.css';
 
+const STATS = [
+  { num: '22', label: 'главы с разбором' },
+  { num: '40+', label: 'тренажёра' },
+  { num: '43', label: 'достижения' },
+];
+
 const TRACKS = [
   {
     to: '/docs/foundation',
@@ -95,24 +101,36 @@ export default function HomeHero() {
       <section className="hh-hero hh-hero--v2">
         <div className="hh-hero-inner">
           <div className="hh-hero-copy">
-            <h1 className="hh-title">От нуля до чемпиона</h1>
-            <p className="hh-subtitle">
+            <p className="hh-kicker pgk-reveal" style={{ ['--i' as string]: 0 }}>
+              Учебная платформа ПГК · подготовка к чемпионату
+            </p>
+            <h1 className="hh-title pgk-reveal" style={{ ['--i' as string]: 1 }}>
+              От нуля до чемпиона
+            </h1>
+            <p className="hh-subtitle pgk-reveal" style={{ ['--i' as string]: 2 }}>
               Мобилка и блокчейн: интерактивные главы, тренажёры и симулятор чемпионата.
             </p>
-            <div className="hh-actions">
+            <div className="hh-actions pgk-reveal" style={{ ['--i' as string]: 3 }}>
               <Link className="button button--primary" to="/route">
-                Маршрут
+                Начать маршрут
               </Link>
               <Link className="button button--secondary" to="/playground">
-                Песочница
-              </Link>
-              <Link className="button button--secondary" to="/simulator">
-                Симулятор
+                Попробовать сразу
               </Link>
             </div>
-            <p className="hh-stats">17 глав · 40+ тренажёров · 40 достижений</p>
+            <p className="hh-note pgk-reveal" style={{ ['--i' as string]: 4 }}>
+              Первый тренажёр открывается сразу, регистрация не нужна.
+            </p>
+            <dl className="hh-stats pgk-reveal" style={{ ['--i' as string]: 5 }}>
+              {STATS.map((s) => (
+                <div key={s.label} className="hh-stat">
+                  <dt className="hh-stat-num">{s.num}</dt>
+                  <dd className="hh-stat-label">{s.label}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
-          <div className="hh-art">
+          <div className="hh-art pgk-reveal" style={{ ['--i' as string]: 3 }}>
             <HeroScene />
           </div>
         </div>

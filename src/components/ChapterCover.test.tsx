@@ -1,8 +1,8 @@
 import { render } from '@testing-library/react';
 import ChapterCover, { CHAPTER_IDS, TrackBanner } from './ChapterCover';
 
-test('покрыты все 18 глав', () => {
-  expect(CHAPTER_IDS).toHaveLength(19);
+test('покрыты все 22 главы', () => {
+  expect(CHAPTER_IDS).toHaveLength(22);
 });
 
 test('каждая глава рендерит свою уникальную обложку с названием', () => {
@@ -23,16 +23,31 @@ test('неизвестный chapterId не рендерит ничего', () =
   expect(container.innerHTML).toBe('');
 });
 
-test('баннеры трёх треков различаются, mini добавляет модификатор', () => {
+test('баннеры четырёх треков различаются, mini добавляет модификатор', () => {
   const markups = new Set<string>();
-  for (const track of ['foundation', 'mobile', 'blockchain'] as const) {
+  for (const track of ['foundation', 'mobile', 'blockchain', 'advanced'] as const) {
     const { container, unmount } = render(<TrackBanner track={track} />);
     expect(container.querySelector('svg')).toBeTruthy();
     markups.add(container.innerHTML);
     unmount();
   }
-  expect(markups.size).toBe(3);
+  expect(markups.size).toBe(4);
 
   const { container } = render(<TrackBanner track="mobile" mini />);
   expect(container.querySelector('.track-banner--mini')).toBeTruthy();
+});
+
+test('обложки advanced-глав показывают трек «Отдельные темы» и верный номер/название', () => {
+  const cases = [
+    ['git-rebase', '03', 'Rebase мастерски'],
+    ['grep-regex', '01', 'Регулярные выражения для grep'],
+    ['ssh-keys-deep', '02', 'SSH-ключи глубоко'],
+  ] as const;
+  for (const [id, num, title] of cases) {
+    const { container, unmount } = render(<ChapterCover chapterId={id} />);
+    expect(container.textContent).toContain('ОТДЕЛЬНЫЕ ТЕМЫ');
+    expect(container.textContent).toContain(num);
+    expect(container.textContent).toContain(title);
+    unmount();
+  }
 });
