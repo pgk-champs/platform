@@ -4,6 +4,7 @@ import Link from '@docusaurus/Link';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import knowledgeMap from '../data/knowledge-map.json';
 import { levelForXp } from '../lib/levels';
+import { ACHIEVEMENTS } from '../lib/achievements';
 import {
   addMentor,
   createGroup,
@@ -11,6 +12,7 @@ import {
   fetchMentorStudents,
   fetchPendingCommunity,
   fetchProfile,
+  fetchStudentDetail,
   isLoggedIn,
   listGroups,
   listMentors,
@@ -22,8 +24,140 @@ import {
   type MentorGroup,
   type MentorStudent,
   type PendingItem,
+  type StudentDetail,
 } from '../lib/account';
 import '../components/trainers.css';
+
+const CH_TITLE = new Map((knowledgeMap as Chapter[]).map((c) => [c.id, c.title]));
+const CH_TRACK = new Map((knowledgeMap as Chapter[]).map((c) => [c.id, c.path.split('/')[0]]));
+const ACH_TITLE = new Map(ACHIEVEMENTS.map((a) => [a.id, { title: a.title, icon: a.icon }]));
+const TRACK_NAME: Record<string, string> = { foundation: 'Фундамент', mobile: 'Мобилка', blockchain: 'Блокчейн', advanced: 'Отдельные темы' };
+
+// Детальная карточка одного ученика — модальное окно поверх дашборда.
+function StudentCard({ id, onClose }: { id: number; onClose: () => void }) {
+  const [d, setD] = useState<StudentDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    let alive = true;
+    fetchStudentDetail(id).then((res) => {
+      if (alive) {
+        setD(res);
+        setLoading(false);
+      }
+    });
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    document.addEventListener('keydown', onKey);
+    return () => {
+      alive = false;
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [id, onClose]);
+
+  // Главы ученика, сгруппированные по трекам, в порядке трек→глава.
+  const byTrack = new Map<string, StudentDetail['chapters']>();
+  for (const c of d?.chapters ?? []) {
+    const tr = CH_TRACK.get(c.chapterId) ?? 'advanced';
+    if (!byTrack.has(tr)) byTrack.set(tr, []);
+    byTrack.get(tr)!.push(c);
+  }
+
+  return (
+    <div className="sc-modal-back" role="dialog" aria-modal="true" onClick={onClose}>
+      <div className="sc-modal" onClick={(e) => e.stopPropagation()}>
+        <button type="button" className="sc-modal-close" onClick={onClose} aria-label="Закрыть">
+          ✕
+        </button>
+        {loading ? (
+          <p className="ac-muted">Загрузка…</p>
+        ) : !d ? (
+          <p className="ac-muted">Не удалось загрузить карточку.</p>
+        ) : (
+          <>
+            <div className="sc-head">
+              {d.student.avatar ? (
+                <img className="ac-avatar" src={d.student.avatar} alt="" width={56} height={56} />
+              ) : (
+                <div className="ac-avatar ac-avatar-empty" aria-hidden="true">
+                  {d.student.login.slice(0, 1).toUpperCase()}
+                </div>
+              )}
+              <div>
+                <h3 className="sc-name">{d.student.name || d.student.login}</h3>
+                <p className="sc-sub">
+                  @{d.student.login} · уровень {levelForXp(d.student.xp).level} · {d.student.xp} XP · был активен {ago(d.student.updatedAt)}
+                </p>
+                {d.groups.length > 0 && (
+                  <p className="sc-groups">{d.groups.map((g) => g.name).join(', ')}</p>
+                )}
+              </div>
+            </div>
+
+            {d.results.length > 0 && (
+              <div className="sc-block">
+                <h4>Симулятор</h4>
+                <ul className="sc-list">
+                  {d.results.map((r) => (
+                    <li key={r.module}>
+                      {r.title}: <strong>{r.score}</strong> из {r.max_score}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="sc-block">
+              <h4>Прогресс по главам</h4>
+              {byTrack.size === 0 ? (
+                <p className="ac-muted">Пока ничего не пройдено.</p>
+              ) : (
+                [...byTrack.entries()].map(([tr, chs]) => (
+                  <div key={tr} className="sc-track">
+                    <div className="sc-track-name">{TRACK_NAME[tr] ?? tr}</div>
+                    {chs.map((c) => (
+                      <div key={c.chapterId} className="sc-chapter">
+                        <span className="sc-ch-title">{CH_TITLE.get(c.chapterId) ?? c.chapterId}</span>
+                        <span className="sc-ch-stats">
+                          {c.sections > 0 && <span title="секций прочитано">📖 {c.sections}</span>}
+                          {c.trainers > 0 && <span title="тренажёров пройдено">🎮 {c.trainers}</span>}
+                          {c.quizzes.map((q) => (
+                            <span key={q.id} className={`sc-quiz ${q.correct === q.total ? 'sc-quiz-full' : ''}`.trim()} title="квиз">
+                              {q.correct}/{q.total}
+                            </span>
+                          ))}
+                          {c.exam && (
+                            <span className="sc-exam" title="лучший экзамен">
+                              экз. {c.exam.correct}/{c.exam.total}
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ))
+              )}
+            </div>
+
+            {d.achievements.length > 0 && (
+              <div className="sc-block">
+                <h4>Достижения ({d.achievements.length})</h4>
+                <div className="sc-achs">
+                  {d.achievements.map((a) => {
+                    const meta = ACH_TITLE.get(a);
+                    return (
+                      <span key={a} className="sc-ach" title={meta?.title ?? a}>
+                        {meta?.icon ?? '🏅'} {meta?.title ?? a}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // Выгрузка группы в CSV — открывается в Excel/Google Sheets.
 function downloadCsv(students: MentorStudent[], groupName: string): void {
@@ -94,6 +228,7 @@ function Dashboard() {
   const [activeGroup, setActiveGroup] = useState<number | 0>(0); // 0 = все
   const [busy, setBusy] = useState(false);
   const [isRoot, setIsRoot] = useState(false);
+  const [openStudent, setOpenStudent] = useState<number | null>(null);
 
   const reloadStudents = async (groupId: number) => {
     const list = await fetchMentorStudents(groupId || undefined);
@@ -230,11 +365,13 @@ function Dashboard() {
           totSections={totSections}
           active={active}
           onRemoveStudent={onRemoveStudent}
+          onOpenStudent={setOpenStudent}
         />
       )}
 
       <ModerationQueue />
       <MentorsPanel canRemove={isRoot} />
+      {openStudent !== null && <StudentCard id={openStudent} onClose={() => setOpenStudent(null)} />}
     </div>
   );
 }
@@ -363,6 +500,7 @@ function RosterView({
   totSections,
   active,
   onRemoveStudent,
+  onOpenStudent,
 }: {
   list: MentorStudent[];
   activeGroup: number;
@@ -370,6 +508,7 @@ function RosterView({
   totSections: number;
   active: number;
   onRemoveStudent: (s: MentorStudent) => void;
+  onOpenStudent: (ghId: number) => void;
 }) {
   return (
     <div>
@@ -416,7 +555,7 @@ function RosterView({
               return (
                 <tr key={s.gh_id} className={stale ? 'mn-stale' : undefined}>
                   <td>
-                    <span className="lb-user">
+                    <button type="button" className="lb-user mn-open" onClick={() => onOpenStudent(s.gh_id)} title="Открыть карточку ученика">
                       {s.avatar ? (
                         <img className="lb-avatar" src={s.avatar} alt="" width={28} height={28} />
                       ) : (
@@ -424,8 +563,8 @@ function RosterView({
                           {s.login.slice(0, 1).toUpperCase()}
                         </span>
                       )}
-                      <span className="lb-name">{s.name || s.login}</span>
-                    </span>
+                      <span className="lb-name mn-open-name">{s.name || s.login}</span>
+                    </button>
                   </td>
                   <td className="lb-secondary">
                     {lvl.level} · {s.xp} XP

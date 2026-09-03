@@ -222,6 +222,30 @@ export async function fetchMentorStudents(groupId?: number): Promise<MentorStude
   }
 }
 
+// Детальная карточка ученика для наставника.
+export type StudentDetail = {
+  student: { gh_id: number; login: string; name: string; avatar: string; xp: number; updatedAt: number };
+  chapters: {
+    chapterId: string;
+    sections: number;
+    quizzes: { id: string; correct: number; total: number }[];
+    exam: { correct: number; total: number } | null;
+    trainers: number;
+  }[];
+  results: { module: string; title: string; score: number; max_score: number; duration_sec: number }[];
+  achievements: string[];
+  groups: { id: number; name: string }[];
+};
+
+export async function fetchStudentDetail(ghId: number): Promise<StudentDetail | null> {
+  try {
+    const r = await api(`/mentor/students/${ghId}`);
+    return r.ok ? ((await r.json()) as StudentDetail) : null;
+  } catch {
+    return null;
+  }
+}
+
 // --- Группы (потоки/классы) ---
 export type MentorGroup = { id: number; name: string; code: string; members: number };
 

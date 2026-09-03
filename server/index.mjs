@@ -473,6 +473,64 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, { students, count: students.length });
     }
 
+    // Детальная карточка одного ученика (наставник): что именно пройдено.
+    const sd = path.match(/^\/mentor\/students\/(\d+)$/);
+    if (sd && req.method === 'GET') {
+      const s = bearer(req);
+      if (!s) return json(res, 401, { error: 'unauthorized' });
+      const me = getUser.get(s.id);
+      if (!isMentor(me)) return json(res, 403, { error: 'forbidden' });
+      const row = getUser.get(Number(sd[1]));
+      if (!row) return json(res, 404, { error: 'not found' });
+      let p = {};
+      try {
+        p = JSON.parse(row.progress || '{}');
+      } catch {
+        p = {};
+      }
+      const secMap = p.sections && typeof p.sections === 'object' ? p.sections : {};
+      const quizMap = p.quizzes && typeof p.quizzes === 'object' ? p.quizzes : {};
+      const examMap = p.exams && typeof p.exams === 'object' ? p.exams : {};
+      const trainMap = p.trainers && typeof p.trainers === 'object' ? p.trainers : {};
+      const chapterIds = [
+        ...new Set([...Object.keys(secMap), ...Object.keys(quizMap), ...Object.keys(examMap), ...Object.keys(trainMap)]),
+      ];
+      const bestExam = (arr) =>
+        Array.isArray(arr) && arr.length
+          ? arr.reduce((a, b) => (Number(b.correct) > Number(a.correct) ? b : a))
+          : null;
+      const chapters = chapterIds.map((ch) => ({
+        chapterId: ch,
+        sections: Array.isArray(secMap[ch]) ? secMap[ch].length : 0,
+        quizzes: quizMap[ch] && typeof quizMap[ch] === 'object'
+          ? Object.entries(quizMap[ch]).map(([id, q]) => ({ id, correct: q.correct, total: q.total }))
+          : [],
+        exam: bestExam(examMap[ch]),
+        trainers: trainMap[ch] && typeof trainMap[ch] === 'object' ? Object.keys(trainMap[ch]).length : 0,
+      }));
+      // Группы этого ученика, которыми владеет ЭТОТ наставник (чужие не раскрываем).
+      const groups = db
+        .prepare(
+          `SELECT g.id, g.name FROM groups g JOIN group_members m ON m.group_id = g.id
+           WHERE m.gh_id = ? AND g.owner = ?`,
+        )
+        .all(row.gh_id, me.gh_id);
+      return json(res, 200, {
+        student: {
+          gh_id: row.gh_id,
+          login: row.login,
+          name: row.name,
+          avatar: row.avatar,
+          xp: Number(p.xp) || 0,
+          updatedAt: row.updated_at || 0,
+        },
+        chapters,
+        results: myResults.all(row.gh_id),
+        achievements: Array.isArray(p.achievementsUnlocked) ? p.achievementsUnlocked : [],
+        groups,
+      });
+    }
+
     // Ученик присоединяется к группе по коду (любой вошедший).
     if (path === '/groups/join' && req.method === 'POST') {
       const s = bearer(req);
