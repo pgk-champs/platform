@@ -45,8 +45,12 @@ export default function SshQuest({ chapterId, trainerId }: SshQuestProps) {
   const push = (add: Line[]) => {
     setLines((prev) => {
       const next = [...prev, ...add];
-      // прокрутка вниз после рендера
-      queueMicrotask(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight));
+      // прокрутка вниз после рендера; scrollTop работает и в браузере, и в jsdom
+      // (в отличие от scrollTo, которого в jsdom нет).
+      queueMicrotask(() => {
+        const el = scrollRef.current;
+        if (el) el.scrollTop = el.scrollHeight;
+      });
       return next;
     });
   };
