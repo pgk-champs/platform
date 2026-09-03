@@ -28,7 +28,7 @@ import MiniFileManager from '@site/src/components/MiniFileManager';
 
 # Linux и терминал
 
-<ChapterProgress chapterId="linux-terminal" totalSections={15} totalQuizzes={6} totalTrainers={5} />
+<ChapterProgress chapterId="linux-terminal" totalSections={15} totalQuizzes={6} totalTrainers={6} />
 
 ## Зачем это нужно
 
@@ -562,6 +562,27 @@ ls -la
   chapterId="linux-terminal"
   trainerId="trainer-terminal-quest"
 />
+</Block>
+
+<Block kind="trainer" title="Квест: наведи порядок" chapterId="linux-terminal" blockId="trainer-tidy-quest">
+
+В домашней папке свалка: две заметки лежат вперемешку с лишним временным файлом. Наведи порядок на своём терминале: создай папку `notes` и **перенеси** туда оба `.txt`-файла (перенеси, а не скопируй — исходники должны исчезнуть из дома), а мусорный `tmp.log` удали.
+
+<TerminalSim
+  initialFs={{
+    'todo.txt': 'позвонить наставнику\nдоделать практикум',
+    'ideas.txt': 'сделать бота\nвыучить регулярки',
+    'tmp.log': 'debug 12:01 ok\ndebug 12:02 ok',
+  }}
+  quest={{
+    title: 'notes/todo.txt и notes/ideas.txt на месте, дом чист от tmp.log и исходников',
+    requiredPaths: ['notes/todo.txt', 'notes/ideas.txt'],
+    forbiddenPaths: ['tmp.log', 'todo.txt', 'ideas.txt'],
+  }}
+  chapterId="linux-terminal"
+  trainerId="trainer-tidy-quest"
+/>
+
 </Block>
 
 <SectionAnchor chapterId="linux-terminal" sectionId="practice-project" />

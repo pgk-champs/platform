@@ -352,14 +352,14 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'терминал-прокачан',
     title: 'Терминал прокачан',
-    desc: 'Пройдены все 5 тренажёров главы про Linux и терминал',
+    desc: 'Пройдены все 6 тренажёров главы про Linux и терминал',
     icon: '🧙',
     category: 'терминал',
     rarity: 'эпическое',
-    // В главе 03-linux-terminal.mdx ровно 5 тренажёров с trainerId
-    // (totalTrainers={5}); порог обязан совпадать, иначе достижение
-    // недостижимо. При добавлении тренажёра в главу — поднять и здесь.
-    check: (s) => chapterTrainerCount(s, 'linux-terminal') >= 5,
+    // В главе 03-linux-terminal.mdx ровно 6 тренажёров с trainerId
+    // (totalTrainers={6}); порог обязан совпадать, иначе достижение
+    // недостижимо. При изменении числа тренажёров в главе — поправить и здесь.
+    check: (s) => chapterTrainerCount(s, 'linux-terminal') >= 6,
   },
 
   // --- язык ---

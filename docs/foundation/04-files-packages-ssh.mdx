@@ -24,10 +24,11 @@ import SectionAnchor from '@site/src/components/SectionAnchor';
 import ChmodCalc from '@site/src/components/ChmodCalc';
 import PermQuest from '@site/src/components/PermQuest';
 import NanoQuest from '@site/src/components/NanoQuest';
+import TerminalSim from '@site/src/components/TerminalSim';
 
 # Файлы, пакеты, SSH
 
-<ChapterProgress chapterId="files-packages-ssh" totalSections={15} totalQuizzes={7} totalTrainers={5} />
+<ChapterProgress chapterId="files-packages-ssh" totalSections={15} totalQuizzes={7} totalTrainers={6} />
 
 ## Зачем это нужно
 
@@ -637,6 +638,24 @@ ssh localhost whoami
 ```text
 student
 ```
+
+<Block kind="trainer" title="Квест: собери папку ~/.ssh" chapterId="files-packages-ssh" blockId="trainer-ssh-setup">
+
+Потренируйся на своём терминале. В домашней папке лежит твой публичный ключ `id_ed25519.pub`. Подготовь папку `~/.ssh`: создай её и положи внутрь два файла — `authorized_keys` (сюда обычно попадает публичный ключ) и пустой `config` для будущих настроек. Порядок важен: файл внутри `.ssh` не создать, пока нет самой папки — сначала `mkdir .ssh`, потом `touch .ssh/authorized_keys` (или `echo ... > .ssh/authorized_keys`).
+
+<TerminalSim
+  initialFs={{
+    'id_ed25519.pub': 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... student@laptop',
+  }}
+  quest={{
+    title: 'В ~/.ssh есть authorized_keys и config',
+    requiredPaths: ['.ssh/authorized_keys', '.ssh/config'],
+  }}
+  chapterId="files-packages-ssh"
+  trainerId="trainer-ssh-setup"
+/>
+
+</Block>
 
 ### Почему право доступа к ключу — не мелочь
 
