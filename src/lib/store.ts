@@ -563,6 +563,22 @@ function snapshot(): Readonly<State> {
   return state;
 }
 
+// Принять состояние с сервера кабинета: сервер уже слил его с локальным и вернул
+// «не хуже», поэтому здесь просто заменяем целиком, проверив форму полей (как при
+// загрузке из localStorage — чужой/битый ответ не должен ломать страницу).
+function importState(incoming: unknown): void {
+  if (!incoming || typeof incoming !== 'object') return;
+  const parsed = incoming as Record<string, unknown>;
+  const next = emptyState();
+  for (const key of Object.keys(next) as (keyof State)[]) {
+    if (sameShape(parsed[key], next[key])) (next as Record<string, unknown>)[key] = parsed[key];
+  }
+  next.easter = { ...emptyState().easter, ...next.easter };
+  if (!Array.isArray(next.easter.historyOpened)) next.easter.historyOpened = [];
+  state = next;
+  persist();
+}
+
 export const store = {
   subscribe,
   getVersion,
@@ -592,6 +608,7 @@ export const store = {
   easter: { markKonami: easterMarkKonami, markSpeedrun: easterMarkSpeedrun, openHistory: easterOpenHistory },
   tour: { markSeen: markTourSeen, isSeen: isTourSeen },
   snapshot,
+  importState,
   /** Тестовый хелпер: перечитывает состояние из localStorage (как при загрузке страницы). */
   __reloadForTests(): void {
     state = loadState();

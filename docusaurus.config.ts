@@ -49,7 +49,7 @@ const config: Config = {
     },
   ],
 
-  clientModules: ['./src/clientModules/readingProgress.ts', './src/clientModules/konami.ts'],
+  clientModules: ['./src/clientModules/readingProgress.ts', './src/clientModules/konami.ts', './src/clientModules/account.ts'],
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -130,6 +130,7 @@ const config: Config = {
           label: 'Мои успехи',
           position: 'right',
           items: [
+            {to: '/account', label: 'Личный кабинет'},
             {to: '/achievements', label: 'Достижения и рекорды'},
             {to: '/favorites', label: 'Избранное'},
           ],
