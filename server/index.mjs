@@ -166,7 +166,9 @@ const server = http.createServer(async (req, res) => {
   const path = url.pathname.replace(/^\/api/, '') || '/';
 
   try {
-    if (path === '/health') return json(res, 200, { ok: true, dev: DEV_LOGIN });
+    // oauth: подключено ли GitHub-приложение. Пока нет — фронт показывает
+    // «скоро», а не кнопку входа, которая привела бы к 503.
+    if (path === '/health') return json(res, 200, { ok: true, dev: DEV_LOGIN, oauth: !!CLIENT_ID || DEV_LOGIN });
 
     if (path === '/auth/login') {
       if (!CLIENT_ID) return json(res, 503, { error: 'oauth not configured' });

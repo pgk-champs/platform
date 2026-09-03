@@ -39,12 +39,14 @@ export function isLoggedIn(): boolean {
   return !!getToken();
 }
 
-/** Доступен ли сервер кабинета. Пока edu.alspio.com не поднят, отвечает false,
- *  и страница показывает «скоро», а не сломанную кнопку входа. */
+/** Готов ли кабинет к входу: сервер поднят И GitHub-приложение подключено.
+ *  Пока нет — страница показывает «скоро», а не кнопку, ведущую к ошибке. */
 export async function apiAvailable(): Promise<boolean> {
   try {
     const r = await fetch(`${apiBase()}/health`, { signal: AbortSignal.timeout?.(4000) });
-    return r.ok;
+    if (!r.ok) return false;
+    const data = await r.json();
+    return !!data.oauth;
   } catch {
     return false;
   }
