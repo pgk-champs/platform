@@ -59,6 +59,26 @@ test('every chapter has 2-5 <Figure> illustrations', () => {
   assert.deepEqual(problems, []);
 });
 
+// <Hint type="..."> ловится только рендером на SSG (Hint.tsx падает на
+// undefined.icon) — typecheck/vitest это не видят, т.к. type: string
+// в JSX-пропах не проверяется как литерал. Пойман 3-го сентября на
+// build-е (advice/warning вместо tip/important/fact); страж — чтобы
+// не пришлось ловить снова на живой сборке.
+test('every <Hint type="..."> in docs uses a valid HintType', () => {
+  const walk = d =>
+    fs.readdirSync(d, { withFileTypes: true }).flatMap(e =>
+      e.isDirectory() ? walk(path.join(d, e.name)) : /\.mdx?$/.test(e.name) ? [path.join(d, e.name)] : [],
+    );
+  const valid = new Set(['tip', 'important', 'fact']);
+  const problems = [];
+  for (const file of walk('docs')) {
+    for (const m of fs.readFileSync(file, 'utf8').matchAll(/<Hint\b[^>]*\btype="([^"]+)"/g)) {
+      if (!valid.has(m[1])) problems.push(`${file}: type="${m[1]}"`);
+    }
+  }
+  assert.deepEqual(problems, []);
+});
+
 // 4-5 куратор-видео на главу (src/data/chapter-videos.json, рендерятся
 // ChapterVideos в футере) — та же ночная директива, «по 4-5 видео».
 test('every chapter has 4-5 curated videos in chapter-videos.json', () => {
