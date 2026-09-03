@@ -83,6 +83,46 @@ const modulesList = db.prepare('SELECT module, title, COUNT(*) AS players FROM r
 const myResults = db.prepare('SELECT module, title, score, max_score, duration_sec, ts FROM results WHERE gh_id = ? ORDER BY module');
 const allUsers = db.prepare('SELECT gh_id, login, name, avatar, progress, updated_at FROM users');
 
+// Группы (потоки/классы): наставник создаёт группу, ученик входит по коду.
+db.exec(`CREATE TABLE IF NOT EXISTS groups (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  code TEXT NOT NULL UNIQUE,
+  owner INTEGER NOT NULL,
+  created_at INTEGER NOT NULL
+)`);
+db.exec(`CREATE TABLE IF NOT EXISTS group_members (
+  group_id INTEGER NOT NULL,
+  gh_id INTEGER NOT NULL,
+  joined_at INTEGER NOT NULL,
+  PRIMARY KEY (group_id, gh_id)
+)`);
+const createGroup = db.prepare('INSERT INTO groups (name, code, owner, created_at) VALUES (?, ?, ?, ?)');
+const groupByCode = db.prepare('SELECT * FROM groups WHERE code = ?');
+const groupById = db.prepare('SELECT * FROM groups WHERE id = ?');
+const groupsByOwner = db.prepare(`SELECT g.*, (SELECT COUNT(*) FROM group_members m WHERE m.group_id = g.id) AS members
+  FROM groups g WHERE g.owner = ? ORDER BY g.created_at DESC`);
+const deleteGroup = db.prepare('DELETE FROM groups WHERE id = ? AND owner = ?');
+const deleteGroupMembers = db.prepare('DELETE FROM group_members WHERE group_id = ?');
+const addMember = db.prepare('INSERT OR IGNORE INTO group_members (group_id, gh_id, joined_at) VALUES (?, ?, ?)');
+const removeMember = db.prepare('DELETE FROM group_members WHERE group_id = ? AND gh_id = ?');
+const memberIds = db.prepare('SELECT gh_id FROM group_members WHERE group_id = ?');
+const myGroups = db.prepare(`SELECT g.id, g.name FROM groups g
+  JOIN group_members m ON m.group_id = g.id WHERE m.gh_id = ?`);
+const deleteResult = db.prepare('DELETE FROM results WHERE gh_id = ? AND module = ?');
+
+// Код присоединения: 6 символов без похожих (0/O, 1/I) — диктовать голосом легко.
+const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function makeGroupCode() {
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const bytes = crypto.randomBytes(6);
+    let code = '';
+    for (const b of bytes) code += CODE_ALPHABET[b % CODE_ALPHABET.length];
+    if (!groupByCode.get(code)) return code;
+  }
+  throw new Error('cannot allocate group code');
+}
+
 // --- сессии: подписанный токен, без кук; клиент шлёт его в Authorization ---
 const b64u = (buf) => Buffer.from(buf).toString('base64url');
 function sign(payload) {
@@ -342,7 +382,16 @@ const server = http.createServer(async (req, res) => {
       const me = getUser.get(s.id);
       if (!isMentor(me)) return json(res, 403, { error: 'forbidden' });
       const overall = new Map(boardOverall.all().map((r) => [r.gh_id, r]));
-      const students = allUsers.all().map((row) => {
+      // Фильтр по группе: ?group=<id> ограничивает выборку её участниками.
+      const groupId = Number(url.searchParams.get('group'));
+      let roster = allUsers.all();
+      if (groupId) {
+        const g = groupById.get(groupId);
+        if (!g || g.owner !== me.gh_id) return json(res, 403, { error: 'forbidden' });
+        const ids = new Set(memberIds.all(groupId).map((r) => r.gh_id));
+        roster = roster.filter((u) => ids.has(u.gh_id));
+      }
+      const students = roster.map((row) => {
         let p = {};
         try {
           p = JSON.parse(row.progress || '{}');
@@ -382,6 +431,90 @@ const server = http.createServer(async (req, res) => {
       });
       students.sort((a, b) => b.xp - a.xp || b.sectionsRead - a.sectionsRead);
       return json(res, 200, { students, count: students.length });
+    }
+
+    // Ученик присоединяется к группе по коду (любой вошедший).
+    if (path === '/groups/join' && req.method === 'POST') {
+      const s = bearer(req);
+      if (!s) return json(res, 401, { error: 'unauthorized' });
+      if (!getUser.get(s.id)) return json(res, 401, { error: 'unauthorized' });
+      let body;
+      try {
+        body = JSON.parse(await readBody(req, 1000));
+      } catch {
+        return json(res, 400, { error: 'bad json' });
+      }
+      const code = String(body.code || '').trim().toUpperCase();
+      const g = code && groupByCode.get(code);
+      if (!g) return json(res, 404, { error: 'группа не найдена' });
+      addMember.run(g.id, s.id, Date.now());
+      return json(res, 200, { ok: true, group: { id: g.id, name: g.name } });
+    }
+
+    // --- Управление группами: только наставник-владелец ---
+    const mentorGuard = () => {
+      const s = bearer(req);
+      if (!s) return { err: [401, 'unauthorized'] };
+      const u = getUser.get(s.id);
+      if (!isMentor(u)) return { err: [403, 'forbidden'] };
+      return { u };
+    };
+
+    if (path === '/mentor/groups' && req.method === 'GET') {
+      const g = mentorGuard();
+      if (g.err) return json(res, g.err[0], { error: g.err[1] });
+      return json(res, 200, { groups: groupsByOwner.all(g.u.gh_id) });
+    }
+
+    if (path === '/mentor/groups' && req.method === 'POST') {
+      const g = mentorGuard();
+      if (g.err) return json(res, g.err[0], { error: g.err[1] });
+      let body;
+      try {
+        body = JSON.parse(await readBody(req, 1000));
+      } catch {
+        return json(res, 400, { error: 'bad json' });
+      }
+      const name = String(body.name || '').trim().slice(0, 80);
+      if (!name) return json(res, 400, { error: 'нужно имя группы' });
+      const code = makeGroupCode();
+      const info = createGroup.run(name, code, g.u.gh_id, Date.now());
+      return json(res, 200, { id: info.lastInsertRowid, name, code, members: 0 });
+    }
+
+    // /mentor/groups/<id>  и  /mentor/groups/<id>/remove
+    const gm = path.match(/^\/mentor\/groups\/(\d+)(\/remove)?$/);
+    if (gm) {
+      const guard = mentorGuard();
+      if (guard.err) return json(res, guard.err[0], { error: guard.err[1] });
+      const id = Number(gm[1]);
+      const g = groupById.get(id);
+      if (!g || g.owner !== guard.u.gh_id) return json(res, 404, { error: 'not found' });
+
+      if (!gm[2] && req.method === 'DELETE') {
+        deleteGroupMembers.run(id);
+        deleteGroup.run(id, guard.u.gh_id);
+        return json(res, 200, { ok: true });
+      }
+      if (gm[2] === '/remove' && req.method === 'POST') {
+        let body;
+        try {
+          body = JSON.parse(await readBody(req, 1000));
+        } catch {
+          return json(res, 400, { error: 'bad json' });
+        }
+        removeMember.run(id, Number(body.gh_id));
+        return json(res, 200, { ok: true });
+      }
+    }
+
+    // Модерация рейтинга: наставник удаляет подозрительный результат ученика.
+    const rm = path.match(/^\/mentor\/results\/(\d+)\/([A-Za-z0-9_-]+)$/);
+    if (rm && req.method === 'DELETE') {
+      const guard = mentorGuard();
+      if (guard.err) return json(res, guard.err[0], { error: guard.err[1] });
+      deleteResult.run(Number(rm[1]), rm[2]);
+      return json(res, 200, { ok: true });
     }
 
     return json(res, 404, { error: 'not found' });

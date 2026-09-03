@@ -209,13 +209,87 @@ export async function fetchBoard(module = 'overall'): Promise<Board | null> {
   }
 }
 
-export async function fetchMentorStudents(): Promise<MentorStudent[] | null> {
+export async function fetchMentorStudents(groupId?: number): Promise<MentorStudent[] | null> {
   if (!getToken()) return null;
   try {
-    const r = await api('/mentor/students');
+    const q = groupId ? `?group=${groupId}` : '';
+    const r = await api(`/mentor/students${q}`);
     if (!r.ok) return null;
     const data = await r.json();
     return (data.students as MentorStudent[]) ?? [];
+  } catch {
+    return null;
+  }
+}
+
+// --- Группы (потоки/классы) ---
+export type MentorGroup = { id: number; name: string; code: string; members: number };
+
+export async function listGroups(): Promise<MentorGroup[]> {
+  try {
+    const r = await api('/mentor/groups');
+    if (!r.ok) return [];
+    return ((await r.json()).groups as MentorGroup[]) ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function createGroup(name: string): Promise<MentorGroup | null> {
+  try {
+    const r = await api('/mentor/groups', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    return r.ok ? ((await r.json()) as MentorGroup) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function deleteGroup(id: number): Promise<boolean> {
+  try {
+    return (await api(`/mentor/groups/${id}`, { method: 'DELETE' })).ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function removeStudent(groupId: number, ghId: number): Promise<boolean> {
+  try {
+    return (
+      await api(`/mentor/groups/${groupId}/remove`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gh_id: ghId }),
+      })
+    ).ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Модерация: удалить подозрительный результат ученика из рейтинга. */
+export async function deleteResult(ghId: number, module: string): Promise<boolean> {
+  try {
+    return (await api(`/mentor/results/${ghId}/${encodeURIComponent(module)}`, { method: 'DELETE' })).ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Ученик присоединяется к группе по коду. Возвращает имя группы или null. */
+export async function joinGroup(code: string): Promise<{ id: number; name: string } | null> {
+  if (!getToken()) return null;
+  try {
+    const r = await api('/groups/join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+    });
+    if (!r.ok) return null;
+    return (await r.json()).group ?? null;
   } catch {
     return null;
   }

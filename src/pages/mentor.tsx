@@ -4,8 +4,54 @@ import Link from '@docusaurus/Link';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import knowledgeMap from '../data/knowledge-map.json';
 import { levelForXp } from '../lib/levels';
-import { fetchMentorStudents, fetchProfile, isLoggedIn, login, type MentorStudent } from '../lib/account';
+import {
+  createGroup,
+  deleteGroup,
+  fetchMentorStudents,
+  fetchProfile,
+  isLoggedIn,
+  listGroups,
+  login,
+  removeStudent,
+  type MentorGroup,
+  type MentorStudent,
+} from '../lib/account';
 import '../components/trainers.css';
+
+// Выгрузка группы в CSV — открывается в Excel/Google Sheets.
+function downloadCsv(students: MentorStudent[], groupName: string): void {
+  const head = ['Логин', 'Имя', 'XP', 'Главы', 'Секции', 'Квизы', 'Экзамены', 'Симулятор', 'Активность'];
+  const esc = (v: string | number) => {
+    const s = String(v ?? '');
+    return /[",;\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const rows = students.map((s) =>
+    [
+      s.login,
+      s.name || s.login,
+      s.xp,
+      s.chaptersStarted,
+      s.sectionsRead,
+      s.quizzesDone,
+      s.examsDone,
+      s.bestScore ?? '',
+      s.updatedAt ? new Date(s.updatedAt).toISOString().slice(0, 10) : '',
+    ]
+      .map(esc)
+      .join(';'),
+  );
+  // BOM — чтобы Excel открыл кириллицу в UTF-8 без «кракозябр».
+  const csv = '﻿' + [head.join(';'), ...rows].join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${groupName || 'группа'}-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
 type Chapter = { id: string; title: string; path: string };
 const CHAPTERS = (knowledgeMap as Chapter[]).map((c) => ({
@@ -37,33 +83,70 @@ function Dashboard() {
   const [students, setStudents] = useState<MentorStudent[] | null>(null);
   const [allowed, setAllowed] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
+  const [groups, setGroups] = useState<MentorGroup[]>([]);
+  const [activeGroup, setActiveGroup] = useState<number | 0>(0); // 0 = все
+  const [busy, setBusy] = useState(false);
+
+  const reloadStudents = async (groupId: number) => {
+    const list = await fetchMentorStudents(groupId || undefined);
+    setStudents(list ?? []);
+  };
+  const reloadGroups = async () => setGroups(await listGroups());
 
   useEffect(() => {
     let alive = true;
     (async () => {
       const p = await fetchProfile();
       if (!alive) return;
-      if (!p) {
-        setAllowed(false);
-        setLoading(false);
-        return;
-      }
-      if (!p.mentor) {
+      if (!p || !p.mentor) {
         setAllowed(false);
         setLoading(false);
         return;
       }
       setAllowed(true);
-      const list = await fetchMentorStudents();
-      if (alive) {
-        setStudents(list ?? []);
-        setLoading(false);
-      }
+      await Promise.all([reloadStudents(0), reloadGroups()]);
+      if (alive) setLoading(false);
     })();
     return () => {
       alive = false;
     };
   }, []);
+
+  const selectGroup = async (id: number) => {
+    setActiveGroup(id);
+    setStudents(null);
+    await reloadStudents(id);
+  };
+
+  const onCreateGroup = async () => {
+    const name = window.prompt('Название группы (например, «1-А, мобилка»):');
+    if (!name || !name.trim()) return;
+    setBusy(true);
+    const g = await createGroup(name.trim());
+    setBusy(false);
+    if (g) {
+      await reloadGroups();
+      window.alert(`Группа «${g.name}» создана.\nКод для учеников: ${g.code}\n\nПопроси их зайти в Личный кабинет → «Присоединиться к группе» и ввести этот код.`);
+    }
+  };
+
+  const onDeleteGroup = async (g: MentorGroup) => {
+    if (!window.confirm(`Удалить группу «${g.name}»? Прогресс учеников не пострадает, только сама группа.`)) return;
+    setBusy(true);
+    await deleteGroup(g.id);
+    setBusy(false);
+    if (activeGroup === g.id) setActiveGroup(0);
+    await Promise.all([reloadGroups(), reloadStudents(activeGroup === g.id ? 0 : activeGroup)]);
+  };
+
+  const onRemoveStudent = async (s: MentorStudent) => {
+    if (!activeGroup) return;
+    if (!window.confirm(`Убрать ${s.name || s.login} из группы? Аккаунт и прогресс ученика останутся.`)) return;
+    setBusy(true);
+    await removeStudent(activeGroup, s.gh_id);
+    setBusy(false);
+    await reloadStudents(activeGroup);
+  };
 
   if (loading) return <p className="ac-muted">Загрузка…</p>;
 
@@ -81,22 +164,89 @@ function Dashboard() {
     );
   }
 
-  if (!students || students.length === 0) {
-    return (
-      <div className="ac-card">
-        <p>Пока никто из учеников не вошёл в аккаунт. Как войдут и начнут заниматься — здесь появится их прогресс.</p>
-      </div>
-    );
-  }
-
-  const totSections = students.reduce((a, s) => a + s.sectionsRead, 0);
-  const active = students.filter((s) => Date.now() - s.updatedAt < 7 * 86400000).length;
+  const activeName = activeGroup ? groups.find((g) => g.id === activeGroup)?.name ?? 'группа' : 'Все ученики';
+  const list = students ?? [];
+  const totSections = list.reduce((a, s) => a + s.sectionsRead, 0);
+  const active = list.filter((s) => Date.now() - s.updatedAt < 7 * 86400000).length;
 
   return (
     <div className="mn-wrap">
+      {/* Группы: выбор, создание, код, удаление */}
+      <div className="mn-groups">
+        <button
+          type="button"
+          className={`lb-tab ${activeGroup === 0 ? 'lb-tab-active' : ''}`.trim()}
+          onClick={() => selectGroup(0)}
+        >
+          Все ученики
+        </button>
+        {groups.map((g) => (
+          <span key={g.id} className={`mn-group-chip ${activeGroup === g.id ? 'mn-group-active' : ''}`.trim()}>
+            <button type="button" className="mn-group-name" onClick={() => selectGroup(g.id)}>
+              {g.name} <span className="mn-group-count">{g.members}</span>
+            </button>
+            <button
+              type="button"
+              className="mn-group-code"
+              title="Код для учеников — нажми, чтобы скопировать"
+              onClick={() => {
+                navigator.clipboard?.writeText(g.code).catch(() => {});
+              }}
+            >
+              {g.code} ⧉
+            </button>
+            <button type="button" className="mn-group-del" title="Удалить группу" onClick={() => onDeleteGroup(g)}>
+              ✕
+            </button>
+          </span>
+        ))}
+        <button type="button" className="mn-group-new" onClick={onCreateGroup} disabled={busy}>
+          + Создать группу
+        </button>
+      </div>
+
+      {list.length === 0 ? (
+        <div className="ac-card">
+          <p>
+            {activeGroup
+              ? 'В этой группе пока никого. Дай ученикам код группы — он на плашке выше.'
+              : 'Пока никто из учеников не вошёл в аккаунт. Как войдут и начнут заниматься — здесь появится их прогресс.'}
+          </p>
+        </div>
+      ) : (
+        <RosterView
+          list={list}
+          activeGroup={activeGroup}
+          activeName={activeName}
+          totSections={totSections}
+          active={active}
+          onRemoveStudent={onRemoveStudent}
+        />
+      )}
+    </div>
+  );
+}
+
+function RosterView({
+  list,
+  activeGroup,
+  activeName,
+  totSections,
+  active,
+  onRemoveStudent,
+}: {
+  list: MentorStudent[];
+  activeGroup: number;
+  activeName: string;
+  totSections: number;
+  active: number;
+  onRemoveStudent: (s: MentorStudent) => void;
+}) {
+  return (
+    <div>
       <div className="mn-summary">
         <div className="ac-card ac-stat">
-          <span className="ac-stat-num">{students.length}</span>
+          <span className="ac-stat-num">{list.length}</span>
           <span className="ac-stat-label">учеников</span>
         </div>
         <div className="ac-card ac-stat">
@@ -109,7 +259,12 @@ function Dashboard() {
         </div>
       </div>
 
-      <h2 className="mn-h">Сводка</h2>
+      <div className="mn-h-row">
+        <h2 className="mn-h">Сводка · {activeName}</h2>
+        <button type="button" className="button button--secondary button--sm" onClick={() => downloadCsv(list, activeName)}>
+          ↓ Скачать CSV
+        </button>
+      </div>
       <div className="lb-table-wrap">
         <table className="lb-table mn-table">
           <thead>
@@ -122,10 +277,11 @@ function Dashboard() {
               <th scope="col">Экз.</th>
               <th scope="col">Симул.</th>
               <th scope="col">Активность</th>
+              {activeGroup > 0 && <th scope="col" aria-label="Действия"></th>}
             </tr>
           </thead>
           <tbody>
-            {students.map((s) => {
+            {list.map((s) => {
               const lvl = levelForXp(s.xp);
               const stale = Date.now() - s.updatedAt > 14 * 86400000;
               return (
@@ -151,6 +307,18 @@ function Dashboard() {
                   <td className="lb-secondary">{s.examsDone}</td>
                   <td className="lb-secondary">{s.bestScore ?? '—'}</td>
                   <td className="lb-secondary">{ago(s.updatedAt)}</td>
+                  {activeGroup > 0 && (
+                    <td>
+                      <button
+                        type="button"
+                        className="mn-kick"
+                        title="Убрать из группы"
+                        onClick={() => onRemoveStudent(s)}
+                      >
+                        ✕
+                      </button>
+                    </td>
+                  )}
                 </tr>
               );
             })}
@@ -177,7 +345,7 @@ function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {students.map((s) => (
+            {list.map((s) => (
               <tr key={s.gh_id}>
                 <td className="mn-heat-name">{s.name || s.login}</td>
                 {CHAPTERS.map((c) => {

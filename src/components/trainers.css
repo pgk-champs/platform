@@ -8921,3 +8921,23 @@
 .mn-cell { width: 1.9rem; height: 1.9rem; color: var(--ifm-color-emphasis-600); font-variant-numeric: tabular-nums; }
 .mn-cell-on { background: color-mix(in srgb, var(--ifm-color-primary) 22%, transparent); color: var(--ifm-font-color-base); font-weight: 700; }
 .mn-track-mobile { color: var(--ifm-color-primary); }
+
+/* Группы и модерация на дашборде наставника */
+.mn-groups { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 1rem 0 1.5rem; }
+.mn-group-chip { display: inline-flex; align-items: center; gap: 0; border: 1px solid var(--ifm-color-emphasis-300); border-radius: 999px; overflow: hidden; }
+.mn-group-chip.mn-group-active { border-color: var(--ifm-color-primary); box-shadow: 0 0 0 1px var(--ifm-color-primary); }
+.mn-group-name { border: none; background: var(--ifm-background-surface-color); cursor: pointer; padding: 0.4rem 0.7rem; font-weight: 600; color: var(--ifm-font-color-base); }
+.mn-group-count { display: inline-block; margin-left: 0.3rem; background: var(--ifm-color-emphasis-200); border-radius: 999px; padding: 0 0.4rem; font-size: 0.78rem; }
+.mn-group-code { border: none; border-left: 1px solid var(--ifm-color-emphasis-300); background: color-mix(in srgb, var(--ifm-color-primary) 10%, transparent); cursor: pointer; padding: 0.4rem 0.6rem; font-family: var(--ifm-font-family-monospace); font-size: 0.82rem; color: var(--ifm-color-primary); font-weight: 700; }
+.mn-group-del { border: none; border-left: 1px solid var(--ifm-color-emphasis-300); background: var(--ifm-background-surface-color); cursor: pointer; padding: 0.4rem 0.55rem; color: var(--pgk-text-danger); }
+.mn-group-new { border: 1px dashed var(--ifm-color-emphasis-400); border-radius: 999px; background: none; cursor: pointer; padding: 0.4rem 0.9rem; font-weight: 600; color: var(--ifm-color-primary); }
+.mn-group-new:disabled { opacity: 0.5; cursor: default; }
+.mn-h-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; }
+.mn-h-row .mn-h { margin: 0; }
+.button--sm { padding: 0.35rem 0.8rem; font-size: 0.85rem; }
+.mn-kick { border: none; background: none; cursor: pointer; color: var(--pgk-text-danger); font-size: 0.95rem; padding: 0.2rem 0.4rem; border-radius: var(--pgk-radius-sm); }
+.mn-kick:hover { background: color-mix(in srgb, var(--pgk-text-danger) 12%, transparent); }
+/* Присоединение к группе в кабинете */
+.ac-join-form { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+.ac-join-input { flex: 1; min-width: 8rem; padding: 0.5rem 0.7rem; border: 1px solid var(--ifm-color-emphasis-300); border-radius: var(--pgk-radius-sm); background: var(--ifm-background-color); color: var(--ifm-font-color-base); font-family: var(--ifm-font-family-monospace); letter-spacing: 0.15em; text-transform: uppercase; }
+.ac-join-ok { color: var(--pgk-text-success); margin-top: 0.5rem; }

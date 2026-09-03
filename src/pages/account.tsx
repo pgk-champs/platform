@@ -10,12 +10,47 @@ import {
   fetchProfile,
   isLoggedIn,
   isSyncing,
+  joinGroup,
   login,
   logout,
   subscribe,
   sync,
   type MyPlaces,
 } from '../lib/account';
+
+function JoinGroup() {
+  const [code, setCode] = useState('');
+  const [state, setState] = useState<{ kind: 'idle' | 'joined' | 'error'; name?: string }>({ kind: 'idle' });
+  return (
+    <div className="ac-card ac-join">
+      <strong>Присоединиться к группе</strong>
+      <p className="ac-muted">Наставник дал код группы? Введи его, чтобы попасть в его список.</p>
+      <form
+        className="ac-join-form"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const g = await joinGroup(code.trim().toUpperCase());
+          setState(g ? { kind: 'joined', name: g.name } : { kind: 'error' });
+          if (g) setCode('');
+        }}
+      >
+        <input
+          className="ac-join-input"
+          value={code}
+          onChange={(e) => setCode(e.target.value.toUpperCase())}
+          placeholder="Код группы"
+          maxLength={8}
+          aria-label="Код группы"
+        />
+        <button type="submit" className="button button--secondary" disabled={!code.trim()}>
+          Войти в группу
+        </button>
+      </form>
+      {state.kind === 'joined' && <p className="ac-join-ok">Готово — ты в группе «{state.name}».</p>}
+      {state.kind === 'error' && <p className="sim-submit-err">Код не подошёл. Проверь у наставника.</p>}
+    </div>
+  );
+}
 import '../components/trainers.css';
 
 type Profile = { id: number; login: string; name: string; avatar: string };
@@ -177,6 +212,8 @@ function Cabinet() {
           Синхронизировать сейчас
         </button>
       </div>
+
+      <JoinGroup />
 
       <button type="button" className="ac-logout" onClick={logout}>
         Выйти из аккаунта
