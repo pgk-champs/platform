@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { fetchApprovedCommunity } from '../lib/account';
 import Link from '@docusaurus/Link';
 import { decodePreset, encodePreset, ENGINE_LABELS, type SharedPreset } from './GymBuilder';
 import { chapterHref, chapterTitle } from './chapterLabels';
@@ -74,11 +75,20 @@ export default function CommunityCatalog() {
   const [author, setAuthor] = useState(ALL);
 
   // Fetch только на клиенте: useEffect не выполняется при SSR-сборке.
+  // Каталог = статичный community.json (сид) + одобренные наставником материалы
+  // с сервера. Сервер может быть недоступен — тогда показываем только статику.
   useEffect(() => {
     let alive = true;
+    // Статичный community.json — базовый источник: если он не открылся, это
+    // реальная ошибка. Одобренные серверные материалы добавляются сверху и
+    // берутся best-effort — их недоступность не роняет каталог.
     fetch(COMMUNITY_JSON_URL)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((json) => alive && setState({ phase: 'ready', items: parseItems(json) }))
+      .then(async (staticJson) => {
+        const server = await fetchApprovedCommunity().catch(() => []);
+        if (!alive) return;
+        setState({ phase: 'ready', items: [...parseItems(server), ...parseItems(staticJson)] });
+      })
       .catch(() => alive && setState({ phase: 'error' }));
     return () => {
       alive = false;

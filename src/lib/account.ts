@@ -17,7 +17,7 @@ function apiBase(): string {
 }
 
 const TOKEN_KEY = 'pgk-account-token';
-export type Profile = { id: number; login: string; name: string; avatar: string; mentor?: boolean };
+export type Profile = { id: number; login: string; name: string; avatar: string; mentor?: boolean; root?: boolean };
 
 export type MentorStudent = {
   gh_id: number;
@@ -274,6 +274,106 @@ export async function removeStudent(groupId: number, ghId: number): Promise<bool
 export async function deleteResult(ghId: number, module: string): Promise<boolean> {
   try {
     return (await api(`/mentor/results/${ghId}/${encodeURIComponent(module)}`, { method: 'DELETE' })).ok;
+  } catch {
+    return false;
+  }
+}
+
+// --- Каталог сообщества с модерацией ---
+export type CommunitySubmission = { type: string; title: string; chapterId?: string; data: unknown };
+export type PendingItem = {
+  id: number;
+  type: string;
+  title: string;
+  author: string;
+  chapterId?: string;
+  data: unknown;
+  status: string;
+  addedAt: string;
+};
+
+/** Одобренные материалы с сервера (ложатся в каталог поверх статичных). */
+export async function fetchApprovedCommunity(): Promise<unknown[]> {
+  try {
+    const r = await api('/community');
+    if (!r.ok) return [];
+    return ((await r.json()).items as unknown[]) ?? [];
+  } catch {
+    return [];
+  }
+}
+
+/** Ученик присылает материал на модерацию. */
+export async function submitCommunity(item: CommunitySubmission): Promise<{ ok: boolean; error?: string }> {
+  if (!getToken()) return { ok: false, error: 'нужен вход' };
+  try {
+    const r = await api('/community', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item),
+    });
+    if (r.ok) return { ok: true };
+    const d = await r.json().catch(() => ({}));
+    return { ok: false, error: (d as { error?: string }).error || 'не отправилось' };
+  } catch {
+    return { ok: false, error: 'сеть недоступна' };
+  }
+}
+
+export async function fetchPendingCommunity(status = 'pending'): Promise<PendingItem[]> {
+  try {
+    const r = await api(`/mentor/community?status=${status}`);
+    if (!r.ok) return [];
+    return ((await r.json()).items as PendingItem[]) ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function reviewCommunity(id: number, action: 'approve' | 'reject'): Promise<boolean> {
+  try {
+    return (
+      await api(`/mentor/community/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      })
+    ).ok;
+  } catch {
+    return false;
+  }
+}
+
+// --- Со-наставники ---
+export type MentorEntry = { login: string; root: boolean; addedBy?: string };
+
+export async function listMentors(): Promise<MentorEntry[]> {
+  try {
+    const r = await api('/mentor/mentors');
+    if (!r.ok) return [];
+    return ((await r.json()).mentors as MentorEntry[]) ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function addMentor(login: string): Promise<boolean> {
+  try {
+    return (
+      await api('/mentor/mentors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ login }),
+      })
+    ).ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function removeMentor(login: string): Promise<boolean> {
+  try {
+    return (await api(`/mentor/mentors/${encodeURIComponent(login)}`, { method: 'DELETE' })).ok;
   } catch {
     return false;
   }

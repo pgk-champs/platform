@@ -28,7 +28,9 @@ const MENTORS = (process.env.MENTORS || '')
   .split(',')
   .map((s) => s.trim().toLowerCase())
   .filter(Boolean);
-const isMentor = (u) => !!u && MENTORS.includes(String(u.login).toLowerCase());
+const isRootMentor = (u) => !!u && MENTORS.includes(String(u.login).toLowerCase());
+// Наставник = корневой из env ИЛИ добавленный со-наставник из таблицы mentors.
+const isMentor = (u) => isRootMentor(u) || (!!u && !!mentorRow.get(String(u.login).toLowerCase()));
 
 if (!SESSION_SECRET) {
   console.error('SESSION_SECRET обязателен'); // подпись токенов без него небезопасна
@@ -110,6 +112,44 @@ const memberIds = db.prepare('SELECT gh_id FROM group_members WHERE group_id = ?
 const myGroups = db.prepare(`SELECT g.id, g.name FROM groups g
   JOIN group_members m ON m.group_id = g.id WHERE m.gh_id = ?`);
 const deleteResult = db.prepare('DELETE FROM results WHERE gh_id = ? AND module = ?');
+
+// Со-наставники: роль наставника поверх env-списка. Env-логины — «корневые»
+// (их нельзя снять из UI), добавленные живут здесь.
+db.exec(`CREATE TABLE IF NOT EXISTS mentors (
+  login TEXT PRIMARY KEY, added_by TEXT, added_at INTEGER
+)`);
+const mentorRow = db.prepare('SELECT login FROM mentors WHERE login = ?');
+const allMentorRows = db.prepare('SELECT login, added_by, added_at FROM mentors ORDER BY added_at');
+const addMentor = db.prepare('INSERT OR IGNORE INTO mentors (login, added_by, added_at) VALUES (?, ?, ?)');
+const removeMentorRow = db.prepare('DELETE FROM mentors WHERE login = ?');
+
+// Каталог сообщества с модерацией: ученик присылает материал (pending),
+// наставник одобряет/отклоняет. Одобренные отдаются публично и ложатся в
+// каталог поверх статичного community.json.
+db.exec(`CREATE TABLE IF NOT EXISTS community (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  type TEXT NOT NULL,
+  chapter_id TEXT,
+  title TEXT NOT NULL,
+  data TEXT NOT NULL,
+  author_gh_id INTEGER NOT NULL,
+  author_login TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending',
+  created_at INTEGER NOT NULL,
+  reviewed_by TEXT,
+  reviewed_at INTEGER
+)`);
+const insertCommunity = db.prepare(`INSERT INTO community
+  (type, chapter_id, title, data, author_gh_id, author_login, status, created_at)
+  VALUES (@type, @chapter_id, @title, @data, @author_gh_id, @author_login, 'pending', @created_at)`);
+const approvedCommunity = db.prepare(`SELECT id, type, chapter_id, title, data, author_login, created_at
+  FROM community WHERE status = 'approved' ORDER BY created_at DESC`);
+const communityByStatus = db.prepare(`SELECT id, type, chapter_id, title, data, author_login, status, created_at
+  FROM community WHERE status = ? ORDER BY created_at DESC LIMIT 500`);
+const setCommunityStatus = db.prepare('UPDATE community SET status = ?, reviewed_by = ?, reviewed_at = ? WHERE id = ?');
+const pendingCountForUser = db.prepare("SELECT COUNT(*) AS n FROM community WHERE author_gh_id = ? AND status = 'pending'");
+
+const COMMUNITY_TYPES = new Set(['preset', 'repo', 'link', 'video', 'source']);
 
 // Код присоединения: 6 символов без похожих (0/O, 1/I) — диктовать голосом легко.
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -282,7 +322,7 @@ const server = http.createServer(async (req, res) => {
       if (!s) return json(res, 401, { error: 'unauthorized' });
       const u = getUser.get(s.id);
       if (!u) return json(res, 401, { error: 'unauthorized' });
-      return json(res, 200, { id: u.gh_id, login: u.login, name: u.name, avatar: u.avatar, mentor: isMentor(u) });
+      return json(res, 200, { id: u.gh_id, login: u.login, name: u.name, avatar: u.avatar, mentor: isMentor(u), root: isRootMentor(u) });
     }
 
     if (path === '/progress' && req.method === 'GET') {
@@ -517,12 +557,148 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, { ok: true });
     }
 
+    // --- Каталог сообщества с модерацией ---
+    // Публичная выдача одобренного (каталог ложит поверх статичного community.json).
+    if (path === '/community' && req.method === 'GET') {
+      const items = approvedCommunity.all().map((r) => ({
+        id: `srv-${r.id}`,
+        type: r.type,
+        title: r.title,
+        author: r.author_login,
+        chapterId: r.chapter_id || undefined,
+        data: safeParse(r.data),
+        addedAt: new Date(r.created_at).toISOString().slice(0, 10),
+      }));
+      return json(res, 200, { items });
+    }
+
+    // Ученик присылает материал на модерацию.
+    if (path === '/community' && req.method === 'POST') {
+      const s = bearer(req);
+      if (!s) return json(res, 401, { error: 'unauthorized' });
+      const u = getUser.get(s.id);
+      if (!u) return json(res, 401, { error: 'unauthorized' });
+      if (pendingCountForUser.get(s.id).n >= 20) {
+        return json(res, 429, { error: 'слишком много материалов на модерации, дождись проверки' });
+      }
+      let body;
+      try {
+        body = JSON.parse(await readBody(req, 20_000));
+      } catch {
+        return json(res, 400, { error: 'bad json' });
+      }
+      const type = String(body.type || '');
+      const title = String(body.title || '').trim().slice(0, 200);
+      const chapterId = String(body.chapterId || '').trim().slice(0, 64);
+      if (!COMMUNITY_TYPES.has(type) || !title) return json(res, 400, { error: 'нужны тип и название' });
+      // url-типы принимают только https-ссылку; пресет — объект. Чужой код не
+      // исполняется: фронт рендерит только данные для своих движков и https.
+      let data = body.data;
+      if (type === 'preset') {
+        if (!data || typeof data !== 'object' || Array.isArray(data)) return json(res, 400, { error: 'пресет должен быть объектом' });
+      } else {
+        if (typeof data !== 'string' || !/^https:\/\//.test(data) || data.length > 500) {
+          return json(res, 400, { error: 'нужна https-ссылка' });
+        }
+      }
+      insertCommunity.run({
+        type,
+        chapter_id: chapterId || null,
+        title,
+        data: JSON.stringify(data),
+        author_gh_id: s.id,
+        author_login: u.login,
+        created_at: Date.now(),
+      });
+      return json(res, 200, { ok: true });
+    }
+
+    // Очередь модерации (наставник).
+    if (path === '/mentor/community' && req.method === 'GET') {
+      const g = mentorGuard();
+      if (g.err) return json(res, g.err[0], { error: g.err[1] });
+      const status = url.searchParams.get('status') || 'pending';
+      const items = communityByStatus.all(status).map((r) => ({
+        id: r.id,
+        type: r.type,
+        title: r.title,
+        author: r.author_login,
+        chapterId: r.chapter_id || undefined,
+        data: safeParse(r.data),
+        status: r.status,
+        addedAt: new Date(r.created_at).toISOString().slice(0, 10),
+      }));
+      return json(res, 200, { items });
+    }
+
+    // Одобрить/отклонить материал (наставник).
+    const cm = path.match(/^\/mentor\/community\/(\d+)$/);
+    if (cm && req.method === 'POST') {
+      const g = mentorGuard();
+      if (g.err) return json(res, g.err[0], { error: g.err[1] });
+      let body;
+      try {
+        body = JSON.parse(await readBody(req, 1000));
+      } catch {
+        return json(res, 400, { error: 'bad json' });
+      }
+      const action = body.action === 'approve' ? 'approved' : body.action === 'reject' ? 'rejected' : null;
+      if (!action) return json(res, 400, { error: 'action: approve|reject' });
+      setCommunityStatus.run(action, g.u.login, Date.now(), Number(cm[1]));
+      return json(res, 200, { ok: true, status: action });
+    }
+
+    // --- Со-наставники ---
+    if (path === '/mentor/mentors' && req.method === 'GET') {
+      const g = mentorGuard();
+      if (g.err) return json(res, g.err[0], { error: g.err[1] });
+      const roots = MENTORS.map((login) => ({ login, root: true }));
+      const added = allMentorRows.all().map((r) => ({ login: r.login, root: false, addedBy: r.added_by }));
+      return json(res, 200, { mentors: [...roots, ...added] });
+    }
+
+    if (path === '/mentor/mentors' && req.method === 'POST') {
+      const g = mentorGuard();
+      if (g.err) return json(res, g.err[0], { error: g.err[1] });
+      let body;
+      try {
+        body = JSON.parse(await readBody(req, 1000));
+      } catch {
+        return json(res, 400, { error: 'bad json' });
+      }
+      const login = String(body.login || '').trim().toLowerCase().replace(/^@/, '');
+      if (!/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i.test(login)) return json(res, 400, { error: 'нужен GitHub-логин' });
+      if (MENTORS.includes(login)) return json(res, 200, { ok: true, already: true });
+      addMentor.run(login, g.u.login, Date.now());
+      return json(res, 200, { ok: true });
+    }
+
+    const mmDel = path.match(/^\/mentor\/mentors\/([A-Za-z\d-]+)$/);
+    if (mmDel && req.method === 'DELETE') {
+      const g = mentorGuard();
+      if (g.err) return json(res, g.err[0], { error: g.err[1] });
+      // Корневых (env) снимать нельзя — только через настройку сервера.
+      if (!isRootMentor(g.u)) return json(res, 403, { error: 'снять со-наставника может только главный наставник' });
+      const login = mmDel[1].toLowerCase();
+      if (MENTORS.includes(login)) return json(res, 400, { error: 'корневого наставника нельзя снять здесь' });
+      removeMentorRow.run(login);
+      return json(res, 200, { ok: true });
+    }
+
     return json(res, 404, { error: 'not found' });
   } catch (e) {
     console.error(path, e.message);
     return json(res, 500, { error: 'server error' });
   }
 });
+
+function safeParse(s) {
+  try {
+    return JSON.parse(s);
+  } catch {
+    return null;
+  }
+}
 
 function hash(str) {
   let h = 0;

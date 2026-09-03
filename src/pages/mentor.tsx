@@ -5,16 +5,23 @@ import BrowserOnly from '@docusaurus/BrowserOnly';
 import knowledgeMap from '../data/knowledge-map.json';
 import { levelForXp } from '../lib/levels';
 import {
+  addMentor,
   createGroup,
   deleteGroup,
   fetchMentorStudents,
+  fetchPendingCommunity,
   fetchProfile,
   isLoggedIn,
   listGroups,
+  listMentors,
   login,
+  removeMentor,
   removeStudent,
+  reviewCommunity,
+  type MentorEntry,
   type MentorGroup,
   type MentorStudent,
+  type PendingItem,
 } from '../lib/account';
 import '../components/trainers.css';
 
@@ -86,6 +93,7 @@ function Dashboard() {
   const [groups, setGroups] = useState<MentorGroup[]>([]);
   const [activeGroup, setActiveGroup] = useState<number | 0>(0); // 0 = все
   const [busy, setBusy] = useState(false);
+  const [isRoot, setIsRoot] = useState(false);
 
   const reloadStudents = async (groupId: number) => {
     const list = await fetchMentorStudents(groupId || undefined);
@@ -104,6 +112,7 @@ function Dashboard() {
         return;
       }
       setAllowed(true);
+      setIsRoot(!!p.root);
       await Promise.all([reloadStudents(0), reloadGroups()]);
       if (alive) setLoading(false);
     })();
@@ -223,7 +232,127 @@ function Dashboard() {
           onRemoveStudent={onRemoveStudent}
         />
       )}
+
+      <ModerationQueue />
+      <MentorsPanel canRemove={isRoot} />
     </div>
+  );
+}
+
+// Очередь модерации присланных материалов.
+function ModerationQueue() {
+  const [items, setItems] = useState<PendingItem[] | null>(null);
+  const reload = () => fetchPendingCommunity('pending').then(setItems);
+  useEffect(() => {
+    reload();
+  }, []);
+  const act = async (id: number, action: 'approve' | 'reject') => {
+    await reviewCommunity(id, action);
+    reload();
+  };
+  if (!items) return null;
+  return (
+    <section className="mn-section">
+      <h2 className="mn-h">Материалы на проверку {items.length > 0 && <span className="mn-badge">{items.length}</span>}</h2>
+      {items.length === 0 ? (
+        <p className="ac-muted">Новых материалов нет. Присланное учениками появляется здесь.</p>
+      ) : (
+        <div className="mn-queue">
+          {items.map((it) => {
+            const url = typeof it.data === 'string' ? it.data : null;
+            return (
+              <div key={it.id} className="ac-card mn-qcard">
+                <div className="mn-qmain">
+                  <span className="mn-qtype">{it.type}</span>
+                  <strong className="mn-qtitle">{it.title}</strong>
+                  {url && (
+                    <a href={url} target="_blank" rel="noopener noreferrer nofollow" className="mn-qurl">
+                      {url}
+                    </a>
+                  )}
+                  <span className="ac-muted mn-qmeta">
+                    от @{it.author}
+                    {it.chapterId ? ` · глава: ${it.chapterId}` : ''}
+                  </span>
+                </div>
+                <div className="mn-qactions">
+                  <button type="button" className="button button--primary button--sm" onClick={() => act(it.id, 'approve')}>
+                    Одобрить
+                  </button>
+                  <button type="button" className="mn-reject" onClick={() => act(it.id, 'reject')}>
+                    Отклонить
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
+// Со-наставники: добавить/снять преподавателей.
+function MentorsPanel({ canRemove }: { canRemove: boolean }) {
+  const [mentors, setMentors] = useState<MentorEntry[] | null>(null);
+  const [login, setLoginValue] = useState('');
+  const reload = () => listMentors().then(setMentors);
+  useEffect(() => {
+    reload();
+  }, []);
+  if (!mentors) return null;
+  return (
+    <section className="mn-section">
+      <h2 className="mn-h">Со-наставники</h2>
+      <p className="ac-muted">Добавь преподавателя по GitHub-логину — он получит доступ к этому дашборду.</p>
+      <div className="mn-mentors">
+        {mentors.map((m) => (
+          <span key={m.login} className="mn-mentor-chip">
+            @{m.login}
+            {m.root ? (
+              <span className="mn-mentor-root" title="Главный наставник (в настройках сервера)">
+                ★
+              </span>
+            ) : canRemove ? (
+              <button
+                type="button"
+                className="mn-mentor-del"
+                title="Снять со-наставника"
+                onClick={async () => {
+                  if (window.confirm(`Снять @${m.login} с наставников?`)) {
+                    await removeMentor(m.login);
+                    reload();
+                  }
+                }}
+              >
+                ✕
+              </button>
+            ) : null}
+          </span>
+        ))}
+      </div>
+      <form
+        className="mn-mentor-add"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          if (!login.trim()) return;
+          await addMentor(login.trim());
+          setLoginValue('');
+          reload();
+        }}
+      >
+        <input
+          value={login}
+          onChange={(e) => setLoginValue(e.target.value)}
+          placeholder="github-логин"
+          aria-label="GitHub-логин со-наставника"
+          className="ac-join-input mn-mentor-input"
+        />
+        <button type="submit" className="button button--secondary" disabled={!login.trim()}>
+          Добавить
+        </button>
+      </form>
+    </section>
   );
 }
 
