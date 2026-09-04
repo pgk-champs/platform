@@ -326,6 +326,58 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="84" y="98" fontSize="12" fontWeight={800} fill={DARK} fontFamily={MONO}>useState</text>
     </g>
   ),
+  /* строка кода, разобранная на кусочки, и точка между ними — арт «code-basics» */
+  'code-basics': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="52" width="52" height="30" rx="9" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <text x="40" y="72" textAnchor="middle" fontSize="12" fontWeight={800} fill="#fff" fontFamily={MONO}>val</text>
+      <rect x="78" y="52" width="60" height="30" rx="9" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <text x="108" y="72" textAnchor="middle" fontSize="12" fontWeight={800} fill="#fff" fontFamily={MONO}>name</text>
+      <circle cx="154" cy="67" r="9" fill={ACCENT} />
+      <rect x="14" y="104" width="124" height="30" rx="9" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <text x="76" y="124" textAnchor="middle" fontSize="12" fontWeight={800} fill="#fff" fontFamily={MONO}>length</text>
+      <path d="M154 78v20" stroke={ACCENT} strokeWidth={4} />
+      <path d="M148 98l6 8 6-8" fill={ACCENT} />
+    </g>
+  ),
+  /* класс-форма и три отлитых по ней объекта — арт «oop-basics» */
+  'oop-basics': () => (
+    <g strokeLinecap="round">
+      <rect x="16" y="46" width="66" height="82" rx="12" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <path d="M28 68h42M28 86h34M28 104h38" stroke="rgba(255,255,255,0.45)" strokeWidth={6} />
+      {[46, 82, 118].map((y) => (
+        <circle key={y} cx="150" cy={y} r="18" fill={ACCENT} />
+      ))}
+      {[46, 82, 118].map((y) => (
+        <path key={y} d={`M86 87C112 87 116 ${y} 130 ${y}`} stroke="rgba(255,255,255,0.4)" strokeWidth={4} fill="none" />
+      ))}
+    </g>
+  ),
+  /* две подписи на одном байткоде: Java длиннее, Kotlin короче — арт «kotlin-vs-java» */
+  'kotlin-vs-java': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="34" width="80" height="46" rx="12" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <text x="54" y="62" textAnchor="middle" fontSize="13" fontWeight={800} fill="#fff" fontFamily={MONO}>Java</text>
+      <rect x="106" y="34" width="80" height="46" rx="12" fill={ACCENT} />
+      <text x="146" y="62" textAnchor="middle" fontSize="13" fontWeight={800} fill={DARK} fontFamily={MONO}>Kotlin</text>
+      <path d="M54 84v14h92V84" stroke="rgba(255,255,255,0.45)" strokeWidth={4} fill="none" />
+      <path d="M100 98v12" stroke="rgba(255,255,255,0.45)" strokeWidth={4} />
+      <rect x="34" y="114" width="132" height="34" rx="10" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <text x="100" y="136" textAnchor="middle" fontSize="12" fontWeight={800} fill="#fff" fontFamily={MONO}>JVM</text>
+    </g>
+  ),
+  /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
+  'ts-vs-js': () => (
+    <g strokeLinecap="round">
+      <rect x="12" y="52" width="70" height="64" rx="12" fill={ACCENT} />
+      <text x="47" y="80" textAnchor="middle" fontSize="14" fontWeight={800} fill={DARK} fontFamily={MONO}>TS</text>
+      <text x="47" y="100" textAnchor="middle" fontSize="10" fontWeight={700} fill={DARK} fontFamily={MONO}>: string</text>
+      <path d="M92 84h30" stroke="rgba(255,255,255,0.5)" strokeWidth={5} />
+      <path d="M116 76l10 8-10 8" fill="rgba(255,255,255,0.5)" />
+      <rect x="132" y="52" width="56" height="64" rx="12" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <text x="160" y="90" textAnchor="middle" fontSize="14" fontWeight={800} fill="#fff" fontFamily={MONO}>JS</text>
+    </g>
+  ),
 };
 
 const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
@@ -338,7 +390,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'git-first-commit': { track: 'foundation', num: '06', title: 'Git: первый коммит' },
   'git-branches': { track: 'foundation', num: '07', title: 'Git: ветки и merge' },
   'git-remote': { track: 'foundation', num: '08', title: 'Git: push, PR и командная работа' },
-  'foundation-final': { track: 'foundation', num: '08', title: 'Финал Фундамента: английский, git, SSH, система, клавиатура' },
+  'foundation-final': { track: 'foundation', num: '10', title: 'Финал Фундамента: английский, git, SSH, система, клавиатура' },
   'android-studio': { track: 'mobile', num: '00', title: 'Android Studio: знакомство с IDE' },
   'kotlin-vars': { track: 'mobile', num: '01', title: 'Переменные и типы' },
   'functions-lambdas': { track: 'mobile', num: '02', title: 'Функции и лямбды' },
@@ -350,6 +402,10 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'what-is-blockchain': { track: 'blockchain', num: '01', title: 'Что такое блокчейн' },
   'waves-first-network': { track: 'blockchain', num: '02', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '03', title: 'Редактор кода: VS Code и WebStorm' },
+  'code-basics': { track: 'foundation', num: '08', title: 'Из чего состоит код' },
+  'oop-basics': { track: 'foundation', num: '09', title: 'ООП простыми словами — на двух языках' },
+  'kotlin-vs-java': { track: 'mobile', num: '08', title: 'Kotlin и Java: в чём разница' },
+  'ts-vs-js': { track: 'blockchain', num: '04', title: 'TypeScript и JavaScript: в чём разница' },
   'grep-regex': { track: 'advanced', num: '01', title: 'Регулярные выражения для grep' },
   'ssh-keys-deep': { track: 'advanced', num: '02', title: 'SSH-ключи глубоко' },
   'git-rebase': { track: 'advanced', num: '03', title: 'Rebase мастерски' },

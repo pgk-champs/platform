@@ -11,6 +11,10 @@ import { ciSchemes } from './figures/ci';
 import { reviewSchemes } from './figures/review';
 import { finalSchemes } from './figures/final';
 import { editorSchemes } from './figures/editor';
+import { codeBasicsSchemes } from './figures/codeBasics';
+import { oopSchemes } from './figures/oop';
+import { kotlinJavaSchemes } from './figures/kotlinJava';
+import { tsJsSchemes } from './figures/tsJs';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -28,6 +32,10 @@ const SCHEMES = {
   ...reviewSchemes,
   ...finalSchemes,
   ...editorSchemes,
+  ...codeBasicsSchemes,
+  ...oopSchemes,
+  ...kotlinJavaSchemes,
+  ...tsJsSchemes,
 };
 
 export const SCHEME_IDS = Object.keys(SCHEMES);

@@ -11,6 +11,10 @@ import { ciSchemes } from './figures/ci';
 import { reviewSchemes } from './figures/review';
 import { finalSchemes } from './figures/final';
 import { editorSchemes } from './figures/editor';
+import { codeBasicsSchemes } from './figures/codeBasics';
+import { oopSchemes } from './figures/oop';
+import { kotlinJavaSchemes } from './figures/kotlinJava';
+import { tsJsSchemes } from './figures/tsJs';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -56,6 +60,10 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(reviewSchemes),
     ...Object.keys(finalSchemes),
     ...Object.keys(editorSchemes),
+    ...Object.keys(codeBasicsSchemes),
+    ...Object.keys(oopSchemes),
+    ...Object.keys(kotlinJavaSchemes),
+    ...Object.keys(tsJsSchemes),
   ];
   const duplicates = all.filter((id, i) => all.indexOf(id) !== i);
   expect(duplicates).toEqual([]);

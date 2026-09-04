@@ -120,11 +120,27 @@
     "path": "foundation/git-remote.mdx"
   },
   {
+    "id": "code-basics",
+    "title": "Из чего состоит код",
+    "audience": "все",
+    "level": "база",
+    "order": 8,
+    "path": "foundation/code-basics.mdx"
+  },
+  {
+    "id": "oop-basics",
+    "title": "ООП простыми словами — на двух языках",
+    "audience": "все",
+    "level": "база",
+    "order": 9,
+    "path": "foundation/oop-basics.mdx"
+  },
+  {
     "id": "foundation-final",
     "title": "Финал Фундамента: всё вместе",
     "audience": "все",
     "level": "база",
-    "order": 8,
+    "order": 10,
     "path": "foundation/foundation-final.mdx"
   },
   {
@@ -192,6 +208,14 @@
     "path": "mobile/ui-kit.mdx"
   },
   {
+    "id": "kotlin-vs-java",
+    "title": "Kotlin и Java: в чём разница",
+    "audience": "мобилка",
+    "level": "база",
+    "order": 8,
+    "path": "mobile/kotlin-vs-java.mdx"
+  },
+  {
     "id": "what-is-blockchain",
     "title": "Что такое блокчейн",
     "audience": "блокчейн",
@@ -214,5 +238,13 @@
     "level": "база",
     "order": 3,
     "path": "blockchain/code-editor.mdx"
+  },
+  {
+    "id": "ts-vs-js",
+    "title": "TypeScript и JavaScript: в чём разница",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 4,
+    "path": "blockchain/ts-vs-js.mdx"
   }
 ]
