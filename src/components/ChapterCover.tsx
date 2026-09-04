@@ -378,6 +378,181 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="160" y="90" textAnchor="middle" fontSize="14" fontWeight={800} fill="#fff" fontFamily={MONO}>JS</text>
     </g>
   ),
+  /* два ярлыка, привязанных к одному значению — арт «ts-values» */
+  'ts-values': () => (
+    <g strokeLinecap="round">
+      <circle cx="146" cy="88" r="34" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <text x="146" y="94" textAnchor="middle" fontSize="13" fontWeight={800} fill="#fff" fontFamily={MONO}>42</text>
+      <rect x="14" y="46" width="66" height="28" rx="9" fill={ACCENT} />
+      <text x="47" y="65" textAnchor="middle" fontSize="11" fontWeight={800} fill={DARK} fontFamily={MONO}>sum</text>
+      <rect x="14" y="102" width="66" height="28" rx="9" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <text x="47" y="121" textAnchor="middle" fontSize="11" fontWeight={800} fill="#fff" fontFamily={MONO}>last</text>
+      <path d="M84 60l26 14" stroke={ACCENT} strokeWidth={4} />
+      <path d="M84 116l26-14" stroke="rgba(255,255,255,0.45)" strokeWidth={4} />
+    </g>
+  ),
+  /* ромб-условие и две расходящиеся ветки — арт «ts-flow» */
+  'ts-flow': () => (
+    <g strokeLinecap="round">
+      <path d="M62 46L104 74L62 102L20 74Z" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <text x="62" y="79" textAnchor="middle" fontSize="12" fontWeight={800} fill="#fff" fontFamily={MONO}>if</text>
+      <path d="M104 66h24" stroke={ACCENT} strokeWidth={4} />
+      <rect x="128" y="34" width="58" height="30" rx="9" fill={ACCENT} />
+      <path d="M128 66V49" stroke={ACCENT} strokeWidth={4} />
+      <path d="M104 82h24v22" stroke="rgba(255,255,255,0.45)" strokeWidth={4} fill="none" />
+      <rect x="128" y="104" width="58" height="30" rx="9" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <path d="M62 102v34h-34" stroke="rgba(255,255,255,0.3)" strokeWidth={4} fill="none" strokeDasharray="6 6" />
+    </g>
+  ),
+  /* аргументы внутрь, одно значение обратно — арт «ts-functions» */
+  'ts-functions': () => (
+    <g strokeLinecap="round">
+      <rect x="62" y="48" width="76" height="76" rx="14" fill={ACCENT} />
+      <text x="100" y="93" textAnchor="middle" fontSize="13" fontWeight={800} fill={DARK} fontFamily={MONO}>fn()</text>
+      <path d="M14 66h38" stroke="rgba(255,255,255,0.55)" strokeWidth={5} />
+      <path d="M46 58l10 8-10 8" fill="rgba(255,255,255,0.55)" />
+      <path d="M14 100h38" stroke="rgba(255,255,255,0.55)" strokeWidth={5} />
+      <path d="M46 92l10 8-10 8" fill="rgba(255,255,255,0.55)" />
+      <path d="M148 86h34" stroke={INK} strokeWidth={5} />
+      <path d="M176 78l10 8-10 8" fill={INK} />
+    </g>
+  ),
+  /* три ячейки массива и пары объекта — арт «ts-collections» */
+  'ts-collections': () => (
+    <g strokeLinecap="round">
+      {[14, 74, 134].map((x, i) => (
+        <g key={x}>
+          <rect x={x} y="40" width="52" height="40" rx="10" fill={i === 1 ? ACCENT : SOFT} stroke={i === 1 ? 'none' : INK} strokeWidth={3} />
+          <text x={x + 26} y="66" textAnchor="middle" fontSize="12" fontWeight={800} fill={i === 1 ? DARK : '#fff'} fontFamily={MONO}>{i}</text>
+        </g>
+      ))}
+      <rect x="14" y="96" width="172" height="46" rx="12" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <text x="44" y="124" textAnchor="middle" fontSize="11" fontWeight={800} fill="#fff" fontFamily={MONO}>key</text>
+      <path d="M74 119h22" stroke={ACCENT} strokeWidth={4} />
+      <text x="140" y="124" textAnchor="middle" fontSize="11" fontWeight={800} fill={ACCENT} fontFamily={MONO}>value</text>
+    </g>
+  ),
+  /* чертёж и три изделия по нему — арт «ts-oop» */
+  'ts-oop': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="38" width="66" height="104" rx="12" fill={ACCENT} />
+      <text x="47" y="84" textAnchor="middle" fontSize="12" fontWeight={800} fill={DARK} fontFamily={MONO}>class</text>
+      <path d="M32 100h30M32 114h20" stroke={DARK} strokeWidth={4} />
+      <path d="M88 90h20" stroke={INK} strokeWidth={5} />
+      <path d="M102 82l10 8-10 8" fill={INK} />
+      {[38, 82, 126].map((y) => (
+        <rect key={y} x="120" y={y} width="66" height="34" rx="10" fill={SOFT} stroke={INK} strokeWidth={3} />
+      ))}
+      <path d="M153 72v10M153 116v10" stroke="rgba(255,255,255,0.35)" strokeWidth={4} strokeDasharray="5 5" />
+    </g>
+  ),
+  /* очередь задач втягивается в петлю цикла событий — арт «ts-async» */
+  'ts-async': () => (
+    <g strokeLinecap="round">
+      {[46, 78, 110].map((y, i) => (
+        <rect key={y} x="14" y={y} width={56 - i * 10} height="22" rx="7" fill={i === 0 ? ACCENT : SOFT} stroke={i === 0 ? 'none' : INK} strokeWidth={3} />
+      ))}
+      <path d="M76 57h16M76 89h16M76 121h16" stroke="rgba(255,255,255,0.35)" strokeWidth={3} />
+      <circle cx="140" cy="89" r="40" fill="none" stroke={ACCENT} strokeWidth={4} strokeDasharray="14 9" />
+      <path d="M134 42l16 7-16 7z" fill={ACCENT} />
+      <text x="140" y="95" textAnchor="middle" fontSize="13" fontWeight={800} fill={ACCENT} fontFamily={MONO}>await</text>
+      <text x="100" y="154" textAnchor="middle" fontSize="12" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>event loop</text>
+    </g>
+  ),
+  /* лента лет с двумя отметками — арт «ts-history» */
+  'ts-history': () => (
+    <g strokeLinecap="round">
+      <path d="M14 90h172" stroke={INK} strokeWidth={4} />
+      {[
+        { x: 34, h: 30, hot: false },
+        { x: 78, h: 46, hot: false },
+        { x: 122, h: 62, hot: true },
+        { x: 166, h: 38, hot: false },
+      ].map((p) => (
+        <g key={p.x}>
+          <rect x={p.x - 11} y={90 - p.h} width="22" height={p.h} rx="6" fill={p.hot ? ACCENT : SOFT} stroke={p.hot ? 'none' : INK} strokeWidth={3} />
+          <circle cx={p.x} cy="90" r="5" fill={p.hot ? ACCENT : INK} />
+        </g>
+      ))}
+      <text x="122" y="124" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>2015</text>
+    </g>
+  ),
+  /* один вход, веер из трёх веток — арт «kotlin-flow» */
+  'kotlin-flow': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="70" width="72" height="40" rx="12" fill={ACCENT} />
+      <text x="50" y="95" textAnchor="middle" fontSize="13" fontWeight={800} fill={DARK} fontFamily={MONO}>when</text>
+      {[44, 90, 136].map((y) => (
+        <g key={y}>
+          <path d={`M92 90H112V${y + 15}h14`} stroke={y === 90 ? ACCENT : 'rgba(255,255,255,0.4)'} strokeWidth={4} fill="none" />
+          <rect x="126" y={y} width="60" height="30" rx="9" fill={y === 90 ? ACCENT : SOFT} stroke={y === 90 ? 'none' : INK} strokeWidth={3} />
+        </g>
+      ))}
+      <path d="M50 128v18h96" stroke="rgba(255,255,255,0.25)" strokeWidth={4} fill="none" strokeDasharray="6 6" />
+    </g>
+  ),
+  /* запечатанная иерархия: родитель и два наследника — арт «kotlin-oop» */
+  'kotlin-oop': () => (
+    <g strokeLinecap="round">
+      <rect x="58" y="30" width="84" height="38" rx="12" fill={ACCENT} />
+      <text x="100" y="55" textAnchor="middle" fontSize="12" fontWeight={800} fill={DARK} fontFamily={MONO}>sealed</text>
+      <path d="M100 68v20M40 88h120M40 88v18M160 88v18" stroke={INK} strokeWidth={4} fill="none" />
+      <rect x="10" y="106" width="60" height="34" rx="10" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <rect x="130" y="106" width="60" height="34" rx="10" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <rect x="82" y="112" width="36" height="24" rx="7" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth={3} strokeDasharray="5 5" />
+      <text x="100" y="130" textAnchor="middle" fontSize="11" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>?</text>
+    </g>
+  ),
+  /* три эпохи одной платформы, третья — горящая — арт «kotlin-history» */
+  'kotlin-history': () => (
+    <g strokeLinecap="round">
+      {[
+        { x: 14, label: 'Java' },
+        { x: 76, label: 'Andr' },
+        { x: 138, label: 'Kt' },
+      ].map((c, i) => (
+        <g key={c.x}>
+          <rect x={c.x} y={i === 2 ? 40 : 66} width="48" height={i === 2 ? 74 : 48} rx="10" fill={i === 2 ? ACCENT : SOFT} stroke={i === 2 ? 'none' : INK} strokeWidth={3} />
+          <text x={c.x + 24} y={i === 2 ? 84 : 96} textAnchor="middle" fontSize="11" fontWeight={800} fill={i === 2 ? DARK : '#fff'} fontFamily={MONO}>{c.label}</text>
+        </g>
+      ))}
+      <path d="M14 130h172" stroke={INK} strokeWidth={4} />
+      <path d="M62 90h14M124 90h14" stroke="rgba(255,255,255,0.45)" strokeWidth={4} />
+      <text x="162" y="150" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>2017</text>
+    </g>
+  ),
+  /* две дорожки времени: сплошная занятая и прерывистая свободная — арт «kotlin-coroutines» */
+  'kotlin-coroutines': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="44" width="172" height="30" rx="9" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <text x="24" y="64" fontSize="11" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>sleep</text>
+      <rect x="72" y="50" width="108" height="18" rx="6" fill="rgba(255,255,255,0.22)" />
+
+      <rect x="14" y="94" width="172" height="30" rx="9" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="24" y="114" fontSize="11" fontWeight={800} fill={ACCENT} fontFamily={MONO}>delay</text>
+      {[72, 108, 144].map((x) => (
+        <rect key={x} x={x} y="100" width="24" height="18" rx="6" fill={ACCENT} />
+      ))}
+      <path d="M100 109h4M136 109h4" stroke={DARK} strokeWidth={3} />
+      <text x="100" y="150" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>1 поток</text>
+    </g>
+  ),
+  /* полный слот, слот с дыркой и страж между ними — арт «kotlin-null» */
+  'kotlin-null': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="42" width="118" height="32" rx="9" fill={ACCENT} />
+      <text x="73" y="63" textAnchor="middle" fontSize="12" fontWeight={800} fill={DARK} fontFamily={MONO}>String</text>
+
+      <rect x="14" y="92" width="118" height="32" rx="9" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <text x="58" y="113" textAnchor="middle" fontSize="12" fontWeight={800} fill="#fff" fontFamily={MONO}>String?</text>
+      <circle cx="110" cy="108" r="10" fill="none" stroke={ACCENT} strokeWidth={3} strokeDasharray="4 4" />
+
+      <rect x="146" y="58" width="40" height="52" rx="12" fill="none" stroke={ACCENT} strokeWidth={3} />
+      <text x="166" y="91" textAnchor="middle" fontSize="15" fontWeight={800} fill={ACCENT} fontFamily={MONO}>?.</text>
+      <path d="M132 58h14M132 108h14" stroke={INK} strokeWidth={3} />
+      <text x="100" y="150" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>?. ?: !!</text>
+    </g>
+  ),
 };
 
 const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
@@ -393,19 +568,31 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'foundation-final': { track: 'foundation', num: '10', title: 'Финал Фундамента: английский, git, SSH, система, клавиатура' },
   'android-studio': { track: 'mobile', num: '00', title: 'Android Studio: знакомство с IDE' },
   'kotlin-vars': { track: 'mobile', num: '01', title: 'Переменные и типы' },
-  'functions-lambdas': { track: 'mobile', num: '02', title: 'Функции и лямбды' },
-  'classes-collections': { track: 'mobile', num: '03', title: 'Классы и коллекции' },
-  'first-compose-screen': { track: 'mobile', num: '04', title: 'Первый экран Compose' },
-  'state-events': { track: 'mobile', num: '05', title: 'Состояние и события' },
-  'layout-by-mockup': { track: 'mobile', num: '06', title: 'Вёрстка по макету' },
-  'ui-kit': { track: 'mobile', num: '07', title: 'Многомодульность и UI Kit' },
+  'kotlin-flow': { track: 'mobile', num: '02', title: 'Условия и циклы на Kotlin' },
+  'functions-lambdas': { track: 'mobile', num: '03', title: 'Функции и лямбды' },
+  'classes-collections': { track: 'mobile', num: '04', title: 'Классы и коллекции' },
+  'kotlin-oop': { track: 'mobile', num: '05', title: 'ООП на Kotlin: классы, наследование, интерфейсы' },
+  'first-compose-screen': { track: 'mobile', num: '10', title: 'Первый экран Compose' },
+  'state-events': { track: 'mobile', num: '11', title: 'Состояние и события' },
+  'layout-by-mockup': { track: 'mobile', num: '12', title: 'Вёрстка по макету' },
+  'ui-kit': { track: 'mobile', num: '13', title: 'Многомодульность и UI Kit' },
   'what-is-blockchain': { track: 'blockchain', num: '01', title: 'Что такое блокчейн' },
   'waves-first-network': { track: 'blockchain', num: '02', title: 'Первая сеть на Waves Enterprise' },
-  'code-editor': { track: 'blockchain', num: '03', title: 'Редактор кода: VS Code и WebStorm' },
+  'code-editor': { track: 'blockchain', num: '03', title: 'Редактор кода: WebStorm и VS Code' },
   'code-basics': { track: 'foundation', num: '08', title: 'Из чего состоит код' },
   'oop-basics': { track: 'foundation', num: '09', title: 'ООП простыми словами — на двух языках' },
-  'kotlin-vs-java': { track: 'mobile', num: '08', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-vs-java': { track: 'mobile', num: '06', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '07', title: 'История Java, Android и Kotlin' },
+  'kotlin-coroutines': { track: 'mobile', num: '08', title: 'Корутины: как приложение не зависает' },
+  'kotlin-null': { track: 'mobile', num: '09', title: 'Null-безопасность: ошибка на миллиард долларов' },
   'ts-vs-js': { track: 'blockchain', num: '04', title: 'TypeScript и JavaScript: в чём разница' },
+  'ts-values': { track: 'blockchain', num: '05', title: 'Значения и переменные: числа, строки, типы' },
+  'ts-flow': { track: 'blockchain', num: '06', title: 'Условия и циклы: как программа принимает решения' },
+  'ts-functions': { track: 'blockchain', num: '07', title: 'Функции: как код перестаёт повторяться' },
+  'ts-collections': { track: 'blockchain', num: '08', title: 'Массивы и объекты: как хранят много данных сразу' },
+  'ts-oop': { track: 'blockchain', num: '09', title: 'ООП на TypeScript: классы, наследование, интерфейсы' },
+  'ts-history': { track: 'blockchain', num: '10', title: 'История JavaScript и TypeScript' },
+  'ts-async': { track: 'blockchain', num: '11', title: 'Асинхронность: промисы, async/await и цикл событий' },
   'grep-regex': { track: 'advanced', num: '01', title: 'Регулярные выражения для grep' },
   'ssh-keys-deep': { track: 'advanced', num: '02', title: 'SSH-ключи глубоко' },
   'git-rebase': { track: 'advanced', num: '03', title: 'Rebase мастерски' },
@@ -422,6 +609,13 @@ const TRACK_ART: Record<Track, string> = {
   blockchain: 'what-is-blockchain',
   advanced: 'grep-regex',
 };
+
+/* Заголовок на обложке — одна строка без переноса, а места до правого края 744 px.
+ * Самая широкая кириллическая буква даёт около 0.59 от кегля, поэтому длинные
+ * названия уменьшаем ступеньками: иначе строка уезжает за viewBox и обрезается. */
+export function coverFontSize(title: string): number {
+  return title.length >= 56 ? 21 : title.length >= 48 ? 25 : 28;
+}
 
 function Frame({
   id, label, num, title, big, art, aria,
@@ -452,7 +646,7 @@ function Frame({
         {label.toUpperCase()}
       </text>
       <text
-        x="36" y="204" fontSize={big ? 44 : 28} fontWeight={700} fill="#fff"
+        x="36" y="204" fontSize={big ? 44 : coverFontSize(title)} fontWeight={700} fill="#fff"
         style={{ fontFamily: 'var(--ifm-heading-font-family, var(--ifm-font-family-base))' }}
       >
         {title}

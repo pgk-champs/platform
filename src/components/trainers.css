@@ -501,6 +501,10 @@
 .block-title {
   font-weight: var(--ifm-font-weight-bold);
   flex: 1;
+  /* без min-width флекс-элемент не сжимается уже самого длинного слова: заголовок
+   * вида «Разбор: user?.profile?.city» вылезал за блок и обрезался на телефоне */
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .block-fav {

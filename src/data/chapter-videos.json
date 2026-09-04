@@ -795,5 +795,329 @@
       "title": "JavaScript — полный курс для начинающих",
       "channel": "Bogdan Stashchuk"
     }
+  ],
+  "ts-values": [
+    {
+      "videoId": "5V8IeATHr4w",
+      "title": "Переменные в JavaScript. Константы. Ключевые слова let, const, var",
+      "channel": "Фрілансер по життю"
+    },
+    {
+      "videoId": "ZV8fNtV1mOM",
+      "title": "Переменные в JavaScript (var, let, const), строгий режим (use strict). Как называть переменные?",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "a9dM7WQRJ0M",
+      "title": "#2. Уроки по JavaScript для НАЧИНАЮЩИХ (const, let, var, типы данных, typeof)",
+      "channel": "Какие-то уроки [Frontend]"
+    },
+    {
+      "videoId": "lZaJ-GFJz-w",
+      "title": "Уроки JavaScript | Урок №4 | Переменные, константы, типы данных. Var, let, const, hoisting",
+      "channel": "Alex Web"
+    },
+    {
+      "videoId": "JPIJ6DlLzK8",
+      "title": "Переменные в JavaScript | let, const и var | Курс по JavaScript №2",
+      "channel": "(не) AlixHatsu"
+    }
+  ],
+  "ts-flow": [
+    {
+      "videoId": "Ufq640I8d50",
+      "title": "Основы JavaScript | Урок 4: Условия и циклы",
+      "channel": "Glo Academy"
+    },
+    {
+      "videoId": "_WlC6UxMyNE",
+      "title": "Циклы в JavaScript — while, do while и for. Прерывание цикла break. Продолжение цикла continue.",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "jwrPJ55OZ4k",
+      "title": "Циклы FOR, WHILE в JS: полный курс с примерами и задачами",
+      "channel": "Pomazkov JS"
+    },
+    {
+      "videoId": "QjDzp-yM_To",
+      "title": "Циклы FOR и WHILE в JavaScript. Директивы break и continue",
+      "channel": "Фрілансер по життю"
+    },
+    {
+      "videoId": "Z5LAqV4BTNA",
+      "title": "Цикл for в JavaScript. JS для начинающих",
+      "channel": "WebDev с нуля. Канал Алекса Лущенко"
+    }
+  ],
+  "ts-functions": [
+    {
+      "videoId": "nGVYdna4kq4",
+      "title": "Функции в JavaScript на практике: виды функций, стрелочные функции, параметры, аргументы, return",
+      "channel": "Pomazkov JS"
+    },
+    {
+      "videoId": "iWTx3t5pd34",
+      "title": "Стрелочные функции JavaScript",
+      "channel": "WebDev с нуля. Канал Алекса Лущенко"
+    },
+    {
+      "videoId": "zL9Q4WaJIBo",
+      "title": "Замыкания, просто и с примерами. Функции JavaScript",
+      "channel": "WebDev с нуля. Канал Алекса Лущенко"
+    },
+    {
+      "videoId": "L1LA6dwTapQ",
+      "title": "JavaScript. Урок 9. Стрелочные функции",
+      "channel": "Loftschool"
+    },
+    {
+      "videoId": "pn5myCmpV2U",
+      "title": "Функции, стрелочные функции, контексты, замыкания в JavaScript",
+      "channel": "Timur Shemsedinov"
+    }
+  ],
+  "ts-collections": [
+    {
+      "videoId": "SjTTDZX2hIA",
+      "title": "Методы массивов JavaScript — forEach, map, filter, reduce, some, every, sort, includes, indexOf",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "nEabP9CYCAQ",
+      "title": "Урок 12. JavaScript. Методы массивов (forEach, map, filter, reduce, find, findIndex)",
+      "channel": "Владилен Минин"
+    },
+    {
+      "videoId": "mbov4Rs0F3k",
+      "title": "Деструктуризация объектов. Фундаментальный JavaScript",
+      "channel": "Михаил Непомнящий"
+    },
+    {
+      "videoId": "qhpqykBJoz4",
+      "title": "Деструктуризация массивов. Фундаментальный JavaScript",
+      "channel": "Михаил Непомнящий"
+    },
+    {
+      "videoId": "YK03qxNdyiM",
+      "title": "Деструктуризация в JavaScript",
+      "channel": "profrontend | Екатерина Нанивская"
+    }
+  ],
+  "ts-oop": [
+    {
+      "videoId": "us1GTgdUsJo",
+      "title": "Классы в JavaScript — объявление, конструктор, наследование, экземпляр, геттеры и сеттеры",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "5KMIGVnzINE",
+      "title": "Классы в TypeScript: создание, синтаксис, свойства и методы. Конструктор и readonly свойства",
+      "channel": "WebDev с нуля. Канал Алекса Лущенко"
+    },
+    {
+      "videoId": "SriNAGDi8yU",
+      "title": "Абстрактные классы в TypeScript: полное руководство",
+      "channel": "WebDev с нуля. Канал Алекса Лущенко"
+    },
+    {
+      "videoId": "FGIdSlK9RhQ",
+      "title": "Контекст вызова функции. Фундаментальный JavaScript",
+      "channel": "Михаил Непомнящий"
+    },
+    {
+      "videoId": "SzaXTW2qcJE",
+      "title": "Прототипное программирование и прототипное наследование в JavaScript",
+      "channel": "Timur Shemsedinov"
+    }
+  ],
+  "ts-history": [
+    {
+      "videoId": "qKJP93dWn40",
+      "title": "A Brief History of JavaScript, talk by Brendan Eich (creator of JavaScript)",
+      "channel": "freeCodeCamp.org"
+    },
+    {
+      "videoId": "UCeV97CMvrk",
+      "title": "История языка JavaScript",
+      "channel": "CodeArmy"
+    },
+    {
+      "videoId": "soLmn6nUwE0",
+      "title": "История языка TypeScript",
+      "channel": "CodeArmy"
+    },
+    {
+      "videoId": "Bksj87wQu3w",
+      "title": "В чем разница между ECMAScript и JavaScript?",
+      "channel": "Pro Web"
+    },
+    {
+      "videoId": "Sh6lK57Cuk4",
+      "title": "The Weird History of JavaScript",
+      "channel": "Fireship"
+    }
+  ],
+  "kotlin-flow": [
+    {
+      "videoId": "8quz22w52b0",
+      "title": "Урок 5: Условные операторы if else when. Операции ветвления // Котлин курс с нуля",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    },
+    {
+      "videoId": "vBSbvKIgiHQ",
+      "title": "Урок 6: Циклы while, do-while. Обратный отсчет с Thread.sleep() // Котлин курс с нуля",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    },
+    {
+      "videoId": "QtAlNz0lzwA",
+      "title": "Урок 7: Цикл for, диапазоны (интервалы). break, continue, return // Котлин курс с нуля",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    },
+    {
+      "videoId": "xpkrSgiRj0Y",
+      "title": "Учим Kotlin с нуля | №5 Циклы while, do-while, for.",
+      "channel": "SyntaxSugarDaddy"
+    },
+    {
+      "videoId": "0CnjN5xSviY",
+      "title": "УРОКИ ПО KOTLIN - цикл for, while | Сравниваем с Java",
+      "channel": "Тимофей Коваленко"
+    }
+  ],
+  "kotlin-oop": [
+    {
+      "videoId": "lvsJHI0-sTI",
+      "title": "Учим Kotlin с нуля | №11 Классы и объекты.",
+      "channel": "SyntaxSugarDaddy"
+    },
+    {
+      "videoId": "INxISepTXA0",
+      "title": "Урок 14: ООП. Наследование. open class. Переопределение (override) // Котлин курс с нуля",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    },
+    {
+      "videoId": "m3bDbrHlDyI",
+      "title": "Урок 15: Интерфейсы, абстрактные классы. Имплементация. // Котлин курс с нуля",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    },
+    {
+      "videoId": "HasH6ARlMNk",
+      "title": "Kotlin enum. Sealed class. Sealed interface",
+      "channel": "FunDroid"
+    },
+    {
+      "videoId": "kJpsqBRUQeY",
+      "title": "Kotlin: Урок 17. Sealed Классы",
+      "channel": "Devcolibri"
+    }
+  ],
+  "kotlin-history": [
+    {
+      "videoId": "CdRbfQk95p0",
+      "title": "Kotlin: История Java, Kotlin и как они связаны. JVM, интерпретируемые и компилируемые языки",
+      "channel": "Seems Nerdy"
+    },
+    {
+      "videoId": "YOmdOTlhZa8",
+      "title": "Андрей Бреслав и Дмитрий Жемеров — Kotlin: сессия вопросов и ответов",
+      "channel": "JPoint, Joker и JUG ru — Java-конференции"
+    },
+    {
+      "videoId": "8f-YLCobZog",
+      "title": "Языки программирования ПОД КАПОТОМ / LLVM, YACC и Bison / Крёстный отец Kotlin - Дмитрий Жемеров",
+      "channel": "АйТиБорода"
+    },
+    {
+      "videoId": "IXFIUF_KW_o",
+      "title": "Светлана Исакова — Kotlin: что понимается под современным языком программирования",
+      "channel": "JPoint, Joker и JUG ru — Java-конференции"
+    },
+    {
+      "videoId": "DwN0N9AgGSs",
+      "title": "Kotlin 2, KMP, JetBrains и ИИ-экосистема вокруг IDE / Developer Advocate из JetBrains Антон Архипов",
+      "channel": "АйТиБорода"
+    }
+  ],
+  "kotlin-coroutines": [
+    {
+      "videoId": "rB5Q3y73FTo",
+      "title": "Роман Елизаров — Корутины в Kotlin",
+      "channel": "JPoint, Joker и JUG ru — Java-конференции"
+    },
+    {
+      "videoId": "KUnYT4CZICU",
+      "title": "Почему Kotlin Coroutines — лучшее, что подходит Android | Кирилл Розов, Android Broadcast",
+      "channel": "AvitoTech"
+    },
+    {
+      "videoId": "AEpRsYQzX4k",
+      "title": "Kotlin Coroutines 1. Асинхронные задачи в Android разработке",
+      "channel": "Devcolibri"
+    },
+    {
+      "videoId": "P3mr2oN-x9g",
+      "title": "#2 CoroutineContext. Настраиваем корутины || Курс по корутинам",
+      "channel": "Android Broadcast. Все об Андроид разработке"
+    },
+    {
+      "videoId": "yBxaE-qAPdI",
+      "title": "Что такое корутины? [RU] / Мобильный разработчик",
+      "channel": "Алексей Гладков"
+    }
+  ],
+  "kotlin-null": [
+    {
+      "videoId": "hf4vrHucYNU",
+      "title": "Урок 13: Null Safety – операторы ?. !!, NullPointerException (NPE) // Котлин курс с нуля",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    },
+    {
+      "videoId": "mtrkgCvrTHk",
+      "title": "Александр Денисов — Так ли страшен Null, как его малюют?",
+      "channel": "Innopolis City"
+    },
+    {
+      "videoId": "0nXXUzMyF8c",
+      "title": "lateinit - это зло и «костыль» Kotlin. Dagger 2 всему виной",
+      "channel": "Android Broadcast. Все об Андроид разработке"
+    },
+    {
+      "videoId": "LxMXFhw0-ms",
+      "title": "NULL и его обработка в «мобильных языках» (Kotlin, Swift, Dart) — Mad Brains Техно",
+      "channel": "Mad Brains"
+    },
+    {
+      "videoId": "ybrQvs4x0Ps",
+      "title": "Null References: The Billion Dollar Mistake — доклад Тони Хоара",
+      "channel": "JoseCan"
+    }
+  ],
+  "ts-async": [
+    {
+      "videoId": "377qAu37OTE",
+      "title": "Что такое Event Loop в JavaScript? Event Loop Простыми словами",
+      "channel": "Ulbi TV"
+    },
+    {
+      "videoId": "C7TgmKZRNF4",
+      "title": "JavaScript событийный цикл Event Loop, асинхронный код, промисы (Promise), async / await",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "vIZs5tH-HGQ",
+      "title": "Урок 4. JavaScript. Асинхронность. Что такое Event Loop. JS SetTimeout 0",
+      "channel": "Владилен Минин"
+    },
+    {
+      "videoId": "SLQAVVziUzg",
+      "title": "#13. JavaScript. Как работает Async, Await, чем отличается от Promise (+ 3 асинхронных примера)",
+      "channel": "Василий Муравьев"
+    },
+    {
+      "videoId": "Ih6Q7ka2eSQ",
+      "title": "Вебинар: Асинхронность в JavaScript. Таймеры, промисы, async/await",
+      "channel": "loftblog"
+    }
   ]
 }

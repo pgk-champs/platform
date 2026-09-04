@@ -14,7 +14,19 @@ import { editorSchemes } from './figures/editor';
 import { codeBasicsSchemes } from './figures/codeBasics';
 import { oopSchemes } from './figures/oop';
 import { kotlinJavaSchemes } from './figures/kotlinJava';
+import { kotlinFlowSchemes } from './figures/kotlinFlow';
+import { kotlinOopSchemes } from './figures/kotlinOop';
+import { kotlinHistorySchemes } from './figures/kotlinHistory';
+import { kotlinCoroutinesSchemes } from './figures/kotlinCoroutines';
+import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
+import { tsValuesSchemes } from './figures/tsValues';
+import { tsFlowSchemes } from './figures/tsFlow';
+import { tsFunctionsSchemes } from './figures/tsFunctions';
+import { tsCollectionsSchemes } from './figures/tsCollections';
+import { tsOopSchemes } from './figures/tsOop';
+import { tsHistorySchemes } from './figures/tsHistory';
+import { tsAsyncSchemes } from './figures/tsAsync';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -63,7 +75,19 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(codeBasicsSchemes),
     ...Object.keys(oopSchemes),
     ...Object.keys(kotlinJavaSchemes),
+    ...Object.keys(kotlinFlowSchemes),
+    ...Object.keys(kotlinOopSchemes),
+    ...Object.keys(kotlinHistorySchemes),
+    ...Object.keys(kotlinCoroutinesSchemes),
+    ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
+    ...Object.keys(tsValuesSchemes),
+    ...Object.keys(tsFlowSchemes),
+    ...Object.keys(tsFunctionsSchemes),
+    ...Object.keys(tsCollectionsSchemes),
+    ...Object.keys(tsOopSchemes),
+    ...Object.keys(tsHistorySchemes),
+    ...Object.keys(tsAsyncSchemes),
   ];
   const duplicates = all.filter((id, i) => all.indexOf(id) !== i);
   expect(duplicates).toEqual([]);

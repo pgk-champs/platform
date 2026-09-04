@@ -58,7 +58,7 @@ export const editorSchemes: Schemes = {
       <rect x={40} y={256} width={720} height={54} rx={10} fill="rgba(0,0,0,0.25)" stroke={ACCENT} strokeWidth={2.5} />
       <text x={58} y={280} fontSize={13} fontWeight={700} fill="#fff">встроенный терминал</text>
       <text x={58} y={300} fontSize={12} fontFamily={MONO} fill={ACCENT}>npm run deploy · docker compose up -d · git status</text>
-      <text x={520} y={290} fontSize={12.5} fill={FADE}>тот же терминал системы, только внутри окна</text>
+      <text x={466} y={290} fontSize={12.5} fill={FADE}>тот же терминал системы, только внутри окна</text>
     </Panel>
   ),
   /* открыть папку, а не файл: индексация, поиск и git появляются только у папки */

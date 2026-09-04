@@ -160,11 +160,19 @@
     "path": "mobile/kotlin-vars.mdx"
   },
   {
+    "id": "kotlin-flow",
+    "title": "Условия и циклы на Kotlin",
+    "audience": "мобилка",
+    "level": "база",
+    "order": 2,
+    "path": "mobile/kotlin-flow.mdx"
+  },
+  {
     "id": "functions-lambdas",
     "title": "Функции и лямбды",
     "audience": "мобилка",
     "level": "база",
-    "order": 2,
+    "order": 3,
     "path": "mobile/functions-lambdas.mdx"
   },
   {
@@ -172,15 +180,55 @@
     "title": "Классы и коллекции",
     "audience": "мобилка",
     "level": "база",
-    "order": 3,
+    "order": 4,
     "path": "mobile/classes-collections.mdx"
+  },
+  {
+    "id": "kotlin-oop",
+    "title": "ООП на Kotlin: классы, наследование, интерфейсы",
+    "audience": "мобилка",
+    "level": "углубление",
+    "order": 5,
+    "path": "mobile/kotlin-oop.mdx"
+  },
+  {
+    "id": "kotlin-vs-java",
+    "title": "Kotlin и Java: в чём разница",
+    "audience": "мобилка",
+    "level": "база",
+    "order": 6,
+    "path": "mobile/kotlin-vs-java.mdx"
+  },
+  {
+    "id": "kotlin-history",
+    "title": "История Java, Android и Kotlin",
+    "audience": "мобилка",
+    "level": "углубление",
+    "order": 7,
+    "path": "mobile/kotlin-history.mdx"
+  },
+  {
+    "id": "kotlin-coroutines",
+    "title": "Корутины: как приложение не зависает",
+    "audience": "мобилка",
+    "level": "углубление",
+    "order": 8,
+    "path": "mobile/kotlin-coroutines.mdx"
+  },
+  {
+    "id": "kotlin-null",
+    "title": "Null-безопасность: ошибка на миллиард долларов",
+    "audience": "мобилка",
+    "level": "углубление",
+    "order": 9,
+    "path": "mobile/kotlin-null.mdx"
   },
   {
     "id": "first-compose-screen",
     "title": "Первый экран Compose",
     "audience": "мобилка",
     "level": "база",
-    "order": 4,
+    "order": 10,
     "path": "mobile/first-compose-screen.mdx"
   },
   {
@@ -188,7 +236,7 @@
     "title": "Состояние и события",
     "audience": "мобилка",
     "level": "база",
-    "order": 5,
+    "order": 11,
     "path": "mobile/state-events.mdx"
   },
   {
@@ -196,7 +244,7 @@
     "title": "Вёрстка по макету",
     "audience": "мобилка",
     "level": "база",
-    "order": 6,
+    "order": 12,
     "path": "mobile/layout-by-mockup.mdx"
   },
   {
@@ -204,16 +252,8 @@
     "title": "Многомодульность и UI Kit",
     "audience": "мобилка",
     "level": "база",
-    "order": 7,
+    "order": 13,
     "path": "mobile/ui-kit.mdx"
-  },
-  {
-    "id": "kotlin-vs-java",
-    "title": "Kotlin и Java: в чём разница",
-    "audience": "мобилка",
-    "level": "база",
-    "order": 8,
-    "path": "mobile/kotlin-vs-java.mdx"
   },
   {
     "id": "what-is-blockchain",
@@ -246,5 +286,61 @@
     "level": "база",
     "order": 4,
     "path": "blockchain/ts-vs-js.mdx"
+  },
+  {
+    "id": "ts-values",
+    "title": "Значения и переменные: числа, строки, типы",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 5,
+    "path": "blockchain/ts-values.mdx"
+  },
+  {
+    "id": "ts-flow",
+    "title": "Условия и циклы: как программа принимает решения",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 6,
+    "path": "blockchain/ts-flow.mdx"
+  },
+  {
+    "id": "ts-functions",
+    "title": "Функции: как код перестаёт повторяться",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 7,
+    "path": "blockchain/ts-functions.mdx"
+  },
+  {
+    "id": "ts-collections",
+    "title": "Массивы и объекты: как хранят много данных сразу",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 8,
+    "path": "blockchain/ts-collections.mdx"
+  },
+  {
+    "id": "ts-oop",
+    "title": "ООП на TypeScript: классы, наследование, интерфейсы",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 9,
+    "path": "blockchain/ts-oop.mdx"
+  },
+  {
+    "id": "ts-history",
+    "title": "История JavaScript и TypeScript",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 10,
+    "path": "blockchain/ts-history.mdx"
+  },
+  {
+    "id": "ts-async",
+    "title": "Асинхронность: промисы, async/await и цикл событий",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 11,
+    "path": "blockchain/ts-async.mdx"
   }
 ]

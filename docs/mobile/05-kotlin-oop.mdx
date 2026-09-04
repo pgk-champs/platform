@@ -1,0 +1,977 @@
+---
+title: 'ООП на Kotlin: классы, наследование, интерфейсы'
+audience: 'мобилка'
+level: 'углубление'
+order: 5
+sidebar_position: 5
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="kotlin-oop" />
+
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import CodeTyping from '@site/src/components/CodeTyping';
+import KotlinPlay from '@site/src/components/KotlinPlay';
+
+# ООП на Kotlin: классы, наследование, интерфейсы
+
+<ChapterProgress chapterId="kotlin-oop" totalSections={20} totalQuizzes={4} totalTrainers={1} />
+
+## Зачем это нужно
+
+В фундаменте была глава про ООП вообще — что такое класс, объект, инкапсуляция, наследование, полиморфизм. Здесь мы не повторяем теорию, а смотрим, как всё это выглядит **именно в Kotlin** и чем отличается от Java, откуда ООП в Android и пришёл.
+
+Разница огромная и заметна сразу. Класс, на который в Java уходит тридцать строк с конструктором, геттерами, `equals`, `hashCode` и `toString`, в Kotlin занимает **одну строку**. Не потому, что Kotlin что-то прячет, — он просто дописывает очевидное сам, а программисту оставляет то, что нужно решить головой.
+
+Кроме короткой записи в Kotlin есть три вещи, которых в Java долго не было и которые меняют стиль кода полностью: **классы закрыты по умолчанию**, **`data class` для данных** и **`sealed class` для закрытых наборов вариантов**. Последний работает в паре с `when` из главы про условия и даёт то, чего в Java нет до сих пор: компилятор сам находит место, которое сломается после добавления нового варианта.
+
+Всё, что напечатано ниже как вывод программы или как сообщение компилятора, снято с настоящего запуска Kotlin 2.4.10.
+
+<CollapsibleToc toc={toc} chapterId="kotlin-oop" />
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="why" />
+
+## Класс в одну строку
+
+Начнём с самого маленького класса, который вообще можно написать:
+
+<KotlinPlay code={`class Empty
+
+fun main() {
+    val e = Empty()
+    println(e)
+}`} />
+
+**Что выведет:** что-то вроде `Empty@2c7b84de`. Это стандартное представление объекта: имя класса, собака и адрес в памяти в шестнадцатеричном виде. Число у тебя будет другим — оно зависит от запуска.
+
+Обрати внимание на две вещи. Во-первых, у класса **нет фигурных скобок**: если тело пустое, скобки не пишут. Во-вторых, объект создаётся как `Empty()` — **без слова `new`**. В Java было бы `new Empty()`, в Kotlin слово `new` из языка убрали: круглые скобки после имени класса и так означают создание.
+
+Теперь настоящий класс:
+
+<KotlinPlay code={`class Wallet(val owner: String, var balance: Int = 0) {
+    fun deposit(amount: Int) {
+        balance += amount
+    }
+}
+
+fun main() {
+    val w = Wallet("Соня")
+    w.deposit(1500)
+    println(w.owner)
+    println(w.balance)
+}`} />
+
+**Что выведет:** `Соня` и `1500`.
+
+<Figure scheme="ko-class-anatomy" caption="Заголовок класса в Kotlin делает сразу две работы: объявляет конструктор и объявляет свойства. Слова val и var перед параметром — это и есть вся разница между «просто параметром» и «полем объекта»." />
+
+<Block kind="breakdown" title="Разбор по частям: объявление класса" chapterId="kotlin-oop" blockId="breakdown-class">
+<SyntaxBreakdown parts={[
+  { text: 'class', label: 'ключевое слово', note: 'объявляет класс — чертёж, по которому создают объекты' },
+  { text: ' Wallet', label: 'имя класса', note: 'с большой буквы и в единственном числе: Wallet, а не wallets' },
+  { text: '(', label: 'открывающая скобка', note: 'начало основного конструктора — того, через что объект создают' },
+  { text: 'val owner: String', label: 'параметр и свойство сразу', note: 'слово val превращает параметр конструктора в неизменяемое свойство объекта. Без val это был бы просто параметр, доступный только внутри' },
+  { text: ', ', label: 'запятая', note: 'разделяет параметры' },
+  { text: 'var balance: Int = 0', label: 'изменяемое свойство', note: 'var — значение можно менять; = 0 — значение по умолчанию, аргумент можно не передавать' },
+  { text: ')', label: 'закрывающая скобка', note: 'конец конструктора' },
+  { text: ' {', label: 'начало тела', note: 'если тела нет, скобки не пишут вообще' },
+  { text: 'fun deposit(...)', label: 'метод', note: 'обычная функция, живущая внутри класса; изнутри видит все свойства без всякого this' },
+  { text: '}', label: 'конец тела', note: '' },
+]} />
+</Block>
+
+Та же самая пара строк на Java выглядела бы так — это не преувеличение, а буквальный перевод:
+
+```java
+public class Wallet {
+    private final String owner;
+    private int balance;
+
+    public Wallet(String owner, int balance) {
+        this.owner = owner;
+        this.balance = balance;
+    }
+
+    public Wallet(String owner) {
+        this(owner, 0);
+    }
+
+    public String getOwner() { return owner; }
+    public int getBalance() { return balance; }
+    public void setBalance(int balance) { this.balance = balance; }
+
+    public void deposit(int amount) { this.balance += amount; }
+}
+```
+
+Двадцать строк против четырёх. И в этих двадцати нет ни одного решения — только механическая работа, которую редактор генерирует по кнопке. Kotlin убрал сам жанр такого кода.
+
+<Hint id="kotlin-oop-h1" type="fact">
+Геттеры и сеттеры в Kotlin никуда не делись — их пишет компилятор. `w.balance = 100` в готовом байт-коде превращается в вызов `setBalance(100)`, а `w.balance` — в `getBalance()`. Именно поэтому Kotlin-класс без всяких переделок виден из Java-кода как обычный Java-класс с геттерами: на этом и держится совместимость двух языков внутри одного проекта.
+</Hint>
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="class" />
+
+## Свойства: `val`, `var` и вычисляемое значение
+
+Свойство — это то, что объект **знает** о себе. Метод — то, что он **умеет**.
+
+Свойства объявляют либо в заголовке класса, либо в теле:
+
+<KotlinPlay code={`class Wallet(val owner: String) {
+    var balance: Int = 0
+    val bank: String = "ТОН-банк"
+
+    val isRich: Boolean
+        get() = balance > 1000
+}
+
+fun main() {
+    val w = Wallet("Соня")
+    println(w.isRich)
+    w.balance = 1500
+    println(w.isRich)
+}`} />
+
+**Что выведет:** `false`, потом `true`.
+
+`isRich` — **вычисляемое свойство**: у него нет собственного места в памяти, оно каждый раз считается заново из `balance`. Пишется через `get()`, читается снаружи как обычное поле: `w.isRich`, без скобок.
+
+Правило выбора простое: если значение можно вывести из других свойств — делай его вычисляемым. Тогда его невозможно рассинхронизировать с реальностью. Хранить отдельно `balance` и отдельно `isRich`, а потом не забывать обновлять второе при изменении первого — это заготовка для ошибки.
+
+Порядок объявления свойств имеет значение. Свойство нельзя использовать раньше, чем оно объявлено:
+
+```kotlin
+class Wallet(val owner: String) {
+    val greeting = "привет, $owner, баланс $balance"
+    val balance = 0
+}
+```
+
+```
+Variable 'balance' must be initialized.
+```
+
+Свойства инициализируются сверху вниз, и на момент вычисления `greeting` поля `balance` ещё не существует. Достаточно поменять две строки местами.
+
+Есть и сеттер — например, чтобы читать свойство можно было всем, а менять только изнутри класса:
+
+<KotlinPlay code={`class Counter {
+    var count = 0
+        private set
+
+    fun tick() {
+        count++
+    }
+}
+
+fun main() {
+    val c = Counter()
+    c.tick()
+    c.tick()
+    println(c.count)
+}`} />
+
+**Что выведет:** `2`.
+
+Попытка написать `c.count = 10` снаружи класса не скомпилируется:
+
+```
+Cannot access 'count': it is private in 'Counter'.
+```
+
+Это и есть **инкапсуляция** — не пустой термин из учебника, а конкретный компилятор, который не пускает чужой код менять внутреннее состояние мимо метода `tick()`.
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="properties" />
+
+## Модификаторы доступа
+
+Четыре слова управляют тем, кто видит член класса:
+
+| Модификатор | Кто видит | Когда нужен |
+| --- | --- | --- |
+| `public` | все | по умолчанию, писать не надо |
+| `private` | только сам класс (или сам файл) | всё внутреннее устройство |
+| `protected` | класс и его наследники | редко, в основе иерархии |
+| `internal` | весь модуль сборки | API библиотеки внутри проекта |
+
+Главное отличие от Java: **по умолчанию в Kotlin `public`**, а в Java — «видно всему пакету». Второе отличие: `internal` в Java аналога не имеет вовсе.
+
+```kotlin
+class Wallet {
+    private val secret = "ключ"
+}
+
+println(Wallet().secret)
+```
+
+```
+Cannot access 'val secret: String': it is private in 'Wallet'.
+```
+
+Практическое правило: **закрывай всё, что не является частью договорённости с внешним кодом.** Публичным делают только то, чем реально пользуются снаружи. Чем меньше публичная поверхность, тем спокойнее менять внутренности потом.
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="visibility" />
+
+## `init`, второй конструктор и `lateinit`
+
+Если при создании объекта надо что-то сделать — проверить аргументы, посчитать значение, записать в лог, — для этого есть блок `init`:
+
+<KotlinPlay code={`class Wallet(val owner: String) {
+    val createdAt: String
+
+    init {
+        println("init: создаём кошелёк для \${owner}")
+        createdAt = "2026-09-04"
+    }
+
+    constructor(owner: String, bonus: Int) : this(owner) {
+        println("второй конструктор, бонус \${bonus}")
+    }
+}
+
+fun main() {
+    val w = Wallet("Соня", 100)
+    println(w.createdAt)
+}`} />
+
+**Что выведет:**
+
+```
+init: создаём кошелёк для Соня
+второй конструктор, бонус 100
+2026-09-04
+```
+
+Порядок вывода показывает главное: **`init` выполняется раньше второго конструктора**. Второй конструктор обязан через `: this(owner)` позвать основной, основной запускает `init`, и только потом выполняется тело второго. Это не мелочь: если что-то в объекте выглядит неинициализированным, порядок надо знать наизусть.
+
+Вторые конструкторы в Kotlin нужны редко — чаще хватает значений по умолчанию у параметров. `Wallet(owner: String, balance: Int = 0)` покрывает оба случая создания без единой лишней строки.
+
+**`lateinit`** — обещание «значение появится позже, но точно до первого чтения». В Android это нужно постоянно: часть объектов система создаёт не в конструкторе, а на этапе `onCreate`.
+
+```kotlin
+class Wallet {
+    lateinit var owner: String
+}
+
+val w = Wallet()
+println(w.owner)
+```
+
+```
+kotlin.UninitializedPropertyAccessException: lateinit property owner has not been initialized
+```
+
+Обрати внимание: это **исключение во время работы**, а не ошибка компиляции. `lateinit` — та же расписка, что и `!!` из предыдущей главы: программист говорит «я отвечаю», а язык верит на слово. Есть `::owner.isInitialized`, чтобы проверить; но лучше обходиться без `lateinit` вовсе, когда значение можно передать в конструктор.
+
+<Hint id="kotlin-oop-h2" type="important">
+`lateinit` работает только с `var` и только с не-nullable типом; для `Int`, `Double` и других примитивов он запрещён. Если очень хочется отложить инициализацию числа — нужен либо `Int?` с обычной проверкой, либо `by lazy`, который считает значение при первом чтении и запоминает результат.
+</Hint>
+
+<KotlinPlay code={`class Heavy {
+    val value: String by lazy {
+        println("считаю один раз")
+        "готово"
+    }
+}
+
+fun main() {
+    val h = Heavy()
+    println(h.value)
+    println(h.value)
+}`} />
+
+**Что выведет:**
+
+```
+считаю один раз
+готово
+готово
+```
+
+Строка «считаю один раз» напечаталась ровно однажды, хотя `h.value` читали дважды. В этом и смысл `by lazy`: тяжёлое вычисление откладывается до первого обращения, а результат сохраняется.
+
+<Block kind="quiz" title="Классы и свойства" chapterId="kotlin-oop" blockId="quiz-class">
+<SelfCheck chapterId="kotlin-oop" quizId="quiz-class" questions={[
+  { q: 'Что делает слово val в заголовке класса: class Wallet(val owner: String)?', options: ['Ничего, это просто стиль', 'Превращает параметр конструктора в неизменяемое свойство объекта', 'Делает класс неизменяемым', 'Запрещает наследование'], correct: 1, why: 'Без val это остался бы обычный параметр, видимый только внутри конструктора и блока init. С val у объекта появляется поле и геттер.' },
+  { q: 'Почему в Kotlin объект создают как Wallet(), а не new Wallet()?', options: ['new можно писать по желанию', 'Слова new в языке нет: круглые скобки после имени класса и так означают создание объекта', 'new нужно только для data class', 'new заменили на create'], correct: 1, why: 'Одна из множества мелочей, убранных ради краткости. То же самое сделали Swift и Python.' },
+  { q: 'Что такое вычисляемое свойство с get()?', options: ['Свойство, которое хранится в памяти как обычное', 'Свойство без собственного места в памяти: значение считается заново при каждом чтении', 'Приватный метод', 'Свойство, доступное только для записи'], correct: 1, why: 'Такое свойство невозможно рассинхронизировать с данными, из которых оно считается, — в этом его главная ценность.' },
+  { q: 'Что означает private set у свойства?', options: ['Свойство нельзя читать', 'Свойство можно читать откуда угодно, а менять — только изнутри класса', 'Свойство становится константой', 'Свойство видно только в модуле'], correct: 1, why: 'Это точная инкапсуляция: внешний код видит состояние, но изменить его может только через методы класса.' },
+  { q: 'lateinit var owner: String прочитали до присваивания. Что будет?', options: ['Вернётся null', 'Ошибка компиляции', 'UninitializedPropertyAccessException во время работы программы', 'Вернётся пустая строка'], correct: 2, why: 'lateinit — расписка программиста, а не проверка компилятора. Ошибка вылезет уже у пользователя.' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="init" />
+
+## Наследование: почему всё закрыто по умолчанию
+
+Наследование — способ сказать «этот класс такой же, как тот, плюс кое-что своё». В Kotlin оно устроено строже, чем в Java.
+
+Попробуем унаследоваться от обычного класса:
+
+```kotlin
+class Animal(val name: String)
+class Cat(name: String) : Animal(name)
+```
+
+```
+This type is final, so it cannot be extended.
+```
+
+**Любой класс в Kotlin закрыт для наследования, пока не написали `open`.** В Java наоборот: наследоваться можно от всего, кроме помеченного словом `final`.
+
+<Figure scheme="ko-open-final" caption="Kotlin поменял умолчание местами по сравнению с Java: закрыто, пока не открыли. Наследование — это договор, и его теперь заключают осознанно." />
+
+Рабочая версия:
+
+<KotlinPlay code={`open class Animal(val name: String) {
+    open fun voice() = "..."
+    fun describe() = "\${name} говорит: \${voice()}"
+}
+
+class Cat(name: String) : Animal(name) {
+    override fun voice() = "мяу"
+}
+
+class Dog(name: String) : Animal(name) {
+    override fun voice() = "гав"
+    fun fetch() = "\${name} принёс палку"
+}
+
+fun main() {
+    val animals: List<Animal> = listOf(Cat("Барсик"), Dog("Рекс"))
+    for (a in animals) println(a.describe())
+}`} />
+
+**Что выведет:**
+
+```
+Барсик говорит: мяу
+Рекс говорит: гав
+```
+
+Вот он, **полиморфизм** — в четыре строки. Список объявлен как `List<Animal>`, метод `describe()` написан один раз в родителе, и он ничего не знает про котов и собак. Но внутри него вызывается `voice()`, и каждый объект отвечает по-своему. Выбор нужной реализации происходит во время работы программы, по фактическому типу объекта.
+
+Двоеточие после имени класса читается «это разновидность»: `class Cat(name: String) : Animal(name)` — «кот является животным». Круглые скобки после `Animal` — вызов конструктора родителя; параметр `name` без `val` здесь не свойство кота, а транзитный аргумент: свойство уже есть у родителя, дублировать его не надо.
+
+Два слова управляют переопределением, и оба обязательны:
+
+- **`open`** у родителя — «этот метод разрешено переопределять»;
+- **`override`** у наследника — «я знаю, что переопределяю».
+
+Забыл `open` у родителя:
+
+```
+'voice' in 'Animal' is final and cannot be overridden.
+```
+
+Забыл `override` у наследника:
+
+```
+'voice' hides member of supertype 'Animal' and needs an 'override' modifier.
+```
+
+Второе сообщение — самое ценное во всей главе. В Java такой код **скомпилировался бы молча**, а метод бы просто перекрыл родительский, и разбираться, почему приложение ведёт себя странно, пришлось бы вручную. В Java для этой ситуации даже придумали необязательную аннотацию `@Override`. Kotlin сделал её обязательным ключевым словом.
+
+Из родительского метода можно вызвать его прежнюю версию через `super`:
+
+```kotlin
+class Cat(name: String) : Animal(name) {
+    override fun voice() = super.voice() + " мяу"
+}
+```
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="inheritance" />
+
+## Абстрактные классы: чертёж без реализации
+
+Иногда родитель нужен только как договорённость: у любой фигуры есть площадь, но у «фигуры вообще» её посчитать невозможно.
+
+<KotlinPlay code={`abstract class Shape {
+    abstract fun area(): Double
+    fun report() = "площадь = \${area()}"
+}
+
+class Square(val side: Double) : Shape() {
+    override fun area() = side * side
+}
+
+fun main() {
+    println(Square(3.0).report())
+}`} />
+
+**Что выведет:** `площадь = 9.0`.
+
+Три вещи стоит запомнить:
+
+1. `abstract fun area(): Double` — **объявление без тела**. Наследник обязан его реализовать.
+2. `report()` — обычный метод **с телом**, доступный всем наследникам. В этом отличие абстрактного класса от интерфейса: он умеет хранить и общий код, и состояние.
+3. Слово `open` не нужно: абстрактный класс открыт для наследования по определению, а абстрактный метод — для переопределения.
+
+Создать объект абстрактного класса нельзя:
+
+```kotlin
+println(Shape())
+```
+
+```
+Cannot create an instance of an abstract class.
+```
+
+Это тоже разумно: у такого объекта не было бы `area()`.
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="abstract" />
+
+## Интерфейсы: договор о поведении
+
+Интерфейс — список того, что класс **умеет**, без единого слова о том, что он **знает**. Наследоваться в Kotlin можно только от одного класса, а интерфейсов реализовать сколько угодно.
+
+<KotlinPlay code={`interface Clickable {
+    fun click()
+    fun showOff() = "я кликабельный"
+}
+
+interface Focusable {
+    fun showOff() = "я фокусируемый"
+}
+
+class Button : Clickable, Focusable {
+    override fun click() = println("клик")
+    override fun showOff() = super<Clickable>.showOff() + " и " + super<Focusable>.showOff()
+}
+
+fun main() {
+    val b = Button()
+    b.click()
+    println(b.showOff())
+}`} />
+
+**Что выведет:**
+
+```
+клик
+я кликабельный и я фокусируемый
+```
+
+Разберём по пунктам.
+
+**Метод без тела** (`fun click()`) — обязательство. Класс, который его не реализовал, не соберётся:
+
+```
+Class 'Button' is not abstract and does not implement abstract member:
+fun click(): Unit
+```
+
+**Метод с телом** (`fun showOff() = "..."`) — реализация по умолчанию. Наследник может её взять как есть, а может переопределить.
+
+**Конфликт двух умолчаний.** Оба интерфейса дают свой `showOff()`. Компилятор не выбирает за программиста — он требует решить конфликт руками, и синтаксис `super<Clickable>.showOff()` позволяет обратиться к конкретному из них. В Java это называлось «ромбовидной проблемой» и десятилетиями было причиной отсутствия множественного наследования вообще.
+
+**Интерфейс не хранит состояние.** Свойство в интерфейсе объявить можно, но у него не будет собственного места в памяти — наследник обязан его предоставить:
+
+```kotlin
+interface Named {
+    val name: String              // требование
+    fun greet() = "привет, $name" // реализация поверх требования
+}
+```
+
+Правило выбора, которое работает почти всегда:
+
+| Нужно | Что брать |
+| --- | --- |
+| Общий код и общее состояние для родственных классов | `abstract class` |
+| Только договор «умеет вот это» | `interface` |
+| Класс должен уметь несколько разных вещей | несколько `interface` |
+
+<Block kind="quiz" title="Наследование и интерфейсы" chapterId="kotlin-oop" blockId="quiz-inherit">
+<SelfCheck chapterId="kotlin-oop" quizId="quiz-inherit" questions={[
+  { q: 'Почему class Cat : Animal() не компилируется, если Animal объявлен как обычный class?', options: ['Нужны фигурные скобки', 'В Kotlin класс закрыт для наследования по умолчанию — нужно слово open', 'Наследование в Kotlin запрещено', 'Не хватает слова extends'], correct: 1, why: 'Точное сообщение: This type is final, so it cannot be extended. В Java умолчание обратное — наследоваться можно от всего, кроме final.' },
+  { q: 'Что сделает компилятор, если у наследника забыть слово override?', options: ['Соберёт молча, метод просто перекроет родительский', 'Откажется собирать: hides member of supertype and needs an override modifier', 'Выдаст предупреждение', 'Вызовет родительский метод'], correct: 1, why: 'Именно этот молчаливый случай в Java был источником ошибок. Kotlin превратил необязательную аннотацию @Override в обязательное слово.' },
+  { q: 'Чем абстрактный класс отличается от интерфейса?', options: ['Ничем', 'Абстрактный класс может хранить состояние и общий код, но наследовать его можно только один; интерфейсов — сколько угодно', 'Интерфейс быстрее', 'В абстрактном классе нельзя писать методы с телом'], correct: 1, why: 'Абстрактный класс отвечает на вопрос «чем является объект», интерфейс — на вопрос «что он умеет».' },
+  { q: 'Два интерфейса дают свою реализацию showOff(). Что произойдёт?', options: ['Возьмётся первая по порядку', 'Компилятор потребует переопределить метод и выбрать нужный через super<Имя>.showOff()', 'Ошибка во время работы', 'Оба вызовутся подряд'], correct: 1, why: 'Kotlin не угадывает за программиста. Ровно из-за этого конфликта в Java долго не было множественного наследования.' },
+  { q: 'Что напечатает цикл по List<Animal> из Cat и Dog, вызывающий общий describe()?', options: ['Дважды одинаковый текст родителя', 'У каждого объекта свой голос: реализация выбирается по фактическому типу во время работы', 'Ошибку компиляции', 'Только первый элемент'], correct: 1, why: 'Это и есть полиморфизм: describe() написан один раз в родителе и ничего не знает про наследников.' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="interfaces" />
+
+## `data class`: класс для данных
+
+Огромная доля классов в приложении не имеет никакого поведения — это просто наборы полей: ответ сервера, строка списка, точка на карте. Для них есть отдельное слово.
+
+Сначала посмотрим, как ведёт себя обычный класс:
+
+<KotlinPlay code={`class Coin(val ticker: String, val price: Int)
+
+fun main() {
+    val c1 = Coin("TON", 5)
+    val c2 = Coin("TON", 5)
+    println(c1)
+    println(c1 == c2)
+}`} />
+
+**Что выведет:** `Coin@5ca881b5` и `false`. Печать бесполезна, а два одинаковых по содержимому объекта считаются разными — потому что стандартный `equals` сравнивает адреса.
+
+Теперь добавим одно слово:
+
+<KotlinPlay code={`data class Coin(val ticker: String, val price: Int)
+
+fun main() {
+    val c1 = Coin("TON", 5)
+    val c2 = Coin("TON", 5)
+    println(c1)
+    println(c1 == c2)
+    println(c1 === c2)
+    println(c1.copy(price = 7))
+    val (t, p) = c1
+    println("\${t} / \${p}")
+}`} />
+
+**Что выведет:**
+
+```
+Coin(ticker=TON, price=5)
+true
+false
+Coin(ticker=TON, price=7)
+TON / 5
+```
+
+<Figure scheme="ko-data-class" caption="Одно слово data — и компилятор дописывает toString, equals, hashCode, copy и функции для разбора объекта на переменные. Всё то, что в Java генерировали кнопкой в редакторе." />
+
+Разберём вывод построчно:
+
+1. **`toString()`** — печатает имя класса и все поля основного конструктора. В логах это разница между «понятно, что не так» и «непонятно ничего».
+2. **`equals()`** — `c1 == c2` теперь `true`: сравнение по содержимому.
+3. **`===`** по-прежнему `false` — это разные объекты в памяти, и `data` этого не меняет.
+4. **`copy()`** — создаёт новый объект, меняя перечисленные поля. Незаменимая вещь для неизменяемых данных: не «поправить объект», а «сделать новый, почти такой же».
+5. **Деструктуризация** — `val (t, p) = c1` разбирает объект на переменные. Ровно тот же механизм, что в `for ((i, coin) in coins.withIndex())` из главы про циклы.
+
+Заодно генерируется `hashCode()`, согласованный с `equals()`. Без него объект нельзя нормально положить в `Set` или использовать ключом в `Map`: коллекции ищут сначала по хэшу и только потом сравнивают.
+
+Ограничение у `data class` ровно одно, и о нём напоминает компилятор:
+
+```kotlin
+data class Empty()
+```
+
+```
+Data class must have at least one primary constructor parameter.
+```
+
+Класс данных без данных смысла не имеет.
+
+<Hint id="kotlin-oop-h3" type="tip">
+В `data class` поля почти всегда объявляют как `val`, а не `var`. Изменяемый объект данных ломает `hashCode`: положили объект в `Set`, поменяли поле — хэш стал другим, и коллекция больше не находит собственный элемент. С `val` и `copy()` такой проблемы нет вовсе, а код становится предсказуемее. То же правило действует в Java-мире с приходом `record`, который решает ровно ту же задачу и появился в 2021 году.
+</Hint>
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="data" />
+
+## `enum`: фиксированный список вариантов
+
+`enum` — набор именованных значений, известный целиком заранее. В Kotlin у каждого варианта могут быть свои данные и общие методы:
+
+<KotlinPlay code={`enum class Level(val minScore: Int) {
+    JUNIOR(0), MIDDLE(50), SENIOR(100);
+
+    fun label() = "\${name} от \${minScore}"
+}
+
+fun main() {
+    for (l in Level.entries) println(l.label())
+    println(Level.valueOf("MIDDLE").minScore)
+    println(Level.SENIOR.ordinal)
+}`} />
+
+**Что выведет:**
+
+```
+JUNIOR от 0
+MIDDLE от 50
+SENIOR от 100
+50
+2
+```
+
+Что тут стоит заметить:
+
+- **Точка с запятой** после списка вариантов — единственное место в Kotlin, где она обязательна. Она отделяет варианты от остального тела `enum`.
+- **`name`** — готовое свойство: имя варианта строкой, писать его самому не надо.
+- **`ordinal`** — порядковый номер, считая с нуля.
+- **`entries`** — список всех вариантов. Это современная замена старому `values()`, который создавал новый массив при каждом вызове.
+- **`valueOf("MIDDLE")`** — разбор из строки; если такого варианта нет, будет исключение.
+
+И главное: `when` по `enum` **не требует ветки `else`**, если перечислены все варианты. Компилятор видит список целиком.
+
+<Block kind="quiz" title="Абстрактные классы и enum" chapterId="kotlin-oop" blockId="quiz-enum">
+<SelfCheck chapterId="kotlin-oop" quizId="quiz-enum" questions={[
+  { q: 'Что произойдёт при попытке создать объект абстрактного класса?', options: ['Создастся объект с пустыми полями', 'Ошибка компиляции: Cannot create an instance of an abstract class', 'Создастся null', 'Программа упадёт при запуске'], correct: 1, why: 'Абстрактный класс — чертёж. Создавать можно только его наследников, у которых все абстрактные члены реализованы.' },
+  { q: 'Что вернёт свойство ordinal у второго варианта enum?', options: ['2', '1 — нумерация идёт с нуля', 'имя варианта строкой', 'количество вариантов'], correct: 1, why: 'Рядом живёт name — имя варианта строкой. Оба свойства готовы, писать их самому не надо.' },
+  { q: 'Чем entries лучше старого values()?', options: ['Ничем, это синонимы', 'values() создавал новый массив при каждом вызове, entries — готовый список', 'entries работает быстрее только на Android', 'values() устарел из-за проблем с null'], correct: 1, why: 'Это современная замена: список создаётся один раз, а не при каждом обращении.' },
+  { q: 'Почему when по enum не требует ветки else?', options: ['Требует, как и любой другой when', 'Компилятор видит весь список вариантов и проверяет, что перечислены все', 'else подставляется автоматически', 'Это работает только внутри самого enum'], correct: 1, why: 'Тот же приём, что и с sealed class: замкнутый набор случаев компилятор умеет проверить целиком.' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="enum" />
+
+## `sealed class`: закрытая иерархия
+
+`enum` хорош, пока варианты — просто имена. Но чаще у вариантов **разные данные**: у успеха есть значение, у ошибки — текст, у загрузки нет ничего. Для этого есть `sealed`.
+
+<KotlinPlay code={`sealed class Result {
+    data class Ok(val value: Int) : Result()
+    data class Fail(val message: String) : Result()
+    object Loading : Result()
+}
+
+fun describe(r: Result): String = when (r) {
+    is Result.Ok -> "успех: \${r.value}"
+    is Result.Fail -> "ошибка: \${r.message}"
+    Result.Loading -> "грузим"
+}
+
+fun main() {
+    println(describe(Result.Ok(42)))
+    println(describe(Result.Fail("нет сети")))
+    println(describe(Result.Loading))
+}`} />
+
+**Что выведет:**
+
+```
+успех: 42
+ошибка: нет сети
+грузим
+```
+
+<Figure scheme="ko-sealed-when" caption="Наследники sealed-класса объявлены рядом с ним, и снаружи новых не добавить. Именно поэтому when по такому типу обходится без else — а при появлении нового варианта компилятор сам приведёт к этому месту." />
+
+`sealed` буквально значит «запечатанный»: наследоваться от такого класса можно **только внутри того же модуля**, а обычно — прямо внутри самого класса, как в примере. Список наследников закрыт, и компилятор знает его целиком.
+
+Отсюда — главная выгода. Убираем одну ветку:
+
+```kotlin
+fun describe(r: Result): String = when (r) {
+    is Result.Ok -> "ок"
+}
+```
+
+```
+'when' expression must be exhaustive. Add the 'is Fail' branch or an 'else' branch.
+```
+
+Компилятор **назвал недостающую ветку по имени**. Это и есть тот сценарий, ради которого `sealed` используют в каждом Android-приложении: добавили в `Result` новый вариант — и компилятор сам провёл по всем `when`, которые надо дописать. Ничего не забудется, потому что забыть физически не дают.
+
+<Hint id="kotlin-oop-h4" type="important">
+Ветка `else` в `when` по `sealed`-классу **убивает всю пользу**. С ней новый вариант молча попадёт в `else`, и компилятор промолчит. Поэтому в `when` по запечатанному типу `else` не пишут вообще — даже если ветка «на всякий случай» кажется безопасной. Здесь «на всякий случай» и есть источник будущего бага.
+</Hint>
+
+Обрати внимание на третий вариант: `object Loading : Result()`. Слово `object` вместо `class` означает «этот вариант существует ровно в одном экземпляре» — у загрузки нет данных, поэтому и создавать копии незачем. И в `when` он сравнивается без `is`: `Result.Loading ->`, потому что объект один и сравнить можно прямо с ним.
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="sealed" />
+
+## `object` и `companion object`
+
+Слово `object` в Kotlin делает три разные вещи, и их стоит различать.
+
+**Первое: одиночка.** Объявление `object Config` создаёт класс и его единственный экземпляр одновременно:
+
+<KotlinPlay code={`object Config {
+    val apiUrl = "https://ton.org"
+    var retries = 3
+}
+
+fun main() {
+    println(Config.apiUrl)
+    Config.retries = 5
+    println(Config.retries)
+}`} />
+
+**Что выведет:** `https://ton.org` и `5`.
+
+Создать второй `Config` невозможно, и это то, что в других языках называют шаблоном «одиночка» (singleton) и пишут вручную десятком строк с приватным конструктором.
+
+**Второе: статические члены класса.** В Kotlin нет слова `static`. То, что в Java было статическим, живёт в `companion object` — «объекте-спутнике» класса:
+
+<KotlinPlay code={`class User private constructor(val nick: String) {
+    companion object {
+        const val MAX_LEN = 12
+        fun of(nick: String): User? =
+            if (nick.length <= MAX_LEN) User(nick) else null
+    }
+}
+
+fun main() {
+    println(User.of("soня")?.nick)
+    println(User.of("оченьдлинныйникнейм")?.nick)
+    println(User.MAX_LEN)
+}`} />
+
+**Что выведет:** `soня`, `null`, `12`.
+
+Здесь показан классический приём: конструктор закрыт словом `private`, а создание идёт через функцию `of()`, которая может отказать и вернуть `null`. Снаружи это выглядит как `User.of(...)` — точно так же, как статический метод в Java.
+
+`const val` — константа времени компиляции: её значение подставляется в код прямо при сборке. Работает только для примитивов и строк и только внутри `companion object` или на верхнем уровне файла.
+
+**Третье: безымянный объект на месте.** Когда нужен один-единственный объект, реализующий интерфейс, класс для него не заводят:
+
+<KotlinPlay code={`interface Listener {
+    fun onEvent(name: String)
+}
+
+fun main() {
+    val anon = object : Listener {
+        override fun onEvent(name: String) = println("поймал \${name}")
+    }
+    anon.onEvent("click")
+}`} />
+
+**Что выведет:** `поймал click`.
+
+Это прямой аналог анонимного класса из Java, и в Android так до сих пор задают обработчики событий там, где не подходит лямбда.
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="object" />
+
+## Функции-расширения: чужой класс с новым методом
+
+Возможность, которой в Java нет вовсе. Можно дописать метод классу, исходники которого недоступны, — например, стандартному `String`:
+
+<KotlinPlay code={`fun String.shorten(max: Int): String =
+    if (length <= max) this else take(max) + "…"
+
+fun main() {
+    println("оченьдлинныйникнейм".shorten(8))
+    println("TON".shorten(8))
+}`} />
+
+**Что выведет:** `оченьдли…` и `TON`.
+
+`String.` перед именем функции означает «эта функция вызывается на строке». Внутри доступны `this` и — как видно из примера — все свойства получателя напрямую: `length` без всякого `this.`.
+
+Класс `String` при этом не меняется: компилятор превращает вызов в обычную статическую функцию с получателем в первом параметре. Отсюда два следствия:
+
+- расширение **не видит приватных членов** класса — оно снаружи;
+- расширение **не переопределяет** существующий метод: если у класса уже есть метод с таким именем, выиграет всегда он.
+
+Половина стандартной библиотеки Kotlin — это расширения к типам из Java. `isNullOrBlank()`, `filter`, `sumOf` из прошлых глав — все они дописаны именно так.
+
+<Block kind="quiz" title="data, sealed, object" chapterId="kotlin-oop" blockId="quiz-data">
+<SelfCheck chapterId="kotlin-oop" quizId="quiz-data" questions={[
+  { q: 'Что добавляет слово data перед class?', options: ['Только красивую печать', 'toString, equals, hashCode, copy и функции для деструктуризации', 'Делает поля неизменяемыми', 'Ускоряет создание объектов'], correct: 1, why: 'Без data два объекта с одинаковым содержимым не равны, а печать выдаёт адрес в памяти вроде Coin@5ca881b5.' },
+  { q: 'Зачем нужен copy() у data class?', options: ['Чтобы скопировать ссылку', 'Чтобы создать новый объект, заменив часть полей, не меняя исходный', 'Чтобы клонировать список', 'Чтобы сравнить два объекта'], correct: 1, why: 'Это основной приём работы с неизменяемыми данными: не править объект, а получать новый, почти такой же.' },
+  { q: 'Почему в when по sealed-классу не пишут else?', options: ['else там запрещён компилятором', 'С else новый вариант молча попадёт в него — и компилятор больше не покажет места, которые надо дописать', 'else замедляет работу', 'else нужен только для enum'], correct: 1, why: 'Вся ценность sealed именно в том, что компилятор приводит к каждому when после добавления варианта. else эту связь разрывает.' },
+  { q: 'Что означает object Config { ... }?', options: ['Абстрактный класс', 'Класс и его единственный экземпляр одновременно — одиночка', 'Интерфейс', 'Псевдоним типа'], correct: 1, why: 'Второй такой объект создать невозможно. В Java этот шаблон писали вручную, с приватным конструктором и статическим полем.' },
+  { q: 'Где в Kotlin живёт то, что в Java было static?', options: ['Слово static есть и в Kotlin', 'В companion object внутри класса', 'В интерфейсе', 'В блоке init'], correct: 1, why: 'Снаружи вызов выглядит как User.of(...) — так же, как статический метод, но внутри это обычный объект-спутник.' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="extensions" />
+
+## Ошибки этой главы и что они значат
+
+Все сообщения сняты с настоящего запуска компилятора Kotlin 2.4.10.
+
+| Сообщение | Что случилось | Как чинить |
+| --- | --- | --- |
+| `This type is final, so it cannot be extended.` | наследуемся от закрытого класса | дописать `open` родителю |
+| `'voice' in 'Animal' is final and cannot be overridden.` | у метода родителя нет `open` | дописать `open` методу |
+| `'voice' hides member of supertype 'Animal' and needs an 'override' modifier.` | забыт `override` | дописать `override` |
+| `Cannot create an instance of an abstract class.` | создаём объект абстрактного класса | создавать наследника |
+| `Class 'Button' is not abstract and does not implement abstract member: fun click(): Unit` | не реализован метод интерфейса | реализовать или сделать класс абстрактным |
+| `'when' expression must be exhaustive. Add the 'is Fail' branch or an 'else' branch.` | в `when` по `sealed` не хватает ветки | дописать названную ветку |
+| `Data class must have at least one primary constructor parameter.` | `data class` без полей | добавить поля или убрать `data` |
+| `Cannot access 'count': it is private in 'Counter'.` | пишем в свойство с `private set` | менять через метод класса |
+| `Cannot access 'val secret: String': it is private in 'Wallet'.` | читаем приватное свойство снаружи | открыть доступ через метод или свойство |
+| `Variable 'balance' must be initialized.` | свойство используется раньше объявления | переставить строки |
+| `'val' cannot be reassigned.` | меняем `val`-поле объекта | объявить как `var`, если менять надо |
+| `UninitializedPropertyAccessException: lateinit property owner has not been initialized` | читаем `lateinit` до присваивания | присвоить до чтения или отказаться от `lateinit` |
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="errors" />
+
+## Тренажёр: объявления этой главы
+
+<Block kind="trainer" title="ООП на Kotlin: набери вслепую" chapterId="kotlin-oop" blockId="trainer-koop-typing">
+<CodeTyping pools={[
+  { label: 'Классы', snippets: [
+    'class Wallet(val owner: String, var balance: Int = 0)',
+    'val isRich: Boolean get() = balance > 1000',
+    'var count = 0 private set',
+    'init { require(balance >= 0) }',
+    'val heavy: String by lazy { compute() }',
+  ] },
+  { label: 'Наследование', snippets: [
+    'open class Animal(val name: String)',
+    'class Cat(name: String) : Animal(name)',
+    'override fun voice() = "мяу"',
+    'abstract fun area(): Double',
+    'interface Clickable { fun click() }',
+    'class Button : Clickable, Focusable',
+  ] },
+  { label: 'data и sealed', snippets: [
+    'data class Coin(val ticker: String, val price: Int)',
+    'val next = coin.copy(price = 7)',
+    'sealed class Result',
+    'data class Ok(val value: Int) : Result()',
+    'object Loading : Result()',
+    'companion object { const val MAX_LEN = 12 }',
+    'fun String.shorten(max: Int): String',
+  ] },
+]} keyboard chapterId="kotlin-oop" trainerId="trainer-koop-typing" targetCpm={105} targetAccuracy={90} />
+</Block>
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="trainer" />
+
+## Символы и слова этой главы
+
+<Block kind="cheatsheet" title="Всё, что встретилось в главе" chapterId="kotlin-oop" blockId="cheatsheet-symbols">
+
+| Слово или знак | Что означает |
+| --- | --- |
+| `class` | объявление класса |
+| `:` после имени класса | «является разновидностью»: наследование или реализация интерфейса |
+| `open` | разрешает наследование класса или переопределение метода |
+| `override` | обязательное объявление «я переопределяю метод родителя» |
+| `abstract` | объявление без тела; наследник обязан реализовать |
+| `interface` | договор о поведении, без состояния |
+| `super` | обращение к реализации родителя |
+| `super<Имя>` | выбор конкретного родителя при конфликте умолчаний |
+| `data` | генерирует `toString`, `equals`, `hashCode`, `copy`, `componentN` |
+| `sealed` | закрытая иерархия: список наследников известен компилятору |
+| `enum class` | фиксированный список именованных вариантов |
+| `object` | одиночка, безымянный объект или вариант `sealed`-класса |
+| `companion object` | замена `static` из Java |
+| `const val` | константа, подставляемая при компиляции |
+| `init` | блок, выполняемый при создании объекта |
+| `constructor` | дополнительный конструктор |
+| `lateinit` | обещание присвоить значение до первого чтения |
+| `by lazy` | вычислить при первом обращении и запомнить |
+| `private` / `protected` / `internal` | ограничение видимости |
+| `private set` | читать можно всем, менять — только изнутри класса |
+| `fun Тип.имя()` | функция-расширение: новый метод у чужого класса |
+| `val (a, b) = obj` | деструктуризация объекта на переменные |
+
+</Block>
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="symbols" />
+
+## Если рядом учат TypeScript
+
+| Что | Kotlin | TypeScript |
+| --- | --- | --- |
+| Создание объекта | `Wallet()` | `new Wallet()` |
+| Свойства в конструкторе | `class W(val owner: String)` | `constructor(public owner: string)` |
+| Наследование по умолчанию | закрыто, нужен `open` | открыто всегда |
+| `override` | обязателен | необязателен |
+| Класс для данных | `data class` | обычный класс или `interface` |
+| Сравнение объектов по содержимому | `==` у `data class` | вручную или через библиотеку |
+| Закрытый набор вариантов | `sealed class` | размеченное объединение типов |
+| Статические члены | `companion object` | `static` |
+| Одиночка | `object Config` | экспортированная константа |
+| Расширение чужого типа | функция-расширение | объявление слияния или обёртка |
+| Множественная реализация | несколько `interface` | несколько `interface` |
+
+Ключевое различие: в Kotlin компилятор **проверяет договор** — `open`, `override`, исчерпывающий `when`. В TypeScript проверок такого рода почти нет, там дисциплину поддерживает разработчик и линтер.
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="vs-ts" />
+
+## Что должен уметь
+
+- Объявлять класс со свойствами прямо в заголовке и объяснять роль `val`/`var` там.
+- Создавать объект без слова `new`.
+- Писать вычисляемое свойство через `get()` и объяснять, зачем оно лучше хранимого.
+- Закрывать изменение свойства через `private set`.
+- Понимать порядок инициализации: свойства сверху вниз, `init`, потом второй конструктор.
+- Отличать `lateinit` от `by lazy` и знать, какое исключение даёт первый.
+- Объяснять, почему в Kotlin класс закрыт для наследования по умолчанию.
+- Пользоваться `open` и `override` и знать оба сообщения компилятора при их отсутствии.
+- Показывать полиморфизм на списке общего типа.
+- Отличать абстрактный класс от интерфейса и выбирать между ними.
+- Реализовывать несколько интерфейсов и разрешать конфликт умолчаний через `super<Имя>`.
+- Объявлять `data class` и перечислять все пять сгенерированных возможностей.
+- Пользоваться `copy()` и деструктуризацией.
+- Объяснять, почему поля `data class` делают `val`.
+- Писать `enum class` с данными у вариантов и знать `name`, `ordinal`, `entries`.
+- Объявлять `sealed class` с наследниками разной формы.
+- Объяснять, почему `else` в `when` по `sealed` вредит.
+- Различать три роли слова `object`.
+- Заменять `static` на `companion object` и закрывать конструктор ради фабричной функции.
+- Писать функцию-расширение и объяснять, почему она не видит приватных членов.
+- Узнавать в лицо двенадцать сообщений компилятора из таблицы ошибок.
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="what-you-should-know" />
+
+<details>
+<summary>Углубиться</summary>
+
+**Почему закрыто по умолчанию.** Это прямое следствие книги Джошуа Блоха «Effective Java», пункт «Design and document for inheritance or else prohibit it». Класс, от которого наследуются, обязан описывать, какие методы вызывают какие, — иначе наследник ломается при любом изменении родителя. Блох советовал по умолчанию писать `final`; авторы Kotlin просто сделали этот совет умолчанием языка. Обратная сторона известна: библиотеки тестирования вроде Mockito не могут подменить закрытый класс, из-за чего в Android-проектах подключают плагин `all-open` для Spring и предпочитают интерфейсы.
+
+**Во что превращается `data class`.** Компилятор дописывает пять методов ровно по полям **основного конструктора**. Поле, объявленное в теле класса, в `equals`, `hashCode` и `toString` не попадает — это регулярный источник удивления. Проверить легко: два объекта, различающиеся только полем из тела, окажутся равными.
+
+**`data class` и `record`.** Java получила похожую конструкцию — `record` — только в версии 16, в 2021 году, через пять лет после выхода Kotlin 1.0. Идея та же: неизменяемый носитель данных с автоматическими `equals`, `hashCode` и `toString`. Разница в том, что `record` жёстче: поля всегда неизменяемы, наследование запрещено полностью, а аналога `copy()` нет.
+
+**`sealed class` и `sealed interface`.** С Kotlin 1.5 запечатанным может быть и интерфейс, и это часто удобнее: у `sealed interface` нет конструктора, а наследник может реализовать сразу несколько таких интерфейсов. В новом коде состояния экрана чаще описывают именно через `sealed interface`. Java тоже получила `sealed` — в версии 17, в 2021-м.
+
+**Что такое `Any`.** У всех классов Kotlin общий предок — `Any`. Именно оттуда приходят `equals()`, `hashCode()` и `toString()`, которые переопределяет `data class`. Отличие от Java-предка `Object` в том, что `Any` не имеет методов `wait()`, `notify()` и `getClass()` — авторы намеренно не пустили в язык устаревший механизм синхронизации.
+
+**Делегирование через `by`.** Кроме `by lazy` слово `by` умеет делегировать целый интерфейс другому объекту: `class Button(l: Clickable) : Clickable by l` — все методы `Clickable` автоматически переадресуются в `l`. Это язык поддерживает шаблон «композиция вместо наследования» синтаксисом, а не советом.
+
+Дальше по теме:
+- [Kotlin docs: Classes](https://kotlinlang.org/docs/classes.html) — классы, конструкторы, `init`
+- [Kotlin docs: Inheritance](https://kotlinlang.org/docs/inheritance.html) — `open`, `override`, `super`
+- [Kotlin docs: Data classes](https://kotlinlang.org/docs/data-classes.html) — что именно генерируется
+- [Kotlin docs: Sealed classes and interfaces](https://kotlinlang.org/docs/sealed-classes.html) — закрытые иерархии
+- [Kotlin docs: Delegation](https://kotlinlang.org/docs/delegation.html) — слово `by` целиком
+
+</details>
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="deep" />
+
+<Block kind="quiz" title="Экзамен главы" chapterId="kotlin-oop" blockId="exam">
+<ChapterExam chapterId="kotlin-oop" questions={[
+  { q: 'Сколько строк занимает в Kotlin класс с двумя свойствами, конструктором, геттерами и сеттером?', options: ['Около двадцати, как в Java', 'Одна: class Wallet(val owner: String, var balance: Int = 0)', 'Пять', 'Зависит от версии языка'], correct: 1, why: 'Геттеры и сеттеры никуда не делись — их пишет компилятор, поэтому из Java такой класс виден как обычный Java-класс.' },
+  { q: 'Почему class Cat : Animal() не компилируется при обычном class Animal?', options: ['Нужны фигурные скобки', 'Класс в Kotlin закрыт для наследования, пока не написано open', 'Нужно слово extends', 'Наследование требует интерфейса'], correct: 1, why: 'This type is final, so it cannot be extended. Умолчание перевёрнуто по сравнению с Java намеренно.' },
+  { q: 'Забыли слово override у метода наследника. Что скажет компилятор?', options: ['Ничего, соберёт молча', 'hides member of supertype and needs an override modifier — и откажется собирать', 'Выдаст предупреждение', 'Потребует abstract'], correct: 1, why: 'В Java этот код собрался бы, и метод бы просто перекрыл родительский. Kotlin превратил аннотацию @Override в обязательное слово.' },
+  { q: 'Что напечатает println(c1) для обычного class Coin(val t: String)?', options: ['Coin(t=TON)', 'TON', 'Что-то вроде Coin@5ca881b5 — имя класса и адрес в памяти', 'null'], correct: 2, why: 'Читаемую печать по полям добавляет только слово data. Без него используется реализация из Any.' },
+  { q: 'c1 и c2 — два data class Coin("TON", 5). Чему равны c1 == c2 и c1 === c2?', options: ['true и true', 'true и false', 'false и false', 'false и true'], correct: 1, why: '== сравнивает содержимое благодаря сгенерированному equals, а === проверяет тождество объектов — это разные объекты в памяти.' },
+  { q: 'Что делает copy(price = 7) у data class?', options: ['Меняет поле в исходном объекте', 'Создаёт новый объект с тем же содержимым, но с заменённым полем price', 'Копирует ссылку', 'Сравнивает объекты'], correct: 1, why: 'Основной приём работы с неизменяемыми данными: не править объект, а получать новый.' },
+  { q: 'Почему data class Empty() не компилируется?', options: ['Нужно слово open', 'Data class must have at least one primary constructor parameter — класс данных без данных бессмыслен', 'Нужен companion object', 'Имя Empty занято'], correct: 1, why: 'Генерировать equals и toString не по чему, поэтому компилятор просит хотя бы одно поле в основном конструкторе.' },
+  { q: 'Какое преимущество даёт when по sealed-классу без ветки else?', options: ['Код работает быстрее', 'При добавлении нового наследника компилятор сам укажет на все when, которые надо дописать', 'Экономится память', 'Не нужен импорт'], correct: 1, why: 'Сообщение даже называет недостающую ветку: Add the is Fail branch or an else branch. Ветка else эту связь разрывает.' },
+  { q: 'Что означает object Loading : Result() внутри sealed-класса?', options: ['Абстрактный вариант', 'Вариант в единственном экземпляре — у него нет данных, поэтому копии не нужны', 'Интерфейс', 'Ошибку'], correct: 1, why: 'В when такой вариант сравнивают без is: Result.Loading ->, потому что объект ровно один.' },
+  { q: 'Где в Kotlin живёт то, что в Java было static?', options: ['Слово static есть и в Kotlin', 'В companion object внутри класса', 'В блоке init', 'В интерфейсе'], correct: 1, why: 'Снаружи вызов выглядит как User.of(...), но внутри это обычный объект-спутник со своими свойствами и методами.' },
+  { q: 'Что произойдёт при чтении lateinit var owner до присваивания?', options: ['Вернётся null', 'Ошибка компиляции', 'UninitializedPropertyAccessException во время работы', 'Вернётся пустая строка'], correct: 2, why: 'lateinit — расписка программиста, как и !!. Компилятор проверок не делает, ошибка вылезет у пользователя.' },
+  { q: 'Что делает by lazy?', options: ['Откладывает создание объекта целиком', 'Вычисляет значение при первом обращении и запоминает результат', 'Делает свойство изменяемым', 'Копирует значение из родителя'], correct: 1, why: 'В примере строка «считаю один раз» печатается однажды, хотя свойство читают дважды.' },
+  { q: 'Два интерфейса дают свою реализацию showOff(). Что требует компилятор?', options: ['Ничего, берётся первая', 'Переопределить метод и выбрать нужный через super<Имя>.showOff()', 'Убрать один интерфейс', 'Сделать класс абстрактным'], correct: 1, why: 'Kotlin не угадывает за программиста. Ровно из-за этого конфликта Java долго обходилась без множественного наследования.' },
+  { q: 'Функция-расширение fun String.shorten() видит приватные поля String?', options: ['Да, она становится частью класса', 'Нет: компилятор превращает её в обычную функцию с получателем в параметре, класс не меняется', 'Да, если объявить internal', 'Только внутри того же модуля'], correct: 1, why: 'По той же причине расширение не может переопределить существующий метод: при совпадении имён выигрывает настоящий метод класса.' },
+  { q: 'Почему поля data class почти всегда объявляют как val?', options: ['Так требует компилятор', 'Изменение поля ломает hashCode: коллекция перестаёт находить собственный элемент', 'val работает быстрее', 'var в data class запрещён'], correct: 1, why: 'Положили объект в Set, поменяли поле — хэш изменился, и элемент «потерялся». С val и copy() такой проблемы нет.' },
+]} />
+</Block>
+
+## Куда дальше: проверенные ресурсы
+
+<Block kind="cheatsheet" title="ООП на Kotlin: официальные источники" chapterId="kotlin-oop" blockId="cheatsheet-resources">
+
+- [Kotlin docs: Classes](https://kotlinlang.org/docs/classes.html) — конструкторы, `init`, свойства.
+- [Kotlin docs: Inheritance](https://kotlinlang.org/docs/inheritance.html) — `open`, `override`, вызов `super`.
+- [Kotlin docs: Properties](https://kotlinlang.org/docs/properties.html) — геттеры, сеттеры, `lateinit`.
+- [Kotlin docs: Interfaces](https://kotlinlang.org/docs/interfaces.html) — реализации по умолчанию и разрешение конфликтов.
+- [Kotlin docs: Data classes](https://kotlinlang.org/docs/data-classes.html) — что именно генерируется и по каким полям.
+- [Kotlin docs: Sealed classes and interfaces](https://kotlinlang.org/docs/sealed-classes.html) — закрытые иерархии.
+- [Kotlin docs: Object declarations](https://kotlinlang.org/docs/object-declarations.html) — все три роли слова `object`.
+- [Kotlin docs: Extensions](https://kotlinlang.org/docs/extensions.html) — функции и свойства-расширения.
+- [Kotlin docs: Visibility modifiers](https://kotlinlang.org/docs/visibility-modifiers.html) — `private`, `protected`, `internal`.
+- [Kotlin Koans: Classes](https://play.kotlinlang.org/koans/overview) — задачи по теме прямо в браузере.
+
+- [Видео и материалы сообщества — ниже](#community-sources) — ролики по теме и ссылки от студентов и преподавателей смотри в самом низу страницы.
+
+</Block>
+
+<SectionAnchor chapterId="kotlin-oop" sectionId="resources" />

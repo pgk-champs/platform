@@ -1,8 +1,21 @@
 import { render } from '@testing-library/react';
-import ChapterCover, { CHAPTER_IDS, TrackBanner } from './ChapterCover';
+import ChapterCover, { CHAPTER_IDS, TrackBanner, coverFontSize } from './ChapterCover';
 
-test('покрыты все 31 глава', () => {
-  expect(CHAPTER_IDS).toHaveLength(31);
+test('покрыты все 43 главы', () => {
+  expect(CHAPTER_IDS).toHaveLength(43);
+});
+
+test('заголовок обложки умещается в ширину 800', () => {
+  for (const id of CHAPTER_IDS) {
+    const { container, unmount } = render(<ChapterCover chapterId={id} />);
+    const found = container.querySelectorAll('text[x="36"][y="204"]');
+    expect(found).toHaveLength(1);
+    const title = found[0].textContent ?? '';
+    expect(Number(found[0].getAttribute('font-size'))).toBe(coverFontSize(title));
+    // при кегле 21 в оставшиеся 744 px влезает около 60 знаков — дальше строка обрежется
+    expect(title.length).toBeLessThanOrEqual(60);
+    unmount();
+  }
 });
 
 test('новые главы стоят в своих треках', () => {
@@ -12,8 +25,22 @@ test('новые главы стоят в своих треках', () => {
     ['android-studio', 'МОБИЛКА', '00'],
     ['code-basics', 'ФУНДАМЕНТ', '08'],
     ['oop-basics', 'ФУНДАМЕНТ', '09'],
-    ['kotlin-vs-java', 'МОБИЛКА', '08'],
+    ['kotlin-flow', 'МОБИЛКА', '02'],
+    ['kotlin-oop', 'МОБИЛКА', '05'],
+    ['kotlin-vs-java', 'МОБИЛКА', '06'],
+    ['kotlin-history', 'МОБИЛКА', '07'],
+    ['kotlin-coroutines', 'МОБИЛКА', '08'],
+    ['kotlin-null', 'МОБИЛКА', '09'],
+    ['first-compose-screen', 'МОБИЛКА', '10'],
+    ['ui-kit', 'МОБИЛКА', '13'],
     ['ts-vs-js', 'БЛОКЧЕЙН', '04'],
+    ['ts-values', 'БЛОКЧЕЙН', '05'],
+    ['ts-flow', 'БЛОКЧЕЙН', '06'],
+    ['ts-functions', 'БЛОКЧЕЙН', '07'],
+    ['ts-collections', 'БЛОКЧЕЙН', '08'],
+    ['ts-oop', 'БЛОКЧЕЙН', '09'],
+    ['ts-history', 'БЛОКЧЕЙН', '10'],
+    ['ts-async', 'БЛОКЧЕЙН', '11'],
   ] as const;
   for (const [id, track, num] of cases) {
     const { container, unmount } = render(<ChapterCover chapterId={id} />);

@@ -1,0 +1,1169 @@
+---
+title: 'ООП на TypeScript: классы, наследование, интерфейсы'
+audience: 'блокчейн'
+level: 'углубление'
+order: 9
+sidebar_position: 9
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="ts-oop" />
+
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import CodeTyping from '@site/src/components/CodeTyping';
+
+# ООП на TypeScript: классы, наследование, интерфейсы
+
+<ChapterProgress chapterId="ts-oop" totalSections={27} totalQuizzes={4} totalTrainers={1} />
+
+## Зачем это нужно
+
+В главе «ООП простыми словами» разобрано, зачем вообще нужны классы: чтобы данные и работа с ними лежали в одном месте, а не разбегались по десятку функций. Здесь — то же самое, но полностью и на одном языке: как это записывается в TypeScript, что при этом происходит в памяти, где именно ломается, и во что превращается после компиляции.
+
+Разница между «понимать идею ООП» и «уметь писать классы» примерно как между «понимать, что такое рычаг» и «уметь чинить велосипед». Идея простая, а деталей — тридцать штук, и каждая ломается по-своему.
+
+Что дальше встретится в настоящем коде:
+
+- SDK любого блокчейна — это классы. `new Signer(...)`, `wallet.sign(tx)`, `provider.getBalance(addr)` — за каждым вызовом класс с полями и методами.
+- Ошибки — тоже классы: `class InsufficientFunds extends Error`. Без наследования не написать своё исключение.
+- Тесты, контроллеры, сервисы — везде классы с интерфейсами.
+
+Глава разбирает всё по порядку: от `class` и `new` до прототипов, на которых это построено. Каждый пример проверен запуском на Node.js 24 и компиляцией TypeScript 6 в строгом режиме — включая тексты ошибок с их настоящими номерами.
+
+<CollapsibleToc toc={toc} chapterId="ts-oop" />
+
+<SectionAnchor chapterId="ts-oop" sectionId="why" />
+
+## Объект руками: почему этого мало
+
+Начнём с того, что уже умеем. Транзакцию можно описать обычным объектом:
+
+```js
+const tx = { id: 'a1', amount: 5000 };
+console.log(tx.amount * 0.001); // 5
+```
+
+Работает. Проблемы начинаются, когда транзакций становится много.
+
+```js
+const tx1 = { id: 'a1', amount: 5000 };
+const tx2 = { id: 'b7', amount: 120 };
+const tx3 = { id: 'c3', amount: 48000 };
+console.log(tx1.amount * 0.001, tx2.amount * 0.001, tx3.amount * 0.001);
+```
+
+Формула комиссии написана три раза. Меняется ставка — правим в трёх местах, и в одном обязательно забудем. Первое решение мы уже знаем — функция:
+
+```js
+function fee(tx) {
+  return tx.amount * 0.001;
+}
+```
+
+Стало лучше, но появилась новая беда: функция `fee` живёт отдельно от объекта. Ничто не мешает передать в неё что угодно — например, объект пользователя, у которого поля `amount` нет вовсе. Получится `undefined * 0.001`, то есть `NaN`, и без единой ошибки.
+
+Второе решение — **фабричная функция**: она собирает объект вместе с его методами.
+
+```js
+function makeTx(id, amount) {
+  return {
+    id,
+    amount,
+    fee() {
+      return this.amount * 0.001;
+    },
+  };
+}
+const t = makeTx('a1', 5000);
+console.log(t.fee()); // 5
+```
+
+Уже почти то, что надо: данные и работа с ними в одном месте. Осталась одна неприятность — **каждый объект носит с собой свою копию функции `fee`**. Для трёх транзакций всё равно, для тридцати тысяч записей из ответа ноды — уже нет.
+
+Класс решает ровно эту задачу: держит данные у каждого объекта свои, а методы — общие на всех.
+
+<SectionAnchor chapterId="ts-oop" sectionId="by-hand" />
+
+## Класс: чертёж и изделие
+
+```js
+class Tx {
+  constructor(id, amount) {
+    this.id = id;
+    this.amount = amount;
+  }
+  fee() {
+    return this.amount * 0.001;
+  }
+}
+
+const t = new Tx('a1', 5000);
+console.log(t.id, t.amount, t.fee()); // a1 5000 5
+```
+
+Живой запуск даёт `a1 5000 5`.
+
+<Block kind="breakdown" title="Разбор по частям: объявление класса" chapterId="ts-oop" blockId="breakdown-class">
+<SyntaxBreakdown parts={[
+  { text: 'class', label: 'ключевое слово', note: 'дальше идёт описание типа объектов, а не сам объект' },
+  { text: 'Tx', label: 'имя класса', note: 'с большой буквы — соглашение, которому следуют все; нарушение не ошибка, но выглядит как чужой код' },
+  { text: '{ … }', label: 'тело класса', note: 'внутри только объявления полей и методов; запятые между ними НЕ ставятся — в отличие от объекта' },
+  { text: 'constructor', label: 'конструктор', note: 'особый метод: запускается один раз при создании объекта; имя фиксировано' },
+  { text: 'this', label: 'создаваемый объект', note: 'внутри конструктора — тот самый объект, который сейчас собирают' },
+  { text: 'fee() { … }', label: 'метод', note: 'функция, привязанная к классу; слова function здесь нет' },
+  { text: 'new Tx(…)', label: 'создание объекта', note: 'без new класс вызвать нельзя — будет TypeError' },
+]} />
+</Block>
+
+Три различия, из-за которых класс путают с объектом:
+
+| | объект `{ }` | класс `class` |
+| --- | --- | --- |
+| Между полями | запятая | ничего |
+| Пара «имя — значение» | `amount: 5000` | `amount = 5000` |
+| Что это такое | готовая вещь | чертёж вещи |
+
+<Figure scheme="to-blueprint-instances" caption="Класс — чертёж. Из одного чертежа делают сколько угодно объектов: поля у каждого свои, а метод существует в единственном экземпляре и лежит в прототипе." />
+
+Проверим главное обещание — что метод один на всех:
+
+```js
+const a = new Tx('a1', 5000);
+const b = new Tx('b7', 120);
+console.log(a.fee === b.fee);            // true
+console.log(a.hasOwnProperty('fee'));    // false
+console.log('fee' in a);                 // true
+```
+
+`a.fee === b.fee` даёт `true`: это буквально одна и та же функция. При этом сам объект поля `fee` не имеет (`hasOwnProperty` — `false`), но найти его через объект можно (`in` — `true`). Куда именно смотрит поиск, разберём в разделе про прототипы.
+
+<SectionAnchor chapterId="ts-oop" sectionId="class-basics" />
+
+## Конструктор: что происходит при `new`
+
+Слово `new` делает четыре вещи подряд:
+
+1. Создаёт новый пустой объект.
+2. Привязывает к нему прототип класса — так объект получает доступ к методам.
+3. Запускает `constructor`, где `this` — этот новый объект.
+4. Возвращает объект (`return` писать не нужно).
+
+Отсюда следствия, которые полезно проверить руками.
+
+```js
+class Tx {
+  constructor(id, amount) {
+    this.id = id;
+    this.amount = amount;
+  }
+}
+console.log(typeof Tx);         // function
+console.log(new Tx('a', 1));    // Tx { id: 'a', amount: 1 }
+```
+
+Вывод — `Tx { id: 'a', amount: 1 }`: Node печатает имя класса перед фигурными скобками, и по этому имени в консоли удобно отличать «просто объект» от объекта класса.
+
+Вызов без `new` запрещён:
+
+```js
+Tx('a', 1);
+// TypeError: Class constructor Tx cannot be invoked without 'new'
+```
+
+Конструктор можно не писать вовсе — тогда используется пустой:
+
+```js
+class Empty {}
+console.log(new Empty()); // Empty {}
+```
+
+Значения по умолчанию задаются как у обычной функции:
+
+```js
+class Tx {
+  constructor(id, amount = 0, fee = amount * 0.001) {
+    this.id = id;
+    this.amount = amount;
+    this.fee = fee;
+  }
+}
+console.log(new Tx('a')); // Tx { id: 'a', amount: 0, fee: 0 }
+```
+
+<Hint id="ts-oop-h1" type="important">
+Конструктор — не место для тяжёлой работы. Сетевой запрос, чтение файла, разбор большого файла — всё это внутри конструктора превращается в мину: объект нельзя создать быстро, нельзя создать в тесте, и ошибку из конструктора неудобно ловить.
+
+Приём, который применяют вместо этого: конструктор только раскладывает переданное по полям, а «дорогое» создание выносят в статический метод:
+
+```js
+class Wallet {
+  constructor(key) { this.key = key; }
+  static async fromFile(path) {
+    const key = await readFile(path, 'utf8');
+    return new Wallet(key.trim());
+  }
+}
+```
+
+Такой метод называют фабричным. Он ещё и читается лучше: `Wallet.fromFile('key.txt')` говорит больше, чем `new Wallet(...)` с непонятным аргументом.
+</Hint>
+
+<SectionAnchor chapterId="ts-oop" sectionId="constructor" />
+
+## Методы: код, общий для всех объектов
+
+Метод — обычная функция, записанная внутри тела класса без слова `function`:
+
+```js
+class Tx {
+  constructor(amount) { this.amount = amount; }
+  fee() { return this.amount * 0.001; }
+  total() { return this.amount + this.fee(); }
+  toString() { return `${this.amount} (комиссия ${this.fee()})`; }
+}
+const t = new Tx(5000);
+console.log(t.total());   // 5005
+console.log(`${t}`);      // 5000 (комиссия 5)
+```
+
+Три вещи, которые здесь стоит заметить.
+
+**Метод зовёт метод через `this`.** Внутри `total` нельзя написать просто `fee()` — такой функции в области видимости нет, будет `ReferenceError`. Только `this.fee()`.
+
+**`toString` — особое имя.** Его вызывает сам язык, когда объект попадает в строку: в шаблонной строке, при склейке через `+`, в `String(t)`. Свой `toString` — самый дешёвый способ сделать объект читаемым в логах.
+
+**В `JSON.stringify` попадают только поля.**
+
+```js
+console.log(JSON.stringify(t)); // {"amount":5000}
+```
+
+Методов в JSON нет и не будет: они лежат не в объекте. Отсюда важное следствие для сетевого кода — объект, вернувшийся из `JSON.parse`, **не является** объектом класса. Он выглядит похоже, но методов у него нет:
+
+```js
+const back = JSON.parse(JSON.stringify(t));
+console.log(back.amount);   // 5000
+console.log(back instanceof Tx); // false
+back.fee();                 // TypeError: back.fee is not a function
+```
+
+Это одна из самых частых неожиданностей у тех, кто пришёл из языков со строгими типами: данные по сети ходят без классов, и класс приходится собирать заново — `new Tx(back.amount)`.
+
+<SectionAnchor chapterId="ts-oop" sectionId="methods" />
+
+## `this`: главная ловушка
+
+`this` — не «текущий класс». `this` — **тот объект, который стоял слева от точки в момент вызова**. Не при объявлении, а при вызове. Отсюда почти все загадочные ошибки в классах.
+
+```js
+class Tx {
+  constructor(amount) { this.amount = amount; }
+  fee() { return this.amount * 0.001; }
+}
+const t = new Tx(5000);
+
+console.log(t.fee());   // 5 — слева от точки стоит t
+
+const f = t.fee;
+f();
+// TypeError: Cannot read properties of undefined (reading 'amount')
+```
+
+Во второй строке метод достали из объекта и положили в переменную. Функция та же самая, но точки при вызове больше нет — и `this` внутри оказывается `undefined`. Ошибка при этом жалуется не на `this`, а на чтение `amount` у `undefined`, и найти причину по тексту сложно.
+
+<Figure scheme="to-this-binding" caption="Три способа вызвать один и тот же метод. Связь с объектом даёт точка при вызове; стоит её потерять — и this становится undefined." />
+
+Где это случается на практике: почти всегда там, где метод передают дальше как значение.
+
+```js
+// все три строки сломаются одинаково
+setTimeout(t.fee, 100);
+[1, 2, 3].forEach(t.fee);
+button.addEventListener('click', t.fee);
+```
+
+Три надёжных способа починить:
+
+```js
+setTimeout(() => t.fee(), 100);        // 1. обёртка-стрелка: точка на месте
+setTimeout(t.fee.bind(t), 100);        // 2. bind: делает новую функцию с приклеенным this
+```
+
+```js
+class Tx {
+  amount = 5000;
+  fee = () => this.amount * 0.001;     // 3. стрелка в поле объекта
+}
+const g = new Tx().fee;
+console.log(g()); // 5 — работает даже без точки
+```
+
+Третий способ работает, потому что у стрелочной функции **своего `this` нет**: она берёт его из места объявления, а объявлена она внутри создаваемого объекта. Цена — такое поле принадлежит объекту, а не прототипу, то есть у каждого объекта своя копия функции. Для обработчиков событий это нормально, для класса, которого создают десятки тысяч, — нет.
+
+<Hint id="ts-oop-h2" type="fact">
+TypeScript умеет ловить потерю `this` заранее. Флаг `strictBindCallApply` проверяет `bind`, `call` и `apply`, а отдельный псевдопараметр `this` в сигнатуре метода позволяет прямо запретить вызов без нужного контекста:
+
+```ts
+class Tx {
+  amount = 0;
+  fee(this: Tx) { return this.amount * 0.001; }
+}
+const f = new Tx().fee;
+f(); // ошибка ещё до запуска
+```
+
+Такой параметр не настоящий: он существует только в типах и в JavaScript не попадает.
+</Hint>
+
+<Block kind="quiz" title="Классы, конструктор, this" chapterId="ts-oop" blockId="quiz-basics">
+<SelfCheck chapterId="ts-oop" quizId="quiz-basics" questions={[
+  { q: 'Чем класс отличается от объекта?', options: ['Ничем, это синонимы', 'Класс — описание, объект — созданная по нему вещь', 'Класс быстрее', 'Объект нельзя менять'], correct: 1, why: 'Из одного класса делают сколько угодно объектов: поля у каждого свои, методы общие.' },
+  { q: 'Что произойдёт при вызове Tx() без new?', options: ['Создастся объект', 'TypeError: Class constructor cannot be invoked without new', 'Вернётся undefined', 'Ничего не произойдёт'], correct: 1, why: 'Классы, в отличие от старых функций-конструкторов, вызывать без new запрещено на уровне языка.' },
+  { q: 'Сколько копий метода fee существует при трёх созданных объектах?', options: ['Три — по одной на объект', 'Одна: метод лежит в прототипе класса', 'Ноль, пока метод не вызвали', 'Зависит от размера объекта'], correct: 1, why: 'Проверяется прямо: a.fee === b.fee даёт true. Поэтому же a.hasOwnProperty("fee") — false.' },
+  { q: 'const f = t.fee; f(). Почему падает?', options: ['Метод приватный', 'Потерялась точка, поэтому this внутри — undefined', 'Функция ещё не объявлена', 'Не хватает аргументов'], correct: 1, why: 'this определяется в момент вызова тем, что стоит слева от точки. Чинится обёрткой-стрелкой, bind или стрелкой в поле.' },
+  { q: 'Что вернёт JSON.parse(JSON.stringify(t)) instanceof Tx?', options: ['true', 'false: JSON хранит только поля, класс не восстанавливается', 'Ошибку', 'undefined'], correct: 1, why: 'Данные по сети ходят без классов. Чтобы получить объект класса, его собирают заново: new Tx(back.amount).' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="ts-oop" sectionId="this" />
+
+## Поля прямо в конструкторе: сокращение TypeScript
+
+В TypeScript у класса появляется то, чего в JavaScript нет: поля объявляют с типами, а конструктор умеет объявлять их сам.
+
+Длинная запись — та же, что в JavaScript, плюс типы:
+
+```ts
+class Tx {
+  id: string;
+  amount: number;
+  constructor(id: string, amount: number) {
+    this.id = id;
+    this.amount = amount;
+  }
+}
+```
+
+Имя поля повторяется четыре раза. Короткая запись делает то же самое:
+
+```ts
+class Tx {
+  constructor(
+    public readonly id: string,
+    private amount: number,
+    protected fee = 0.001,
+  ) {}
+  total(): number {
+    return this.amount + this.fee;
+  }
+}
+```
+
+Тело конструктора пустое, а поля всё равно есть. Это называется **параметрами-свойствами**: модификатор доступа (`public`, `private`, `protected`, `readonly`) перед параметром конструктора говорит компилятору «заведи такое поле и положи туда аргумент».
+
+<Block kind="breakdown" title="Разбор по частям: параметры-свойства" chapterId="ts-oop" blockId="breakdown-param-props">
+<SyntaxBreakdown parts={[
+  { text: 'public', label: 'доступно снаружи', note: 'поведение по умолчанию; пишут явно, чтобы включить сокращение' },
+  { text: 'readonly', label: 'только для чтения', note: 'присвоить можно один раз, в конструкторе; дальше только читать' },
+  { text: 'private', label: 'только внутри класса', note: 'проверка выполняется компилятором; в готовом JavaScript ограничения не остаётся' },
+  { text: 'protected', label: 'внутри класса и наследников', note: 'середина между private и public' },
+  { text: 'id: string', label: 'имя и тип', note: 'то же, что у обычного параметра функции' },
+  { text: 'fee = 0.001', label: 'значение по умолчанию', note: 'тип number выведется сам, писать его не нужно' },
+  { text: '{}', label: 'пустое тело', note: 'присваивания this.id = id компилятор допишет сам' },
+]} />
+</Block>
+
+Вот что из этого получится после компиляции — реальный вывод `tsc --target es2022`:
+
+```js
+class Tx {
+    id;
+    amount;
+    constructor(id, amount) {
+        this.id = id;
+        this.amount = amount;
+    }
+}
+```
+
+Компилятор дописал ровно то, что мы поленились написать руками. Все модификаторы при этом исчезли.
+
+<Hint id="ts-oop-h3" type="tip">
+Поле, объявленное без значения и без присваивания в конструкторе, — ошибка в строгом режиме:
+
+```ts
+class C {
+  name: string;
+}
+// error TS2564: Property 'name' has no initializer
+// and is not definitely assigned in the constructor.
+```
+
+Три законных выхода: дать значение по умолчанию (`name = ''`), присвоить в конструкторе или честно признать, что поля может не быть (`name?: string`). Четвёртый выход — приписка `name!: string` — говорит компилятору «поверь мне на слово»; ей пользуются, когда значение проставляет фреймворк, и в обычном коде она означает, что что-то спроектировано неудачно.
+</Hint>
+
+<SectionAnchor chapterId="ts-oop" sectionId="param-props" />
+
+## Инкапсуляция: `private`, `protected` и `#`
+
+Инкапсуляция — это ответ на вопрос «к чему снаружи можно прикасаться, а к чему нельзя». Без неё любой чужой код может залезть в середину объекта и сломать его согласованность.
+
+В TypeScript есть три модификатора и одна возможность самого JavaScript.
+
+```ts
+class Tx {
+  constructor(
+    public readonly id: string,
+    private amount: number,
+    protected fee = 0.001,
+  ) {}
+  total(): number { return this.amount + this.fee; }
+}
+
+const t = new Tx('a1', 100);
+t.id = 'b2';            // error TS2540: Cannot assign to 'id' because it is a read-only property.
+console.log(t.amount);  // error TS2341: Property 'amount' is private and only accessible within class 'Tx'.
+console.log(t.fee);     // error TS2445: Property 'fee' is protected and only accessible within class 'Tx' and its subclasses.
+```
+
+Все три ошибки — настоящий вывод компилятора. И у всех трёх есть общая особенность, о которой обязательно нужно знать.
+
+<Hint id="ts-oop-h4" type="important">
+`private` в TypeScript — **не защита, а договорённость, проверяемая до запуска**. В скомпилированном JavaScript от него не остаётся ничего: поле обычное, и любой код, работающий с готовым файлом, спокойно его прочитает.
+
+Настоящую защиту даёт возможность самого JavaScript — поле с решёткой:
+
+```js
+class Wallet {
+  #key = 'секрет';
+  reveal() { return this.#key.length; }
+}
+const w = new Wallet();
+console.log(w.reveal());          // 6
+console.log(Object.keys(w));      // []
+console.log(JSON.stringify(w));   // {}
+w.#key;                           // SyntaxError на этапе разбора файла
+```
+
+Живой запуск: `6`, пустой массив ключей, пустой JSON. Поле `#key` не видно ни через `Object.keys`, ни в JSON, ни отладчиком снаружи, и обращение к нему из чужого кода — синтаксическая ошибка ещё до запуска.
+
+Правило простое: секрет (ключ, пароль, токен) — `#`. Внутренняя кухня, о которой просто не нужно знать снаружи, — `private`.
+</Hint>
+
+TypeScript знает и про `#`, и ошибка у него отдельная:
+
+```ts
+console.log(t.#hash);
+// error TS18013: Property '#hash' is not accessible outside class 'Tx'
+// because it has a private identifier.
+```
+
+<SectionAnchor chapterId="ts-oop" sectionId="encapsulation" />
+
+## Геттеры и сеттеры
+
+Иногда поле нужно не хранить, а вычислять — но обращаться к нему хочется как к полю, без скобок. Для этого есть `get`:
+
+```js
+class Block {
+  constructor(txs) { this.txs = txs; }
+  get total() { return this.txs.reduce((s, x) => s + x, 0); }
+}
+const b = new Block([1, 2, 3]);
+console.log(b.total);        // 6 — без скобок!
+console.log(Object.keys(b)); // [ 'txs' ] — поля total не существует
+```
+
+Живой запуск подтверждает: `b.total` даёт `6`, но среди собственных полей объекта `total` нет — это метод, замаскированный под поле.
+
+Парный `set` перехватывает присваивание и позволяет проверить значение до того, как оно попадёт внутрь:
+
+```js
+class Wallet {
+  #balance = 0;
+  get balance() { return this.#balance; }
+  set balance(v) {
+    if (v < 0) throw new RangeError('баланс не может быть отрицательным');
+    this.#balance = v;
+  }
+}
+const w = new Wallet();
+w.balance = 100;   // проходит через сеттер
+w.balance = -5;    // RangeError: баланс не может быть отрицательным
+```
+
+Такая пара — типовой приём: хранит `#balance`, а наружу выставляет `balance` с проверкой. Снаружи это выглядит как обычное поле, и вызывающий код ничего не подозревает.
+
+<Hint id="ts-oop-h5" type="tip">
+Геттер обязан быть дешёвым. Читающий код видит `b.total` и считает, что это просто чтение поля, — а внутри может оказаться перебор десяти тысяч элементов, который выполнится при каждом обращении в цикле.
+
+Правило: если работа дорогая, делайте её методом со скобками — `b.computeTotal()`. Скобки честно предупреждают «здесь что-то происходит».
+</Hint>
+
+<SectionAnchor chapterId="ts-oop" sectionId="accessors" />
+
+## `readonly`: поле, которое нельзя переписать
+
+`readonly` разрешает присвоить значение только один раз — при объявлении или в конструкторе:
+
+```ts
+class Tx {
+  constructor(public readonly id: string) {}
+  rename(next: string) {
+    this.id = next; // error TS2540: Cannot assign to 'id' because it is a read-only property.
+  }
+}
+```
+
+Ошибка возникает даже внутри класса — в этом весь смысл: идентификатор транзакции не должен меняться никогда и ни у кого.
+
+Разница с `const` и с `Object.freeze`:
+
+| | что защищает | когда проверяется |
+| --- | --- | --- |
+| `const` | имя переменной | до запуска и во время работы |
+| `readonly` | поле объекта | только до запуска, компилятором |
+| `Object.freeze` | все поля объекта | во время работы, молча не даёт изменить |
+
+И `readonly`, как всё остальное из TypeScript, исчезает при компиляции. Если объект уезжает в чужой код, который на TypeScript не написан, защиты нет.
+
+<SectionAnchor chapterId="ts-oop" sectionId="readonly" />
+
+## `static`: принадлежит классу, а не объекту
+
+Статическое поле или метод живёт у самого класса. У объектов его нет.
+
+```js
+class Counter {
+  static made = 0;
+  constructor() { Counter.made += 1; }
+}
+new Counter();
+new Counter();
+console.log(Counter.made);        // 2
+console.log(new Counter().made);  // undefined
+```
+
+Живой запуск: `2` и `undefined`. Это ровно то, что смущает в первый раз — обращаться нужно через имя класса, не через объект.
+
+Для чего это применяют на практике:
+
+```ts
+class Address {
+  private constructor(public readonly value: string) {}
+
+  static readonly PREFIX = '3P';           // константа класса
+
+  static isValid(s: string): boolean {      // проверка, которой не нужен объект
+    return s.startsWith(Address.PREFIX) && s.length === 35;
+  }
+
+  static from(s: string): Address {          // фабричный метод
+    if (!Address.isValid(s)) throw new Error(`не адрес: ${s}`);
+    return new Address(s);
+  }
+}
+
+const a = Address.from('3P8fH2...');
+```
+
+Три типовых применения статики видны здесь сразу: **константа** класса, **проверка**, которой не нужен готовый объект, и **фабричный метод**, создающий объект вместо `new`. Обратите внимание на `private constructor` — из-за него объект нельзя создать напрямую, и единственная дверь внутрь идёт через `Address.from`, где выполняется проверка.
+
+<Hint id="ts-oop-h6" type="fact">
+`static` — соблазн написать класс, который на самом деле не нужен:
+
+```ts
+class MathUtils {
+  static add(a: number, b: number) { return a + b; }
+  static sub(a: number, b: number) { return a - b; }
+}
+```
+
+Класс, у которого всё статическое, — это модуль, переодетый классом. В JavaScript и TypeScript для этого есть настоящие модули: просто `export function add(...)` в отдельном файле. Так короче, так лучше работает удаление неиспользуемого кода при сборке, и `new` по ошибке никто не напишет.
+</Hint>
+
+<Block kind="quiz" title="Инкапсуляция, геттеры, static" chapterId="ts-oop" blockId="quiz-encapsulation">
+<SelfCheck chapterId="ts-oop" quizId="quiz-encapsulation" questions={[
+  { q: 'Что останется от private в скомпилированном JavaScript?', options: ['Поле станет недоступным', 'Ничего: поле обычное, ограничение было только для компилятора', 'Поле удалится', 'Появится проверка во время работы'], correct: 1, why: 'Настоящую защиту во время работы даёт только поле с решёткой: #key не виден снаружи, в Object.keys и в JSON.' },
+  { q: 'Что покажет JSON.stringify для объекта с полем #key?', options: ['{"#key":"секрет"}', '{} — приватные поля в JSON не попадают', '{"key":"секрет"}', 'Ошибку'], correct: 1, why: 'Проверено запуском: Object.keys даёт пустой массив, JSON.stringify — пустой объект. Ровно то, что нужно для ключей и токенов.' },
+  { q: 'Чем get total отличается от метода total()?', options: ['Ничем', 'Обращаются без скобок, как к полю, но код выполняется при каждом чтении', 'Он быстрее', 'Он статический'], correct: 1, why: 'Отсюда правило: геттер обязан быть дешёвым. Дорогую работу делают методом со скобками — они честно предупреждают о вычислении.' },
+  { q: 'Что вернёт new Counter().made при static made?', options: ['Текущее значение счётчика', 'undefined: статика принадлежит классу, а не объекту', '0', 'Ошибку'], correct: 1, why: 'Обращаться нужно через имя класса: Counter.made. У объектов статических полей нет.' },
+  { q: 'Зачем классу private constructor?', options: ['Чтобы ускорить создание', 'Чтобы объект нельзя было создать мимо проверки — только через статический фабричный метод', 'Чтобы запретить наследование', 'Чтобы поля стали приватными'], correct: 1, why: 'Приём даёт единственную дверь внутрь: Address.from проверяет строку и только потом создаёт объект.' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="ts-oop" sectionId="static" />
+
+## Наследование: `extends` и `super`
+
+Наследование говорит: «этот класс — такой же, как тот, плюс кое-что своё».
+
+```js
+class Tx {
+  constructor(id) { this.id = id; }
+  describe() { return `объект ${this.id}`; }
+}
+
+class Transfer extends Tx {
+  constructor(id, to) {
+    super(id);      // сначала родитель
+    this.to = to;   // потом своё
+  }
+  describe() {
+    return super.describe() + ` → ${this.to}`;
+  }
+}
+
+const tr = new Transfer('x9', 'Bob');
+console.log(tr.describe()); // объект x9 → Bob
+```
+
+Живой вывод — `объект x9 → Bob`.
+
+<Block kind="breakdown" title="Разбор по частям: наследование" chapterId="ts-oop" blockId="breakdown-extends">
+<SyntaxBreakdown parts={[
+  { text: 'extends Tx', label: 'от кого наследуем', note: 'ровно один родитель: множественного наследования в языке нет' },
+  { text: 'super(id)', label: 'вызов конструктора родителя', note: 'обязателен и строго ДО первого обращения к this' },
+  { text: 'super.describe()', label: 'вызов метода родителя', note: 'нужен, когда своё поведение дополняет родительское, а не заменяет' },
+  { text: 'this.to = to', label: 'своё поле', note: 'добавляется к унаследованным, ничего не затирая' },
+]} />
+</Block>
+
+<Figure scheme="to-inheritance" caption="Наследник получает все поля и методы родителя. Часть он оставляет как есть, часть заменяет своими — и внутри замены может позвать родительскую версию через super." />
+
+Порядок вызова `super` — не формальность. Забыли — получите ошибку, и вот её настоящий текст:
+
+```js
+class Broken extends Tx {
+  constructor(id) { this.id = id; }
+}
+new Broken('z');
+// ReferenceError: Must call super constructor in derived class
+// before accessing 'this' or returning from derived constructor
+```
+
+Причина техническая: до `super()` объекта `this` ещё физически не существует — его создаёт конструктор родителя.
+
+<SectionAnchor chapterId="ts-oop" sectionId="inheritance" />
+
+## Переопределение и `override`
+
+Метод с тем же именем в наследнике **заменяет** родительский. Работает это молча — и в этом опасность: опечатались в имени, и вместо переопределения получился новый метод, а старый продолжает вызываться.
+
+TypeScript умеет ловить это с флагом `noImplicitOverride`:
+
+```ts
+class A {
+  greet(): string { return 'a'; }
+}
+class B extends A {
+  override gret(): string { return 'b'; }
+}
+// error TS4117: This member cannot have an 'override' modifier because
+// it is not declared in the base class 'A'. Did you mean 'greet'?
+```
+
+Компилятор не только заметил, но и подсказал правильное имя. Ради одной этой проверки `noImplicitOverride` стоит включить в любом проекте с наследованием.
+
+Второе, что проверяет компилятор, — совместимость сигнатур. Наследник не может требовать больше, чем родитель:
+
+```ts
+class Base { greet() { return 'a'; } }
+class Sub extends Base {
+  greet(name: string) { return name; }
+}
+// error TS2416: Property 'greet' in type 'Sub' is not assignable
+// to the same property in base type 'Base'.
+//   Target signature provides too few arguments. Expected 1 or more, but got 0.
+```
+
+Логика такая: любой код, работающий с `Base`, вправе вызвать `greet()` без аргументов. Если под видом `Base` подсунуть `Sub`, этот код сломается. Компилятор запрещает такую подмену заранее.
+
+<SectionAnchor chapterId="ts-oop" sectionId="override" />
+
+## Полиморфизм: один вызов — разное поведение
+
+Полиморфизм звучит страшно, а значит буквально следующее: вызывающий код пишет одну строку, а выполняется та версия метода, которая соответствует настоящему классу объекта.
+
+```js
+const all = [new Tx('b1'), new Transfer('t1', 'Alice')];
+console.log(all.map((x) => x.describe()));
+// [ 'объект b1', 'объект t1 → Alice' ]
+```
+
+Строка `x.describe()` одна. Результаты разные, потому что объекты разных классов. Никаких `if` по типу писать не нужно — язык сам находит нужную версию.
+
+Ради этого ООП и придумали. Сравните с тем, что было бы без него:
+
+```js
+// плохо: каждый новый вид транзакции требует править эту функцию
+function describe(x) {
+  if (x.kind === 'transfer') return `объект ${x.id} → ${x.to}`;
+  if (x.kind === 'issue') return `выпуск ${x.amount}`;
+  return `объект ${x.id}`;
+}
+```
+
+Такой `if` расползается: сегодня он в одном месте, через месяц — в семи, и добавление нового вида транзакции требует найти их все. При полиморфизме новый вид — это новый класс со своим `describe`, и старый код трогать не нужно вовсе.
+
+<SectionAnchor chapterId="ts-oop" sectionId="polymorphism" />
+
+## `instanceof` и почему им злоупотребляют зря
+
+Проверить, объект какого класса перед нами:
+
+```js
+console.log(tr instanceof Transfer); // true
+console.log(tr instanceof Tx);       // true — родитель тоже подходит
+console.log(tr instanceof Array);    // false
+```
+
+`instanceof` идёт вверх по цепочке наследования, поэтому объект наследника — это одновременно и объект родителя.
+
+Законное применение — разбор ошибок:
+
+```js
+try {
+  await sendTx(tx);
+} catch (e) {
+  if (e instanceof InsufficientFunds) console.log('не хватает средств');
+  else if (e instanceof NetworkError) console.log('сеть недоступна, повторим');
+  else throw e;
+}
+```
+
+Незаконное — подмена полиморфизма:
+
+```js
+// плохо
+function describe(x) {
+  if (x instanceof Transfer) return `${x.id} → ${x.to}`;
+  if (x instanceof Issue) return `выпуск ${x.amount}`;
+  return `объект ${x.id}`;
+}
+```
+
+Это тот же самый расползающийся `if`, только записанный красивее. Признак, по которому его узнают: цепочка `instanceof`, в которую придётся дописывать строку при появлении нового класса. Если так получилось — метод просится в сам класс.
+
+<Hint id="ts-oop-h7" type="important">
+`instanceof` ломается там, где объект пришёл из другого «мира»: из другого окна браузера, из другого экземпляра библиотеки в `node_modules`, из `JSON.parse`. Классы там технически другие, и проверка даст `false` при внешне одинаковых объектах.
+
+Устойчивая альтернатива — обычное поле-метка:
+
+```ts
+type Tx = { kind: 'transfer'; to: string } | { kind: 'issue'; amount: number };
+```
+
+TypeScript такой набор понимает особым образом: после проверки `if (tx.kind === 'transfer')` он сам знает, что поле `to` существует. Приём называется размеченным объединением, и в коде, работающем с данными по сети, он надёжнее классов.
+</Hint>
+
+<SectionAnchor chapterId="ts-oop" sectionId="instanceof" />
+
+## Абстрактный класс: чертёж с дырой
+
+Абстрактный класс описывает общее, но сам объектом стать не может: в нём намеренно оставлена дыра, которую обязан заполнить наследник.
+
+```ts
+abstract class Shape {
+  abstract area(): number;          // дыра: тела нет
+  describe(): string {              // общее: тело есть
+    return `площадь ${this.area()}`;
+  }
+}
+
+new Shape();
+// error TS2511: Cannot create an instance of an abstract class.
+
+class Square extends Shape {
+  side = 2;
+}
+// error TS2515: Non-abstract class 'Square' does not implement
+// inherited abstract member area from class 'Shape'.
+```
+
+Обе ошибки — настоящий вывод компилятора. Первая говорит «чертёж с дырой изделием быть не может», вторая — «наследник дыру не заполнил».
+
+Правильный наследник:
+
+```ts
+class Square extends Shape {
+  constructor(private side: number) { super(); }
+  area(): number { return this.side ** 2; }
+}
+console.log(new Square(3).describe()); // площадь 9
+```
+
+Смысл конструкции: `describe` написан один раз в родителе и работает у всех наследников, хотя родитель понятия не имеет, как считается площадь. Это самый частый и самый полезный вид наследования — вынести общий алгоритм наверх, оставив вниз только различающийся шаг.
+
+<SectionAnchor chapterId="ts-oop" sectionId="abstract" />
+
+## Интерфейс: контракт без реализации
+
+Интерфейс — список того, что объект обязан уметь. Кода в нём нет вовсе.
+
+```ts
+interface Signer {
+  sign(data: string): string;
+  publicKey: string;
+}
+
+class Wallet implements Signer {
+  sign(data: string): string { return data; }
+}
+// error TS2420: Class 'Wallet' incorrectly implements interface 'Signer'.
+//   Property 'publicKey' is missing in type 'Wallet' but required in type 'Signer'.
+```
+
+Слово `implements` — заявка «мой класс соответствует этому контракту». Компилятор проверяет заявку и находит несоответствие сразу. Он же ловит и неверные типы аргументов:
+
+```ts
+class Wallet implements Signer {
+  sign(data: number): string { return String(data); }
+}
+// error TS2416: Property 'sign' in type 'Wallet' is not assignable
+// to the same property in base type 'Signer'.
+```
+
+Зачем это нужно на практике: интерфейс позволяет писать код, которому всё равно, с каким именно кошельком он работает.
+
+```ts
+function send(tx: string, signer: Signer): string {
+  return signer.sign(tx);
+}
+```
+
+Функция `send` работает с любым объектом, у которого есть `sign` и `publicKey`: с настоящим кошельком, с аппаратным ключом, с заглушкой в тестах. Ни одного из этих классов она не знает и знать не должна.
+
+<Figure scheme="to-interface-erasure" caption="Интерфейсы, типы и модификаторы доступа существуют только до компиляции: в готовом JavaScript от них не остаётся ни строчки. Класс, static и поле с решёткой остаются." />
+
+<SectionAnchor chapterId="ts-oop" sectionId="interface" />
+
+## `interface`, `type` и `abstract class`: что когда
+
+Три способа описать «форму» объекта. Различия — не в стиле, а в том, что каждый умеет.
+
+| | что даёт | остаётся в JS | множественность |
+| --- | --- | --- | --- |
+| `interface` | список обязательных полей и методов | нет | класс может реализовать несколько |
+| `type` | то же плюс объединения, пересечения, вычисляемые типы | нет | не про наследование вовсе |
+| `abstract class` | контракт **и** готовый общий код | да | родитель ровно один |
+
+Практическое правило:
+
+- Нужен только контракт — `interface`.
+- Нужны объединения (`'low' | 'high'`), пересечения, работа с типами — `type`.
+- Нужно вместе с контрактом отдать наследникам общий код — `abstract class`.
+
+Реализовать несколько интерфейсов класс может, а вот наследовать несколько классов — нет:
+
+```ts
+class Wallet implements Signer, Serializable {  // так можно
+  // …
+}
+```
+
+Это и есть обычный ответ на вопрос «почему в языке нет множественного наследования»: множественное наследование **контрактов** есть, а множественного наследования **кода** нет — именно оно и порождает неразрешимые конфликты.
+
+<SectionAnchor chapterId="ts-oop" sectionId="interface-vs" />
+
+<Block kind="quiz" title="Наследование, абстракции, интерфейсы" chapterId="ts-oop" blockId="quiz-inheritance">
+<SelfCheck chapterId="ts-oop" quizId="quiz-inheritance" questions={[
+  { q: 'Что произойдёт, если в конструкторе наследника не вызвать super()?', options: ['Ничего, super необязателен', 'ReferenceError: this недоступен до вызова super', 'Поля родителя станут undefined', 'Класс не скомпилируется'], correct: 1, why: 'До super() объекта this ещё не существует — его создаёт конструктор родителя. Ошибка возникает во время работы, а не при компиляции.' },
+  { q: 'Зачем нужен флаг noImplicitOverride?', options: ['Ускоряет компиляцию', 'Ловит опечатку в имени переопределяемого метода: TS4117 с подсказкой правильного имени', 'Запрещает наследование', 'Делает методы приватными'], correct: 1, why: 'Без него опечатка молча создаёт новый метод, а старый продолжает вызываться — ошибку ищут потом часами.' },
+  { q: 'Что такое полиморфизм на практике?', options: ['Класс с несколькими конструкторами', 'Одна строка вызова, а выполняется версия метода настоящего класса объекта', 'Наследование от нескольких классов', 'Перегрузка операторов'], correct: 1, why: 'Именно это избавляет от расползающихся if по типу: новый вид — новый класс, старый код не трогаем.' },
+  { q: 'Почему цепочку instanceof считают запахом кода?', options: ['Она медленная', 'В неё придётся дописывать строку при каждом новом классе — это тот же if по типу', 'Она не работает с наследниками', 'Она устарела'], correct: 1, why: 'Законное применение у instanceof есть — разбор классов ошибок в catch. Незаконное — подмена полиморфизма.' },
+  { q: 'Чем abstract class отличается от interface?', options: ['Ничем', 'Абстрактный класс может нести готовый общий код и остаётся в JS; интерфейс исчезает при компиляции', 'Интерфейс быстрее', 'Абстрактный класс нельзя наследовать'], correct: 1, why: 'Отсюда и правило выбора: нужен только контракт — interface; нужно отдать наследникам общий алгоритм — abstract class.' },
+  { q: 'Сколько интерфейсов может реализовать один класс?', options: ['Один', 'Сколько угодно, а вот наследовать можно только один класс', 'Не больше двух', 'Ни одного'], correct: 1, why: 'Множественное наследование контрактов есть, множественного наследования кода нет — именно оно порождает конфликты реализаций.' },
+]} />
+</Block>
+
+## Композиция вместо наследования
+
+Наследование выглядит удобным, пока иерархия не выросла. Классическая ловушка:
+
+```ts
+class Tx { }
+class SignedTx extends Tx { }
+class SignedTimestampedTx extends SignedTx { }
+class SignedTimestampedFeeTx extends SignedTimestampedTx { }
+```
+
+Каждое новое сочетание свойств требует нового класса, и число классов растёт быстрее, чем число свойств. Через полгода никто не помнит, что где переопределено, а изменение в корне ломает всё дерево разом.
+
+Композиция решает ту же задачу через поля:
+
+```ts
+class Tx {
+  constructor(
+    private signer: Signer,
+    private clock: Clock,
+    private fees: FeePolicy,
+  ) {}
+  async send(): Promise<string> {
+    const at = this.clock.now();
+    const fee = this.fees.calc(this);
+    return this.signer.sign(`${at}:${fee}`);
+  }
+}
+```
+
+Класс не «является» подписывателем — он **им пользуется**. Сменить политику комиссий теперь значит передать другой объект в конструктор, а не переписывать дерево наследования. Для тестов туда же подставляют заглушку с фиксированным временем.
+
+Практическое правило, которым пользуются повсеместно: **«является» — наследование, «имеет» или «использует» — композиция**. `Transfer` является транзакцией — наследование уместно. Транзакция использует подписыватель — тут композиция.
+
+<SectionAnchor chapterId="ts-oop" sectionId="composition" />
+
+## Что под капотом: прототипы
+
+Классы появились в языке только в 2015 году. До этого те же задачи решали прототипами, и `class` — это удобная запись поверх них, а не новый механизм. Знать это нужно, потому что все сообщения об ошибках и весь старый код говорят на языке прототипов.
+
+```js
+const tr = new Transfer('x9', 'Bob');
+console.log(Object.getPrototypeOf(tr) === Transfer.prototype); // true
+console.log(Object.getOwnPropertyNames(Transfer.prototype));   // [ 'constructor', 'describe' ]
+console.log(tr.hasOwnProperty('describe'));                    // false
+console.log('describe' in tr);                                 // true
+```
+
+Живой запуск подтверждает всё сразу. Что здесь происходит при вызове `tr.describe()`:
+
+1. Язык ищет поле `describe` в самом объекте `tr`. Не находит.
+2. Идёт в прототип — в `Transfer.prototype`. Находит и вызывает.
+3. Если бы не нашёл — пошёл бы в `Tx.prototype`, затем в `Object.prototype`, затем вернул бы `undefined`.
+
+Эта цепочка и называется прототипной. Наследование классов — просто связывание прототипов в цепь.
+
+Отсюда становятся понятны две вещи, которые раньше приходилось запоминать.
+
+**Почему методов нет в `JSON.stringify` и в `Object.keys`.** Они не в объекте, а в его прототипе, а оба этих инструмента смотрят только на собственные поля.
+
+**Почему `class` — это функция.**
+
+```js
+console.log(typeof Tx);  // function
+console.log(Tx.name);    // Tx
+```
+
+`typeof` даёт `function` — потому что под капотом класс и есть функция-конструктор с прикреплённым `prototype`. Единственное отличие от старых функций-конструкторов: класс запрещено вызывать без `new` и его объявление не поднимается вверх файла.
+
+<SectionAnchor chapterId="ts-oop" sectionId="prototypes" />
+
+## Структурная типизация: неожиданный сюрприз
+
+Тем, кто раньше видел Java или C#, этот раздел нужен обязательно: в TypeScript типы сравниваются **по форме, а не по имени**.
+
+```ts
+class Open { constructor(public v: number) {} }
+const a: Open = { v: 1 };   // компилируется! обычный объект подошёл под тип класса
+
+class Dog { bark() {} }
+class Cat { bark() {} }
+const c: Dog = new Cat();   // компилируется! классы разные, форма одинаковая
+```
+
+Обе строки проходят проверку — это проверено компиляцией. Для TypeScript «тип `Dog`» означает «что-нибудь с методом `bark`», а не «объект, созданный из класса `Dog`».
+
+Ломается это ровно в одном месте — при наличии приватного поля:
+
+```ts
+class Closed { constructor(private v: number) {} }
+const b: Closed = { v: 1 };
+// error TS2322: Type '{ v: number; }' is not assignable to type 'Closed'.
+//   Property 'v' is private in type 'Closed' but not in type '{ v: number; }'.
+```
+
+Приватное поле делает тип уникальным: подделать его снаружи нельзя, потому что никакой посторонний объект не может иметь то самое приватное поле. Этим иногда пользуются намеренно, когда нужен тип, который нельзя подменить похожим по форме объектом.
+
+<Block kind="quiz" title="Композиция, прототипы, структурная типизация" chapterId="ts-oop" blockId="quiz-under-hood">
+<SelfCheck chapterId="ts-oop" quizId="quiz-under-hood" questions={[
+  { q: 'Когда выбирают композицию вместо наследования?', options: ['Всегда', 'Когда отношение «использует», а не «является»', 'Когда классов больше десяти', 'Когда нет интерфейсов'], correct: 1, why: 'Transfer является транзакцией — наследование. Транзакция использует подписыватель — композиция. Иначе число классов растёт быстрее числа свойств.' },
+  { q: 'Что вернёт typeof для объявленного класса?', options: ['"class"', '"function"', '"object"', '"undefined"'], correct: 1, why: 'Класс — синтаксическая надстройка над функцией-конструктором с прикреплённым prototype. Отличия: нельзя вызвать без new и объявление не поднимается.' },
+  { q: 'Почему tr.hasOwnProperty("describe") даёт false, а "describe" in tr — true?', options: ['Это ошибка в Node', 'Метод лежит в прототипе, а не в самом объекте; in ищет по всей цепочке', 'describe приватный', 'hasOwnProperty устарел'], correct: 1, why: 'Оттуда же следует, почему методов нет в Object.keys и в JSON.stringify: оба смотрят только собственные поля объекта.' },
+  { q: 'const c: Dog = new Cat() при одинаковых методах — что скажет компилятор?', options: ['Ошибку несовместимости классов', 'Ничего: типы сравниваются по форме, а не по имени', 'Предупреждение', 'Потребует implements'], correct: 1, why: 'Это структурная типизация. Уникальным тип делает только приватное поле — тогда посторонний объект подставить нельзя.' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="ts-oop" sectionId="structural" />
+
+## Типичные ошибки: текст, перевод, причина, починка
+
+| Что видно | Перевод | Причина | Как чинить |
+| --- | --- | --- | --- |
+| `TypeError: Class constructor Tx cannot be invoked without 'new'` | Конструктор класса нельзя вызвать без `new` | Забыли `new` | Добавить `new` |
+| `TypeError: Cannot read properties of undefined (reading 'amount')` внутри метода | Чтение поля у `undefined` | Потеряли `this`: метод вызвали без точки | Обёртка-стрелка, `bind` или стрелка в поле |
+| `ReferenceError: Must call super constructor…` | Нужно вызвать конструктор родителя | В конструкторе наследника нет `super()` или он после `this` | Поставить `super(...)` первой строкой |
+| `TypeError: back.fee is not a function` | У объекта нет такого метода | Объект пришёл из `JSON.parse` — это не объект класса | Собрать заново: `new Tx(back.amount)` |
+| `error TS2564: Property 'name' has no initializer` | У поля нет начального значения | Поле объявлено, но не заполнено | Значение по умолчанию, присваивание в конструкторе или `name?: string` |
+| `error TS2341: Property 'amount' is private` | Поле приватное | Обращение снаружи класса | Геттер, публичный метод — или признать, что поле должно быть публичным |
+| `error TS2540: Cannot assign to 'id'` | Поле только для чтения | Присваивание в `readonly` после конструктора | Убрать `readonly` или создавать новый объект вместо изменения |
+| `error TS2511: Cannot create an instance of an abstract class` | Абстрактный класс объектом не бывает | `new` от абстрактного класса | Создавать наследника |
+| `error TS2515: …does not implement inherited abstract member` | Наследник не заполнил дыру | Не реализован `abstract`-метод | Написать метод в наследнике |
+| `error TS2420: Class incorrectly implements interface` | Класс не соответствует контракту | Нет поля или метода из интерфейса | Дописать недостающее |
+| `error TS4117: This member cannot have an 'override' modifier` | Переопределять нечего | Опечатка в имени метода | Компилятор сам подсказывает верное имя |
+| `error TS18013: Property '#hash' is not accessible outside class` | Поле с решёткой недоступно снаружи | Обращение к `#`-полю извне | Публичный метод или геттер внутри класса |
+
+<SectionAnchor chapterId="ts-oop" sectionId="errors" />
+
+## Тренажёр: ООП вслепую
+
+<Block kind="trainer" title="Классы и интерфейсы: набери вслепую" chapterId="ts-oop" blockId="trainer-oop-typing">
+<CodeTyping pools={[
+  { label: 'Классы', snippets: [
+    'class Tx { constructor(public readonly id: string) {} }',
+    'const tx = new Tx("a1");',
+    'get total(): number { return this.amount + this.fee; }',
+    'static from(raw: string): Tx { return new Tx(raw.trim()); }',
+    '#secret = process.env.PRIVATE_KEY ?? "";',
+  ] },
+  { label: 'Наследование', snippets: [
+    'class Transfer extends Tx { constructor(id: string, public to: string) { super(id); } }',
+    'override describe(): string { return super.describe() + this.to; }',
+    'abstract class Shape { abstract area(): number; }',
+    'if (e instanceof InsufficientFunds) retry();',
+    'class InsufficientFunds extends Error {}',
+  ] },
+  { label: 'Контракты', snippets: [
+    'interface Signer { sign(data: string): string; publicKey: string }',
+    'class Wallet implements Signer, Serializable {',
+    'function send(tx: string, signer: Signer): string {',
+    'private constructor(private readonly value: string) {}',
+    'type Level = "low" | "medium" | "high";',
+  ] },
+]} keyboard chapterId="ts-oop" trainerId="trainer-oop-typing" targetCpm={110} targetAccuracy={90} />
+</Block>
+
+<SectionAnchor chapterId="ts-oop" sectionId="trainer" />
+
+## Символы этой главы
+
+<Block kind="cheatsheet" title="Все знаки и слова, встреченные в главе" chapterId="ts-oop" blockId="cheatsheet-symbols">
+
+| Знак или слово | Название | Что делает |
+| --- | --- | --- |
+| `class` | класс | объявляет чертёж объектов |
+| `new` | создание объекта | создаёт объект, привязывает прототип, запускает конструктор |
+| `constructor` | конструктор | метод, выполняемый один раз при создании |
+| `this` | текущий объект | то, что стояло слева от точки при вызове |
+| `extends` | наследование | связывает класс с родителем |
+| `super(…)` | конструктор родителя | обязателен до первого `this` в наследнике |
+| `super.метод()` | метод родителя | вызывает родительскую версию переопределённого метода |
+| `static` | статический член | принадлежит классу, а не объектам |
+| `get` / `set` | геттер и сеттер | метод, к которому обращаются как к полю |
+| `#поле` | приватное поле JavaScript | настоящая недоступность снаружи, в том числе после компиляции |
+| `private` | приватное поле TypeScript | проверка компилятором; в готовом JS ограничения нет |
+| `protected` | защищённое поле | доступно классу и его наследникам |
+| `public` | публичное поле | поведение по умолчанию; пишут ради параметров-свойств |
+| `readonly` | только для чтения | присвоить можно один раз, в конструкторе |
+| `abstract` | абстрактный | класс без объектов, метод без тела |
+| `implements` | реализация контракта | заявка, что класс соответствует интерфейсу |
+| `interface` | интерфейс | список обязательных полей и методов; исчезает при компиляции |
+| `override` | явное переопределение | с `noImplicitOverride` ловит опечатку в имени метода |
+| `instanceof` | проверка происхождения | идёт вверх по цепочке прототипов |
+| `.prototype` | прототип класса | объект, где физически лежат методы |
+
+</Block>
+
+<SectionAnchor chapterId="ts-oop" sectionId="symbols" />
+
+## Что должен уметь
+
+- Объяснять, зачем нужен класс, если уже есть объект и функция.
+- Писать класс с конструктором, полями и методами и создавать объекты через `new`.
+- Объяснять, что делает `new` в четыре шага, и почему без него — `TypeError`.
+- Доказывать, что метод один на все объекты: `a.fee === b.fee`, `hasOwnProperty`, `in`.
+- Находить причину `Cannot read properties of undefined` внутри метода и чинить потерю `this` тремя способами.
+- Понимать, почему стрелка в поле решает проблему `this` и чем за это платят.
+- Пользоваться параметрами-свойствами и объяснять, во что они превращаются после компиляции.
+- Различать `private` и `#`, знать, что от `private` не остаётся ничего в готовом JavaScript.
+- Писать геттер и сеттер и помнить правило «геттер обязан быть дешёвым».
+- Отличать `readonly` от `const` и от `Object.freeze`.
+- Применять `static` для констант, проверок и фабричных методов — и видеть, когда класс со сплошной статикой должен быть модулем.
+- Наследовать классы, вызывать `super()` первой строкой и `super.метод()` внутри переопределения.
+- Включать `noImplicitOverride` и понимать, от какой ошибки он спасает.
+- Объяснять полиморфизм на примере и заменять им расползающийся `if` по типу.
+- Знать законное и незаконное применение `instanceof` и его слабое место.
+- Писать абстрактный класс с общим алгоритмом и абстрактным шагом.
+- Описывать интерфейс, реализовывать его через `implements` и читать `TS2420`.
+- Выбирать между `interface`, `type` и `abstract class` по задаче.
+- Отличать «является» от «использует» и заменять глубокую иерархию композицией.
+- Объяснять, что `class` — надстройка над прототипами, и проходить цепочку поиска метода руками.
+- Понимать структурную типизацию и знать, что уникальным тип делает приватное поле.
+- Читать ошибки `TS2564`, `TS2341`, `TS2540`, `TS2511`, `TS2515`, `TS2420`, `TS4117`, `TS18013`.
+
+<SectionAnchor chapterId="ts-oop" sectionId="what-you-should-know" />
+
+<details>
+<summary>Углубиться</summary>
+
+**Порядок инициализации полей.** Поля наследника заполняются **после** возврата из `super()`. Отсюда неочевидная ловушка: если конструктор родителя вызовет метод, переопределённый в наследнике, тот увидит поля наследника ещё незаполненными — `undefined` вместо значения. Вывод практический: не вызывайте переопределяемые методы из конструктора.
+
+**`super` в статике.** У статических методов своя цепочка: `Child.staticMethod` наследуется от `Parent`, и внутри работает `super.staticMethod()`. Статика наследуется точно так же, как обычные методы, — об этом часто забывают.
+
+**`new.target`.** Внутри конструктора доступно `new.target` — тот класс, от которого на самом деле шёл `new`. Приём применяют, чтобы запретить прямое создание базового класса: `if (new.target === Base) throw new Error(...)`.
+
+**Наследование от `Error`.** Свой класс ошибки требует одной дополнительной строки: `this.name = 'InsufficientFunds'`, иначе в логах будет просто `Error`. Более тонкий момент — при компиляции в старый ES5 наследование от встроенных классов ломается, и `instanceof` перестаёт работать; при `target: es2015` и новее всё в порядке.
+
+**Декораторы.** С TypeScript 5 доступны стандартные декораторы — записи вида `@logged` перед классом или методом, которые оборачивают их дополнительным поведением. На них построены Angular и NestJS. Мощная вещь, но начинать с неё не стоит: декоратор прячет происходящее, а отлаживать спрятанное сложнее.
+
+**`Object.create` и наследование без классов.** Прототип можно назначить напрямую: `Object.create(proto)` создаёт объект с заданным прототипом. Так писали всё до 2015 года, и в старых библиотеках эта запись встречается постоянно.
+
+**Классы против чистых функций.** Заметная часть современного кода на TypeScript классов почти не использует: данные держат в обычных объектах и типах, а поведение — в функциях. Спор старый и решается по задаче: там, где у объекта есть состояние и жизненный цикл (соединение, кошелёк, сессия), класс уместнее; там, где идёт преобразование данных, — функция.
+
+Дальше по теме:
+- [MDN: классы](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Classes) — полный справочник со всеми формами записи
+- [MDN: прототипное наследование](https://developer.mozilla.org/ru/docs/Web/JavaScript/Inheritance_and_the_prototype_chain) — что под капотом
+- [TypeScript Handbook: Classes](https://www.typescriptlang.org/docs/handbook/2/classes.html) — модификаторы, абстракции, параметры-свойства
+- [TypeScript Handbook: Type Compatibility](https://www.typescriptlang.org/docs/handbook/type-compatibility.html) — структурная типизация целиком
+
+</details>
+
+<SectionAnchor chapterId="ts-oop" sectionId="deep" />
+
+<Block kind="quiz" title="Экзамен главы" chapterId="ts-oop" blockId="exam">
+<ChapterExam chapterId="ts-oop" questions={[
+  { q: 'Чем класс принципиально лучше фабричной функции, возвращающей объект с методами?', options: ['Ничем', 'Методы лежат в прототипе — одна копия на все объекты, а не по копии у каждого', 'Класс быстрее создаётся', 'Класс нельзя изменить'], correct: 1, why: 'Для трёх объектов разницы нет, для тридцати тысяч записей из ответа ноды — есть. Проверяется через a.fee === b.fee.' },
+  { q: 'Что из перечисленного НЕ делает оператор new?', options: ['Создаёт пустой объект', 'Привязывает прототип класса', 'Запускает конструктор', 'Копирует методы в новый объект'], correct: 3, why: 'Методы не копируются никогда — объект получает к ним доступ через прототип. Именно поэтому их нет в Object.keys и в JSON.' },
+  { q: 'Внутри метода total() нужно вызвать метод fee() того же класса. Как?', options: ['fee()', 'this.fee()', 'super.fee()', 'Tx.fee()'], correct: 1, why: 'Просто fee() даст ReferenceError: такой функции в области видимости нет. super.fee() — версия родителя, Tx.fee() — статический метод.' },
+  { q: 'setTimeout(t.fee, 100) падает с TypeError. Какое исправление НЕ сработает?', options: ['setTimeout(() => t.fee(), 100)', 'setTimeout(t.fee.bind(t), 100)', 'Сделать fee стрелкой в поле класса', 'setTimeout(t.fee(), 100)'], correct: 3, why: 'Последний вариант вызывает метод немедленно и передаёт в setTimeout результат, а не функцию. Первые три чинят потерю this по-разному.' },
+  { q: 'Объект пришёл из JSON.parse. Что с ним не так?', options: ['Ничего', 'Это обычный объект: методов класса у него нет, instanceof даёт false', 'У него потеряны поля', 'Он заморожен'], correct: 1, why: 'Классы по сети не ходят. Объект собирают заново через конструктор — типовой шаг при работе с любым API.' },
+  { q: 'Чем #key отличается от private key в TypeScript?', options: ['Ничем, это синонимы', '#key недоступно снаружи и после компиляции; private — проверка только до запуска', 'private надёжнее', '#key работает только в классах-наследниках'], correct: 1, why: 'Ключи, пароли и токены держат в #. Живой запуск: Object.keys даёт пустой массив, JSON.stringify — пустой объект.' },
+  { q: 'Что вернёт new Counter().made, если made объявлено как static?', options: ['Значение счётчика', 'undefined', '0', 'Ошибку'], correct: 1, why: 'Статика принадлежит классу. Обращаться нужно через Counter.made — проверено запуском.' },
+  { q: 'Почему super() обязан идти до первого обращения к this?', options: ['Так требует стиль', 'До вызова super объекта this ещё не существует — его создаёт конструктор родителя', 'Иначе поля перезапишутся', 'Иначе не сработает instanceof'], correct: 1, why: 'Нарушение даёт ReferenceError: Must call super constructor in derived class before accessing this.' },
+  { q: 'Флаг noImplicitOverride включён. Что произойдёт при опечатке в имени переопределяемого метода?', options: ['Ничего', 'TS4117 с подсказкой правильного имени', 'Метод удалится', 'Программа упадёт во время работы'], correct: 1, why: 'Без флага опечатка молча создаёт новый метод, а вызываться продолжает родительский — ошибку ищут потом часами.' },
+  { q: 'Наследник объявил greet(name: string), у родителя greet(). Что скажет компилятор?', options: ['Ничего', 'TS2416: сигнатура несовместима, наследник требует больше аргументов', 'Потребует override', 'Сделает параметр необязательным'], correct: 1, why: 'Любой код, работающий с родителем, вправе вызвать greet() без аргументов. Подмена сломала бы его — компилятор запрещает заранее.' },
+  { q: 'Что означает ошибка TS2515 «does not implement inherited abstract member»?', options: ['Класс абстрактный', 'Наследник не реализовал абстрактный метод родителя', 'Метод объявлен дважды', 'Интерфейс не найден'], correct: 1, why: 'Абстрактный метод — намеренно оставленная дыра, которую обязан заполнить каждый конкретный наследник.' },
+  { q: 'Когда выбирают abstract class, а не interface?', options: ['Всегда', 'Когда вместе с контрактом нужно отдать наследникам готовый общий код', 'Когда классов больше пяти', 'Когда нужно несколько родителей'], correct: 1, why: 'Интерфейс исчезает при компиляции и кода не несёт. Абстрактный класс остаётся в JS и может содержать общий алгоритм.' },
+  { q: 'Цепочка из шести instanceof в одной функции. Что это означает?', options: ['Хороший код', 'Обычно — что метод просится в сами классы: это if по типу другими словами', 'Нехватку интерфейсов', 'Ошибку компилятора'], correct: 1, why: 'Признак тот же: при новом классе придётся дописывать строку. Законное применение instanceof — разбор классов ошибок в catch.' },
+  { q: 'Класс Tx хранит поле signer и зовёт signer.sign(). Как называется эта связь?', options: ['Наследование', 'Композиция: «использует», а не «является»', 'Полиморфизм', 'Инкапсуляция'], correct: 1, why: 'Сменить политику подписи теперь значит передать другой объект в конструктор, а не переписывать дерево наследования.' },
+  { q: 'Что даст typeof для объявленного класса?', options: ['"class"', '"function"', '"object"', '"prototype"'], correct: 1, why: 'class — синтаксическая надстройка над функцией-конструктором. Отличия: нельзя вызвать без new и объявление не поднимается вверх файла.' },
+  { q: 'const c: Dog = new Cat(), у обоих классов только метод bark(). Что скажет TypeScript?', options: ['Ошибку', 'Ничего: типы сравниваются по форме, а не по имени', 'Предупреждение', 'Потребует implements'], correct: 1, why: 'Структурная типизация. Уникальным тип делает только приватное поле: посторонний объект не может иметь то самое приватное поле.' },
+]} />
+</Block>
+
+## Куда дальше: проверенные ресурсы
+
+<Block kind="cheatsheet" title="ООП в TypeScript: официальные источники" chapterId="ts-oop" blockId="cheatsheet-resources">
+
+- [MDN: классы](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Classes) — справочник по всем формам записи, на русском.
+- [MDN: приватные поля](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Classes/Private_properties) — поля с решёткой и их ограничения.
+- [MDN: наследование и цепочка прототипов](https://developer.mozilla.org/ru/docs/Web/JavaScript/Inheritance_and_the_prototype_chain) — что происходит под капотом.
+- [MDN: this](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Operators/this) — все случаи, включая стрелки и `bind`.
+- [TypeScript Handbook: Classes](https://www.typescriptlang.org/docs/handbook/2/classes.html) — модификаторы доступа, абстракции, параметры-свойства.
+- [TypeScript Handbook: Type Compatibility](https://www.typescriptlang.org/docs/handbook/type-compatibility.html) — структурная типизация и её границы.
+- [TypeScript: tsconfig — strict](https://www.typescriptlang.org/tsconfig/#strict) — что именно включают строгие флаги, включая `noImplicitOverride`.
+- [Learn JavaScript: классы](https://learn.javascript.ru/classes) — подробный русскоязычный раздел с задачами.
+
+- [Видео и материалы сообщества — ниже](#community-sources) — ролики по теме и ссылки от студентов и преподавателей смотри в самом низу страницы.
+
+</Block>
+
+<SectionAnchor chapterId="ts-oop" sectionId="resources" />

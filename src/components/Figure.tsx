@@ -14,7 +14,19 @@ import { editorSchemes } from './figures/editor';
 import { codeBasicsSchemes } from './figures/codeBasics';
 import { oopSchemes } from './figures/oop';
 import { kotlinJavaSchemes } from './figures/kotlinJava';
+import { kotlinFlowSchemes } from './figures/kotlinFlow';
+import { kotlinOopSchemes } from './figures/kotlinOop';
+import { kotlinHistorySchemes } from './figures/kotlinHistory';
+import { kotlinCoroutinesSchemes } from './figures/kotlinCoroutines';
+import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
+import { tsValuesSchemes } from './figures/tsValues';
+import { tsFlowSchemes } from './figures/tsFlow';
+import { tsFunctionsSchemes } from './figures/tsFunctions';
+import { tsCollectionsSchemes } from './figures/tsCollections';
+import { tsOopSchemes } from './figures/tsOop';
+import { tsHistorySchemes } from './figures/tsHistory';
+import { tsAsyncSchemes } from './figures/tsAsync';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -35,7 +47,19 @@ const SCHEMES = {
   ...codeBasicsSchemes,
   ...oopSchemes,
   ...kotlinJavaSchemes,
+  ...kotlinFlowSchemes,
+  ...kotlinOopSchemes,
+  ...kotlinHistorySchemes,
+  ...kotlinCoroutinesSchemes,
+  ...kotlinNullSchemes,
   ...tsJsSchemes,
+  ...tsValuesSchemes,
+  ...tsFlowSchemes,
+  ...tsFunctionsSchemes,
+  ...tsCollectionsSchemes,
+  ...tsOopSchemes,
+  ...tsHistorySchemes,
+  ...tsAsyncSchemes,
 };
 
 export const SCHEME_IDS = Object.keys(SCHEMES);
