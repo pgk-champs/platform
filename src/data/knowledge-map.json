@@ -64,6 +64,14 @@
     "path": "foundation/linux-terminal.mdx"
   },
   {
+    "id": "repo-anatomy",
+    "title": "Анатомия взрослого репозитория",
+    "audience": "все",
+    "level": "углубление",
+    "order": 4,
+    "path": "advanced/repo-anatomy.mdx"
+  },
+  {
     "id": "files-packages-ssh",
     "title": "Файлы, пакеты, SSH",
     "audience": "все",
@@ -72,12 +80,28 @@
     "path": "foundation/files-packages-ssh.mdx"
   },
   {
+    "id": "github-actions",
+    "title": "CI: робот проверяет за тебя",
+    "audience": "все",
+    "level": "углубление",
+    "order": 5,
+    "path": "advanced/github-actions.mdx"
+  },
+  {
     "id": "git-first-commit",
     "title": "Git: первый коммит",
     "audience": "все",
     "level": "база",
     "order": 5,
     "path": "foundation/git-first-commit.mdx"
+  },
+  {
+    "id": "code-review-release",
+    "title": "Ревью, коммиты, релизы",
+    "audience": "все",
+    "level": "углубление",
+    "order": 6,
+    "path": "advanced/code-review-release.mdx"
   },
   {
     "id": "git-branches",

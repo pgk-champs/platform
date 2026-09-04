@@ -1,8 +1,8 @@
 import { render } from '@testing-library/react';
 import ChapterCover, { CHAPTER_IDS, TrackBanner } from './ChapterCover';
 
-test('покрыты все 22 главы', () => {
-  expect(CHAPTER_IDS).toHaveLength(22);
+test('покрыты все 25 глав', () => {
+  expect(CHAPTER_IDS).toHaveLength(25);
 });
 
 test('каждая глава рендерит свою уникальную обложку с названием', () => {
@@ -42,6 +42,9 @@ test('обложки advanced-глав показывают трек «Отде�
     ['git-rebase', '03', 'Rebase мастерски'],
     ['grep-regex', '01', 'Регулярные выражения для grep'],
     ['ssh-keys-deep', '02', 'SSH-ключи глубоко'],
+    ['repo-anatomy', '04', 'Анатомия взрослого репозитория'],
+    ['github-actions', '05', 'CI: робот проверяет за тебя'],
+    ['code-review-release', '06', 'Ревью, коммиты, релизы'],
   ] as const;
   for (const [id, num, title] of cases) {
     const { container, unmount } = render(<ChapterCover chapterId={id} />);

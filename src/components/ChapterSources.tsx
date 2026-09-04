@@ -8,7 +8,7 @@ import {
 import YoutubeFacade, { extractYoutubeVideoId } from './YoutubeFacade';
 import './trainers.css';
 
-// Авто-блок «Видео и источники по теме» в конце каждой главы (пакет sources,
+// Авто-блок «Материалы от сообщества» в конце каждой главы (пакет sources,
 // волна 7): клиентский fetch того же community.json, что и /community, фильтр
 // по chapterId и типам video/source/link. Пусто или сеть недоступна — блок не
 // рендерится вовсе, глава остаётся как была. Вставляется общим футером глав
@@ -61,7 +61,7 @@ export default function ChapterSources({ chapterId }: { chapterId: string }) {
   // компонентом (эта секция клиентская и пуста при SSR, id тут не годится).
   return (
     <section className="chsrc">
-      <h2 className="chsrc-title">Видео и источники по теме</h2>
+      <h2 className="chsrc-title">Материалы от сообщества</h2>
       <div className="chsrc-grid">
         {items.map((item) => {
           const videoId = item.type === 'video' ? extractYoutubeVideoId(item.data as string) : null;

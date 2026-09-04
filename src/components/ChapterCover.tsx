@@ -261,6 +261,44 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="160" y="150" textAnchor="middle" fontSize="14" fontWeight={700} fill="#fff" fontFamily={MONO}>public</text>
     </g>
   ),
+  /* корень репозитория: README подсвечен, рядом служебные файлы — арт «repo-root» */
+  'repo-anatomy': () => (
+    <g strokeLinecap="round">
+      <rect x="16" y="28" width="168" height="130" rx="14" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <rect x="30" y="44" width="140" height="26" rx="7" fill={ACCENT} />
+      <text x="42" y="63" fontSize="14" fontWeight={800} fill={DARK} fontFamily={MONO}>README.md</text>
+      <path d="M34 88h96M34 108h76M34 128h108" stroke="rgba(255,255,255,0.45)" strokeWidth={9} />
+      <circle cx="152" cy="128" r="19" fill={ACCENT} />
+      <path d="M143 128l6 7 13-15" stroke={DARK} strokeWidth={4.5} fill="none" strokeLinejoin="round" />
+    </g>
+  ),
+  /* конвейер шагов: два пройдены, третий — зелёная галочка — арт «ci-pipeline» */
+  'github-actions': () => (
+    <g strokeLinecap="round">
+      <rect x="12" y="72" width="46" height="46" rx="12" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <path d="M26 95h18" stroke="rgba(255,255,255,0.5)" strokeWidth={7} />
+      <path d="M64 95h18" stroke={INK} strokeWidth={5} />
+      <rect x="88" y="72" width="46" height="46" rx="12" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <path d="M102 95h18" stroke="rgba(255,255,255,0.5)" strokeWidth={7} />
+      <path d="M140 95h14" stroke={INK} strokeWidth={5} />
+      <circle cx="166" cy="95" r="24" fill={ACCENT} />
+      <path d="M155 95l7 9 16-18" stroke={DARK} strokeWidth={5} fill="none" strokeLinejoin="round" />
+      <text x="100" y="150" textAnchor="middle" fontSize="14" fontWeight={700} fill="#fff" fontFamily={MONO}>on: push</text>
+    </g>
+  ),
+  /* две реплики ревью над диффом и ярлык версии — арт «review-release» */
+  'code-review-release': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="30" width="104" height="44" rx="12" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <path d="M34 70l-6 18 22-14z" fill={SOFT} stroke={INK} strokeWidth={3} strokeLinejoin="round" />
+      <path d="M30 46h64M30 58h40" stroke="rgba(255,255,255,0.45)" strokeWidth={6} />
+      <rect x="82" y="86" width="104" height="44" rx="12" fill={ACCENT} />
+      <path d="M166 126l6 18-22-14z" fill={ACCENT} />
+      <path d="M98 102h64M98 114h34" stroke={DARK} strokeWidth={6} opacity={0.75} />
+      <rect x="14" y="126" width="56" height="30" rx="9" fill="none" stroke={INK} strokeWidth={3} />
+      <text x="42" y="147" textAnchor="middle" fontSize="14" fontWeight={800} fill="#fff" fontFamily={MONO}>v1.2</text>
+    </g>
+  ),
 };
 
 const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
@@ -286,6 +324,9 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'grep-regex': { track: 'advanced', num: '01', title: 'Регулярные выражения для grep' },
   'ssh-keys-deep': { track: 'advanced', num: '02', title: 'SSH-ключи глубоко' },
   'git-rebase': { track: 'advanced', num: '03', title: 'Rebase мастерски' },
+  'repo-anatomy': { track: 'advanced', num: '04', title: 'Анатомия взрослого репозитория' },
+  'github-actions': { track: 'advanced', num: '05', title: 'CI: робот проверяет за тебя' },
+  'code-review-release': { track: 'advanced', num: '06', title: 'Ревью, коммиты, релизы' },
 };
 
 export const CHAPTER_IDS = Object.keys(CHAPTERS);

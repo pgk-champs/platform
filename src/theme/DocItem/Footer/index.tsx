@@ -7,7 +7,7 @@ import Comments from '../../../components/Comments';
 import ChapterSources from '../../../components/ChapterSources';
 import ChapterVideos from '../../../components/ChapterVideos';
 
-// Swizzle-safe обёртка футера главы: авто-блок «Видео и источники по теме»
+// Swizzle-safe обёртка футера главы: кураторские «Видео по теме» + «Материалы от сообщества»
 // (пакет sources) + оригинальный футер (с «Редактировать страницу» от editUrl)
 // + кнопка «Предложить правку» + комментарии giscus (пакет wiki-flow).
 // Одно место вместо правки 19 mdx руками.

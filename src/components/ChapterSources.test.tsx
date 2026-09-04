@@ -81,7 +81,7 @@ test('renders only video/source/link cards of its chapter', async () => {
   const spy = mockFetch(() => okResponse(ITEMS));
   render(<ChapterSources chapterId="kotlin-vars" />);
 
-  expect(await screen.findByText('Видео и источники по теме')).toBeInTheDocument();
+  expect(await screen.findByText('Материалы от сообщества')).toBeInTheDocument();
   expect(spy).toHaveBeenCalledWith(COMMUNITY_JSON_URL);
   expect(screen.getByText('Kotlin с нуля — курс')).toBeInTheDocument();
   expect(screen.getByText('Официальная документация Kotlin')).toBeInTheDocument();

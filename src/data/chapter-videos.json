@@ -552,5 +552,86 @@
       "title": "Как работают смарт-контракты? Простое объяснение",
       "channel": "EMCD in Russian"
     }
+  ],
+  "repo-anatomy": [
+    {
+      "videoId": "NXNf9aYTCZ0",
+      "title": "Как Оформить README-Файл На GitHub | Основы Markdown",
+      "channel": "PyLounge - программирование на Python и всё о Айти"
+    },
+    {
+      "videoId": "syrGPPekLHQ",
+      "title": "#15 Уроки Git+GitHub - Создание файла README.md синтаксис Markdown",
+      "channel": "ITDoctor"
+    },
+    {
+      "videoId": "0DiNdpUx5_Q",
+      "title": "GIT. Урок 4. Использование .gitignore файла | QA START UP",
+      "channel": "Serhii Hlivinskyi - QA START UP"
+    },
+    {
+      "videoId": "Bi1Jp6yRCWw",
+      "title": "Python и переменные окружения | Где и как хранить секреты в коде | .env, .gitignore",
+      "channel": "PythonToday"
+    },
+    {
+      "videoId": "E0RMqtgqrgM",
+      "title": "Сравнение лицензий с открытым исходным кодом GPL / MIT / Apache",
+      "channel": "PracticU - онлайн IT курсы"
+    }
+  ],
+  "github-actions": [
+    {
+      "videoId": "e0A2hDObLmg",
+      "title": "Github Actions - Введение в CI/CD",
+      "channel": "Владилен Минин"
+    },
+    {
+      "videoId": "QMATr0vCsYg",
+      "title": "Про GitHub Actions за 10 минут",
+      "channel": "Merion Academy"
+    },
+    {
+      "videoId": "zn5T7FkpaTA",
+      "title": "GitHub Actions для CI/CD - mini курс за 30 минут",
+      "channel": "PurpleSchool | Anton Larichev"
+    },
+    {
+      "videoId": "NijFSs03Pd4",
+      "title": "GitHub Actions для автоматической проверки кода",
+      "channel": "Хитрый питон"
+    },
+    {
+      "videoId": "Yg5rpke79X4",
+      "title": "GitHub Actions - Основы Автоматизации - DevOps - GitOps",
+      "channel": "ADV-IT"
+    }
+  ],
+  "code-review-release": [
+    {
+      "videoId": "SO73exyXswA",
+      "title": "P3. Ревью кода / Pull Request и Merge Request | ULearn Git",
+      "channel": "ФИИТ УрФУ"
+    },
+    {
+      "videoId": "Svx5wiDqWyE",
+      "title": "Что такое Pull Request \\ Merge Request. \"Git - это просто!\" - Урок 9",
+      "channel": "JavaClass"
+    },
+    {
+      "videoId": "JOoukuYzoOg",
+      "title": "6 советов для правильного написания git commit сообщений",
+      "channel": "PurpleSchool | Anton Larichev"
+    },
+    {
+      "videoId": "rlkxdk-1Mt8",
+      "title": "Обновления без страха: объясняю SemVer (MAJOR/MINOR/PATCH)",
+      "channel": "Agile Clarity"
+    },
+    {
+      "videoId": "N0V1Cm6DT30",
+      "title": "1.2 Git – Теги – Использование тегов для релиза с describe и archive",
+      "channel": "JavaScript.ru"
+    }
   ]
 }

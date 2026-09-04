@@ -6,6 +6,9 @@ import { foundationBSchemes } from './figures/foundationB';
 import { advancedSchemes } from './figures/advanced';
 import { mobileSchemes } from './figures/mobile';
 import { blockchainSchemes } from './figures/blockchain';
+import { repoAnatomySchemes } from './figures/repoAnatomy';
+import { ciSchemes } from './figures/ci';
+import { reviewSchemes } from './figures/review';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -18,6 +21,9 @@ const SCHEMES = {
   ...advancedSchemes,
   ...mobileSchemes,
   ...blockchainSchemes,
+  ...repoAnatomySchemes,
+  ...ciSchemes,
+  ...reviewSchemes,
 };
 
 export const SCHEME_IDS = Object.keys(SCHEMES);

@@ -6,6 +6,9 @@ import { foundationBSchemes } from './figures/foundationB';
 import { mobileSchemes } from './figures/mobile';
 import { blockchainSchemes } from './figures/blockchain';
 import { advancedSchemes } from './figures/advanced';
+import { repoAnatomySchemes } from './figures/repoAnatomy';
+import { ciSchemes } from './figures/ci';
+import { reviewSchemes } from './figures/review';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -46,6 +49,9 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(mobileSchemes),
     ...Object.keys(blockchainSchemes),
     ...Object.keys(advancedSchemes),
+    ...Object.keys(repoAnatomySchemes),
+    ...Object.keys(ciSchemes),
+    ...Object.keys(reviewSchemes),
   ];
   const duplicates = all.filter((id, i) => all.indexOf(id) !== i);
   expect(duplicates).toEqual([]);
