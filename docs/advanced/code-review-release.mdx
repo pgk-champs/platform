@@ -19,10 +19,12 @@ import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import Figure from '@site/src/components/Figure';
+import TerminalSim from '@site/src/components/TerminalSim';
+import CodeTyping from '@site/src/components/CodeTyping';
 
 # Ревью, коммиты, релизы
 
-<ChapterProgress chapterId="code-review-release" totalSections={16} totalQuizzes={5} totalTrainers={0} />
+<ChapterProgress chapterId="code-review-release" totalSections={17} totalQuizzes={5} totalTrainers={2} />
 
 ## Зачем это нужно
 
@@ -560,6 +562,57 @@ Changelog — файл в корне репозитория, где записа
 </Block>
 
 <SectionAnchor chapterId="code-review-release" sectionId="workflow" />
+
+## Практика: подготовь релиз
+
+Ветку влили в `main`, версия готова к выпуску — осталось оформить. В учебном
+репозитории уже лежит `CHANGELOG.md` с незакрытым разделом `[Unreleased]` и
+файл `VERSION` со старым номером. Подготовь релиз: заведи каталог `release/`
+с заметками `release/v1.5.0.md` и убери временный файл `notes.tmp`, который
+случайно попал в репозиторий.
+
+<Block kind="trainer" title="Квест: оформи выпуск версии" chapterId="code-review-release" blockId="trainer-release-prep">
+<TerminalSim
+  initialFs={{
+    'CHANGELOG.md': '# Изменения\n\n## [Unreleased]\n### Added\n- вход по одноразовому коду\n### Fixed\n- пустой пароль больше не роняет форму',
+    VERSION: '1.4.3',
+    'notes.tmp': 'напомнить себе: спросить у наставника про теги',
+    'README.md': '# Сервис расписания',
+  }}
+  quest={{
+    title: 'Создай release/v1.5.0.md с заметками и удали notes.tmp',
+    requiredPaths: ['release/v1.5.0.md'],
+    forbiddenPaths: ['notes.tmp'],
+  }}
+  chapterId="code-review-release"
+  trainerId="trainer-release-prep"
+/>
+</Block>
+
+<Hint id="code-review-release-h-quest" type="tip">
+Прочитать раздел `[Unreleased]` поможет `cat CHANGELOG.md`, а перенести строку в заметки — `echo "- вход по одноразовому коду" >> release/v1.5.0.md`. Каталога `release` ещё нет: `mkdir release`.
+</Hint>
+
+Дальше — руки. Команды релиза набираются редко, а ошибиться в них дорого:
+`git tag` без `-a` создаёт лёгкий тег без автора и даты, а `--force-with-lease`
+отличается от `--force` тем, что не затрёт чужую работу.
+
+<Block kind="trainer" title="Набор команд ревью и релиза" chapterId="code-review-release" blockId="trainer-release-typing">
+<CodeTyping pools={[{ label: 'Коммиты, PR и релизы', snippets: [
+  "git add -p src/auth.js",
+  "git commit -m 'feat(auth): вход по одноразовому коду'",
+  "git commit -m 'fix(form): не падать на пустом пароле'",
+  "git push --force-with-lease origin feature/otp",
+  "gh pr create --fill --base main",
+  "gh pr view --web",
+  "git tag -a v1.5.0 -m 'Вход по одноразовому коду'",
+  "git push origin v1.5.0",
+  "git log --oneline v1.4.3..v1.5.0",
+  "gh release create v1.5.0 --notes-file release/v1.5.0.md",
+]}]} chapterId="code-review-release" trainerId="trainer-release-typing" targetAccuracy={90} />
+</Block>
+
+<SectionAnchor chapterId="code-review-release" sectionId="practice" />
 
 ## Чек-лист
 

@@ -19,10 +19,12 @@ import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import Figure from '@site/src/components/Figure';
+import TerminalSim from '@site/src/components/TerminalSim';
+import CodeTyping from '@site/src/components/CodeTyping';
 
 # Анатомия взрослого репозитория
 
-<ChapterProgress chapterId="repo-anatomy" totalSections={15} totalQuizzes={5} totalTrainers={0} />
+<ChapterProgress chapterId="repo-anatomy" totalSections={16} totalQuizzes={5} totalTrainers={2} />
 
 ## Зачем это нужно
 
@@ -512,6 +514,55 @@ trim_trailing_whitespace = false
 </Hint>
 
 <SectionAnchor chapterId="repo-anatomy" sectionId="pitfalls" />
+
+## Практика: наведи порядок в чужом репозитории
+
+Перед тобой корень репозитория, который бросили на полпути: код есть, а всё
+остальное — как получилось. В нём лежит закоммиченный `.env` с настоящим
+ключом, нет ни `.gitignore`, ни `.env.example`, а README называется как
+попало. Приведи корень в порядок: секрет из репозитория убери, вместо него
+оставь пример без значений, добавь `.gitignore` и нормальный `README.md`.
+
+<Block kind="trainer" title="Квест: собери корень репозитория" chapterId="repo-anatomy" blockId="trainer-repo-root">
+<TerminalSim
+  initialFs={{
+    '.env': 'API_TOKEN=sk_live_9f3ac41b7d\nDB_PASSWORD=hunter2',
+    'readme.txt': 'todo: написать нормально',
+    'main.py': "print('hello')",
+    node_modules: { 'placeholder.txt': 'сюда npm складывает зависимости — в репозиторий им нельзя' },
+  }}
+  quest={{
+    title: 'Оставь в корне README.md, .gitignore и .env.example, а .env и readme.txt убери',
+    requiredPaths: ['README.md', '.gitignore', '.env.example'],
+    forbiddenPaths: ['.env', 'readme.txt'],
+  }}
+  chapterId="repo-anatomy"
+  trainerId="trainer-repo-root"
+/>
+</Block>
+
+<Hint id="repo-anatomy-h-quest" type="tip">
+Файл с текстом создаётся не только через `touch`: `echo "# Проект" > README.md` сразу кладёт внутрь строку. Удалить лишнее — `rm .env`. А чтобы посмотреть, что получилось, включая скрытые файлы с точкой в начале, пригодится `ls -a`.
+</Hint>
+
+Теперь набери вслепую команды, которыми этот порядок наводят в настоящем
+репозитории. Здесь важен каждый символ: `git rm --cached` без `--cached`
+удалит файл с диска, а не только из индекса.
+
+<Block kind="trainer" title="Набор команд наведения порядка" chapterId="repo-anatomy" blockId="trainer-repo-typing">
+<CodeTyping pools={[{ label: 'Команды порядка в репозитории', snippets: [
+  "git rm --cached .env",
+  "echo '.env' >> .gitignore",
+  "cp .env .env.example",
+  "git check-ignore -v build/app.js",
+  "git status --short",
+  "curl -sL https://www.toptal.com/developers/gitignore/api/node -o .gitignore",
+  "git add .gitignore .env.example README.md",
+  "git commit -m 'docs: README, .gitignore и пример окружения'",
+]}]} chapterId="repo-anatomy" trainerId="trainer-repo-typing" targetAccuracy={90} />
+</Block>
+
+<SectionAnchor chapterId="repo-anatomy" sectionId="practice" />
 
 ## Чек-лист: репозиторий готов к показу
 

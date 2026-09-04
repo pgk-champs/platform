@@ -19,10 +19,12 @@ import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import Figure from '@site/src/components/Figure';
+import TerminalSim from '@site/src/components/TerminalSim';
+import CodeTyping from '@site/src/components/CodeTyping';
 
 # CI: робот проверяет за тебя
 
-<ChapterProgress chapterId="github-actions" totalSections={16} totalQuizzes={4} totalTrainers={0} />
+<ChapterProgress chapterId="github-actions" totalSections={17} totalQuizzes={4} totalTrainers={2} />
 
 ## Зачем это нужно
 
@@ -478,6 +480,61 @@ Error: Process completed with exit code 1.
 </Block>
 
 <SectionAnchor chapterId="github-actions" sectionId="setup-steps" />
+
+## Практика: заведи workflow руками
+
+Робот включается не кнопкой, а файлом в нужном месте. Проверь, что помнишь
+это место наизусть: перед тобой репозиторий без CI. Создай каталог
+`.github/workflows` и положи внутрь `deploy.yml` — дальше GitHub подхватит
+его сам.
+
+<Block kind="trainer" title="Квест: положи workflow в правильное место" chapterId="github-actions" blockId="trainer-ci-place">
+<TerminalSim
+  initialFs={{
+    'package.json': '{ "name": "my-site", "scripts": { "build": "docusaurus build" } }',
+    'README.md': '# Мой сайт',
+    src: { 'index.js': "console.log('hi')" },
+  }}
+  quest={{
+    title: 'Создай .github/workflows/deploy.yml (каталога .github ещё нет)',
+    requiredPaths: ['.github/workflows/deploy.yml'],
+  }}
+  chapterId="github-actions"
+  trainerId="trainer-ci-place"
+/>
+</Block>
+
+<Hint id="github-actions-h-quest" type="tip">
+Вложенный каталог одной командой создаёт `mkdir -p .github/workflows` — без `-p` система откажется делать `workflows` внутри несуществующего `.github`. Пустой файл появляется через `touch`, а `ls -a` показывает каталоги, начинающиеся с точки.
+</Hint>
+
+Теперь набери вслепую строки, из которых состоит настоящий workflow, и
+команды, которыми смотрят его результат из терминала. В YAML отступ — часть
+синтаксиса, а не оформление: два пробела там, где они стоят в образце.
+
+<Block kind="trainer" title="Набор строк workflow" chapterId="github-actions" blockId="trainer-ci-typing">
+<CodeTyping pools={[{ label: 'YAML и gh', snippets: [
+  "name: deploy",
+  "on:",
+  "  push:",
+  "    branches: [main]",
+  "jobs:",
+  "  build:",
+  "    runs-on: ubuntu-latest",
+  "    steps:",
+  "      - uses: actions/checkout@v4",
+  "      - uses: actions/setup-node@v4",
+  "        with:",
+  "          node-version: 20",
+  "      - run: npm ci",
+  "      - run: npm test",
+  "    needs: build",
+  "gh run list -L 5",
+  "gh run watch --exit-status",
+]}]} chapterId="github-actions" trainerId="trainer-ci-typing" targetAccuracy={92} />
+</Block>
+
+<SectionAnchor chapterId="github-actions" sectionId="practice" />
 
 ## На чемпионате
 
