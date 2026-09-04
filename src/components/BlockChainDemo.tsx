@@ -96,12 +96,10 @@ export default function BlockChainDemo({
   const firstTampered = ready ? live.findIndex((h, i) => h !== sealed[i]) : -1;
   const broken = firstTampered !== -1;
 
-  useEffect(() => {
-    if (broken) {
-      brokeRef.current = true;
-      setRepaired(false);
-    }
-  }, [broken]);
+  // Разрыв цепи отмечается там, где он рождается — в правке поля (см. onChange
+  // ниже), а не эффектом по `broken`. Эффект зависел от асинхронного пересчёта
+  // hash и на медленной машине мог погасить свежее объяснение уже после
+  // «Пересчитать»: цепь целая, а плашки «Цепь пересчитана» нет.
 
   const statusOf = (i: number): Status => {
     if (!ready) return 'pending';
@@ -155,6 +153,8 @@ export default function BlockChainDemo({
                   value={d}
                   onChange={(e) => {
                     const v = e.target.value;
+                    brokeRef.current = true;
+                    setRepaired(false);
                     setData((arr) => arr.map((x, j) => (j === i ? v : x)));
                   }}
                 />
