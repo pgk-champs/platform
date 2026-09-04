@@ -1,8 +1,22 @@
 import { render } from '@testing-library/react';
 import ChapterCover, { CHAPTER_IDS, TrackBanner } from './ChapterCover';
 
-test('покрыты все 25 глав', () => {
-  expect(CHAPTER_IDS).toHaveLength(25);
+test('покрыты все 27 глав', () => {
+  expect(CHAPTER_IDS).toHaveLength(27);
+});
+
+test('новые главы стоят в своих треках', () => {
+  const cases = [
+    ['foundation-final', 'ФУНДАМЕНТ', '08'],
+    ['code-editor', 'БЛОКЧЕЙН', '03'],
+    ['android-studio', 'МОБИЛКА', '00'],
+  ] as const;
+  for (const [id, track, num] of cases) {
+    const { container, unmount } = render(<ChapterCover chapterId={id} />);
+    expect(container.textContent).toContain(track);
+    expect(container.textContent).toContain(num);
+    unmount();
+  }
 });
 
 test('каждая глава рендерит свою уникальную обложку с названием', () => {

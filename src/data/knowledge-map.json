@@ -120,12 +120,20 @@
     "path": "foundation/git-remote.mdx"
   },
   {
-    "id": "android-studio",
-    "title": "Android Studio: знакомство с IDE",
+    "id": "foundation-final",
+    "title": "Финал Фундамента: всё вместе",
     "audience": "все",
     "level": "база",
     "order": 8,
-    "path": "foundation/android-studio.mdx"
+    "path": "foundation/foundation-final.mdx"
+  },
+  {
+    "id": "android-studio",
+    "title": "Android Studio: знакомство с IDE",
+    "audience": "мобилка",
+    "level": "база",
+    "order": 0,
+    "path": "mobile/android-studio.mdx"
   },
   {
     "id": "kotlin-vars",
@@ -198,5 +206,13 @@
     "level": "база",
     "order": 2,
     "path": "blockchain/waves-first-network.mdx"
+  },
+  {
+    "id": "code-editor",
+    "title": "Редактор кода: WebStorm и VS Code",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 3,
+    "path": "blockchain/code-editor.mdx"
   }
 ]

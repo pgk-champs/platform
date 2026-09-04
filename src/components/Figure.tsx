@@ -9,6 +9,8 @@ import { blockchainSchemes } from './figures/blockchain';
 import { repoAnatomySchemes } from './figures/repoAnatomy';
 import { ciSchemes } from './figures/ci';
 import { reviewSchemes } from './figures/review';
+import { finalSchemes } from './figures/final';
+import { editorSchemes } from './figures/editor';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -24,6 +26,8 @@ const SCHEMES = {
   ...repoAnatomySchemes,
   ...ciSchemes,
   ...reviewSchemes,
+  ...finalSchemes,
+  ...editorSchemes,
 };
 
 export const SCHEME_IDS = Object.keys(SCHEMES);

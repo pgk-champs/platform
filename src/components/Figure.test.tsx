@@ -9,6 +9,8 @@ import { advancedSchemes } from './figures/advanced';
 import { repoAnatomySchemes } from './figures/repoAnatomy';
 import { ciSchemes } from './figures/ci';
 import { reviewSchemes } from './figures/review';
+import { finalSchemes } from './figures/final';
+import { editorSchemes } from './figures/editor';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -52,6 +54,8 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(repoAnatomySchemes),
     ...Object.keys(ciSchemes),
     ...Object.keys(reviewSchemes),
+    ...Object.keys(finalSchemes),
+    ...Object.keys(editorSchemes),
   ];
   const duplicates = all.filter((id, i) => all.indexOf(id) !== i);
   expect(duplicates).toEqual([]);

@@ -633,5 +633,59 @@
       "title": "1.2 Git – Теги – Использование тегов для релиза с describe и archive",
       "channel": "JavaScript.ru"
     }
+  ],
+  "foundation-final": [
+    {
+      "videoId": "1Mp2CXSN8Fg",
+      "title": "УРОК 3 - Английский для айтишников | Основные термины из сферы IT",
+      "channel": "Войти в IT"
+    },
+    {
+      "videoId": "iCswbUkRILY",
+      "title": "GIT. Урок 3. Git init, status, remote, add, commit, push",
+      "channel": "Serhii Hlivinskyi - QA START UP"
+    },
+    {
+      "videoId": "sbVYRf_6Hvg",
+      "title": "Основы SSH | Хекслет",
+      "channel": "Хекслет - нормальные it-курсы"
+    },
+    {
+      "videoId": "I4ff1HCrpsg",
+      "title": "Как устроена файловая система в Linux",
+      "channel": "Поясни за DevOps"
+    },
+    {
+      "videoId": "Lc03HxjD-68",
+      "title": "Что такое «СЛЕПАЯ ПЕЧАТЬ». Как научиться БЫСТРО ПЕЧАТАТЬ за 2 недели",
+      "channel": "DonEx Code"
+    }
+  ],
+  "code-editor": [
+    {
+      "videoId": "SE0_wdokumg",
+      "title": "VS Code ПОЛНЫЙ курс + настройка (интерфейс, плагины, работа с кодом)",
+      "channel": "Андрей Шопинский"
+    },
+    {
+      "videoId": "S8FnJRRX21o",
+      "title": "Visual Studio Code | Настройка, установка, плагины | Подробный гайд за 30 минут",
+      "channel": "Web Skills. Уроки по веб-разработке"
+    },
+    {
+      "videoId": "PLU2AuU6wlU",
+      "title": "WebStorm настройки для быстрой и удобной работы • Плагины • Git GUI • Шаблоны и сниппеты",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "hH5xZ2lt_-o",
+      "title": "Мой личный ТОП горячих клавиш в WebStorm",
+      "channel": "Андрей Кобец"
+    },
+    {
+      "videoId": "rXAH2MQQTsY",
+      "title": "Настройка Webstorm 2022 + сравнение с VS Code",
+      "channel": "RED Group"
+    }
   ]
 }

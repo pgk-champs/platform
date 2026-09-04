@@ -299,6 +299,33 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="42" y="147" textAnchor="middle" fontSize="14" fontWeight={800} fill="#fff" fontFamily={MONO}>v1.2</text>
     </g>
   ),
+  /* четыре навыка Фундамента сходятся в один финиш — арт «foundation-final» */
+  'foundation-final': () => (
+    <g strokeLinecap="round">
+      {[38, 70, 102, 134].map((y, i) => (
+        <g key={y}>
+          <rect x="12" y={y - 14} width="58" height="28" rx="9" fill={SOFT} stroke={INK} strokeWidth={3} />
+          <path d={`M74 ${y}C104 ${y} 104 86 128 86`} stroke="rgba(255,255,255,0.45)" strokeWidth={5} fill="none" />
+          <text x="41" y={y + 5} textAnchor="middle" fontSize="11" fontWeight={700} fill="#fff" fontFamily={MONO}>
+            {['EN', 'git', 'ssh', 'sys'][i]}
+          </text>
+        </g>
+      ))}
+      <circle cx="152" cy="86" r="30" fill={ACCENT} />
+      <path d="M138 86l9 11 20-23" stroke={DARK} strokeWidth={5} fill="none" strokeLinejoin="round" />
+    </g>
+  ),
+  /* окно редактора: дерево файлов слева, подсказка автодополнения — арт «code-editor» */
+  'code-editor': () => (
+    <g strokeLinecap="round">
+      <rect x="12" y="30" width="176" height="128" rx="14" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <path d="M62 34v120" stroke={INK} strokeWidth={3} />
+      <path d="M26 56h24M26 74h22M26 92h26M26 110h20" stroke="rgba(255,255,255,0.45)" strokeWidth={7} />
+      <path d="M76 56h64M76 74h44M76 110h52" stroke="rgba(255,255,255,0.45)" strokeWidth={7} />
+      <rect x="76" y="84" width="98" height="18" rx="6" fill={ACCENT} />
+      <text x="84" y="98" fontSize="12" fontWeight={800} fill={DARK} fontFamily={MONO}>useState</text>
+    </g>
+  ),
 };
 
 const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
@@ -311,7 +338,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'git-first-commit': { track: 'foundation', num: '06', title: 'Git: первый коммит' },
   'git-branches': { track: 'foundation', num: '07', title: 'Git: ветки и merge' },
   'git-remote': { track: 'foundation', num: '08', title: 'Git: push, PR и командная работа' },
-  'android-studio': { track: 'foundation', num: '09', title: 'Android Studio: знакомство с IDE' },
+  'foundation-final': { track: 'foundation', num: '08', title: 'Финал Фундамента: английский, git, SSH, система, клавиатура' },
+  'android-studio': { track: 'mobile', num: '00', title: 'Android Studio: знакомство с IDE' },
   'kotlin-vars': { track: 'mobile', num: '01', title: 'Переменные и типы' },
   'functions-lambdas': { track: 'mobile', num: '02', title: 'Функции и лямбды' },
   'classes-collections': { track: 'mobile', num: '03', title: 'Классы и коллекции' },
@@ -321,6 +349,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'ui-kit': { track: 'mobile', num: '07', title: 'Многомодульность и UI Kit' },
   'what-is-blockchain': { track: 'blockchain', num: '01', title: 'Что такое блокчейн' },
   'waves-first-network': { track: 'blockchain', num: '02', title: 'Первая сеть на Waves Enterprise' },
+  'code-editor': { track: 'blockchain', num: '03', title: 'Редактор кода: VS Code и WebStorm' },
   'grep-regex': { track: 'advanced', num: '01', title: 'Регулярные выражения для grep' },
   'ssh-keys-deep': { track: 'advanced', num: '02', title: 'SSH-ключи глубоко' },
   'git-rebase': { track: 'advanced', num: '03', title: 'Rebase мастерски' },
