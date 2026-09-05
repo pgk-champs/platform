@@ -524,6 +524,22 @@ const ARTS: Record<string, () => React.ReactNode> = {
   /* две дорожки времени: сплошная занятая и прерывистая свободная — арт «kotlin-coroutines» */
   /* поток значений во времени против одного хранимого — арт «flow-streams» */
   /* видимое окно поверх длинной ленты — арт «lazy-lists» */
+  /* светлая и тёмная половины одной палитры — арт «material-theme» */
+  'material-theme': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="40" width="84" height="112" rx="12" fill="rgba(255,255,255,0.92)" stroke={INK} strokeWidth={3} />
+      <rect x="26" y="54" width="60" height="12" rx="5" fill="#1B1B1B" />
+      <rect x="26" y="74" width="42" height="10" rx="4" fill="rgba(0,0,0,0.45)" />
+      <rect x="26" y="112" width="60" height="26" rx="8" fill={DARK} />
+
+      <rect x="102" y="40" width="84" height="112" rx="12" fill="rgba(0,0,0,0.55)" stroke={ACCENT} strokeWidth={3} />
+      <rect x="114" y="54" width="60" height="12" rx="5" fill="rgba(255,255,255,0.9)" />
+      <rect x="114" y="74" width="42" height="10" rx="4" fill="rgba(255,255,255,0.45)" />
+      <rect x="114" y="112" width="60" height="26" rx="8" fill={ACCENT} />
+
+      <text x="100" y="172" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>одна разметка</text>
+    </g>
+  ),
   'lazy-lists': () => (
     <g strokeLinecap="round">
       {[38, 58, 78, 98, 118, 138].map((y, i) => (
@@ -607,11 +623,12 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'code-basics': { track: 'foundation', num: '08', title: 'Из чего состоит код' },
   'oop-basics': { track: 'foundation', num: '09', title: 'ООП простыми словами — на двух языках' },
-  'kotlin-vs-java': { track: 'mobile', num: '14', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '15', title: 'История Java, Android и Kotlin' },
+  'kotlin-vs-java': { track: 'mobile', num: '15', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '16', title: 'История Java, Android и Kotlin' },
+  'material-theme': { track: 'mobile', num: '12', title: 'Material 3: тема, которую вам уже сгенерировали' },
   'lazy-lists': { track: 'mobile', num: '11', title: 'Списки: LazyColumn и всё, что не нарисовать циклом' },
-  'flow-streams': { track: 'mobile', num: '13', title: 'Flow: поток значений во времени' },
-  'kotlin-coroutines': { track: 'mobile', num: '12', title: 'Корутины: как приложение не зависает' },
+  'flow-streams': { track: 'mobile', num: '14', title: 'Flow: поток значений во времени' },
+  'kotlin-coroutines': { track: 'mobile', num: '13', title: 'Корутины: как приложение не зависает' },
   'kotlin-null': { track: 'mobile', num: '02', title: 'Null-безопасность: ошибка на миллиард долларов' },
   'ts-vs-js': { track: 'blockchain', num: '03', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '04', title: 'Значения и переменные: числа, строки, типы' },

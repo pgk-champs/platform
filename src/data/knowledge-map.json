@@ -240,11 +240,19 @@
     "path": "mobile/lazy-lists.mdx"
   },
   {
+    "id": "material-theme",
+    "title": "Material 3: тема, которую вам уже сгенерировали",
+    "audience": "мобилка",
+    "level": "база",
+    "order": 12,
+    "path": "mobile/material-theme.mdx"
+  },
+  {
     "id": "kotlin-coroutines",
     "title": "Корутины: как приложение не зависает",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 12,
+    "order": 13,
     "path": "mobile/kotlin-coroutines.mdx"
   },
   {
@@ -252,7 +260,7 @@
     "title": "Flow: поток значений во времени",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 13,
+    "order": 14,
     "path": "mobile/flow-streams.mdx"
   },
   {
@@ -260,7 +268,7 @@
     "title": "Kotlin и Java: в чём разница",
     "audience": "мобилка",
     "level": "база",
-    "order": 14,
+    "order": 15,
     "path": "mobile/kotlin-vs-java.mdx"
   },
   {
@@ -268,7 +276,7 @@
     "title": "История Java, Android и Kotlin",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 15,
+    "order": 16,
     "path": "mobile/kotlin-history.mdx"
   },
   {

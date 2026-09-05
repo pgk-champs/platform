@@ -1173,5 +1173,32 @@
       "title": "The FULL Nested Scrolling Guide for Jetpack Compose",
       "channel": "Philipp Lackner"
     }
+  ],
+  "material-theme": [
+    {
+      "videoId": "I3eT32LXAKc",
+      "title": "Introduction to Material 3 (Color Theming, Typography, Shapes)",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "xS4GpdIQUEo",
+      "title": "Material You in Compose apps",
+      "channel": "Android Developers"
+    },
+    {
+      "videoId": "lkU2Z1uzR4c",
+      "title": "Material 3 Theming & Dynamic Color in Jetpack Compose",
+      "channel": "ComposeNCode"
+    },
+    {
+      "videoId": "1rScT0dNggg",
+      "title": "Jetpack Compose - Theme | Customizing Colors & Typography",
+      "channel": "Cheezy Code"
+    },
+    {
+      "videoId": "tEQk1pA1Ils",
+      "title": "Material 3 Dynamic Colors Feature in Android Studio with Jetpack Compose",
+      "channel": "Stevdza-San"
+    }
   ]
 }

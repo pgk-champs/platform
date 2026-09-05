@@ -1,0 +1,443 @@
+---
+title: 'Material 3: тема, которую вам уже сгенерировали'
+audience: 'мобилка'
+level: 'база'
+order: 12
+sidebar_position: 12
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="material-theme" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+import KotlinPlay from '@site/src/components/KotlinPlay';
+
+# Material 3: тема, которую вам уже сгенерировали
+
+<ChapterProgress chapterId="material-theme" totalSections={14} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="material-theme" />
+
+## Зачем это нужно
+
+В самой первой главе Android Studio создала проект, а в нём — папку `ui/theme` с тремя файлами. Мы её открыли, увидели непонятное и пошли дальше. С тех пор прошло одиннадцать глав: мы верстали экраны, собирали UI Kit, писали списки — и всё это время делали цвета и шрифты руками, объектами `UiKitColors` и `UiKitType`.
+
+Пора вернуться. Эти три файла — не мусор шаблона, а готовая система оформления, которая умеет то, чего наши объекты не умеют совсем: подставлять другой набор цветов, когда телефон переключается в тёмную тему. Без единой правки в разметке.
+
+Ещё важнее другое. Все готовые компоненты Material — кнопки, поля ввода, карточки, панели — берут цвета и шрифты **оттуда**. Пока вы красите свои компоненты вручную, а рядом ставите готовую кнопку, экран разъезжается: половина элементов вашего оттенка, половина — стандартного фиолетового.
+
+Эта глава закрывает разрыв между «я крашу руками» и «в проекте есть тема».
+
+<SectionAnchor chapterId="material-theme" sectionId="zachem" />
+
+## Откройте `ui/theme`
+
+Три файла, которые лежат там с первого дня:
+
+<Figure scheme="mt-three-files" caption="Color.kt, Type.kt и Shapes.kt хранят части оформления; Theme.kt собирает их в MaterialTheme" />
+
+`Color.kt` — просто значения цветов, объявленные как `val`. Ровно то же, что мы делали в `UiKitColors`, только сгенерированное заранее.
+
+`Type.kt` — набор стилей текста: какой размер и начертание у заголовка, у основного текста, у подписи.
+
+`Theme.kt` — самое интересное. Он собирает первые два в одно целое и раздаёт всему приложению.
+
+Наши собственные объекты из главы про UI Kit не были ошибкой: чтобы понять, что делает тема, полезно было сначала собрать её вручную. Но дальше рукодельный вариант проигрывает по одной причине — он ничего не знает про тёмную тему и про готовые компоненты.
+
+<SectionAnchor chapterId="material-theme" sectionId="tri-fayla" />
+
+## Цвет как роль, а не как имя
+
+Главная идея Material, которую нужно принять до всего остального: **цвет называется по своей работе, а не по своему виду**.
+
+В нашем UI Kit было `UiKitColors.CardBackground` — «фон карточки». В Material это `surface` — «поверхность». Разница кажется словесной, пока не появляется вторая тема. Смоделируем:
+
+<KotlinPlay code={`data class Scheme(val surface: String, val onSurface: String, val primary: String, val onPrimary: String)
+
+val light = Scheme(surface = "#FFFFFF", onSurface = "#1B1B1B", primary = "#4B2FD6", onPrimary = "#FFFFFF")
+val dark  = Scheme(surface = "#141218", onSurface = "#E6E0E9", primary = "#CFBCFF", onPrimary = "#2A1A6B")
+
+fun drawByHex(s: Scheme) = println("  фон #FFFFFF, текст #1B1B1B   (жёсткий хардкод — тема не влияет)")
+fun drawByRole(s: Scheme) = println("  фон \${s.surface}, текст \${s.onSurface}   (роли — тема учтена)")
+
+fun main() {
+    println("СВЕТЛАЯ ТЕМА"); drawByHex(light); drawByRole(light)
+    println("ТЁМНАЯ ТЕМА");  drawByHex(dark);  drawByRole(dark)
+    println()
+    println("пара primary/onPrimary всегда контрастна: \${light.primary} + \${light.onPrimary}")
+    println("и в тёмной тоже:                          \${dark.primary} + \${dark.onPrimary}")
+}`} />
+
+Живой вывод:
+
+```text
+СВЕТЛАЯ ТЕМА
+  фон #FFFFFF, текст #1B1B1B   (жёсткий хардкод — тема не влияет)
+  фон #FFFFFF, текст #1B1B1B   (роли — тема учтена)
+ТЁМНАЯ ТЕМА
+  фон #FFFFFF, текст #1B1B1B   (жёсткий хардкод — тема не влияет)
+  фон #141218, текст #E6E0E9   (роли — тема учтена)
+
+пара primary/onPrimary всегда контрастна: #4B2FD6 + #FFFFFF
+и в тёмной тоже:                          #CFBCFF + #2A1A6B
+```
+
+Разметка в обоих случаях одна и та же. Но в тёмной теме жёстко заданный белый фон так и остался белым — и выбился из экрана, а текст на нём стал нечитаемым. Роль подставила нужное значение сама.
+
+<Figure scheme="mt-roles" caption="Жёстко заданный цвет одинаков в обеих темах; роль подставляет подходящее значение, а пара «цвет и то, что на нём» гарантирует контраст" />
+
+Второе, что видно в выводе: роли ходят парами. `primary` и `onPrimary`, `surface` и `onSurface`. Приставка `on` означает «то, что лежит на этом»: `onPrimary` — цвет текста и значков поверх `primary`. Значения в паре подобраны так, чтобы контраста хватало, и это избавляет от целого класса ошибок вроде серого текста на светло-сером фоне.
+
+<Block kind="cheatsheet">
+
+| Роль | Для чего |
+|---|---|
+| `primary` / `onPrimary` | главное действие: основная кнопка, активный переключатель |
+| `secondary` / `onSecondary` | второстепенные акценты, чипы, фильтры |
+| `error` / `onError` | ошибки: рамка поля, текст под ним |
+| `surface` / `onSurface` | поверхность и текст на ней: карточки, диалоги, панели |
+| `surfaceVariant` / `onSurfaceVariant` | приглушённая поверхность: подписи, второстепенный текст |
+| `background` / `onBackground` | фон экрана целиком |
+| `outline` | границы, разделители, рамка неактивного поля |
+
+</Block>
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="material-theme" quizId="quiz-1" questions={[
+  { q: 'Почему цвета в Material называются ролями, а не именами вроде «фиолетовый»?', options: ['Так короче писать', 'Роль — это назначение цвета, и тема подставляет под неё разное значение: в светлой одно, в тёмной другое, а разметка не меняется', 'Имена цветов запрещены в Kotlin', 'Так требует компилятор'], correct: 1, why: 'В примере видно: жёстко заданный белый остался белым и в тёмной теме, а роль surface подставила тёмное значение сама.' },
+  { q: 'Что означает приставка on в onSurface?', options: ['Признак включённого состояния', 'Цвет того, что лежит поверх surface: текста и значков, с гарантированным контрастом', 'Цвет при наведении', 'Устаревшее название'], correct: 1, why: 'Значения в паре подбирались вместе, поэтому текст onSurface на фоне surface читается в любой теме.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="material-theme" sectionId="roli" />
+
+## Как тема попадает в компонент
+
+Второй вопрос, который возникает сразу: если `ProductCard` берёт цвет из темы, кто ей эту тему передал? Ответ — никто. Смоделируем механизм:
+
+<KotlinPlay code={`class Theme(val bg: String, val text: String)
+
+val stack = ArrayDeque<Theme>()
+fun current(): Theme = stack.last()
+
+fun provide(theme: Theme, body: () -> Unit) {
+    stack.addLast(theme); body(); stack.removeLast()
+}
+
+fun card(name: String) = println("  \$name рисуется на фоне \${current().bg}, текст \${current().text}")
+
+fun main() {
+    provide(Theme("белый", "чёрный")) {
+        println("светлая тема:")
+        card("Карточка"); card("Кнопка")
+
+        provide(Theme("чёрный", "белый")) {
+            println("вложенный блок с тёмной темой:")
+            card("Карточка")
+        }
+
+        println("вышли из блока — тема вернулась:")
+        card("Кнопка")
+    }
+}`} />
+
+```text
+светлая тема:
+  Карточка рисуется на фоне белый, текст чёрный
+  Кнопка рисуется на фоне белый, текст чёрный
+вложенный блок с тёмной темой:
+  Карточка рисуется на фоне чёрный, текст белый
+вышли из блока — тема вернулась:
+  Кнопка рисуется на фоне белый, текст чёрный
+```
+
+Функция `card` не принимает тему параметром — она достаёт её из окружения в момент вызова. Вложенный `provide` переопределяет тему только внутри своего блока, а после выхода всё возвращается.
+
+Именно так устроен `MaterialTheme`. Значение раздаётся вниз по дереву, и любая функция на любой глубине берёт его сама:
+
+```kotlin
+@Composable
+fun ProductCard(title: String) {
+    Surface(color = MaterialTheme.colorScheme.surface) {
+        Text(
+            text = title,
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.titleMedium,
+        )
+    }
+}
+```
+
+<Figure scheme="mt-provide" caption="Тема объявляется один раз наверху и достаётся из окружения на любой глубине — передавать её параметром не нужно" />
+
+<Hint type="fact">
+Механизм называется `CompositionLocal`. Кроме темы через него раздаются плотность экрана, локаль, контекст и другие вещи, которые нужны всем и которые бессмысленно тащить параметром через двадцать уровней. Своими такими значениями пользуются редко и осторожно: то, что берётся «из воздуха», труднее отследить, чем то, что передано явно.
+</Hint>
+
+<SectionAnchor chapterId="material-theme" sectionId="kak-popadaet" />
+
+## Разбор `Theme.kt`
+
+Теперь файл из шаблона читается целиком:
+
+```kotlin
+private val LightColors = lightColorScheme(
+    primary = Purple40,
+    onPrimary = Color.White,
+    surface = Color(0xFFFFFBFE),
+    onSurface = Color(0xFF1C1B1F),
+)
+
+private val DarkColors = darkColorScheme(
+    primary = Purple80,
+    onPrimary = Color(0xFF381E72),
+    surface = Color(0xFF1C1B1F),
+    onSurface = Color(0xFFE6E1E5),
+)
+
+@Composable
+fun AppTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit,
+) {
+    MaterialTheme(
+        colorScheme = if (darkTheme) DarkColors else LightColors,
+        typography = Typography,
+        content = content,
+    )
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'lightColorScheme(', label: 'построитель светлой схемы', note: 'принимает роли по именам. Всё, что не указали, получит значение по умолчанию — схема всегда заполнена целиком' },
+  { text: 'darkTheme: Boolean = ', label: 'параметр со значением по умолчанию', note: 'вызывающий может передать своё значение — так делают переключатель темы внутри приложения' },
+  { text: 'isSystemInDarkTheme()', label: 'что выбрано в системе', note: 'читает настройку телефона. Это @Composable-функция: при смене настройки экран перерисуется сам' },
+  { text: 'content: @Composable () -> Unit', label: 'слот содержимого', note: 'то самое, что мы разбирали в главе про UI Kit: функция принимает разметку и оборачивает её собой' },
+]} />
+
+Обратите внимание на `content`. Именно поэтому в `MainActivity` тема оборачивает экран фигурными скобками — это trailing lambda, последний параметр-функция:
+
+```kotlin
+setContent {
+    AppTheme {
+        ProductListScreen()
+    }
+}
+```
+
+Тёмная тема после этого работает сама. Ничего дописывать не надо — при условии, что в разметке нет жёстко заданных цветов.
+
+<SectionAnchor chapterId="material-theme" sectionId="theme-kt" />
+
+## Типографика с макета
+
+`MaterialTheme.typography` — набор готовых стилей. Их пятнадцать, и запоминать все не нужно: на практике встречаются пять-шесть.
+
+```kotlin
+Text("Заголовок экрана", style = MaterialTheme.typography.headlineSmall)
+Text("Название товара",  style = MaterialTheme.typography.titleMedium)
+Text("Описание",         style = MaterialTheme.typography.bodyMedium)
+Text("2 490 ₽",          style = MaterialTheme.typography.labelLarge)
+```
+
+Имена устроены системно: `display` — самые крупные, `headline` — заголовки экранов, `title` — заголовки блоков, `body` — основной текст, `label` — подписи и текст на кнопках. У каждого три размера: `Large`, `Medium`, `Small`.
+
+Когда в макете написано «16sp, Medium, межстрочный 24», ищите ближайший подходящий стиль и при необходимости правьте его в `Type.kt` — один раз для всего приложения:
+
+```kotlin
+val Typography = Typography(
+    titleMedium = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Medium,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+    ),
+)
+```
+
+<Hint type="tip">
+Не создавайте новый стиль под каждую строку макета. В хорошем макете стилей всё равно немного — дизайнер сам работает системой. Если кажется, что нужен шестнадцатый стиль, скорее всего подойдёт существующий с изменённым цветом: `style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant`.
+</Hint>
+
+<SectionAnchor chapterId="material-theme" sectionId="tipografika" />
+
+## Переход с рукодельной темы
+
+В главе про UI Kit мы завели свои объекты. Перевод на `MaterialTheme` делается механически:
+
+```kotlin
+// было
+Text(text = title, fontSize = UiKitType.TitleFontSize)
+Box(modifier = Modifier.background(UiKitColors.CardBackground))
+
+// стало
+Text(text = title, style = MaterialTheme.typography.titleMedium)
+Box(modifier = Modifier.background(MaterialTheme.colorScheme.surface))
+```
+
+Порядок работы: сначала перенесите значения из своих объектов в `Color.kt` и `Type.kt`, потом замените обращения в компонентах, и только потом удалите старые объекты. Если удалить сразу, компилятор завалит вас ошибками во всех файлах разом, и станет непонятно, что уже перенесено, а что нет.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="material-theme" quizId="quiz-2" questions={[
+  { q: 'Как ProductCard получает доступ к теме, если ей никто её не передавал?', options: ['Тема — глобальная переменная', 'Тема раздаётся вниз по дереву и достаётся из окружения в момент отрисовки, а вложенная тема переопределяет её только внутри своего блока', 'Каждый компонент создаёт свою тему', 'Тема передаётся через параметры, просто неявно компилятором'], correct: 1, why: 'Механизм называется CompositionLocal: значение доступно всем ниже по дереву, и вложенное объявление действует только внутри своего блока.' },
+  { q: 'Что нужно дописать, чтобы заработала тёмная тема, если все цвета взяты из ролей?', options: ['Отдельную вёрстку для тёмной темы', 'Ничего: darkColorScheme уже в Theme.kt, а isSystemInDarkTheme читает настройку телефона', 'Проверку isDark в каждом компоненте', 'Второй набор компонентов'], correct: 1, why: 'Ради этого роли и существуют — разметка одна, значения подставляет тема. Ломают её только жёстко заданные цвета.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="material-theme" sectionId="perehod" />
+
+## Динамический цвет и почему его выключают
+
+Начиная с Android 12 система умеет собирать палитру из обоев пользователя — это называется динамическим цветом. В шаблоне проекта эта возможность обычно включена.
+
+Для личного приложения приём приятный. Для работы, которую оценивают по макету, — вредный: цвета на экране перестают совпадать с макетом, потому что зависят от обоев конкретного телефона.
+
+```kotlin
+@Composable
+fun AppTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    dynamicColor: Boolean = false,   // на чемпионате — false
+    content: @Composable () -> Unit,
+) { /* ... */ }
+```
+
+Проверьте это в первый же день: если в шаблоне стоит `dynamicColor: Boolean = true`, поменяйте на `false`, иначе эксперт увидит не тот экран, что вы рисовали.
+
+<SectionAnchor chapterId="material-theme" sectionId="dinamicheskiy" />
+
+## Типичные ошибки
+
+**Жёстко заданный цвет вместо роли.** `Color(0xFFFFFFFF)` в разметке. В светлой теме всё хорошо, в тёмной элемент светится белым пятном. Самая частая причина «сломанной тёмной темы».
+
+**Своя палитра рядом со стандартной.** Собственные компоненты покрашены вручную, готовые кнопки Material берут цвет из темы — экран из двух половин разного оттенка. Лечится переносом значений в `Color.kt`.
+
+**Тема объявлена не на самом верху.** Часть экрана оказалась вне `AppTheme` и рисуется значениями по умолчанию — обычно фиолетовыми. Оборачивать надо в `setContent`, а не отдельные куски.
+
+**`fontSize` вместо `style`.** Размер поменялся, а начертание и межстрочный интервал остались от стиля по умолчанию, и текст не сходится с макетом при измерении.
+
+**Забыли выключить `dynamicColor`.** На телефоне разработчика цвета одни, на телефоне эксперта — другие.
+
+<SectionAnchor chapterId="material-theme" sectionId="oshibki" />
+
+## Слова главы
+
+<Block kind="vocab">
+
+- **`MaterialTheme`** — обёртка, раздающая цвета, типографику и формы всему, что внутри.
+- **Роль цвета** — назначение вместо значения: `primary`, `surface`, `error`.
+- **Пара `on`** — цвет содержимого поверх основного: `onPrimary` на `primary`.
+- **`lightColorScheme` / `darkColorScheme`** — построители наборов ролей.
+- **`isSystemInDarkTheme()`** — что выбрано в настройках телефона.
+- **`typography`** — набор стилей текста: `headline`, `title`, `body`, `label`.
+- **`CompositionLocal`** — механизм раздачи значений вниз по дереву без параметров.
+- **Динамический цвет** — палитра из обоев пользователя, Android 12+; на чемпионате выключают.
+
+</Block>
+
+<SectionAnchor chapterId="material-theme" sectionId="slova" />
+
+## Тренажёр: набрать вслепую
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="material-theme"
+  trainerId="trainer-material-theme"
+  targetCpm={100}
+  targetAccuracy={88}
+  pools={[
+    { label: 'Обращение к теме', snippets: [
+      'color = MaterialTheme.colorScheme.onSurface',
+      'style = MaterialTheme.typography.titleMedium',
+      'Surface(color = MaterialTheme.colorScheme.surface)',
+    ] },
+    { label: 'Объявление темы', snippets: [
+      'private val LightColors = lightColorScheme(primary = Purple40)',
+      'darkTheme: Boolean = isSystemInDarkTheme()',
+      'MaterialTheme(colorScheme = colors, typography = Typography, content = content)',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="material-theme" sectionId="trenazher" />
+
+## На чемпионате
+
+Первым заданием модуля вёрстки обычно идёт «Создайте цвета, как на макете» и «Создайте тему с типографикой, как на макете» — то есть тема оценивается отдельно, до всех экранов. Стоит она немного, но без неё не сходится всё остальное: цвета проверяют на каждом экране.
+
+Порядок первого часа, который экономит время потом:
+
+1. Выключить `dynamicColor`.
+2. Перенести цвета макета в `Color.kt` под ролями Material, а не под своими именами.
+3. Собрать `Typography` по стилям макета.
+4. Проверить оба режима — светлый и тёмный — на пустом экране, до того как в нём появятся компоненты.
+
+Проверять темы удобно, не пересобирая приложение: в `@Preview` есть параметр `uiMode`, который показывает экран в тёмном режиме прямо в Android Studio.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="material-theme" quizId="quiz-3" questions={[
+  { q: 'В макете цвет карточки #FFFFFF. Как записать его в проекте?', options: ['Color(0xFFFFFFFF) прямо в разметке карточки', 'Положить в Color.kt и подставить в роль surface схемы, а в разметке брать MaterialTheme.colorScheme.surface', 'Завести свой объект Colors', 'Использовать Color.White'], correct: 1, why: 'Значение живёт в одном месте, разметка обращается к роли — тогда тёмная тема и готовые компоненты Material работают согласованно.' },
+  { q: 'Почему на чемпионате выключают динамический цвет?', options: ['Он замедляет приложение', 'Он собирает палитру из обоев устройства, и цвета перестают совпадать с макетом на чужом телефоне', 'Он не работает на Android 12', 'Он требует разрешения пользователя'], correct: 1, why: 'Работу открывают на устройстве эксперта. С динамическим цветом там будет другая палитра, чем вы рисовали.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="material-theme" sectionId="na-chempionate" />
+
+## Что дальше
+
+Тема есть — значит, готовые компоненты Material теперь встанут в ваш экран и будут выглядеть как ваши. Следующая глава про них: какие компоненты существуют, где смотреть их список и как читать документацию, чтобы находить нужный за полминуты, а не собирать своё из прямоугольников.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="material-theme" quizId="quiz-4" questions={[
+  { q: 'Зачем вообще нужна была рукодельная тема из главы про UI Kit, если есть MaterialTheme?', options: ['Она была ошибкой', 'Чтобы понять, что тема делает внутри: своя версия показывает механизм, а MaterialTheme добавляет к нему тёмную тему и согласованность с готовыми компонентами', 'MaterialTheme работает только в новых проектах', 'Рукодельная тема быстрее'], correct: 1, why: 'Сначала собрать руками, потом заменить готовым — обычный порядок обучения: видно, что именно берёт на себя библиотека.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="material-theme" sectionId="dalshe" />
+
+## Углубиться
+
+- Material Theme Builder — сайт, где по нескольким цветам макета генерируется готовый `Color.kt` сразу для светлой и тёмной схемы.
+- `surfaceContainer`, `surfaceContainerHigh` и остальные уровни поверхностей: чем они заменили «тень по высоте» из старой версии Material.
+- `Shapes` — скругления как часть темы: одно изменение меняет форму всех карточек и кнопок сразу.
+- `LocalContentColor` — как компонент узнаёт, каким цветом рисовать содержимое, не спрашивая об этом явно.
+- Собственный `CompositionLocal` — когда своё значение действительно стоит раздать вниз по дереву, а когда лучше обычный параметр.
+
+<SectionAnchor chapterId="material-theme" sectionId="uglubitsya" />
+
+<ChapterExam chapterId="material-theme" questions={[
+  { q: 'Что хранится в файлах Color.kt, Type.kt и Theme.kt?', options: ['Настройки сборки проекта', 'Значения цветов, стили текста и сборка их в MaterialTheme — три части системы оформления', 'Ресурсы приложения: иконки и строки', 'Тесты интерфейса'], correct: 1, why: 'Android Studio создаёт их в первый день, и до этой главы они стояли без дела.' },
+  { q: 'В чём практический смысл ролей вместо конкретных цветов?', options: ['Роли короче писать', 'Разметка не меняется, а значение подставляет тема — поэтому тёмная тема получается без второй вёрстки', 'Роли работают быстрее', 'Роли требуются компилятором'], correct: 1, why: 'В живом примере жёстко заданный белый остался белым и в тёмной теме, а роль surface подставила тёмное значение.' },
+  { q: 'Что означает onSurface?', options: ['Состояние «включено»', 'Цвет содержимого поверх surface: текста и значков, с гарантированным контрастом', 'Цвет при нажатии', 'Цвет тени'], correct: 1, why: 'Значения в паре подбирались вместе, поэтому текст читается в обеих темах.' },
+  { q: 'Как компонент на пятом уровне вложенности получает тему?', options: ['Через параметр от родителя', 'Достаёт из окружения: тема раздана вниз по дереву механизмом CompositionLocal', 'Создаёт свою копию темы', 'Читает файл Theme.kt при каждой отрисовке'], correct: 1, why: 'Именно поэтому тему объявляют один раз в setContent, а параметром её никуда не передают.' },
+  { q: 'В разметке написано Color(0xFFFFFFFF). Что произойдёт в тёмной теме?', options: ['Цвет автоматически инвертируется', 'Останется белым и выбьется из тёмного экрана — тема на жёстко заданные значения не влияет', 'Приложение упадёт', 'Компилятор выдаст предупреждение'], correct: 1, why: 'Это самая частая причина «сломанной тёмной темы»: одно жёстко заданное значение среди ролей.' },
+  { q: 'Почему для текста лучше style, а не fontSize?', options: ['fontSize устарел', 'style задаёт размер, начертание и межстрочный интервал вместе — с fontSize остальное останется от стиля по умолчанию и не сойдётся с макетом', 'fontSize не работает в Material 3', 'Разницы нет'], correct: 1, why: 'На чемпионате отступы и текст сверяют измерением, а межстрочный интервал влияет на высоту блока.' },
+  { q: 'Первый час работы над вёрсткой. Что сделать с темой?', options: ['Ничего, шаблон подойдёт', 'Выключить dynamicColor, перенести цвета макета в роли, собрать типографику и проверить оба режима на пустом экране', 'Сразу верстать экраны, а тему настроить в конце', 'Удалить папку ui/theme и красить вручную'], correct: 1, why: 'Цвета проверяются на каждом экране, а динамический цвет на чужом устройстве даст палитру из чужих обоев.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Material Design 3 в Compose — developer.android.com](https://developer.android.com/develop/ui/compose/designsystems/material3) — первоисточник по теме, ролям и типографике.
+- [Material Theme Builder](https://material-foundation.github.io/material-theme-builder/) — генератор схемы по цветам макета, сразу для светлой и тёмной темы.
+- [Спецификация цветовых ролей — m3.material.io](https://m3.material.io/styles/color/roles) — что означает каждая роль и где её применяют.
+- [CompositionLocal — developer.android.com](https://developer.android.com/develop/ui/compose/compositionlocal) — механизм, которым раздаётся тема, и когда заводить свой.
