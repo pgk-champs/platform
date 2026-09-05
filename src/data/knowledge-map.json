@@ -304,11 +304,19 @@
     "path": "mobile/network-errors.mdx"
   },
   {
+    "id": "data-storage",
+    "title": "Хранение на устройстве: DataStore и Room",
+    "audience": "мобилка",
+    "level": "углубление",
+    "order": 20,
+    "path": "mobile/data-storage.mdx"
+  },
+  {
     "id": "kotlin-vs-java",
     "title": "Kotlin и Java: в чём разница",
     "audience": "мобилка",
     "level": "база",
-    "order": 20,
+    "order": 21,
     "path": "mobile/kotlin-vs-java.mdx"
   },
   {
@@ -316,7 +324,7 @@
     "title": "История Java, Android и Kotlin",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 21,
+    "order": 22,
     "path": "mobile/kotlin-history.mdx"
   },
   {

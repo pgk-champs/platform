@@ -1,0 +1,449 @@
+---
+title: 'Хранение на устройстве: DataStore и Room'
+audience: 'мобилка'
+level: 'углубление'
+order: 20
+sidebar_position: 20
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="data-storage" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+import KotlinPlay from '@site/src/components/KotlinPlay';
+
+# Хранение на устройстве: DataStore и Room
+
+<ChapterProgress chapterId="data-storage" totalSections={14} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="data-storage" />
+
+## Зачем это нужно
+
+За последние главы мы дважды упирались в одно и то же ограничение. Выбранная вкладка нижней панели должна пережить перезапуск — а `remember` и `ViewModel` его не переживают. При отсутствии сети экран остаётся пустым — потому что загруженные раньше товары нигде не сохранились.
+
+Оба вопроса решает хранение на устройстве. Это последняя ступень в цепочке, которую мы выстраивали:
+
+<Figure scheme="ds-survives" caption="Каждый следующий способ переживает больше событий; перезапуск приложения переживает только запись на диск" />
+
+Перезапуск — это новый процесс. В памяти не остаётся ничего, и единственное, что можно прочитать, — то, что было записано на диск.
+
+В конкурсных заданиях это отдельные критерии, причём формулируются они одинаково из года в год: «данные входа и активная сессия должны быть сохранены после перезапуска приложения», «необходимо сохранять состояние экрана», «реализуйте кэширование главной страницы».
+
+<SectionAnchor chapterId="data-storage" sectionId="zachem" />
+
+## Два хранилища под разные задачи
+
+Android предлагает два основных способа, и выбор между ними прост, если задать правильный вопрос.
+
+<KotlinPlay code={`data class Product(val id: Int, val title: String, val price: Double)
+
+class Prefs { private val map = mutableMapOf<String, String>()
+    fun put(k: String, v: String) { map[k] = v }
+    fun get(k: String) = map[k]
+    fun dump() = map.toString() }
+
+class Table { private val rows = mutableListOf<Product>()
+    fun insertAll(items: List<Product>) { rows.clear(); rows.addAll(items) }
+    fun query(min: Double) = rows.filter { it.price >= min }
+    fun count() = rows.size }
+
+fun main() {
+    val prefs = Prefs()
+    prefs.put("token", "abc123"); prefs.put("darkTheme", "true"); prefs.put("lastTab", "cart")
+    println("хранилище настроек: \${prefs.dump()}")
+    println("  ↑ пары ключ-значение, читаются целиком, искать по ним нельзя")
+
+    println()
+    val table = Table()
+    table.insertAll(List(500) { Product(it, "товар \$it", it * 1.5) })
+    println("таблица: \${table.count()} записей")
+    println("  выборка «дороже 700»: \${table.query(700.0).size} записей")
+    println("  ↑ можно искать, сортировать, брать частями — не читая всё в память")
+}`} />
+
+```text
+хранилище настроек: {token=abc123, darkTheme=true, lastTab=cart}
+  ↑ пары ключ-значение, читаются целиком, искать по ним нельзя
+
+таблица: 500 записей
+  выборка «дороже 700»: 33 записей
+  ↑ можно искать, сортировать, брать частями — не читая всё в память
+```
+
+<Figure scheme="ds-prefs-vs-db" caption="DataStore хранит отдельные значения, Room — наборы однотипных записей с возможностью выборки" />
+
+Вопрос для выбора: **это одно значение или набор однотипных записей?**
+
+Токен, флаг тёмной темы, последняя открытая вкладка, признак «онбординг уже показан» — отдельные значения, их место в `DataStore`.
+
+Пятьсот товаров, история заказов, содержимое корзины — записи, по которым нужно искать и сортировать. Это `Room`.
+
+<SectionAnchor chapterId="data-storage" sectionId="dva-hranilishcha" />
+
+## DataStore: значения, которые надо запомнить
+
+```kotlin
+private val Context.settings by preferencesDataStore(name = "settings")
+
+class SettingsStorage(private val context: Context) {
+
+    private val tokenKey = stringPreferencesKey("auth_token")
+    private val lastTabKey = stringPreferencesKey("last_tab")
+
+    val token: Flow<String?> = context.settings.data.map { it[tokenKey] }
+
+    suspend fun saveToken(value: String) {
+        context.settings.edit { it[tokenKey] = value }
+    }
+
+    suspend fun clear() {
+        context.settings.edit { it.clear() }
+    }
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'by preferencesDataStore(name = "settings")', label: 'делегат уровня файла', note: 'объявляется один раз на всё приложение. Два экземпляра на один файл — исключение при запуске, поэтому делегат и вынесен наружу класса' },
+  { text: 'stringPreferencesKey("auth_token")', label: 'типизированный ключ', note: 'тип задаётся при создании ключа, поэтому прочитать строку как число не выйдет — ошибка будет на компиляции, а не в работе' },
+  { text: 'val token: Flow<String?>', label: 'чтение — поток', note: 'не «прочитать один раз», а подписка: значение изменилось где угодно в приложении — все читатели узнали. Это тот же Flow из главы про потоки' },
+  { text: 'suspend fun saveToken', label: 'запись приостанавливаемая', note: 'диск — медленное устройство, поэтому запись только из корутины. Вызывается из viewModelScope' },
+  { text: 'edit { it[tokenKey] = value }', label: 'атомарное изменение', note: 'внутри блока данные читаются и записываются одной операцией — параллельные записи не затрут друг друга' },
+]} />
+
+Возвращаясь к висящему вопросу из главы про `Scaffold`: сохранение выбранной вкладки — это ровно две строки. Записали при переключении, прочитали при запуске.
+
+<Hint type="important">
+`DataStore` пришёл на смену `SharedPreferences`, и разница не косметическая: старый способ умел читать с диска в главном потоке, из-за чего интерфейс подвисал в самый неожиданный момент. `DataStore` этого не позволяет вовсе — запись только `suspend`, чтение только потоком. Если встретите `SharedPreferences` в чужом коде, это не ошибка, но в новом проекте берите `DataStore`.
+</Hint>
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="data-storage" quizId="quiz-1" questions={[
+  { q: 'Что выбрать для хранения токена авторизации?', options: ['Room: это важные данные', 'DataStore: это одно значение, по которому не нужно искать и сортировать', 'ViewModel', 'Обычную переменную'], correct: 1, why: 'Вопрос для выбора всегда один: это отдельное значение или набор однотипных записей?' },
+  { q: 'Почему чтение из DataStore — это Flow, а не обычная функция?', options: ['Так быстрее', 'Это подписка: значение изменилось где угодно в приложении — все читатели узнали, без повторного чтения', 'Требование Kotlin', 'Чтобы не блокировать диск'], correct: 1, why: 'Тот же Flow из главы про потоки, только источник — файл настроек.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="data-storage" sectionId="datastore" />
+
+## Room: таблица из data class
+
+`Room` — надстройка над SQLite, которая избавляет от ручного написания запросов и, что важнее, проверяет их на этапе компиляции. Опечатка в SQL станет ошибкой сборки, а не падением у пользователя.
+
+Три части: сущность, объект доступа и сама база.
+
+```kotlin
+@Entity(tableName = "products")
+data class ProductEntity(
+    @PrimaryKey val id: Int,
+    val title: String,
+    val price: Double,
+    val updatedAt: Long,
+)
+```
+
+```kotlin
+@Dao
+interface ProductDao {
+
+    @Query("SELECT * FROM products ORDER BY title")
+    fun observeAll(): Flow<List<ProductEntity>>
+
+    @Query("SELECT * FROM products WHERE title LIKE '%' || :query || '%'")
+    fun search(query: String): Flow<List<ProductEntity>>
+
+    @Upsert
+    suspend fun upsertAll(items: List<ProductEntity>)
+
+    @Query("DELETE FROM products")
+    suspend fun clear()
+}
+```
+
+```kotlin
+@Database(entities = [ProductEntity::class], version = 1)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun productDao(): ProductDao
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: '@Entity(tableName = "products")', label: 'класс становится таблицей', note: 'каждое свойство — колонка. Room создаст таблицу сам при первом запуске' },
+  { text: '@PrimaryKey val id: Int', label: 'первичный ключ', note: 'уникальный идентификатор записи. Обычно берут id с сервера — тогда повторная загрузка обновит существующие записи, а не создаст копии' },
+  { text: '@Dao', label: 'объект доступа к данным', note: 'интерфейс с описанием операций. Реализацию Room генерирует при сборке — как Retrofit, только на этапе компиляции' },
+  { text: '@Query("SELECT * FROM products")', label: 'проверяемый SQL', note: 'запрос разбирается при компиляции: ошибка в имени таблицы или колонки — ошибка сборки, а не падение у пользователя' },
+  { text: 'fun observeAll(): Flow<List<...>>', label: 'без suspend, но с Flow', note: 'запрос, возвращающий Flow, не приостанавливается: он отдаёт подписку. Room сам присылает новое значение при любом изменении таблицы' },
+  { text: '@Upsert', label: 'вставить или обновить', note: 'если запись с таким ключом есть — обновит, если нет — вставит. Ровно то, что нужно при повторной загрузке с сервера' },
+]} />
+
+<SectionAnchor chapterId="data-storage" sectionId="room" />
+
+## Запрос, который продолжает отвечать
+
+Самая ценная особенность `Room` — запросы, возвращающие `Flow`. Проследим, что это даёт:
+
+<KotlinPlay code={`import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+
+data class Note(val id: Int, val text: String)
+
+class Dao {
+    private val state = MutableStateFlow(listOf(Note(1, "молоко")))
+    fun observeAll(): Flow<List<Note>> = state
+    suspend fun insert(n: Note) { state.value = state.value + n }
+    suspend fun delete(id: Int) { state.value = state.value.filterNot { it.id == id } }
+}
+
+fun main() = runBlocking {
+    val dao = Dao()
+    val job = launch {
+        dao.observeAll().collect { list -> println("  экран показывает: \${list.map { it.text }}") }
+    }
+    delay(30)
+    println("добавили запись:");      dao.insert(Note(2, "хлеб"));  delay(30)
+    println("добавили ещё одну:");    dao.insert(Note(3, "сыр"));   delay(30)
+    println("удалили первую:");       dao.delete(1);                delay(30)
+    job.cancel()
+    println()
+    println("ни одного повторного запроса из экрана — база сама сообщила об изменениях")
+}`} />
+
+```text
+  экран показывает: [молоко]
+добавили запись:
+  экран показывает: [молоко, хлеб]
+добавили ещё одну:
+  экран показывает: [молоко, хлеб, сыр]
+удалили первую:
+  экран показывает: [хлеб, сыр]
+
+ни одного повторного запроса из экрана — база сама сообщила об изменениях
+```
+
+<Figure scheme="ds-flow" caption="Запрос отдаёт поток: изменение таблицы в любом месте приложения доходит до экрана само" />
+
+Практический смысл: экран корзины не нужно обновлять вручную после добавления товара с другого экрана. Он подписан на таблицу и получит новое содержимое сам. Это тот же `Flow` из главы про потоки, только источником стала база.
+
+<SectionAnchor chapterId="data-storage" sectionId="flow-iz-bazy" />
+
+## Ещё одна модель данных
+
+В главе про слои у нас было три модели: DTO с сервера, доменная и модель экрана. `Room` добавляет четвёртую — `Entity`.
+
+Соблазн обойтись одним классом велик, но у сущности базы свои требования: первичный ключ, только простые типы в колонках, аннотации `Room`. Тащить это в доменную модель — значит связать предметную область со способом хранения.
+
+```kotlin
+fun ProductEntity.toDomain() = Product(id = id, title = title, priceRub = price)
+fun Product.toEntity(now: Long) = ProductEntity(id = id, title = title, price = priceRub, updatedAt = now)
+```
+
+Мапперы те же, что и для сети, и живут там же — в слое `data`.
+
+<Hint type="tip">
+Room умеет хранить только простые типы: числа, строки, логические значения. Для даты, списка или вложенного объекта нужен `TypeConverter` — функция, которая переводит тип в строку и обратно. Практичнее хранить дату числом (`Long`), а списки выносить в отдельную таблицу со связью: так по ним можно будет искать, а не только читать целиком.
+</Hint>
+
+<SectionAnchor chapterId="data-storage" sectionId="entity" />
+
+## Миграции: почему приложение падает после обновления
+
+`version = 1` в аннотации базы — не формальность. Как только вы добавите колонку и не тронете версию, приложение упадёт при запуске с сообщением о несовпадении схемы.
+
+Два пути.
+
+**Во время разработки** проще всего разрешить пересоздание базы:
+
+```kotlin
+Room.databaseBuilder(context, AppDatabase::class.java, "shop.db")
+    .fallbackToDestructiveMigration()
+    .build()
+```
+
+Данные при этом теряются, но во время разработки их и не жалко.
+
+**В настоящем приложении** так нельзя: пользователь потеряет корзину и историю. Там пишут миграцию — инструкцию, как превратить старую схему в новую:
+
+```kotlin
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE products ADD COLUMN discount INTEGER NOT NULL DEFAULT 0")
+    }
+}
+```
+
+На чемпионате в течение соревнования обычно хватает первого варианта. Но знать про второй нужно: вопрос про миграции — типовой на защите.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="data-storage" quizId="quiz-2" questions={[
+  { q: 'Добавили колонку в @Entity и запустили приложение. Что произойдёт?', options: ['Room добавит колонку сам', 'Падение при запуске: схема не совпала с версией базы — нужно поднять version и написать миграцию либо разрешить пересоздание', 'Колонка будет пустой', 'Ничего не изменится'], correct: 1, why: 'fallbackToDestructiveMigration годится для разработки, но стирает данные — в рабочем приложении пишут миграцию.' },
+  { q: 'Зачем Entity отдельно от доменной модели?', options: ['Так больше кода', 'У сущности базы свои требования — первичный ключ, простые типы, аннотации; тащить их в доменную модель значит связать предметную область со способом хранения', 'Room не умеет иначе', 'Для скорости'], correct: 1, why: 'Тот же принцип, что и с DTO: чужие требования не должны протекать в домен.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="data-storage" sectionId="migracii" />
+
+## Где живёт база
+
+`AppDatabase` создаётся **один раз на всё приложение**. Создание — дорогая операция, а два открытых экземпляра одного файла приводят к блокировкам.
+
+```kotlin
+object DatabaseProvider {
+    @Volatile private var instance: AppDatabase? = null
+
+    fun get(context: Context): AppDatabase =
+        instance ?: synchronized(this) {
+            instance ?: Room.databaseBuilder(
+                context.applicationContext,
+                AppDatabase::class.java,
+                "shop.db",
+            ).build().also { instance = it }
+        }
+}
+```
+
+Обратите внимание на `applicationContext`: база живёт столько же, сколько процесс, и держать в ней ссылку на конкретную Activity — та же утечка памяти, о которой говорилось в главе про `ViewModel`.
+
+Эта конструкция — двойная проверка с блокировкой — типовая для одиночек. Когда объектов такого рода становится много, их создание передают библиотеке внедрения зависимостей. Пока их два-три, ручной вариант честнее и понятнее.
+
+<SectionAnchor chapterId="data-storage" sectionId="gde-zhivyot" />
+
+## Типичные ошибки
+
+**Два экземпляра `DataStore` на один файл.** Исключение при запуске. Делегат объявляют один раз на уровне файла, а не внутри класса.
+
+**Запрос базы в главном потоке.** `Room` этого не позволяет и бросает исключение — и правильно делает. Все операции идут из корутин.
+
+**Схема поменялась, версия нет.** Падение при запуске после обновления.
+
+**`Context` активности в базе.** Утечка. Нужен `applicationContext`.
+
+**Пароль в `DataStore` открытым текстом.** Хранить можно токен, но не пароль. Токен протухает и отзывается, пароль — нет.
+
+**Кэш без отметки времени.** Данные лежат вечно, и приложение показывает прошлогодние цены. Поле вроде `updatedAt` стоит завести сразу.
+
+**`Entity` уехал во `ViewModel`.** Слой представления получил модель со всеми аннотациями базы.
+
+<SectionAnchor chapterId="data-storage" sectionId="oshibki" />
+
+## Слова главы
+
+<Block kind="vocab">
+
+- **`DataStore`** — хранилище пар ключ-значение; чтение потоком, запись `suspend`.
+- **`stringPreferencesKey`** — типизированный ключ настройки.
+- **`Room`** — надстройка над SQLite с проверкой запросов при компиляции.
+- **`@Entity`** — класс, ставший таблицей.
+- **`@PrimaryKey`** — уникальный идентификатор записи.
+- **`@Dao`** — интерфейс операций с таблицей.
+- **`@Query`** — SQL, проверяемый на этапе сборки.
+- **`@Upsert`** — вставить или обновить по ключу.
+- **Миграция** — инструкция превращения старой схемы в новую.
+- **`TypeConverter`** — перевод сложного типа в простой и обратно.
+
+</Block>
+
+<SectionAnchor chapterId="data-storage" sectionId="slova" />
+
+## Тренажёр: набрать вслепую
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="data-storage"
+  trainerId="trainer-data-storage"
+  targetCpm={100}
+  targetAccuracy={88}
+  pools={[
+    { label: 'DataStore', snippets: [
+      'private val Context.settings by preferencesDataStore(name = "settings")',
+      'val token: Flow<String?> = context.settings.data.map { it[tokenKey] }',
+      'context.settings.edit { it[tokenKey] = value }',
+    ] },
+    { label: 'Room', snippets: [
+      '@Entity(tableName = "products") data class ProductEntity(@PrimaryKey val id: Int)',
+      '@Query("SELECT * FROM products ORDER BY title") fun observeAll(): Flow<List<ProductEntity>>',
+      'Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "shop.db").build()',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="data-storage" sectionId="trenazher" />
+
+## На чемпионате
+
+Модуль хранения весит немного, но требования в нём конкретные и повторяются из года в год:
+
+- **«Данные входа и активная сессия сохранены после перезапуска»** — токен в `DataStore`, проверка при запуске.
+- **«Сохранять состояние последнего экрана»** и **«состояние Bottom Bar»** — тоже `DataStore`, по значению на каждое.
+- **«Реализуйте кэширование главной страницы»** — `Room` плюс отметка времени.
+- **«Все медиа ресурсы должны кэшироваться»** — этим занимается библиотека загрузки изображений, отдельного кода обычно не требует.
+
+Практический совет: проверяйте не поворотом экрана, а **полным закрытием приложения** — смахиванием из списка недавних. Поворот переживает и `ViewModel`, поэтому он ничего не докажет. Эксперт проверяет именно перезапуск.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="data-storage" quizId="quiz-3" questions={[
+  { q: 'Как правильно проверить, что состояние переживает перезапуск?', options: ['Повернуть экран', 'Полностью закрыть приложение, смахнув из списка недавних, и открыть заново', 'Свернуть и развернуть', 'Перезагрузить телефон'], correct: 1, why: 'Поворот переживает и ViewModel — он ничего не докажет. Эксперт проверяет именно перезапуск.' },
+  { q: 'Где хранить пароль пользователя?', options: ['В DataStore рядом с токеном', 'Нигде: хранят токен, который протухает и отзывается, а пароль — нет', 'В Room в отдельной таблице', 'В обычном файле'], correct: 1, why: 'Утечка токена ограничена его сроком жизни, утечка пароля — нет.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="data-storage" sectionId="na-chempionate" />
+
+## Что дальше
+
+Данные теперь можно сохранить, но приложение пока не умеет ими пользоваться при отсутствии сети: репозиторий по-прежнему ходит только в сеть и отдаёт ошибку, если её нет. Следующая глава соединяет два источника — базу и сеть — так, чтобы экран показывал сохранённое, пока обновление в пути, и не оставался пустым в самолётном режиме.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="data-storage" quizId="quiz-4" questions={[
+  { q: 'Почему запрос @Query с Flow не помечают suspend?', options: ['Это ошибка, надо помечать', 'Он не приостанавливается, а возвращает подписку: Room сам присылает новое значение при каждом изменении таблицы', 'Flow не работает с suspend', 'Так требует SQLite'], correct: 1, why: 'Suspend помечают одноразовые операции — вставку, удаление, разовое чтение.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="data-storage" sectionId="dalshe" />
+
+## Углубиться
+
+- `@Relation` и `@Embedded` — связи между таблицами: заказ и его позиции одним запросом.
+- `@Transaction` — несколько операций как одна: либо все, либо ни одной.
+- Database Inspector в Android Studio — смотреть содержимое таблиц на работающем приложении.
+- Proto DataStore — типизированное хранилище, когда настроек становится много.
+- Шифрование: Android Keystore для по-настоящему чувствительных данных.
+
+<SectionAnchor chapterId="data-storage" sectionId="uglubitsya" />
+
+<ChapterExam chapterId="data-storage" questions={[
+  { q: 'Что переживает полный перезапуск приложения?', options: ['ViewModel', 'rememberSaveable', 'Только записанное на диск: DataStore и Room', 'remember'], correct: 2, why: 'Перезапуск — новый процесс, в памяти не остаётся ничего.' },
+  { q: 'Токен авторизации: DataStore или Room?', options: ['Room, это важные данные', 'DataStore: это одно значение, по которому не нужно искать и сортировать', 'Обе подойдут одинаково', 'Обычный файл'], correct: 1, why: 'Вопрос для выбора один: отдельное значение или набор однотипных записей.' },
+  { q: 'Что даёт @Query, возвращающий Flow?', options: ['Ускоряет запрос', 'Подписку: при любом изменении таблицы новое значение доходит до экрана само, без повторного запроса', 'Кэширование результата', 'Асинхронность'], correct: 1, why: 'Поэтому корзина обновляется сама, когда товар добавили с другого экрана.' },
+  { q: 'Что делает @Upsert?', options: ['Удаляет и вставляет заново', 'Обновляет запись, если она есть, и вставляет, если её нет — ровно то, что нужно при повторной загрузке с сервера', 'Вставляет только новые записи', 'Обновляет только существующие'], correct: 1, why: 'При первичном ключе, взятом с сервера, повторная загрузка обновит записи, а не создаст копии.' },
+  { q: 'Изменили схему таблицы, версию базы не тронули. Что будет?', options: ['Room обновит схему сам', 'Падение при запуске из-за несовпадения схемы', 'Старые данные удалятся', 'Новые поля будут пустыми'], correct: 1, why: 'Нужно поднять version и написать миграцию либо разрешить пересоздание базы на время разработки.' },
+  { q: 'Почему AppDatabase создают в единственном экземпляре?', options: ['Экономия памяти', 'Создание дорогое, а два открытых экземпляра одного файла приводят к блокировкам', 'Так требует Kotlin', 'Иначе не работают миграции'], correct: 1, why: 'Отсюда типовая конструкция с двойной проверкой и блокировкой.' },
+  { q: 'Как проверить требование «состояние сохраняется после перезапуска»?', options: ['Повернуть экран', 'Полностью закрыть приложение из списка недавних и открыть снова', 'Свернуть и развернуть', 'Очистить кэш'], correct: 1, why: 'Поворот переживает и ViewModel, поэтому такая проверка ничего не доказывает.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Room — developer.android.com](https://developer.android.com/training/data-storage/room) — сущности, DAO, запросы и миграции.
+- [DataStore](https://developer.android.com/topic/libraries/architecture/datastore) — хранилище настроек и его отличия от `SharedPreferences`.
+- [Room и Flow](https://developer.android.com/training/data-storage/room/async-queries) — асинхронные запросы и подписки на таблицы.
+- [Миграции Room](https://developer.android.com/training/data-storage/room/migrating-db-versions) — как менять схему, не теряя данные.

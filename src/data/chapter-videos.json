@@ -1335,5 +1335,32 @@
       "title": "Android Retrofit Tutorial: MVVM with Error Handling",
       "channel": "Modern Android Development"
     }
+  ],
+  "data-storage": [
+    {
+      "videoId": "bOd3wO0uFr8",
+      "title": "The FULL Beginner Guide for Room in Android | Local Database",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "McnVx7l5awk",
+      "title": "Preferences DataStore in 10min (SharedPreferences deprecated)",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "vsDkhRTMdA0",
+      "title": "Kotlin: Using Room Kotlin APIs - MAD Skills",
+      "channel": "Android Developers"
+    },
+    {
+      "videoId": "kp53qL_O5gk",
+      "title": "Preferences DataStore - MAD Skills",
+      "channel": "Android Developers"
+    },
+    {
+      "videoId": "KG_T8eNl-d4",
+      "title": "How to Save Complex Objects In a Room DB",
+      "channel": "Philipp Lackner"
+    }
   ]
 }

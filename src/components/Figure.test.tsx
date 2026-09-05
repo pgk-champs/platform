@@ -26,6 +26,7 @@ import { viewModelStateSchemes } from './figures/viewModelState';
 import { appLayersSchemes } from './figures/appLayers';
 import { networkLayerSchemes } from './figures/networkLayer';
 import { networkErrorsSchemes } from './figures/networkErrors';
+import { dataStorageSchemes } from './figures/dataStorage';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -95,6 +96,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(appLayersSchemes),
     ...Object.keys(networkLayerSchemes),
     ...Object.keys(networkErrorsSchemes),
+    ...Object.keys(dataStorageSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

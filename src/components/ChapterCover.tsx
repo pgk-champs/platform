@@ -530,6 +530,22 @@ const ARTS: Record<string, () => React.ReactNode> = {
   /* три слоя и стрелки внутрь — арт «app-layers» */
   /* запрос уходит, ответ приходит — арт «network-retrofit» */
   /* оборванная связь и запасной путь — арт «network-errors» */
+  /* диск помнит, память забывает — арт «data-storage» */
+  'data-storage': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="44" width="76" height="104" rx="11" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} strokeDasharray="7 5" />
+      <text x="52" y="90" textAnchor="middle" fontSize="11" fontWeight={800} fill="rgba(255,255,255,0.4)" fontFamily={MONO}>память</text>
+      <text x="52" y="116" textAnchor="middle" fontSize="16" fontWeight={800} fill="rgba(255,255,255,0.3)" fontFamily={MONO}>—</text>
+
+      <rect x="110" y="44" width="76" height="104" rx="11" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="148" y="78" textAnchor="middle" fontSize="11" fontWeight={800} fill={ACCENT} fontFamily={MONO}>диск</text>
+      {[92, 108, 124].map((y) => (
+        <rect key={y} x="122" y={y} width="52" height="8" rx="3" fill={ACCENT} />
+      ))}
+
+      <text x="100" y="172" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>после перезапуска</text>
+    </g>
+  ),
   'network-errors': () => (
     <g strokeLinecap="round">
       <rect x="14" y="52" width="56" height="96" rx="11" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
@@ -705,8 +721,9 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'code-basics': { track: 'foundation', num: '08', title: 'Из чего состоит код' },
   'oop-basics': { track: 'foundation', num: '09', title: 'ООП простыми словами — на двух языках' },
-  'kotlin-vs-java': { track: 'mobile', num: '20', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '21', title: 'История Java, Android и Kotlin' },
+  'kotlin-vs-java': { track: 'mobile', num: '21', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '22', title: 'История Java, Android и Kotlin' },
+  'data-storage': { track: 'mobile', num: '20', title: 'Хранение на устройстве: DataStore и Room' },
   'network-errors': { track: 'mobile', num: '19', title: 'Когда сети нет: ошибки, повторы и что видит пользователь' },
   'network-retrofit': { track: 'mobile', num: '18', title: 'Сеть: тот же экран, но с настоящими данными' },
   'app-layers': { track: 'mobile', num: '17', title: 'Слои приложения: data, domain и репозиторий' },

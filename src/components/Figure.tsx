@@ -26,6 +26,7 @@ import { viewModelStateSchemes } from './figures/viewModelState';
 import { appLayersSchemes } from './figures/appLayers';
 import { networkLayerSchemes } from './figures/networkLayer';
 import { networkErrorsSchemes } from './figures/networkErrors';
+import { dataStorageSchemes } from './figures/dataStorage';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -67,6 +68,7 @@ const SCHEMES = {
   ...appLayersSchemes,
   ...networkLayerSchemes,
   ...networkErrorsSchemes,
+  ...dataStorageSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,
