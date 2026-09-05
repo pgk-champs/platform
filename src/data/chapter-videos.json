@@ -688,60 +688,6 @@
       "channel": "RED Group"
     }
   ],
-  "code-basics": [
-    {
-      "videoId": "UHqnpHEXtII",
-      "title": "Уроки JavaScript для начинающих / #4 – Переменные и типы данных в JS",
-      "channel": "Школа itProger / Программирование"
-    },
-    {
-      "videoId": "uYazRUDdtuY",
-      "title": "2. JavaScript: Основы. Типы данных, операторы, приведение типов",
-      "channel": "Аргументика"
-    },
-    {
-      "videoId": "bgfCKSJDHVA",
-      "title": "Основы JavaScript | Урок 2: Переменные и операторы",
-      "channel": "Glo Academy"
-    },
-    {
-      "videoId": "KqtF13jV0rk",
-      "title": "Уроки JavaScript | Урок №4 - Переменные и их типы",
-      "channel": "Гоша Дударь"
-    },
-    {
-      "videoId": "BrUayeSPBLc",
-      "title": "Основы JavaScript для начинающих: подключение js, переменные, типы данных, операторы",
-      "channel": "Онлайн-школа METHED"
-    }
-  ],
-  "oop-basics": [
-    {
-      "videoId": "-6DWwR_R4Xk",
-      "title": "ООП на простых примерах. Объектно-ориентированное программирование",
-      "channel": "Ulbi TV"
-    },
-    {
-      "videoId": "WXAQDK1eN1I",
-      "title": "Урок по ООП №2. Базовый словарь: инкапсуляция, наследование, полиморфизм, композиция, абстракция",
-      "channel": "SBeregovoyRU"
-    },
-    {
-      "videoId": "VrQw4rpjSgQ",
-      "title": "ООП | Классы, наследование и объекты. Простым языком",
-      "channel": "Ruslan Shishmarev"
-    },
-    {
-      "videoId": "zKpL-6STiVU",
-      "title": "#Java простыми словами. Урок 1: принципы ООП — наследование, инкапсуляция, полиморфизм, абстракция",
-      "channel": "Игорь К"
-    },
-    {
-      "videoId": "EvGi6XDgV7w",
-      "title": "Принципы ООП. 1. Инкапсуляция",
-      "channel": "Serhii Nemchynskyi"
-    }
-  ],
   "kotlin-vs-java": [
     {
       "videoId": "C04KnNj_1IU",
