@@ -533,6 +533,21 @@ const ARTS: Record<string, () => React.ReactNode> = {
   /* диск помнит, память забывает — арт «data-storage» */
   /* половина оценки срезана — арт «clean-code» */
   /* база в середине: сеть пишет, экран читает — арт «cache-offline» */
+  /* замок открыт токеном, не паролем — арт «auth-session» */
+  'auth-session': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="44" width="172" height="30" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="26" y="64" fontSize="10" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>ivan@mail.ru</text>
+
+      <rect x="14" y="82" width="172" height="30" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="26" y="102" fontSize="12" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>••••••••</text>
+
+      <rect x="60" y="122" width="80" height="34" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="145" textAnchor="middle" fontSize="10" fontWeight={800} fill={ACCENT} fontFamily={MONO}>Bearer</text>
+
+      <text x="100" y="176" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>токен, не пароль</text>
+    </g>
+  ),
   'cache-offline': () => (
     <g strokeLinecap="round">
       <rect x="14" y="52" width="50" height="40" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
@@ -758,8 +773,9 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'code-basics': { track: 'foundation', num: '08', title: 'Из чего состоит код' },
   'oop-basics': { track: 'foundation', num: '09', title: 'ООП простыми словами — на двух языках' },
-  'kotlin-vs-java': { track: 'mobile', num: '23', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '24', title: 'История Java, Android и Kotlin' },
+  'kotlin-vs-java': { track: 'mobile', num: '24', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '25', title: 'История Java, Android и Kotlin' },
+  'auth-session': { track: 'mobile', num: '23', title: 'Авторизация: вход, живая сессия и биометрия' },
   'cache-offline': { track: 'mobile', num: '21', title: 'Кэш и офлайн: база как источник истины' },
   'clean-code': { track: 'mobile', num: '22', title: 'Чистый код: комментарии и логирование, которые оценивают' },
   'data-storage': { track: 'mobile', num: '20', title: 'Хранение на устройстве: DataStore и Room' },

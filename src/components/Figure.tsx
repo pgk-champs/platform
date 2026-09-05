@@ -29,6 +29,7 @@ import { networkErrorsSchemes } from './figures/networkErrors';
 import { dataStorageSchemes } from './figures/dataStorage';
 import { cleanCodeSchemes } from './figures/cleanCode';
 import { cacheOfflineSchemes } from './figures/cacheOffline';
+import { authSessionSchemes } from './figures/authSession';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -73,6 +74,7 @@ const SCHEMES = {
   ...dataStorageSchemes,
   ...cleanCodeSchemes,
   ...cacheOfflineSchemes,
+  ...authSessionSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

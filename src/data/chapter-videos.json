@@ -1416,5 +1416,32 @@
       "title": "Сохраняем локальные данные через Room (SQLite) + Kotlin",
       "channel": "Android Heroes"
     }
+  ],
+  "auth-session": [
+    {
+      "videoId": "yJoD0v00uBQ",
+      "title": "Урок 9: TextField, OutlinedTextField, Валидация почты",
+      "channel": "Kotlin & Android с нуля"
+    },
+    {
+      "videoId": "_dCRQ9wta-I",
+      "title": "How to Implement Biometric Auth in Your Android App",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "iNgqzqHy5sw",
+      "title": "Биометрическая аутентификация / сканер отпечатка пальца",
+      "channel": "Андрей Яшев"
+    },
+    {
+      "videoId": "zx9GUaKH2Ew",
+      "title": "Building Secure APIs with JWT and Token Refresh Mechanism",
+      "channel": "Rahul Ray"
+    },
+    {
+      "videoId": "kp53qL_O5gk",
+      "title": "Preferences DataStore - MAD Skills",
+      "channel": "Android Developers"
+    }
   ]
 }

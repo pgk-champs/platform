@@ -1,0 +1,777 @@
+---
+title: 'Авторизация: вход, живая сессия и биометрия'
+audience: 'мобилка'
+level: 'углубление'
+order: 23
+sidebar_position: 23
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="auth-session" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+import KotlinPlay from '@site/src/components/KotlinPlay';
+
+# Авторизация: вход, живая сессия и биометрия
+
+<ChapterProgress chapterId="auth-session" totalSections={21} totalQuizzes={6} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="auth-session" />
+
+## Зачем это нужно
+
+Экран входа — первое, что увидит эксперт. И единственная тема, где одна ошибка стоит не балл, а всю проверку: если вход не работает, дальше смотреть нечего.
+
+При этом в конкурсных заданиях авторизация расписана подробнее любой другой темы. Валидация почты — по дословному паттерну. Пароль — не короче восьми символов. Сессия — «должна быть сохранена после перезапуска приложения». Ошибки — под полем, а не всплывающим сообщением. Всё это проверяется руками: эксперт вводит `Ivan@Mail.RU`, вводит семь символов, убивает приложение и открывает заново.
+
+В этой главе сойдётся почти всё из блока данных: сеть даст эндпоинты, хранилище примет токен, обработка ошибок научит различать «неверный пароль» и «нет соединения». А в конце — биометрия, которая работает не так, как кажется.
+
+<SectionAnchor chapterId="auth-session" sectionId="zachem" />
+
+## Что значит «пользователь вошёл»
+
+С точки зрения приложения «вошёл» — это не открытый главный экран. Это **наличие действующего токена**.
+
+<Figure scheme="as-what-is-login" caption="Вход обменивает пароль на токен; дальше пароль не нужен вовсе — каждый запрос несёт токен" />
+
+Механика простая. Приложение один раз отправляет почту и пароль на сервер. Сервер отвечает токеном — длинной строкой, которая живёт ограниченное время. Все дальнейшие запросы несут этот токен в заголовке, и по нему сервер понимает, кто пришёл.
+
+Отсюда два следствия, которые часто путают.
+
+**Пароль на устройстве не хранят никогда.** Нужен только токен. Он протухает, его можно отозвать — утечка токена ограничена его сроком жизни. Утечка пароля — нет.
+
+**Токен переживает перезапуск** — иначе пользователю пришлось бы входить при каждом открытии. Место для него — `DataStore` из главы про хранение.
+
+<SectionAnchor chapterId="auth-session" sectionId="chto-znachit" />
+
+## Два эндпоинта
+
+В заданиях они называются одинаково из года в год: `Registration` и `Authorization`.
+
+```kotlin
+interface AuthApi {
+    @POST("auth/register")
+    suspend fun register(@Body body: RegisterDto): TokenDto
+
+    @POST("auth/login")
+    suspend fun login(@Body body: LoginDto): TokenDto
+}
+
+@Serializable data class LoginDto(val email: String, val password: String)
+@Serializable data class TokenDto(val token: String, val userId: String)
+```
+
+Регистрация создаёт учётную запись и обычно сразу возвращает токен. Вход обменивает пароль на токен. Оба — `POST`, потому что несут тело и меняют состояние на сервере.
+
+<SectionAnchor chapterId="auth-session" sectionId="dva-endpointa" />
+
+## Проверять форму до запроса
+
+Пустое поле и короткий пароль видно на телефоне за ноль миллисекунд. Отправлять их на сервер и ждать ответа — тратить секунду пользователя на то, что можно было сказать сразу.
+
+Поэтому валидация делится на два уровня. **Локальная** — формат почты, длина пароля, совпадение подтверждения. **Серверная** — существует ли пользователь, верен ли пароль. Первую делаем сами до запроса, вторую получаем в ответе.
+
+<SectionAnchor chapterId="auth-session" sectionId="do-zaprosa" />
+
+## Валидация почты по паттерну задания
+
+Требование формулируется дословно и повторяется во всех заданиях: почта должна соответствовать паттерну `name@domenname.ru`, где имя и доменное имя **могут состоять только из маленьких букв и цифр**.
+
+Это строже привычного «правильного email», и разница видна на конкретных адресах:
+
+<KotlinPlay code={`// Валидатор email по требованию конкурсного задания: «name@domenname.ru»,
+// только строчные латинские буквы и цифры.
+// Создан 05-09-2026, участник №00.
+
+val looseRule = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\\\.[A-Za-z]{2,}\$")
+val kzRule = Regex("^[a-z0-9]+@[a-z0-9]+\\\\.ru\$")
+val kzNoAnchors = Regex("[a-z0-9]+@[a-z0-9]+\\\\.ru")
+
+val cases = listOf(
+    "ivan@mail.ru",
+    "user123@shop2024.ru",
+    "Ivan@mail.ru",
+    "ivan@Mail.ru",
+    "ivan@mail.RU",
+    "иван@почта.ru",
+    "ivan.petrov@mail.ru",
+    "ivan_petrov@mail.ru",
+    "ivan-petrov@mail.ru",
+    "ivan@mail.com",
+    "ivan@ru",
+    "@mail.ru",
+    "ivan@sub.mail.ru",
+    " ivan@mail.ru "
+)
+
+fun mark(b: Boolean) = if (b) "принял" else "ОТВЕРГ"
+
+fun main() {
+    println("── один и тот же список через два правила ──")
+    println("адрес                    свободное   правило КЗ")
+    var looseOk = 0
+    var kzOk = 0
+    for (c in cases) {
+        val l = looseRule.matches(c)
+        val k = kzRule.matches(c)
+        if (l) looseOk++
+        if (k) kzOk++
+        println("«" + c + "»" + " ".repeat(maxOf(1, 24 - c.length)) + mark(l) + "      " + mark(k))
+    }
+    println()
+    println("свободное правило пропустило: " + looseOk + " из " + cases.size)
+    println("правило задания пропустило:   " + kzOk + " из " + cases.size)
+
+    println()
+    println("── четыре способа спросить одно и то же ──")
+    val dirty = "мой адрес ivan@mail.ru, пишите"
+    println("строка: «" + dirty + "»")
+    println("  с якорями ^\$,  matches()         → " + kzRule.matches(dirty))
+    println("  БЕЗ якорей,    matches()         → " + kzNoAnchors.matches(dirty) + "   ← в Kotlin matches() всегда по всей строке")
+    println("  с якорями ^\$,  containsMatchIn() → " + kzRule.containsMatchIn(dirty))
+    println("  БЕЗ якорей,    containsMatchIn() → " + kzNoAnchors.containsMatchIn(dirty) + "    ← вот она, дыра")
+
+    println()
+    println("── пробелы по краям ──")
+    val spaced = "  ivan@mail.ru  "
+    println("«" + spaced + "» → " + kzRule.matches(spaced) + ", после trim() → " + kzRule.matches(spaced.trim()))
+
+    println()
+    println("── длина пароля ──")
+    for (p in listOf("qwerty", "qwerty12", "пароль12", "pass🔒🔒")) {
+        println("«" + p + "»  length=" + p.length + "  символов=" + p.codePointCount(0, p.length) + "  проходит length>=8: " + (p.length >= 8))
+    }
+}`} />
+
+Живой вывод:
+
+```text
+── один и тот же список через два правила ──
+адрес                    свободное   правило КЗ
+«ivan@mail.ru»            принял      принял
+«Ivan@mail.ru»            принял      ОТВЕРГ
+«ivan.petrov@mail.ru»     принял      ОТВЕРГ
+«ivan@mail.com»           принял      ОТВЕРГ
+«ivan@sub.mail.ru»        принял      ОТВЕРГ
+« ivan@mail.ru »          ОТВЕРГ      ОТВЕРГ
+
+свободное правило пропустило: 10 из 14
+правило задания пропустило:   2 из 14
+
+── четыре способа спросить одно и то же ──
+строка: «мой адрес ivan@mail.ru, пишите»
+  с якорями ^$,  matches()         → false
+  БЕЗ якорей,    matches()         → false   ← в Kotlin matches() всегда по всей строке
+  с якорями ^$,  containsMatchIn() → false
+  БЕЗ якорей,    containsMatchIn() → true    ← вот она, дыра
+
+── длина пароля ──
+«qwerty12»  length=8  символов=8  проходит length>=8: true
+«pass🔒🔒»  length=8  символов=6  проходит length>=8: true
+```
+
+Три урока в одном выводе.
+
+**Свободное правило пропускает `Ivan@mail.ru`, точку, дефис, `.com` и поддомен** — всё, что задание запрещает. Из четырнадцати адресов оно приняло десять, а правило задания — два. Значит, привычный «валидатор email» здесь не годится: нужен свой, под формулировку.
+
+**Дыра в `containsMatchIn` без якорей.** Строка «мой адрес ivan@mail.ru, пишите» проходит проверку, потому что где-то внутри неё есть похожий на адрес кусок. В Kotlin `matches()` всегда сравнивает всю строку, а вот `containsMatchIn()` ищет вхождение — и это разница между «поле принимает адрес» и «поле принимает что угодно, где есть адрес».
+
+**Эмодзи считаются за два.** `«pass🔒🔒».length` даёт восемь, хотя символов шесть. Для чемпионата достаточно `length`, но знать про это стоит.
+
+Сам валидатор:
+
+```kotlin
+private val EMAIL_RULE = Regex("^[a-z0-9]+@[a-z0-9]+\\.ru$")
+
+fun isEmailValid(raw: String): Boolean = EMAIL_RULE.matches(raw.trim())
+```
+
+<SyntaxBreakdown parts={[
+  { text: '^', label: 'начало строки', note: 'якорь: совпадение обязано начинаться с первого символа. Без него подошла бы строка, где адрес стоит после мусора' },
+  { text: '[a-z0-9]+', label: 'имя: строчные латинские и цифры', note: 'ровно то, что требует задание. Заглавные, точка, подчёркивание и кириллица сюда не входят — и это не недоработка, а формулировка' },
+  { text: '@', label: 'разделитель', note: 'один, обязательный' },
+  { text: '\\\\.ru', label: 'точка и домен', note: 'точка экранирована — без обратной косой она означает «любой символ». Домен зафиксирован: .com по заданию не проходит' },
+  { text: '$', label: 'конец строки', note: 'второй якорь: после .ru ничего быть не может' },
+  { text: '.matches(raw.trim())', label: 'вся строка, без пробелов по краям', note: 'trim снимает пробел, который клавиатура ставит после автоподстановки. matches проверяет строку целиком — не то же самое, что containsMatchIn' },
+]} />
+
+<Hint type="important">
+Соблазн взять готовый `android.util.Patterns.EMAIL_ADDRESS` понятен, но он подводит дважды. Во-первых, он принимает всё, что задание запрещает, — заглавные, точки, `.com`. Во-вторых, `Patterns` — часть Android-фреймворка, и в обычном JVM-тесте он даёт `NullPointerException`. А тесты на валидатор — одно из требований модуля тестирования. Свой `Regex` решает обе проблемы.
+</Hint>
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="auth-session" quizId="quiz-1" questions={[
+  { q: 'Адрес Ivan@mail.ru должен пройти валидацию по заданию?', options: ['Да, это правильный email', 'Нет: задание требует только строчные буквы и цифры — заглавная I нарушает формулировку', 'Да, если домен .ru', 'Зависит от сервера'], correct: 1, why: 'В модели свободное правило приняло его, а правило задания отвергло — вместе с точкой, дефисом и .com.' },
+  { q: 'Чем опасен containsMatchIn() без якорей для проверки почты?', options: ['Работает медленнее', 'Ищет вхождение внутри строки: «мой адрес ivan@mail.ru, пишите» проходит проверку, потому что где-то внутри есть адрес', 'Не работает с кириллицей', 'Требует больше памяти'], correct: 1, why: 'matches() в Kotlin всегда сравнивает всю строку целиком — для поля ввода нужен именно он.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="auth-session" sectionId="email" />
+
+## Пароль: восемь символов и невидимость
+
+Требование к паролю в большинстве заданий сводится к одному: не менее восьми символов. Проверяется вводом семи.
+
+```kotlin
+fun isPasswordValid(p: String): Boolean = p.length >= 8
+```
+
+Второе требование — не про проверку, а про поле: пароль скрывают точками, а рядом стоит кнопка «показать». Оба готовы в Material:
+
+```kotlin
+OutlinedTextField(
+    value = password,
+    onValueChange = onPasswordChange,
+    visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
+    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+    trailingIcon = {
+        IconButton(onClick = { visible = !visible }) {
+            Icon(if (visible) Icons.Default.VisibilityOff else Icons.Default.Visibility, contentDescription = "Показать пароль")
+        }
+    },
+)
+```
+
+`KeyboardType.Password` не только меняет раскладку — он выключает автоподстановку и обучение клавиатуры, чтобы пароль не всплывал потом в подсказках.
+
+<SectionAnchor chapterId="auth-session" sectionId="parol" />
+
+## Ошибка под полем, а не тостом
+
+Всплывающее сообщение исчезает через две секунды и не привязано к полю: пользователь не понимает, какое из двух он заполнил неверно. В заданиях формулировка прямая — «при некорректном заполнении необходимо отобразить ошибку», и по макету она стоит под полем.
+
+```kotlin
+OutlinedTextField(
+    value = email,
+    onValueChange = onEmailChange,
+    isError = emailError != null,
+    supportingText = { emailError?.let { Text(it) } },
+)
+```
+
+`isError` красит рамку, `supportingText` показывает текст под полем. Он остаётся на экране, пока пользователь не исправит ввод.
+
+Отдельный вопрос — **когда** показывать. Красить поле красным на первой введённой букве — отталкивать пользователя, который ещё не закончил. Практичный компромисс: проверять при потере фокуса или после первого нажатия «Войти», а дальше — при каждом изменении, пока ошибка не исчезнет.
+
+<SectionAnchor chapterId="auth-session" sectionId="oshibka-pod-polem" />
+
+## Куда класть токен
+
+Место токена — `DataStore`, и хранилище для него мы уже писали в главе про данные:
+
+```kotlin
+class SessionStorage(private val context: Context) {
+    private val tokenKey = stringPreferencesKey("auth_token")
+
+    val token: Flow<String?> = context.settings.data.map { it[tokenKey] }
+
+    suspend fun save(token: String) = context.settings.edit { it[tokenKey] = token }
+    suspend fun clear() = context.settings.edit { it.remove(tokenKey) }
+}
+```
+
+Что **не** класть: пароль — никогда, ни в каком виде. Если пользователь поставил галочку «запомнить меня», запоминают не пароль, а сам факт, что токен надо хранить дольше сеанса.
+
+<SectionAnchor chapterId="auth-session" sectionId="kuda-token" />
+
+## Заголовок через перехватчик
+
+Токен нужен почти каждому запросу. В главе про сеть мы уже решили, что писать `@Header` в каждом методе — путь к «забыл в одном из двадцати». Правильное место — перехватчик OkHttp:
+
+```kotlin
+class AuthInterceptor(private val tokenProvider: () -> String?) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val token = tokenProvider() ?: return chain.proceed(chain.request())
+        val authed = chain.request().newBuilder()
+            .addHeader("Authorization", "Bearer $token")
+            .build()
+        return chain.proceed(authed)
+    }
+}
+```
+
+Здесь есть тонкость, о которой узнают по первому `401` после запуска. Перехватчик **синхронный**, а токен в `DataStore` читается через `Flow`. Если передать в `tokenProvider` функцию, которая пытается прочитать `Flow`, первый запрос уйдёт без заголовка. Решение — держать текущий токен в памяти: при старте прочитать его один раз из `DataStore` в переменную, и `tokenProvider` возвращает её.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="auth-session" quizId="quiz-2" questions={[
+  { q: 'Что хранят на устройстве после входа?', options: ['Почту и пароль, чтобы не спрашивать снова', 'Только токен: он протухает и отзывается, а пароль — нет; утечка токена ограничена его сроком жизни', 'Хэш пароля', 'Ничего, вход каждый раз'], correct: 1, why: 'Галочка «запомнить меня» означает хранить токен дольше сеанса, а не хранить пароль.' },
+  { q: 'Первый запрос после запуска приходит с 401, хотя токен сохранён. В чём причина?', options: ['Токен протух', 'Перехватчик синхронный, а токен в DataStore читается через Flow — запрос ушёл без заголовка; токен надо держать в памяти', 'Сервер не принимает Bearer', 'Не тот эндпоинт'], correct: 1, why: 'Решение — прочитать токен один раз при старте в переменную, а tokenProvider возвращает её.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="auth-session" sectionId="perehvatchik" />
+
+## Стартовый экран: куда пускать при запуске
+
+Кажется, исходов два: токен есть — главный экран, токена нет — вход. На самом деле их три, и модель показывает, почему двух мало:
+
+<KotlinPlay code={`// Машина состояний сессии: чем «токен лежит на диске» отличается от «пользователь вошёл».
+// Создан 05-09-2026, участник №00.
+
+sealed interface Session {
+    data object None : Session
+    data class Active(val token: String, val expiresAt: Long) : Session
+}
+
+enum class Screen { LOGIN, MAIN }
+
+fun log(level: String, tag: String, event: String, details: String) =
+    println("  \$level [\$tag]: \$event — \$details")
+
+// Наивно: токен есть — значит вошёл.
+fun naive(s: Session): Screen = if (s is Session.Active) Screen.MAIN else Screen.LOGIN
+
+// Аккуратно: токен есть И он ещё живой (с запасом 60 с на дорогу запроса).
+fun careful(s: Session, now: Long): Screen = when {
+    s is Session.Active && s.expiresAt > now + 60 -> Screen.MAIN
+    else -> Screen.LOGIN
+}
+
+fun main() {
+    var now = 1_000_000L
+    var session: Session = Session.None
+    var wrongScreens = 0
+
+    fun step(title: String) {
+        val n = naive(session)
+        val c = careful(session, now)
+        val flag = if (n != c) { wrongScreens++; "  ← РАСХОЖДЕНИЕ" } else ""
+        println(title)
+        println("    состояние: " + session)
+        println("    наивно → " + n + "   аккуратно → " + c + flag)
+    }
+
+    println("── 1. первый запуск, диск пуст ──")
+    log("INFO", "SplashScreen", "onCreate", "проверяем сохранённую сессию")
+    step("  решение о стартовом экране:")
+
+    println()
+    println("── 2. успешный вход ──")
+    log("INFO", "AuthScreen", "нажата кнопка Войти", "email=ivan@mail.ru")
+    log("INFO", "AuthRepository", "POST /login", "начало")
+    session = Session.Active("eyJhbGciOi...", expiresAt = now + 3600)
+    log("DEBUG", "AuthRepository", "POST /login", "успех, токен живёт 3600 с")
+    step("  решение о стартовом экране:")
+
+    println()
+    println("── 3. перезапуск приложения через 10 минут ──")
+    now += 600
+    log("INFO", "SplashScreen", "onCreate", "токен прочитан из DataStore")
+    step("  решение о стартовом экране:")
+
+    println()
+    println("── 4. перезапуск на следующий день: токен протух ──")
+    now += 86_400
+    log("INFO", "SplashScreen", "onCreate", "токен прочитан из DataStore")
+    step("  решение о стартовом экране:")
+    println("    наивный путь дальше: MAIN → первый запрос → 401 → выкидывает на LOGIN")
+    log("ERROR", "AuthInterceptor", "ответ 401", "GET /profile, токен недействителен")
+
+    println()
+    println("── 5. обновление по refresh-токену ──")
+    log("INFO", "AuthRepository", "POST /refresh", "начало")
+    session = Session.Active("eyJhbGciOi...НОВЫЙ", expiresAt = now + 3600)
+    log("DEBUG", "AuthRepository", "POST /refresh", "успех, выдан новый access-токен")
+    step("  решение о стартовом экране:")
+
+    println()
+    println("── 6. выход ──")
+    log("INFO", "ProfileScreen", "нажата кнопка Выйти", "очищаем DataStore и кэш Room")
+    session = Session.None
+    step("  решение о стартовом экране:")
+
+    println()
+    println("расхождений между двумя стратегиями: " + wrongScreens)
+    println("каждое расхождение = мигание чужого экрана перед глазами эксперта")
+}`} />
+
+Живой вывод (сокращён до расхождения):
+
+```text
+── 3. перезапуск приложения через 10 минут ──
+    состояние: Active(token=eyJhbGciOi..., expiresAt=1003600)
+    наивно → MAIN   аккуратно → MAIN
+
+── 4. перезапуск на следующий день: токен протух ──
+    состояние: Active(token=eyJhbGciOi..., expiresAt=1003600)
+    наивно → MAIN   аккуратно → LOGIN  ← РАСХОЖДЕНИЕ
+    наивный путь дальше: MAIN → первый запрос → 401 → выкидывает на LOGIN
+  ERROR [AuthInterceptor]: ответ 401 — GET /profile, токен недействителен
+```
+
+<Figure scheme="as-start-screen" caption="Токен есть, токен протух, токен ещё не прочитан — три состояния, а не два" />
+
+На четвёртом шаге наивное решение открывает главный экран, потому что токен в хранилище **есть**. Пользователь видит главный экран, приложение делает первый запрос, получает `401` и выкидывает его на вход. Мигание экранов и ощущение сломанности.
+
+Аккуратное решение проверяет не факт наличия, а **срок**: если сервер прислал время жизни токена, его сохраняют рядом и сравнивают при старте.
+
+Третий исход — «ещё не прочитали». Чтение из `DataStore` асинхронно: на долю секунды состояние неизвестно. Если в этот момент показать экран входа, а потом переключить на главный — пользователь увидит мигание. Заставка на это время решает вопрос.
+
+```kotlin
+sealed interface SessionState {
+    data object Loading : SessionState
+    data object LoggedOut : SessionState
+    data class Active(val token: String) : SessionState
+}
+```
+
+<SectionAnchor chapterId="auth-session" sectionId="startovyi-ekran" />
+
+## Протухший токен и обновление
+
+Токен живёт ограниченное время, и на длинной сессии он протухнет посреди работы. Сервер ответит `401`. Есть два пути.
+
+**Простой:** на `401` стереть токен и отправить на вход. Честно, но пользователь теряет контекст.
+
+**Правильный:** сервер вместе с токеном выдаёт второй, долгоживущий — refresh-токен. По нему без пароля получают новый токен доступа и повторяют упавший запрос. Пользователь ничего не замечает.
+
+В OkHttp для этого есть отдельный механизм — `Authenticator`, который вызывается сам при каждом `401`:
+
+```kotlin
+class TokenAuthenticator(private val session: SessionManager) : Authenticator {
+    override fun authenticate(route: Route?, response: Response): Request? {
+        val newToken = session.refreshBlocking() ?: return null   // null — сдаёмся, пользователь выйдет
+        return response.request.newBuilder()
+            .header("Authorization", "Bearer $newToken")
+            .build()                                              // запрос повторится с новым токеном
+    }
+}
+```
+
+И здесь спрятан самый неочевидный баг всей темы.
+
+<SectionAnchor chapterId="auth-session" sectionId="protuh" />
+
+## Один полёт за обновлением, а не три
+
+Читая код одного запроса, этот баг увидеть невозможно. Он проявляется, когда запросов несколько:
+
+<KotlinPlay code={`// Три экрана обновляются одновременно, токен только что протух.
+// Что делает интерсептор, который обновляет токен «в лоб».
+// Создан 05-09-2026, участник №00.
+
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+
+class Server {
+    var validAccess = "нет"          // access-токен клиента уже протух
+    var validRefresh = "R1"
+    var refreshCalls = 0
+
+    suspend fun get(path: String, access: String): Int {
+        delay(20)
+        return if (access == validAccess) 200 else 401
+    }
+
+    // Сервер ротирует refresh: использованный больше не действует.
+    suspend fun refresh(rt: String): String? {
+        delay(50)
+        refreshCalls++
+        if (rt != validRefresh) return null
+        validAccess = "A" + refreshCalls
+        validRefresh = "R" + (refreshCalls + 1)
+        return validAccess
+    }
+}
+
+class Client(val server: Server) {
+    var access = "A0"
+    var refresh = "R1"
+    var loggedOut = false
+    val lock = Mutex()
+
+    suspend fun naive(path: String): String {
+        if (server.get(path, access) != 401) return "\$path → 200"
+        val new = server.refresh(refresh) ?: run { loggedOut = true; return "\$path → 401, ВЫХОД" }
+        access = new
+        refresh = server.validRefresh
+        return "\$path → повтор → " + server.get(path, access)
+    }
+
+    suspend fun guarded(path: String): String {
+        if (server.get(path, access) != 401) return "\$path → 200"
+        val seen = access
+        lock.withLock {
+            if (access == seen) {                       // никто не успел обновить
+                val new = server.refresh(refresh) ?: run { loggedOut = true; return "\$path → 401, ВЫХОД" }
+                access = new
+                refresh = server.validRefresh
+            }
+        }
+        return "\$path → повтор → " + server.get(path, access)
+    }
+}
+
+fun main() = runBlocking {
+    val paths = listOf("/profile", "/cart", "/orders")
+
+    println("── интерсептор без защиты ──")
+    val s1 = Server()
+    val c1 = Client(s1)
+    coroutineScope { paths.map { async { c1.naive(it) } }.awaitAll() }.forEach { println("  \$it") }
+    println("  обращений к /refresh: " + s1.refreshCalls + ", пользователь выкинут: " + c1.loggedOut)
+
+    println()
+    println("── тот же сценарий, обновление под замком ──")
+    val s2 = Server()
+    val c2 = Client(s2)
+    coroutineScope { paths.map { async { c2.guarded(it) } }.awaitAll() }.forEach { println("  \$it") }
+    println("  обращений к /refresh: " + s2.refreshCalls + ", пользователь выкинут: " + c2.loggedOut)
+
+    println()
+    println("разница в коде — шесть строк, разница для эксперта — вход слетает на ровном месте")
+}`} />
+
+Живой вывод:
+
+```text
+── интерсептор без защиты ──
+  /profile → повтор → 200
+  /cart → 401, ВЫХОД
+  /orders → 401, ВЫХОД
+  обращений к /refresh: 3, пользователь выкинут: true
+
+── тот же сценарий, обновление под замком ──
+  /profile → повтор → 200
+  /cart → повтор → 200
+  /orders → повтор → 200
+  обращений к /refresh: 1, пользователь выкинут: false
+
+разница в коде — шесть строк, разница для эксперта — вход слетает на ровном месте
+```
+
+<Figure scheme="as-refresh-lock" caption="Три экрана получают 401 одновременно; без замка каждый идёт за новым токеном сам, и второй уже опаздывает" />
+
+Главный экран открывается и запускает три запроса — профиль, корзина, заказы. Токен протух, все три получают `401`, и каждый **сам** идёт обновлять токен. Первый успевает. Но refresh-токен одноразовый: второй и третий вызовы с ним получают отказ, и приложение решает, что сессия мертва. Пользователя выкидывает на вход — при живом сервере и правильном пароле.
+
+Решение — обновлять под замком: первый запрос, получивший `401`, идёт за новым токеном, остальные ждут его результата и повторяются уже с ним. В Kotlin для этого есть `Mutex`:
+
+```kotlin
+private val refreshMutex = Mutex()
+
+suspend fun refreshIfNeeded(failedToken: String): String? = refreshMutex.withLock {
+    val current = currentToken()
+    if (current != failedToken) return current      // кто-то уже обновил, пока мы ждали
+    api.refresh(refreshToken)?.also { save(it) }
+}
+```
+
+Проверка `current != failedToken` — ключевая: второй и третий запросы, дождавшись замка, обнаруживают, что токен уже новый, и не ходят на сервер вовсе.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="auth-session" quizId="quiz-3" questions={[
+  { q: 'Токен в хранилище есть. Значит, показываем главный экран?', options: ['Да, токен же есть', 'Нет, если он протух: главный экран откроется, первый запрос вернёт 401 и выкинет на вход — надо проверять срок, а не факт наличия', 'Да, а 401 обработаем потом', 'Зависит от сервера'], correct: 1, why: 'В модели на четвёртом шаге наивный путь даёт MAIN → 401 → LOGIN, аккуратный — сразу LOGIN.' },
+  { q: 'Три запроса одновременно получили 401. Что произойдёт без замка?', options: ['Все три обновят токен и продолжат', 'Каждый пойдёт за новым токеном сам; refresh-токен одноразовый — второй и третий получат отказ, и пользователя выкинет на вход', 'Первый обновит, остальные подождут', 'Ничего страшного'], correct: 1, why: 'В модели три обращения к /refresh и выход при живом сервере. Под замком — одно обращение и все три запроса прошли.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="auth-session" sectionId="odin-polyot" />
+
+## Выход: что именно стереть
+
+Стереть токен — очевидно. Но в главе про кэш мы уже видели, что этого мало:
+
+```kotlin
+suspend fun logout() {
+    session.clear()          // токен и refresh-токен
+    userDao.clear()          // корзина, заказы, профиль — всё, что принадлежит пользователю
+    // общий каталог можно оставить
+}
+```
+
+И ещё одно, о чём забывают: **состояние экранов**. `ViewModel` главного экрана может пережить выход и при следующем входе показать прежние данные, пока не обновится. Если экраны переживают смену пользователя, их состояние нужно сбросить вместе с остальным.
+
+<SectionAnchor chapterId="auth-session" sectionId="vyhod" />
+
+## Биометрия работает не так, как кажется
+
+В части заданий встречается требование: «вход по паролю или биометрии». Важно понять, что делает отпечаток на самом деле.
+
+**Он не заменяет токен и не ходит на сервер.** Сервер про отпечаток не знает и знать не может. Биометрия — это локальная защёлка на **уже сохранённой сессии**: пользователь однажды вошёл паролем, токен лежит в хранилище, и при следующем открытии вместо пароля приложение просит палец, чтобы разблокировать доступ к этому токену.
+
+Отсюда: биометрия доступна только когда токен уже есть. При первом входе она бессмысленна.
+
+```kotlin
+val prompt = BiometricPrompt(activity, executor, object : BiometricPrompt.AuthenticationCallback() {
+    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+        openMainScreen()          // токен уже в хранилище — просто пускаем
+    }
+})
+
+val info = BiometricPrompt.PromptInfo.Builder()
+    .setTitle("Вход")
+    .setSubtitle("Подтвердите отпечатком")
+    .setNegativeButtonText("Ввести пароль")
+    .build()
+
+prompt.authenticate(info)
+```
+
+Перед показом проверяют, доступна ли биометрия вообще — `BiometricManager.canAuthenticate()`. На устройстве без датчика или без записанного отпечатка показывают обычный вход.
+
+<Hint type="important">
+Библиотека `androidx.biometric` живёт в двух версиях, и это ловушка для руководств. Стабильная — `1.1.0`, она работает через `Activity` и обратные вызовы, как в примере выше. Compose-обёртка появилась только в `1.4.0-alpha`, и на чемпионате её брать не стоит. Вторая ловушка — `setNegativeButtonText` конфликтует с разрешением `DEVICE_CREDENTIAL`: если разрешить вход по PIN устройства, кнопку отмены задавать нельзя, иначе `build()` упадёт с `IllegalArgumentException`.
+</Hint>
+
+<SectionAnchor chapterId="auth-session" sectionId="biometriya" />
+
+## Комментарии и логирование здесь
+
+Множитель из главы про чистый код действует и на этот модуль. Что именно логировать в авторизации — из обязательных точек задания:
+
+```kotlin
+Log.i(TAG, "[AuthScreen]: Нажата кнопка — Войти, email=${email.take(3)}***")
+Log.i(TAG, "[AuthRepository]: POST /login — начало")
+Log.d(TAG, "[AuthRepository]: POST /login — успех, токен получен")
+Log.e(TAG, "[AuthRepository]: POST /login — ошибка: ${e.message}", e)
+```
+
+Одно правило сверху: **ни пароль, ни токен целиком в лог не попадают**. Почту можно обрезать до первых символов, токен — не писать вовсе. Логи попадают в отчёты и на экраны экспертов.
+
+<SectionAnchor chapterId="auth-session" sectionId="logirovanie" />
+
+## Типичные ошибки
+
+**Регекс без якорей и `containsMatchIn`.** Поле принимает любую строку, где встречается адрес.
+
+**`Patterns.EMAIL_ADDRESS`.** Принимает всё, что задание запрещает, и падает с `NullPointerException` в JVM-тесте.
+
+**Стартовый экран смотрит на факт наличия токена.** Протухший токен открывает главный экран на секунду, потом `401` выкидывает на вход.
+
+**Токен читается из `DataStore` внутри синхронного перехватчика.** Первый запрос после запуска уходит без заголовка.
+
+**Обновление токена без замка.** Несколько экранов идут за новым токеном одновременно; refresh-токен одноразовый — пользователя выкидывает.
+
+**Выход стирает токен, но не кэш и не состояние.** Следующий пользователь видит чужие данные.
+
+**Ошибка тостом.** Исчезает через две секунды и не привязана к полю.
+
+**`setNegativeButtonText` вместе с `DEVICE_CREDENTIAL`.** Падение на `build()`.
+
+<SectionAnchor chapterId="auth-session" sectionId="oshibki" />
+
+## Слова главы
+
+<Block kind="vocab">
+
+- **Токен** — строка, подтверждающая вход; живёт ограниченное время, несётся в каждом запросе.
+- **Refresh-токен** — долгоживущий; по нему получают новый токен доступа без пароля. Одноразовый.
+- **`Authorization: Bearer`** — заголовок с токеном.
+- **`Authenticator`** — механизм OkHttp, вызываемый на `401`.
+- **`Mutex`** — замок: обновление токена делает один, остальные ждут.
+- **`matches()` / `containsMatchIn()`** — вся строка против поиска вхождения.
+- **`isError` / `supportingText`** — рамка и текст ошибки под полем.
+- **`PasswordVisualTransformation`** — точки вместо символов.
+- **`BiometricPrompt`** — системный диалог отпечатка; защёлка на сохранённой сессии.
+
+</Block>
+
+<SectionAnchor chapterId="auth-session" sectionId="slova" />
+
+## Тренажёр: набрать вслепую
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="auth-session"
+  trainerId="trainer-auth-session"
+  targetCpm={100}
+  targetAccuracy={88}
+  pools={[
+    { label: 'Валидация', snippets: [
+      'private val EMAIL_RULE = Regex("^[a-z0-9]+@[a-z0-9]+\\\\.ru$")',
+      'fun isEmailValid(raw: String) = EMAIL_RULE.matches(raw.trim())',
+      'fun isPasswordValid(p: String) = p.length >= 8',
+    ] },
+    { label: 'Сессия', snippets: [
+      '.addHeader("Authorization", "Bearer $token")',
+      'suspend fun refreshIfNeeded(failed: String) = refreshMutex.withLock { ... }',
+      'isError = emailError != null, supportingText = { emailError?.let { Text(it) } }',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="auth-session" sectionId="trenazher" />
+
+## На чемпионате
+
+Что эксперт делает руками — и что должно произойти:
+
+- **Вводит `Ivan@Mail.RU`** — поле показывает ошибку под собой. Не тост.
+- **Вводит семь символов пароля** — ошибка под полем.
+- **Входит, убивает приложение из недавних, открывает** — главный экран без повторного входа. Это «данные входа и активная сессия должны быть сохранены после перезапуска приложения».
+- **Выходит и входит другим пользователем** — никаких следов предыдущего.
+- **Отключает сеть и нажимает «Войти»** — понятная ошибка про соединение, не «неверный пароль».
+
+И два требования из соседних модулей: unit-тесты сетевого слоя на **каждый** запрос — `/register` и `/login` входят в это «каждый»; шапка класса и логи с датой и номером участника.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="auth-session" quizId="quiz-4" questions={[
+  { q: 'Что делает отпечаток пальца при входе?', options: ['Отправляет биометрию на сервер вместо пароля', 'Разблокирует уже сохранённую сессию: токен получен паролем раньше, отпечаток лишь открывает к нему доступ', 'Генерирует новый токен', 'Заменяет DataStore'], correct: 1, why: 'Сервер про отпечаток не знает. Поэтому биометрия доступна только когда токен уже есть.' },
+  { q: 'Эксперт отключил сеть и нажал «Войти». Что показать?', options: ['«Неверный пароль»', 'Понятную ошибку про соединение: это отказ сети, а не отказ сервера — их различают по типу исключения', 'Ничего, подождать', 'Главный экран из кэша'], correct: 1, why: 'Обработка отказов из главы про ошибки сети действует и здесь: IOException — не то же самое, что 401.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="auth-session" sectionId="na-chempionate" />
+
+## Что дальше
+
+Пользователь входит, сессия живёт, выход чистит следы. Дальше — то, что приложение делает с железом устройства: камера и галерея для фото профиля, локальные уведомления и виджет на домашний экран. Это модуль аппаратных возможностей, и в нём три требования повторяются из года в год почти дословно.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="auth-session" quizId="quiz-5" questions={[
+  { q: 'Почему валидацию делят на локальную и серверную?', options: ['Так требует архитектура', 'Формат почты и длину пароля видно за ноль миллисекунд — незачем ждать сеть; а существует ли пользователь, знает только сервер', 'Локальная надёжнее', 'Серверная быстрее'], correct: 1, why: 'Первую делают до запроса, вторую получают в ответе.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="auth-session" sectionId="dalshe" />
+
+## Углубиться
+
+- OAuth и вход через сторонние сервисы: чем отличается от собственной авторизации и когда его требуют.
+- JWT изнутри: что зашито в токене, почему его можно прочитать без сервера и почему нельзя доверять прочитанному.
+- Android Keystore: аппаратное хранение ключей для по-настоящему чувствительных данных.
+- `CredentialManager` — системный диалог с сохранёнными паролями и ключами доступа.
+- Ограничение попыток входа и что делать с подбором пароля на стороне клиента.
+
+<SectionAnchor chapterId="auth-session" sectionId="uglubitsya" />
+
+<ChapterExam chapterId="auth-session" questions={[
+  { q: 'Что означает «пользователь вошёл» с точки зрения приложения?', options: ['Открыт главный экран', 'Есть действующий токен: пароль обменян на него один раз, дальше каждый запрос несёт токен', 'Пароль сохранён в памяти', 'Сервер запомнил устройство'], correct: 1, why: 'Отсюда: пароль на устройстве не хранят никогда, а токен кладут в DataStore.' },
+  { q: 'Почему нельзя взять готовый Patterns.EMAIL_ADDRESS?', options: ['Он медленный', 'Он принимает всё, что задание запрещает — заглавные, точки, .com, — и падает с NullPointerException в JVM-тесте', 'Он устарел', 'Он не работает с Compose'], correct: 1, why: 'Задание требует только строчные буквы и цифры с доменом .ru — нужен свой Regex с якорями и matches().' },
+  { q: 'Где показывать ошибку валидации?', options: ['Тостом', 'Под полем через isError и supportingText: текст остаётся, пока ввод не исправлен, и привязан к конкретному полю', 'В диалоге', 'В заголовке экрана'], correct: 1, why: 'Тост исчезает через две секунды, и пользователь не понимает, какое из двух полей неверно.' },
+  { q: 'Сколько исходов у стартового экрана?', options: ['Два: токен есть или нет', 'Три: токен есть и жив, токена нет или он протух, токен ещё не прочитан с диска', 'Один', 'Четыре'], correct: 1, why: 'Протухший токен — это «нет», иначе главный экран мигнёт и выкинет на вход по 401. А чтение с диска асинхронно.' },
+  { q: 'Три запроса получили 401 одновременно. Что делать с обновлением токена?', options: ['Каждый обновляет сам', 'Обновлять под замком: первый идёт за токеном, остальные ждут — refresh-токен одноразовый, второй вызов с ним получит отказ', 'Не обновлять, а выйти', 'Обновлять по очереди с паузой'], correct: 1, why: 'В модели без замка три обращения к /refresh и выход при живом сервере; под замком одно обращение.' },
+  { q: 'Что стирать при выходе?', options: ['Только токен', 'Токен, кэш пользовательских данных и состояние экранов: иначе следующий пользователь увидит чужое', 'Всё приложение', 'Только кэш'], correct: 1, why: 'Общий каталог можно оставить; корзину, заказы, профиль и ViewModel — сбросить.' },
+  { q: 'Что делает биометрия при входе?', options: ['Отправляет отпечаток на сервер', 'Разблокирует уже сохранённую сессию — сервер про отпечаток не знает, токен получен паролем раньше', 'Создаёт новый токен', 'Заменяет пароль на сервере'], correct: 1, why: 'Поэтому при первом входе биометрия бессмысленна: токена ещё нет.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [BiometricPrompt — developer.android.com](https://developer.android.com/identity/sign-in/biometric-auth) — системный диалог биометрии и проверка доступности.
+- [OkHttp Authenticator](https://lysine.dev/okhttp/recipes/#handling-authentication-kt-java) — обновление токена по `401` и повтор запроса.
+- [DataStore](https://developer.android.com/topic/libraries/architecture/datastore) — хранилище для токена.
+- [Regex в Kotlin](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/-regex/) — `matches`, `containsMatchIn` и разница между ними.
