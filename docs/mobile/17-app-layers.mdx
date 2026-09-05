@@ -243,7 +243,7 @@ class GetDiscountedProductsUseCase(private val repo: ProductRepository) {
 
 ```kotlin
 class ProductRepositoryImpl(
-    private val api: ProductApi = ProductApi(),
+    private val api: ProductApi = ApiFactory.productApi,
 ) : ProductRepository { /* ... */ }
 
 class CatalogViewModel(
