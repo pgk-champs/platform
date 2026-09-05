@@ -160,11 +160,19 @@
     "path": "mobile/kotlin-vars.mdx"
   },
   {
+    "id": "kotlin-null",
+    "title": "Null-безопасность: ошибка на миллиард долларов",
+    "audience": "мобилка",
+    "level": "углубление",
+    "order": 2,
+    "path": "mobile/kotlin-null.mdx"
+  },
+  {
     "id": "kotlin-flow",
     "title": "Условия и циклы на Kotlin",
     "audience": "мобилка",
     "level": "база",
-    "order": 2,
+    "order": 3,
     "path": "mobile/kotlin-flow.mdx"
   },
   {
@@ -172,7 +180,7 @@
     "title": "Функции и лямбды",
     "audience": "мобилка",
     "level": "база",
-    "order": 3,
+    "order": 4,
     "path": "mobile/functions-lambdas.mdx"
   },
   {
@@ -180,7 +188,7 @@
     "title": "Классы и коллекции",
     "audience": "мобилка",
     "level": "база",
-    "order": 4,
+    "order": 5,
     "path": "mobile/classes-collections.mdx"
   },
   {
@@ -188,47 +196,15 @@
     "title": "ООП на Kotlin: классы, наследование, интерфейсы",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 5,
-    "path": "mobile/kotlin-oop.mdx"
-  },
-  {
-    "id": "kotlin-vs-java",
-    "title": "Kotlin и Java: в чём разница",
-    "audience": "мобилка",
-    "level": "база",
     "order": 6,
-    "path": "mobile/kotlin-vs-java.mdx"
-  },
-  {
-    "id": "kotlin-history",
-    "title": "История Java, Android и Kotlin",
-    "audience": "мобилка",
-    "level": "углубление",
-    "order": 7,
-    "path": "mobile/kotlin-history.mdx"
-  },
-  {
-    "id": "kotlin-coroutines",
-    "title": "Корутины: как приложение не зависает",
-    "audience": "мобилка",
-    "level": "углубление",
-    "order": 8,
-    "path": "mobile/kotlin-coroutines.mdx"
-  },
-  {
-    "id": "kotlin-null",
-    "title": "Null-безопасность: ошибка на миллиард долларов",
-    "audience": "мобилка",
-    "level": "углубление",
-    "order": 9,
-    "path": "mobile/kotlin-null.mdx"
+    "path": "mobile/kotlin-oop.mdx"
   },
   {
     "id": "first-compose-screen",
     "title": "Первый экран Compose",
     "audience": "мобилка",
     "level": "база",
-    "order": 10,
+    "order": 7,
     "path": "mobile/first-compose-screen.mdx"
   },
   {
@@ -236,7 +212,7 @@
     "title": "Состояние и события",
     "audience": "мобилка",
     "level": "база",
-    "order": 11,
+    "order": 8,
     "path": "mobile/state-events.mdx"
   },
   {
@@ -244,7 +220,7 @@
     "title": "Вёрстка по макету",
     "audience": "мобилка",
     "level": "база",
-    "order": 12,
+    "order": 9,
     "path": "mobile/layout-by-mockup.mdx"
   },
   {
@@ -252,8 +228,32 @@
     "title": "Многомодульность и UI Kit",
     "audience": "мобилка",
     "level": "база",
-    "order": 13,
+    "order": 10,
     "path": "mobile/ui-kit.mdx"
+  },
+  {
+    "id": "kotlin-coroutines",
+    "title": "Корутины: как приложение не зависает",
+    "audience": "мобилка",
+    "level": "углубление",
+    "order": 11,
+    "path": "mobile/kotlin-coroutines.mdx"
+  },
+  {
+    "id": "kotlin-vs-java",
+    "title": "Kotlin и Java: в чём разница",
+    "audience": "мобилка",
+    "level": "база",
+    "order": 12,
+    "path": "mobile/kotlin-vs-java.mdx"
+  },
+  {
+    "id": "kotlin-history",
+    "title": "История Java, Android и Kotlin",
+    "audience": "мобилка",
+    "level": "углубление",
+    "order": 13,
+    "path": "mobile/kotlin-history.mdx"
   },
   {
     "id": "what-is-blockchain",
@@ -264,19 +264,11 @@
     "path": "blockchain/what-is-blockchain.mdx"
   },
   {
-    "id": "waves-first-network",
-    "title": "Первая сеть на Waves Enterprise",
-    "audience": "блокчейн",
-    "level": "база",
-    "order": 2,
-    "path": "blockchain/waves-first-network.mdx"
-  },
-  {
     "id": "code-editor",
     "title": "Редактор кода: WebStorm и VS Code",
     "audience": "блокчейн",
     "level": "база",
-    "order": 3,
+    "order": 2,
     "path": "blockchain/code-editor.mdx"
   },
   {
@@ -284,7 +276,7 @@
     "title": "TypeScript и JavaScript: в чём разница",
     "audience": "блокчейн",
     "level": "база",
-    "order": 4,
+    "order": 3,
     "path": "blockchain/ts-vs-js.mdx"
   },
   {
@@ -292,7 +284,7 @@
     "title": "Значения и переменные: числа, строки, типы",
     "audience": "блокчейн",
     "level": "база",
-    "order": 5,
+    "order": 4,
     "path": "blockchain/ts-values.mdx"
   },
   {
@@ -300,7 +292,7 @@
     "title": "Условия и циклы: как программа принимает решения",
     "audience": "блокчейн",
     "level": "база",
-    "order": 6,
+    "order": 5,
     "path": "blockchain/ts-flow.mdx"
   },
   {
@@ -308,7 +300,7 @@
     "title": "Функции: как код перестаёт повторяться",
     "audience": "блокчейн",
     "level": "база",
-    "order": 7,
+    "order": 6,
     "path": "blockchain/ts-functions.mdx"
   },
   {
@@ -316,7 +308,7 @@
     "title": "Массивы и объекты: как хранят много данных сразу",
     "audience": "блокчейн",
     "level": "база",
-    "order": 8,
+    "order": 7,
     "path": "blockchain/ts-collections.mdx"
   },
   {
@@ -324,8 +316,16 @@
     "title": "ООП на TypeScript: классы, наследование, интерфейсы",
     "audience": "блокчейн",
     "level": "углубление",
-    "order": 9,
+    "order": 8,
     "path": "blockchain/ts-oop.mdx"
+  },
+  {
+    "id": "ts-async",
+    "title": "Асинхронность: промисы, async/await и цикл событий",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 9,
+    "path": "blockchain/ts-async.mdx"
   },
   {
     "id": "ts-history",
@@ -336,11 +336,11 @@
     "path": "blockchain/ts-history.mdx"
   },
   {
-    "id": "ts-async",
-    "title": "Асинхронность: промисы, async/await и цикл событий",
+    "id": "waves-first-network",
+    "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
-    "level": "углубление",
+    "level": "база",
     "order": 11,
-    "path": "blockchain/ts-async.mdx"
+    "path": "blockchain/waves-first-network.mdx"
   }
 ]
