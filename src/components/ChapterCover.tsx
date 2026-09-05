@@ -531,6 +531,21 @@ const ARTS: Record<string, () => React.ReactNode> = {
   /* запрос уходит, ответ приходит — арт «network-retrofit» */
   /* оборванная связь и запасной путь — арт «network-errors» */
   /* диск помнит, память забывает — арт «data-storage» */
+  /* половина оценки срезана — арт «clean-code» */
+  'clean-code': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="40" width="172" height="46" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="26" y="60" fontSize="10" fontWeight={800} fill={ACCENT} fontFamily={MONO}>/** ... */</text>
+      <text x="26" y="78" fontSize="10" fontWeight={800} fill="rgba(255,255,255,0.75)" fontFamily={MONO}>05-09-2026</text>
+
+      <rect x="14" y="96" width="172" height="26" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      <text x="26" y="114" fontSize="9.5" fontWeight={800} fill="rgba(255,255,255,0.8)" fontFamily={MONO}>[Tag]: Событие</text>
+
+      <rect x="14" y="132" width="103" height="20" rx="6" fill={ACCENT} />
+      <rect x="121" y="132" width="65" height="20" rx="6" fill="rgba(255,255,255,0.12)" />
+      <text x="100" y="174" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>×0,5 без них</text>
+    </g>
+  ),
   'data-storage': () => (
     <g strokeLinecap="round">
       <rect x="14" y="44" width="76" height="104" rx="11" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} strokeDasharray="7 5" />
@@ -721,8 +736,9 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'code-basics': { track: 'foundation', num: '08', title: 'Из чего состоит код' },
   'oop-basics': { track: 'foundation', num: '09', title: 'ООП простыми словами — на двух языках' },
-  'kotlin-vs-java': { track: 'mobile', num: '21', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '22', title: 'История Java, Android и Kotlin' },
+  'kotlin-vs-java': { track: 'mobile', num: '22', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '23', title: 'История Java, Android и Kotlin' },
+  'clean-code': { track: 'mobile', num: '21', title: 'Чистый код: комментарии и логирование, которые оценивают' },
   'data-storage': { track: 'mobile', num: '20', title: 'Хранение на устройстве: DataStore и Room' },
   'network-errors': { track: 'mobile', num: '19', title: 'Когда сети нет: ошибки, повторы и что видит пользователь' },
   'network-retrofit': { track: 'mobile', num: '18', title: 'Сеть: тот же экран, но с настоящими данными' },

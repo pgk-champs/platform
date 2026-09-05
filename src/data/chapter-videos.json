@@ -1362,5 +1362,32 @@
       "title": "How to Save Complex Objects In a Room DB",
       "channel": "Philipp Lackner"
     }
+  ],
+  "clean-code": [
+    {
+      "videoId": "ah42ZZ4WRnI",
+      "title": "Урок 17: Жизненный цикл Activity, Logcat (логирование)",
+      "channel": "Kotlin & Android с нуля"
+    },
+    {
+      "videoId": "yn-LpRQYzp8",
+      "title": "Kotlin Code Style за 20 минут",
+      "channel": "FunDroid"
+    },
+    {
+      "videoId": "g_Ka8x49nqA",
+      "title": "Чистый код / Clean Code #2: Комментарии, условные выражения",
+      "channel": "EngineerSpock"
+    },
+    {
+      "videoId": "SWBN0y0lFNY",
+      "title": "Jetpack Compose: Debugging recomposition",
+      "channel": "Android Developers"
+    },
+    {
+      "videoId": "hWwZ_AuSGfo",
+      "title": "Where to hoist that state in Compose?",
+      "channel": "Android Developers"
+    }
   ]
 }

@@ -27,6 +27,7 @@ import { appLayersSchemes } from './figures/appLayers';
 import { networkLayerSchemes } from './figures/networkLayer';
 import { networkErrorsSchemes } from './figures/networkErrors';
 import { dataStorageSchemes } from './figures/dataStorage';
+import { cleanCodeSchemes } from './figures/cleanCode';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -69,6 +70,7 @@ const SCHEMES = {
   ...networkLayerSchemes,
   ...networkErrorsSchemes,
   ...dataStorageSchemes,
+  ...cleanCodeSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

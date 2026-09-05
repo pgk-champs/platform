@@ -27,6 +27,7 @@ import { appLayersSchemes } from './figures/appLayers';
 import { networkLayerSchemes } from './figures/networkLayer';
 import { networkErrorsSchemes } from './figures/networkErrors';
 import { dataStorageSchemes } from './figures/dataStorage';
+import { cleanCodeSchemes } from './figures/cleanCode';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -97,6 +98,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(networkLayerSchemes),
     ...Object.keys(networkErrorsSchemes),
     ...Object.keys(dataStorageSchemes),
+    ...Object.keys(cleanCodeSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),
