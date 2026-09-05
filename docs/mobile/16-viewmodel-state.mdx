@@ -1,0 +1,409 @@
+---
+title: 'ViewModel: состояние, которое переживает поворот'
+audience: 'мобилка'
+level: 'углубление'
+order: 16
+sidebar_position: 16
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="viewmodel-state" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+import KotlinPlay from '@site/src/components/KotlinPlay';
+
+# ViewModel: состояние, которое переживает поворот
+
+<ChapterProgress chapterId="viewmodel-state" totalSections={14} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="viewmodel-state" />
+
+## Зачем это нужно
+
+Есть простой опыт, который стоит проделать самому. Соберите экран со счётчиком на `remember`, нажмите кнопку десять раз и поверните телефон. Счётчик обнулится.
+
+Причина не в Compose и не в ошибке. При повороте Android **пересоздаёт Activity целиком**: старая уничтожается, новая строится заново, и всё, что жило внутри неё, исчезает вместе с ней. То же самое происходит при смене языка системы, при переключении на тёмную тему, при изменении размера окна.
+
+Пользователь при этом уверен, что ничего не делал — он просто повернул телефон. Потерянный текст в форме, сброшенный фильтр, пропавший список — всё это выглядит как поломка приложения.
+
+Нужен объект, который живёт дольше экрана. В Android он называется `ViewModel`, и на чемпионате именно с него начинается модуль архитектуры — самый первый и всегда обязательный.
+
+<SectionAnchor chapterId="viewmodel-state" sectionId="zachem" />
+
+## Что переживает пересоздание
+
+Проследим границу на модели:
+
+<KotlinPlay code={`class Screen(val name: String) { var counter = 0 }
+
+class ViewModelStore { val kept = mutableMapOf<String, Int>() }
+
+fun main() {
+    val store = ViewModelStore()
+
+    var screen = Screen("Каталог")
+    screen.counter = 7
+    store.kept["counter"] = screen.counter
+    println("пользователь досчитал до \${screen.counter}")
+
+    println("поворот экрана — Activity пересоздаётся...")
+    screen = Screen("Каталог")
+
+    println("  переменная внутри экрана:  \${screen.counter}   ← обнулилась")
+    println("  значение во ViewModel:     \${store.kept["counter"]}   ← пережило")
+}`} />
+
+Живой вывод:
+
+```text
+пользователь досчитал до 7
+поворот экрана — Activity пересоздаётся...
+  переменная внутри экрана:  0   ← обнулилась
+  значение во ViewModel:     7   ← пережило
+```
+
+<Figure scheme="vm-survives" caption="Activity пересоздаётся при повороте, ViewModel остаётся; но перезапуск приложения не переживает и она" />
+
+Важно понимать границы. `ViewModel` живёт дольше экрана, но не вечно:
+
+| Событие | `remember` | `rememberSaveable` | `ViewModel` | Хранилище на диске |
+|---|---|---|---|---|
+| Рекомпозиция | переживает | переживает | переживает | переживает |
+| Поворот экрана | теряется | переживает | переживает | переживает |
+| Уход в фон и возврат | теряется | переживает | переживает | переживает |
+| Система убила процесс | теряется | переживает | теряется | переживает |
+| Перезапуск приложения | теряется | теряется | теряется | переживает |
+
+Отсюда правило: `ViewModel` — для состояния экрана в течение сеанса. Для того, что обязано пережить перезапуск — например, выбранной вкладки из прошлой главы — нужно хранилище, и до него мы дойдём в блоке про данные.
+
+<SectionAnchor chapterId="viewmodel-state" sectionId="chto-perezhivaet" />
+
+## Первая ViewModel
+
+```kotlin
+class CatalogViewModel : ViewModel() {
+
+    private val _uiState = MutableStateFlow(CatalogUiState())
+    val uiState: StateFlow<CatalogUiState> = _uiState.asStateFlow()
+
+    fun onRetryClick() {
+        _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+    }
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'class CatalogViewModel : ViewModel()', label: 'наследование от ViewModel', note: 'именно оно даёт объекту право пережить пересоздание Activity. Система сама решает, когда его уничтожить' },
+  { text: 'private val _uiState', label: 'изменяемое состояние, приватное', note: 'подчёркивание в начале — общепринятая пометка «внутреннее, снаружи не трогать». Менять состояние может только сама ViewModel' },
+  { text: 'MutableStateFlow', label: 'поток с текущим значением и правом записи', note: 'из главы про Flow: у него всегда есть .value, и одинаковое значение подряд он не рассылает' },
+  { text: 'val uiState: StateFlow<...>', label: 'то же состояние, но только для чтения', note: 'у StateFlow нет .value =. Экран физически не может изменить состояние в обход ViewModel — ограничение обеспечено типом' },
+  { text: '.asStateFlow()', label: 'явное сужение', note: 'возвращает обёртку, которую нельзя привести обратно к Mutable. Без него настойчивый программист смог бы сделать приведение типа и всё-таки записать значение' },
+]} />
+
+Экран подписывается на состояние так:
+
+```kotlin
+@Composable
+fun CatalogScreen(viewModel: CatalogViewModel = viewModel()) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    when {
+        state.isLoading -> LoadingIndicator()
+        state.error != null -> ErrorMessage(state.error, onRetry = viewModel::onRetryClick)
+        else -> ProductList(state.items)
+    }
+}
+```
+
+`collectAsStateWithLifecycle` — та самая подписка из главы про `Flow`. Она останавливает сбор, когда экран уходит с переднего плана, и возобновляет при возврате. Обычный `collectAsState` продолжал бы слушать невидимый экран, тратя батарею и трафик.
+
+<SectionAnchor chapterId="viewmodel-state" sectionId="pervaya-vm" />
+
+## `UiState`: одно состояние вместо россыпи флагов
+
+Соблазн велик: завести отдельные переменные под загрузку, под список, под ошибку. Посмотрим, к чему это приводит:
+
+<KotlinPlay code={`fun main() {
+    println("── пять независимых переменных ──")
+    var isLoading = true; var items = listOf<String>(); var error: String? = null
+    fun show() {
+        println("  loading=\$isLoading, items=\${items.size}, error=\$error")
+        if (isLoading && error != null) println("     ⚠ спиннер и ошибка одновременно — так быть не должно")
+    }
+    isLoading = true; error = "нет сети"; show()
+
+    println()
+    println("── одно состояние с закрытым набором вариантов ──")
+    println("  Loading           → крутим спиннер")
+    println("  Content(items=3)  → показываем список")
+    println("  Error(«нет сети») → показываем ошибку и кнопку")
+    println("  третьего не дано: невозможных сочетаний просто не существует")
+}`} />
+
+```text
+── пять независимых переменных ──
+  loading=true, items=0, error=нет сети
+     ⚠ спиннер и ошибка одновременно — так быть не должно
+
+── одно состояние с закрытым набором вариантов ──
+  Loading           → крутим спиннер
+  Content(items=3)  → показываем список
+  Error(«нет сети») → показываем ошибку и кнопку
+  третьего не дано: невозможных сочетаний просто не существует
+```
+
+Пять булевых переменных дают тридцать два сочетания, из которых осмысленны три. Остальные двадцать девять — это баги, ждущие своего часа, и каждый придётся отлавливать вручную.
+
+<Figure scheme="vm-uistate" caption="Независимые флаги допускают невозможные сочетания; закрытый набор состояний их не допускает вовсе" />
+
+Два способа записать состояние одним объектом:
+
+```kotlin
+// вариант 1: data class — когда части состояния сосуществуют
+data class CatalogUiState(
+    val isLoading: Boolean = false,
+    val items: List<Product> = emptyList(),
+    val error: String? = null,
+    val query: String = "",
+)
+
+// вариант 2: sealed interface — когда состояния взаимоисключающие
+sealed interface CatalogUiState {
+    data object Loading : CatalogUiState
+    data class Content(val items: List<Product>) : CatalogUiState
+    data class Error(val message: String) : CatalogUiState
+}
+```
+
+`data class` удобен, когда на экране есть постоянные части: строка поиска остаётся видимой и во время загрузки, и при ошибке. `sealed interface` строже: он делает невозможные сочетания невыразимыми, и `when` по нему компилятор проверяет на полноту — забыли вариант, получите ошибку компиляции, а не пустой экран.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="viewmodel-state" quizId="quiz-1" questions={[
+  { q: 'Почему состояние экрана держат в одном объекте, а не в отдельных переменных?', options: ['Так меньше кода', 'Независимые флаги допускают невозможные сочетания — спиннер вместе с ошибкой; одно состояние делает такие сочетания невыразимыми', 'Одна переменная работает быстрее', 'Так требует Compose'], correct: 1, why: 'Пять булевых переменных дают тридцать два сочетания при трёх осмысленных. Остальные — потенциальные баги.' },
+  { q: 'Зачем наружу отдают StateFlow, а внутри держат MutableStateFlow?', options: ['Так принято', 'У StateFlow нет записи: экран не может изменить состояние в обход ViewModel, и это обеспечено типом, а не договорённостью', 'MutableStateFlow не работает в Compose', 'Ради производительности'], correct: 1, why: 'asStateFlow() возвращает обёртку, которую нельзя привести обратно к Mutable — обойти ограничение не получится.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="viewmodel-state" sectionId="uistate" />
+
+## Обновление состояния через `copy`
+
+Состояние в `StateFlow` меняют не по частям, а целиком — новым объектом:
+
+```kotlin
+fun onQueryChange(text: String) {
+    _uiState.value = _uiState.value.copy(query = text)
+}
+
+fun onLoadStart() {
+    _uiState.update { it.copy(isLoading = true, error = null) }
+}
+```
+
+`copy` создаёт новый объект, где изменены названные поля, а остальные скопированы. Это не прихоть: `StateFlow` сравнивает новое значение с текущим и молчит, если они равны. Если поменять поле внутри существующего объекта, ссылка останется той же — `StateFlow` решит, что ничего не изменилось, и экран не перерисуется. Ошибка без сообщения, ровно та, о которой предупреждала глава про `Flow`.
+
+Функция `update { }` делает то же самое, но безопаснее: она читает и записывает одной атомарной операцией. Когда состояние меняют из нескольких корутин сразу, `_uiState.value = _uiState.value.copy(...)` может потерять одно из изменений — между чтением и записью успевает вклиниться другая.
+
+<Hint type="important">
+Правило простое: если состояние меняется только из главного потока — годится присваивание. Если хоть где-то из фона или из нескольких корутин — только `update { }`. Второе не дороже и работает всегда, поэтому проще привыкнуть сразу к нему.
+</Hint>
+
+<SectionAnchor chapterId="viewmodel-state" sectionId="copy" />
+
+## `viewModelScope`: корутины, живущие с экраном
+
+В главе про корутины мы запускали их через `runBlocking` и `rememberCoroutineScope`. У `ViewModel` есть свой готовый scope:
+
+```kotlin
+fun loadProducts() {
+    viewModelScope.launch {
+        _uiState.update { it.copy(isLoading = true) }
+        val result = repository.getProducts()
+        _uiState.update { it.copy(isLoading = false, items = result) }
+    }
+}
+```
+
+`viewModelScope` отменяется автоматически, когда `ViewModel` уничтожается. Пользователь ушёл с экрана — запрос прервался сам, и результат не придёт в объект, которого уже нет. Это избавляет от целого класса утечек, которые в старом Android приходилось вычищать руками.
+
+<SectionAnchor chapterId="viewmodel-state" sectionId="viewmodelscope" />
+
+## Однонаправленный поток данных
+
+Сложив всё вместе, получаем схему, которую на чемпионате называют по имени: состояние идёт вниз, события идут вверх.
+
+<Figure scheme="vm-udf" caption="ViewModel отдаёт состояние экрану, экран сообщает о действиях пользователя обратно" />
+
+Экран не решает ничего. Он получает состояние и рисует его. Когда пользователь нажимает кнопку, экран не меняет данные — он **сообщает о событии**:
+
+```kotlin
+@Composable
+fun ProductList(
+    state: CatalogUiState,
+    onRetryClick: () -> Unit,
+    onQueryChange: (String) -> Unit,
+) { /* только отрисовка */ }
+```
+
+Событие — обычный параметр-функция, ровно как `onClick` из главы про состояние и события. Компонент не знает, что произойдёт при нажатии, и это правильно: его дело — сообщить.
+
+Практическая польза видна при отладке. Если состояние меняется только в одном месте, вопрос «кто это сломал» имеет ровно один адрес. В коде, где экран правит данные напрямую, тот же вопрос требует обхода всех файлов.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="viewmodel-state" quizId="quiz-2" questions={[
+  { q: 'Изменили поле внутри объекта состояния, не создавая новый. Что произойдёт?', options: ['Экран перерисуется как обычно', 'Экран не перерисуется: StateFlow сравнит ссылку на тот же самый объект и решит, что изменений нет', 'Приложение упадёт', 'Изменение потеряется'], correct: 1, why: 'Ошибка без единого сообщения — поэтому состояние всегда обновляют через copy, создавая новый объект.' },
+  { q: 'Что происходит с корутиной из viewModelScope, когда пользователь уходит с экрана?', options: ['Продолжает работать в фоне', 'Отменяется автоматически вместе с ViewModel — результат не придёт в уничтоженный объект', 'Ставится на паузу', 'Переносится в другой scope'], correct: 1, why: 'Именно поэтому запросы запускают из viewModelScope: он избавляет от утечек, которые раньше вычищали вручную.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="viewmodel-state" sectionId="udf" />
+
+## Чего в ViewModel быть не должно
+
+`ViewModel` живёт дольше экрана — отсюда главный запрет: **в ней не должно быть ничего, что связано с конкретным экраном**.
+
+Нельзя хранить `Context` активности, `View`, `NavController` или что-либо, ссылающееся на Activity. Экран пересоздастся, а ссылка останется указывать на уничтоженный объект — это утечка памяти в чистом виде, и приложение будет держать в памяти всё старое дерево разметки.
+
+Нельзя обращаться к ресурсам через контекст: `context.getString(R.string.error)`. Строку с текстом ошибки формирует экран, а `ViewModel` отдаёт ему код или тип ошибки. Так и локализация работает правильно: при смене языка экран пересоберётся и возьмёт строку заново.
+
+Нельзя делать сетевые запросы напрямую из `ViewModel` — но об этом отдельно в главе про слои. Пока достаточно помнить, что `ViewModel` решает, **что** показать, а не **где** это взять.
+
+<SectionAnchor chapterId="viewmodel-state" sectionId="chego-ne-dolzhno" />
+
+## Типичные ошибки
+
+**Состояние в `remember` вместо `ViewModel`.** Поворот экрана обнуляет всё. Самая заметная ошибка и самая простая в починке.
+
+**Изменение поля вместо `copy`.** Экран не перерисовывается, ошибок нет. Ищется долго.
+
+**`Context` внутри `ViewModel`.** Утечка памяти. Если контекст действительно нужен — например, для DataStore — берут `AndroidViewModel` с контекстом приложения, который живёт столько же, сколько процесс.
+
+**`collectAsState` вместо `collectAsStateWithLifecycle`.** Подписка продолжает работать на невидимом экране.
+
+**Логика в `Composable`.** Фильтрация списка или разбор даты прямо в разметке выполняются при каждой перерисовке. Место такого кода — `ViewModel`.
+
+**Одна `ViewModel` на всё приложение.** Растёт до тысячи строк и превращается в свалку. У каждого экрана своя.
+
+<SectionAnchor chapterId="viewmodel-state" sectionId="oshibki" />
+
+## Слова главы
+
+<Block kind="vocab">
+
+- **`ViewModel`** — объект, переживающий пересоздание Activity.
+- **`viewModel()`** — функция, которая достаёт существующую или создаёт новую.
+- **`UiState`** — состояние экрана одним объектом.
+- **`sealed interface`** — закрытый набор состояний; `when` по нему проверяется на полноту.
+- **`copy()`** — новый объект с изменёнными полями; без него `StateFlow` не заметит изменения.
+- **`update { }`** — атомарное обновление состояния.
+- **`asStateFlow()`** — сужение до версии только для чтения.
+- **`viewModelScope`** — область корутин, отменяемая вместе с `ViewModel`.
+- **Однонаправленный поток** — состояние вниз, события вверх.
+
+</Block>
+
+<SectionAnchor chapterId="viewmodel-state" sectionId="slova" />
+
+## Тренажёр: набрать вслепую
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="viewmodel-state"
+  trainerId="trainer-viewmodel"
+  targetCpm={100}
+  targetAccuracy={88}
+  pools={[
+    { label: 'Объявление состояния', snippets: [
+      'private val _uiState = MutableStateFlow(CatalogUiState())',
+      'val uiState: StateFlow<CatalogUiState> = _uiState.asStateFlow()',
+      'class CatalogViewModel : ViewModel()',
+    ] },
+    { label: 'Работа с состоянием', snippets: [
+      '_uiState.update { it.copy(isLoading = true, error = null) }',
+      'val state by viewModel.uiState.collectAsStateWithLifecycle()',
+      'viewModelScope.launch { repository.getProducts() }',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="viewmodel-state" sectionId="trenazher" />
+
+## На чемпионате
+
+Модуль архитектуры — первый и всегда обязательный, а в критериях он разложен на слои: отдельно проверяют, что слой представления не содержит чужого кода. `ViewModel` — сердце этого слоя.
+
+Что смотрят по факту:
+
+- **Состояние переживает поворот.** Проверяется прямо на защите: эксперт поворачивает устройство.
+- **Индикатор загрузки и обработка ошибок.** В заданиях это отдельное требование — «отображение статусов выполнения операций». Ради него и нужен `UiState` с вариантами.
+- **Логика не живёт в разметке.** Composable-функция, которая фильтрует список или ходит в сеть, — прямой минус по критерию слоёв.
+- **Комментарии к классам.** По требованиям 2026 года у каждого класса верхнего уровня — включая `ViewModel` — должен быть комментарий с описанием, датой создания и номером участника. Это множитель на итоговый балл, а не отдельный аспект.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="viewmodel-state" quizId="quiz-3" questions={[
+  { q: 'Эксперт поворачивает устройство, и введённый в форму текст пропадает. В чём причина?', options: ['Ошибка в Compose', 'Состояние живёт в remember внутри экрана, а не во ViewModel: при повороте Activity пересоздаётся', 'Не хватает памяти', 'Неверно настроена тема'], correct: 1, why: 'Это первое, что проверяют на защите, и первое, что чинится переносом состояния во ViewModel.' },
+  { q: 'Можно ли хранить Context активности во ViewModel?', options: ['Да, это удобно', 'Нет: ViewModel живёт дольше экрана, и ссылка останется указывать на уничтоженную Activity — это утечка памяти', 'Можно, если очищать в onCleared', 'Только на новых версиях Android'], correct: 1, why: 'Если контекст действительно нужен, берут AndroidViewModel с контекстом приложения, живущим столько же, сколько процесс.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="viewmodel-state" sectionId="na-chempionate" />
+
+## Что дальше
+
+`ViewModel` держит состояние и решает, что показать. Но откуда берутся сами данные, пока непонятно: в примерах они появлялись из ниоткуда. Следующая глава — про слои: где живут данные, почему между `ViewModel` и сетью ставят посредника и как устроить всё так, чтобы подключение настоящего сервера не потребовало переписывать экран.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="viewmodel-state" quizId="quiz-4" questions={[
+  { q: 'Выбранная вкладка нижней панели должна пережить перезапуск приложения. Хватит ViewModel?', options: ['Да, она для этого и нужна', 'Нет: ViewModel переживает поворот, но не перезапуск — нужно хранилище на диске', 'Хватит rememberSaveable', 'Достаточно remember'], correct: 1, why: 'Перезапуск — новый процесс. Пережить его может только то, что записано на диск.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="viewmodel-state" sectionId="dalshe" />
+
+## Углубиться
+
+- `SavedStateHandle` — состояние, переживающее убийство процесса системой: то, что между `ViewModel` и хранилищем.
+- `onCleared()` — момент уничтожения `ViewModel`; место для освобождения ресурсов, которые не закрываются сами.
+- `stateIn` — превращение холодного потока из репозитория в `StateFlow` для экрана, с политикой подписки.
+- Тестирование `ViewModel`: `runTest`, подмена диспетчера и почему для этого `viewModelScope` в новых версиях стал переопределяемым.
+- `AndroidViewModel` и когда контекст приложения действительно нужен, а когда это признак того, что логика лежит не там.
+
+<SectionAnchor chapterId="viewmodel-state" sectionId="uglubitsya" />
+
+<ChapterExam chapterId="viewmodel-state" questions={[
+  { q: 'Что происходит при повороте экрана?', options: ['Compose перерисовывает разметку', 'Activity пересоздаётся целиком, и всё, что жило внутри неё, исчезает', 'Приложение уходит в фон', 'Ничего особенного'], correct: 1, why: 'То же самое происходит при смене языка, темы и размера окна — отсюда и нужда в объекте, живущем дольше экрана.' },
+  { q: 'Что переживает поворот экрана, но не переживает перезапуск приложения?', options: ['remember', 'ViewModel и rememberSaveable', 'Только запись на диск', 'Ничего'], correct: 1, why: 'Перезапуск — новый процесс: пережить его может лишь то, что записано в хранилище.' },
+  { q: 'Зачем состояние экрана собирают в один объект UiState?', options: ['Меньше кода', 'Независимые флаги допускают невозможные сочетания вроде спиннера вместе с ошибкой, а одно состояние делает их невыразимыми', 'Так быстрее работает', 'Требование библиотеки'], correct: 1, why: 'Пять булевых переменных дают тридцать два сочетания при трёх осмысленных.' },
+  { q: 'Почему состояние обновляют через copy, а не изменением поля?', options: ['copy работает быстрее', 'StateFlow сравнивает значения: у изменённого объекта та же ссылка, и он решит, что изменений нет — экран не перерисуется', 'Так требует Kotlin', 'Поля data class нельзя менять'], correct: 1, why: 'Ошибка без единого сообщения: приложение выглядит зависшим, хотя данные внутри поменялись.' },
+  { q: 'В чём разница между присваиванием value и update { }?', options: ['Разницы нет', 'update читает и записывает атомарно, поэтому не теряет изменения при обновлении из нескольких корутин', 'value быстрее', 'update работает только с data class'], correct: 1, why: 'Между чтением и записью в варианте с присваиванием может вклиниться другая корутина.' },
+  { q: 'Что нельзя хранить во ViewModel?', options: ['Список товаров', 'Context активности, View, NavController — всё, что связано с конкретным экраном: ViewModel живёт дольше и ссылка станет утечкой', 'Строку поиска', 'Флаг загрузки'], correct: 1, why: 'Приложение будет держать в памяти всё старое дерево разметки уничтоженной Activity.' },
+  { q: 'Что означает «состояние вниз, события вверх»?', options: ['Порядок объявления функций', 'ViewModel отдаёт экрану состояние, экран сообщает о действиях пользователя через параметры-функции и сам ничего не решает', 'Способ прокрутки списка', 'Порядок вызова корутин'], correct: 1, why: 'Данные текут в одну сторону, поэтому у вопроса «кто изменил состояние» всегда ровно один адрес.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [ViewModel — developer.android.com](https://developer.android.com/topic/libraries/architecture/viewmodel) — первоисточник по жизненному циклу и области видимости.
+- [Состояние в Compose](https://developer.android.com/develop/ui/compose/state) — подъём состояния и связь с `ViewModel`.
+- [Слой представления в архитектуре](https://developer.android.com/topic/architecture/ui-layer) — `UiState`, однонаправленный поток и события.
+- [collectAsStateWithLifecycle](https://medium.com/androiddevelopers/consuming-flows-safely-in-jetpack-compose-cde014d0d5a3) — почему обычный `collectAsState` небезопасен.

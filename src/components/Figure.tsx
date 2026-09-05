@@ -22,6 +22,7 @@ import { flowStreamsSchemes } from './figures/flowStreams';
 import { lazyListsSchemes } from './figures/lazyLists';
 import { materialThemeSchemes } from './figures/materialTheme';
 import { scaffoldBarsSchemes } from './figures/scaffoldBars';
+import { viewModelStateSchemes } from './figures/viewModelState';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -59,6 +60,7 @@ const SCHEMES = {
   ...lazyListsSchemes,
   ...materialThemeSchemes,
   ...scaffoldBarsSchemes,
+  ...viewModelStateSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

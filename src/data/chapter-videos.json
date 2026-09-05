@@ -1227,5 +1227,32 @@
       "title": "Learn What's New - Material 3 Top App Bar Component",
       "channel": "Stevdza-San"
     }
+  ],
+  "viewmodel-state": [
+    {
+      "videoId": "9sqvBydNJSg",
+      "title": "ViewModels & Configuration Changes - Android Basics",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "PMMY23F0CFg",
+      "title": "State in Jetpack Compose",
+      "channel": "Android Developers"
+    },
+    {
+      "videoId": "T8vApYJlW8o",
+      "title": "Should You Use Compose State or StateFlow in Your ViewModel?",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "TzA049PAlSs",
+      "title": "Mastering UI Events and States in Jetpack Compose",
+      "channel": "Stevdza-San"
+    },
+    {
+      "videoId": "5qlIPTDE274",
+      "title": "Android Jetpack: ViewModel",
+      "channel": "Android Developers"
+    }
   ]
 }

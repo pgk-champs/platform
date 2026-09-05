@@ -526,6 +526,20 @@ const ARTS: Record<string, () => React.ReactNode> = {
   /* видимое окно поверх длинной ленты — арт «lazy-lists» */
   /* светлая и тёмная половины одной палитры — арт «material-theme» */
   /* рамка экрана: шапка, содержимое, нижняя панель — арт «scaffold-bars» */
+  /* экран пересоздаётся, состояние остаётся — арт «viewmodel-state» */
+  'viewmodel-state': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="40" width="76" height="96" rx="11" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} strokeDasharray="7 5" />
+      <text x="52" y="94" textAnchor="middle" fontSize="20" fontWeight={800} fill="rgba(255,255,255,0.35)" fontFamily={MONO}>0</text>
+
+      <path d="M100 88h18M118 88l-6-6M118 88l-6 6" stroke={INK} strokeWidth={3} fill="none" />
+
+      <rect x="126" y="40" width="60" height="96" rx="11" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="156" y="94" textAnchor="middle" fontSize="20" fontWeight={800} fill={ACCENT} fontFamily={MONO}>7</text>
+
+      <text x="100" y="162" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>пережило поворот</text>
+    </g>
+  ),
   'scaffold-bars': () => (
     <g strokeLinecap="round">
       <rect x="14" y="34" width="172" height="124" rx="12" fill="rgba(0,0,0,0.25)" stroke={INK} strokeWidth={3} />
@@ -638,8 +652,9 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'code-basics': { track: 'foundation', num: '08', title: 'Из чего состоит код' },
   'oop-basics': { track: 'foundation', num: '09', title: 'ООП простыми словами — на двух языках' },
-  'kotlin-vs-java': { track: 'mobile', num: '16', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '17', title: 'История Java, Android и Kotlin' },
+  'kotlin-vs-java': { track: 'mobile', num: '17', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '18', title: 'История Java, Android и Kotlin' },
+  'viewmodel-state': { track: 'mobile', num: '16', title: 'ViewModel: состояние, которое переживает поворот' },
   'scaffold-bars': { track: 'mobile', num: '13', title: 'Scaffold: каркас экрана, шапка и нижняя панель' },
   'material-theme': { track: 'mobile', num: '12', title: 'Material 3: тема, которую вам уже сгенерировали' },
   'lazy-lists': { track: 'mobile', num: '11', title: 'Списки: LazyColumn и всё, что не нарисовать циклом' },
