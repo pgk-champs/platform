@@ -522,6 +522,21 @@ const ARTS: Record<string, () => React.ReactNode> = {
     </g>
   ),
   /* две дорожки времени: сплошная занятая и прерывистая свободная — арт «kotlin-coroutines» */
+  /* поток значений во времени против одного хранимого — арт «flow-streams» */
+  'flow-streams': () => (
+    <g strokeLinecap="round">
+      <text x="14" y="34" fontSize="11" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>Flow</text>
+      {[14, 62, 110, 158].map((x, i) => (
+        <rect key={x} x={x} y="44" width="34" height="26" rx="8" fill={i === 3 ? SOFT : ACCENT} stroke={ACCENT} strokeWidth={3} />
+      ))}
+      <path d="M52 57h6M100 57h6M148 57h6" stroke={INK} strokeWidth={3} />
+
+      <text x="14" y="106" fontSize="11" fontWeight={800} fill={ACCENT} fontFamily={MONO}>StateFlow</text>
+      <rect x="14" y="116" width="172" height="34" rx="10" fill={SOFT} stroke={INK} strokeWidth={3} />
+      <rect x="24" y="124" width="60" height="18" rx="6" fill={INK} />
+      <text x="100" y="138" fontSize="11" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>.value</text>
+    </g>
+  ),
   'kotlin-coroutines': () => (
     <g strokeLinecap="round">
       <rect x="14" y="44" width="172" height="30" rx="9" fill={SOFT} stroke={INK} strokeWidth={3} />
@@ -581,8 +596,9 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'code-basics': { track: 'foundation', num: '08', title: 'Из чего состоит код' },
   'oop-basics': { track: 'foundation', num: '09', title: 'ООП простыми словами — на двух языках' },
-  'kotlin-vs-java': { track: 'mobile', num: '12', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '13', title: 'История Java, Android и Kotlin' },
+  'kotlin-vs-java': { track: 'mobile', num: '13', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '14', title: 'История Java, Android и Kotlin' },
+  'flow-streams': { track: 'mobile', num: '12', title: 'Flow: поток значений во времени' },
   'kotlin-coroutines': { track: 'mobile', num: '11', title: 'Корутины: как приложение не зависает' },
   'kotlin-null': { track: 'mobile', num: '02', title: 'Null-безопасность: ошибка на миллиард долларов' },
   'ts-vs-js': { track: 'blockchain', num: '03', title: 'TypeScript и JavaScript: в чём разница' },

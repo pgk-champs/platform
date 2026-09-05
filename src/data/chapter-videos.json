@@ -1119,5 +1119,32 @@
       "title": "Вебинар: Асинхронность в JavaScript. Таймеры, промисы, async/await",
       "channel": "loftblog"
     }
+  ],
+  "flow-streams": [
+    {
+      "videoId": "O0_5gc24KUo",
+      "title": "#7 Kotlin Coroutines Flow. StateFlow. SharedFlow || Курс по корутинам",
+      "channel": "Android Broadcast. Все об Андроид разработке"
+    },
+    {
+      "videoId": "dlgaO3T96eY",
+      "title": "Kotlin Flow. SharedFlow. StateFlow [Ru, Kotlin] / Мобильный разработчик",
+      "channel": "Алексей Гладков"
+    },
+    {
+      "videoId": "M8YtV47kaqA",
+      "title": "Hot Flows vs. Cold Flows In Kotlin - When to Use What?",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "2JFoNxpwty0",
+      "title": "Максим Сидоров — Kotlin Flow и реальные задачи SberDevices",
+      "channel": "JPoint, Joker и JUG ru — Java-конференции"
+    },
+    {
+      "videoId": "i4vfklDGn_o",
+      "title": "Миграция с LiveData на Coroutines Flow",
+      "channel": "Android Broadcast. Все об Андроид разработке"
+    }
   ]
 }

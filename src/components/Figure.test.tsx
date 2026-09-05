@@ -18,6 +18,7 @@ import { kotlinFlowSchemes } from './figures/kotlinFlow';
 import { kotlinOopSchemes } from './figures/kotlinOop';
 import { kotlinHistorySchemes } from './figures/kotlinHistory';
 import { kotlinCoroutinesSchemes } from './figures/kotlinCoroutines';
+import { flowStreamsSchemes } from './figures/flowStreams';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -79,6 +80,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(kotlinOopSchemes),
     ...Object.keys(kotlinHistorySchemes),
     ...Object.keys(kotlinCoroutinesSchemes),
+    ...Object.keys(flowStreamsSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),
