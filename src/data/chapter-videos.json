@@ -1389,5 +1389,32 @@
       "title": "Where to hoist that state in Compose?",
       "channel": "Android Developers"
     }
+  ],
+  "cache-offline": [
+    {
+      "videoId": "jaZ2gLMGUsM",
+      "title": "Create offline-first apps",
+      "channel": "Android Developers"
+    },
+    {
+      "videoId": "vpJIH1vSv0g",
+      "title": "Offline First Architecture - Android Developers Office Hours",
+      "channel": "Android Developers"
+    },
+    {
+      "videoId": "4FOw6a8Rrwc",
+      "title": "The 4 Types of Offline Caches On Android",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "-IaESTc9fno",
+      "title": "Дмитрий Васильев — Как кэшировать информацию в Android-приложении",
+      "channel": "Mobius"
+    },
+    {
+      "videoId": "6tRqSRH_6CI",
+      "title": "Сохраняем локальные данные через Room (SQLite) + Kotlin",
+      "channel": "Android Heroes"
+    }
   ]
 }

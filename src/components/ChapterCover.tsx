@@ -532,6 +532,28 @@ const ARTS: Record<string, () => React.ReactNode> = {
   /* оборванная связь и запасной путь — арт «network-errors» */
   /* диск помнит, память забывает — арт «data-storage» */
   /* половина оценки срезана — арт «clean-code» */
+  /* база в середине: сеть пишет, экран читает — арт «cache-offline» */
+  'cache-offline': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="52" width="50" height="40" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="39" y="77" textAnchor="middle" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.75)" fontFamily={MONO}>сеть</text>
+
+      <path d="M70 72h16M86 72l-5-4M86 72l-5 4" stroke={INK} strokeWidth={2.5} fill="none" />
+
+      <rect x="92" y="44" width="56" height="56" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      {[58, 70, 82].map((y) => (
+        <rect key={y} x="102" y={y} width="36" height="7" rx="3" fill={ACCENT} />
+      ))}
+
+      <path d="M154 72h16M170 72l-5-4M170 72l-5 4" stroke={ACCENT} strokeWidth={2.5} fill="none" />
+      <rect x="176" y="52" width="10" height="40" rx="4" fill="rgba(255,255,255,0.2)" />
+
+      <rect x="14" y="112" width="172" height="26" rx="8" fill="rgba(0,0,0,0.25)" stroke={SOFT} strokeWidth={2} />
+      <text x="100" y="130" textAnchor="middle" fontSize="10" fontWeight={800} fill="rgba(255,255,255,0.8)" fontFamily={MONO}>данные от 12:40</text>
+
+      <text x="100" y="166" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>работает без сети</text>
+    </g>
+  ),
   'clean-code': () => (
     <g strokeLinecap="round">
       <rect x="14" y="40" width="172" height="46" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
@@ -736,9 +758,10 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'code-basics': { track: 'foundation', num: '08', title: 'Из чего состоит код' },
   'oop-basics': { track: 'foundation', num: '09', title: 'ООП простыми словами — на двух языках' },
-  'kotlin-vs-java': { track: 'mobile', num: '22', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '23', title: 'История Java, Android и Kotlin' },
-  'clean-code': { track: 'mobile', num: '21', title: 'Чистый код: комментарии и логирование, которые оценивают' },
+  'kotlin-vs-java': { track: 'mobile', num: '23', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '24', title: 'История Java, Android и Kotlin' },
+  'cache-offline': { track: 'mobile', num: '21', title: 'Кэш и офлайн: база как источник истины' },
+  'clean-code': { track: 'mobile', num: '22', title: 'Чистый код: комментарии и логирование, которые оценивают' },
   'data-storage': { track: 'mobile', num: '20', title: 'Хранение на устройстве: DataStore и Room' },
   'network-errors': { track: 'mobile', num: '19', title: 'Когда сети нет: ошибки, повторы и что видит пользователь' },
   'network-retrofit': { track: 'mobile', num: '18', title: 'Сеть: тот же экран, но с настоящими данными' },

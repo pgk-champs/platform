@@ -312,11 +312,19 @@
     "path": "mobile/data-storage.mdx"
   },
   {
+    "id": "cache-offline",
+    "title": "Кэш и офлайн: база как источник истины",
+    "audience": "мобилка",
+    "level": "углубление",
+    "order": 21,
+    "path": "mobile/cache-offline.mdx"
+  },
+  {
     "id": "clean-code",
     "title": "Чистый код: комментарии и логирование, которые оценивают",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 21,
+    "order": 22,
     "path": "mobile/clean-code.mdx"
   },
   {
@@ -324,7 +332,7 @@
     "title": "Kotlin и Java: в чём разница",
     "audience": "мобилка",
     "level": "база",
-    "order": 22,
+    "order": 23,
     "path": "mobile/kotlin-vs-java.mdx"
   },
   {
@@ -332,7 +340,7 @@
     "title": "История Java, Android и Kotlin",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 23,
+    "order": 24,
     "path": "mobile/kotlin-history.mdx"
   },
   {

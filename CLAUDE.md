@@ -50,6 +50,9 @@ src/components/             173 файла: тренажёры, Block, Hint, Sel
   figures/<модуль>.tsx      схемы по главам, по модулю на тему
   Figure.tsx                собирает все модули в один SCHEMES
   ChapterCover.tsx          ART (svg-арт) + CHAPTERS (track/num/title) на каждую главу
+                            ВНИМАНИЕ: свои константы ACCENT/DARK/INK/SOFT/MONO, БЕЗ FADE —
+                            он есть только в figures/kit.tsx. Ловилось дважды: тест ширины
+                            заголовка падает с «FADE is not defined»
   DailyChallenge.tsx        DAILY_BANK — вопросы дня
 src/data/
   knowledge-map.json        ГЕНЕРИТСЯ, руками не трогать
