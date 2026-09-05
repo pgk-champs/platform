@@ -1,0 +1,752 @@
+---
+title: 'Возможности устройства: камера, уведомления, виджет'
+audience: 'мобилка'
+level: 'углубление'
+order: 24
+sidebar_position: 24
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="device-features" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+import KotlinPlay from '@site/src/components/KotlinPlay';
+
+# Возможности устройства: камера, уведомления, виджет
+
+<ChapterProgress chapterId="device-features" totalSections={17} totalQuizzes={6} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="device-features" />
+
+## Зачем это нужно
+
+Модуль аппаратных возможностей весит немного — пять-шесть баллов. Но три его требования повторяются в заданиях из года в год почти дословно, а проверяются они не чтением кода, а руками и секундомером. И у каждого есть свой способ сломаться **без единого сообщения об ошибке**: уведомление не пришло, виджет показал ноль, камера упала — и в журнале пусто.
+
+Три требования, выписанные из конкурсных заданий:
+
+1. «При нажатии на кнопку „Выбрать фото" предоставить возможность выбрать фотографию **из галереи или сделать фото с камеры** устройства» — с предпросмотром.
+2. «Приложение отправляет **локальное уведомление, если пользователь не открывал приложение более минуты**. Уведомление отправляется **один раз до следующего входа** в приложение».
+3. «Виджет для домашнего экрана со счётчиком; если пользователь **не прошёл авторизацию — отображать призыв к действию**».
+
+Все три упираются в одно: телефон — не ваш компьютер, а чужое устройство с владельцем. Владелец решает, что приложению можно, — и решает во время работы, а не при установке.
+
+<SectionAnchor chapterId="device-features" sectionId="zachem" />
+
+## Разрешение — не строка в манифесте
+
+Манифест только **объявляет намерение**. Само разрешение с Android 6 выдаёт пользователь во время работы, диалогом, и он же может его отозвать в любой момент из настроек.
+
+Отсюда две вещи, которые надо принять сразу. Первая: разрешение проверяют **перед каждым использованием**, а не один раз при запуске. Вторая: приложение обязано работать при отказе — это отдельный критерий, а не пожелание.
+
+Кажется, что состояний два: дали или не дали. На самом деле четыре, и система различает только два из них:
+
+<KotlinPlay code={`// Модель системы разрешений Android.
+// Показывает, что «ещё не спрашивали» и «отказал навсегда» для приложения выглядят одинаково.
+
+enum class Otvet { RAZRESHIT, ZAPRETIT }
+
+class SistemaRazresheniy(private val scenario: List<Otvet>) {
+    private var vydano = false
+    private var otkazov = 0
+    private var shag = 0
+    var dialogovPokazano = 0
+        private set
+
+    fun checkSelfPermission(): String = if (vydano) "GRANTED" else "DENIED"
+
+    // Начиная с Android 11 система показывает диалог не больше двух раз.
+    // После второго отказа launcher возвращает отказ мгновенно — без диалога,
+    // без исключения, без единой строчки в логе.
+    fun requestPermission(): String {
+        if (vydano) return "GRANTED"
+        if (otkazov >= 2) return "DENIED  (диалог не показан)"
+        dialogovPokazano++
+        val otvet = scenario.getOrElse(shag++) { Otvet.ZAPRETIT }
+        return if (otvet == Otvet.RAZRESHIT) { vydano = true; "GRANTED" }
+        else { otkazov++; "DENIED" }
+    }
+
+    // true — только между первым и вторым отказом
+    fun shouldShowRequestPermissionRationale(): Boolean = otkazov == 1
+}
+
+// Вариант А: решение принимается только по системным вызовам
+fun ekranA(s: SistemaRazresheniy): String = when {
+    s.checkSelfPermission() == "GRANTED" -> "открываем камеру"
+    s.shouldShowRequestPermissionRationale() -> "объясняем, зачем нужна камера, и просим снова"
+    else -> "просим разрешение"
+}
+
+// Вариант Б: приложение само помнит, что уже спрашивало (флаг в DataStore)
+fun ekranB(s: SistemaRazresheniy, sprashivali: Boolean): String = when {
+    s.checkSelfPermission() == "GRANTED" -> "открываем камеру"
+    !sprashivali -> "просим разрешение"
+    s.shouldShowRequestPermissionRationale() -> "объясняем, зачем нужна камера, и просим снова"
+    else -> "«Разрешение выключено. Открыть настройки» + кнопка «Выбрать из галереи»"
+}
+
+fun main() {
+    val s = SistemaRazresheniy(listOf(Otvet.ZAPRETIT, Otvet.ZAPRETIT))
+    var sprashivali = false
+
+    val stroki = mutableListOf<Array<String>>()
+    fun snimok(podpis: String) {
+        stroki += arrayOf(
+            podpis,
+            s.checkSelfPermission(),
+            s.shouldShowRequestPermissionRationale().toString(),
+            ekranA(s),
+            ekranB(s, sprashivali),
+        )
+    }
+
+    snimok("до первого нажатия")
+    println("нажали «Выбрать фото» → requestPermission() = " + s.requestPermission()); sprashivali = true
+    snimok("после 1-го отказа")
+    println("нажали ещё раз      → requestPermission() = " + s.requestPermission())
+    snimok("после 2-го отказа")
+    println("нажали третий раз   → requestPermission() = " + s.requestPermission())
+    snimok("после 3-го нажатия")
+
+    val shapka = arrayOf("состояние", "checkSelf", "rationale", "вариант А (без флага)", "вариант Б (с флагом)")
+    val shirina = IntArray(shapka.size) { i ->
+        maxOf(shapka[i].length, stroki.maxOf { it[i].length })
+    }
+    println()
+    println(shapka.mapIndexed { i, t -> t.padEnd(shirina[i]) }.joinToString(" │ "))
+    println(shirina.joinToString("─┼─") { "─".repeat(it) })
+    stroki.forEach { r -> println(r.mapIndexed { i, t -> t.padEnd(shirina[i]) }.joinToString(" │ ")) }
+
+    println()
+    println("системных диалогов показано: " + s.dialogovPokazano + " из 3 нажатий")
+    println("строк первого и последнего состояния совпадает у А: " +
+        (stroki.first()[3] == stroki.last()[3]) + ", у Б: " + (stroki.first()[4] == stroki.last()[4]))
+}`} />
+
+Живой вывод:
+
+```text
+нажали «Выбрать фото» → requestPermission() = DENIED
+нажали ещё раз      → requestPermission() = DENIED
+нажали третий раз   → requestPermission() = DENIED  (диалог не показан)
+
+состояние          │ checkSelf │ rationale │ вариант А (без флага)                         │ вариант Б (с флагом)
+до первого нажатия │ DENIED    │ false     │ просим разрешение                             │ просим разрешение
+после 1-го отказа  │ DENIED    │ true      │ объясняем, зачем нужна камера, и просим снова │ объясняем, зачем нужна камера, и просим снова
+после 2-го отказа  │ DENIED    │ false     │ просим разрешение                             │ «Разрешение выключено. Открыть настройки» + кнопка «Выбрать из галереи»
+
+системных диалогов показано: 2 из 3 нажатий
+строк первого и последнего состояния совпадает у А: true, у Б: false
+```
+
+<Figure scheme="df-permission" caption="«Ещё не спрашивали» и «отказал навсегда» для системы неразличимы; различить их может только само приложение — своим флагом" />
+
+Смотрите на первую и третью строки таблицы: `DENIED / false` в обоих случаях. Система **не различает** «ещё не спрашивали» и «пользователь отказал дважды и больше диалог не увидит». Приложение без собственного флага «уже спрашивали» на третьем нажатии снова «просит разрешение» — а диалог не появляется. Пользователь жмёт кнопку, ничего не происходит, и так до бесконечности.
+
+Вариант Б держит флаг сам и на третьем нажатии показывает то, что нужно: объяснение, кнопку «Открыть настройки» и запасной путь — выбрать из галереи, для которой разрешение не требуется вовсе.
+
+<SectionAnchor chapterId="device-features" sectionId="razreshenie" />
+
+## Как это пишется в Compose
+
+```kotlin
+val cameraLauncher = rememberLauncherForActivityResult(
+    ActivityResultContracts.RequestPermission()
+) { granted ->
+    if (granted) openCamera() else onCameraDenied()
+}
+
+Button(onClick = { cameraLauncher.launch(Manifest.permission.CAMERA) }) {
+    Text("Сделать фото")
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'rememberLauncherForActivityResult', label: 'регистрация до показа', note: 'создаётся при первой композиции и переживает рекомпозиции благодаря remember. Регистрировать лаунчер нужно до того, как он понадобится — иначе результат придёт в никуда' },
+  { text: 'ActivityResultContracts.RequestPermission()', label: 'контракт', note: 'описывает, что запрашиваем и что получим в ответ: здесь — одно разрешение и Boolean. Есть контракты для нескольких разрешений, для фото, для камеры' },
+  { text: '{ granted -> … }', label: 'обратный вызов', note: 'сработает, когда пользователь закроет системный диалог. Оба исхода обязаны быть обработаны: приложение должно работать при отказе' },
+  { text: 'onClick = { cameraLauncher.launch(…) }', label: 'запуск из обработчика', note: 'только из события — нажатия кнопки. Вызов launch() прямо в теле composable покажет диалог на каждой рекомпозиции' },
+]} />
+
+Последняя заметка — про самую частую ошибку главы. `launch()` в теле `@Composable` вместо обработчика нажатия даёт бесконечную череду диалогов: тело выполняется на каждую рекомпозицию, и каждая рекомпозиция снова спрашивает.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="device-features" quizId="quiz-1" questions={[
+  { q: 'Почему нельзя обойтись двумя состояниями разрешения — «дали» и «не дали»?', options: ['Можно, этого достаточно', 'Система не различает «ещё не спрашивали» и «отказал навсегда» — без своего флага приложение зациклится на запросе, который больше не покажет диалог', 'Состояний три', 'Это зависит от версии Android'], correct: 1, why: 'В модели первая и третья строки дают одинаковые DENIED и false — различить их может только флаг приложения.' },
+  { q: 'Что случится, если вызвать launch() у лаунчера разрешения прямо в теле @Composable?', options: ['Ничего, это нормально', 'Диалог будет показываться на каждой рекомпозиции — бесконечная череда запросов', 'Разрешение выдастся автоматически', 'Приложение упадёт при сборке'], correct: 1, why: 'Тело композабла выполняется заново на каждое изменение состояния. Запуск — только из обработчика события.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="device-features" sectionId="v-compose" />
+
+## Что показывать при отказе
+
+Три экрана вместо одного, по состояниям из модели:
+
+- **Первый отказ** — короткое объяснение, зачем нужна камера, и кнопка «Разрешить» для повторного запроса. Система в этом состоянии диалог ещё покажет.
+- **Отказ навсегда** — «Разрешение выключено» и кнопка «Открыть настройки»: там пользователь сам включит, если захочет.
+- **В любом случае** — запасной путь. Для фото это галерея, для которой разрешение не нужно совсем.
+
+```kotlin
+fun openAppSettings(context: Context) {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        .setData(Uri.fromParts("package", context.packageName, null))
+    context.startActivity(intent)
+}
+```
+
+<SectionAnchor chapterId="device-features" sectionId="pri-otkaze" />
+
+## Фото: галерея не требует разрешений вовсе
+
+Первое, что стоит знать о требовании «из галереи или с камеры»: половина его закрывается без единого разрешения. Модель показывает, кому что нужно:
+
+<KotlinPlay code={`// Модель: какое разрешение реально нужно, чтобы получить фотографию,
+// и что видит разработчик, когда разрешения нет.
+
+enum class Sposob(val podpis: String) {
+    PHOTO_PICKER("PickVisualMedia — системный выбор фото"),
+    GET_CONTENT("GetContent / OpenDocument"),
+    MEDIASTORE("запрос к MediaStore напрямую"),
+    SIS_KAMERA("TakePicture — системная камера"),
+    CAMERAX("CameraX внутри приложения"),
+}
+
+fun nuzhno(s: Sposob, api: Int, cameraVManifeste: Boolean): String = when (s) {
+    Sposob.PHOTO_PICKER, Sposob.GET_CONTENT -> "—"
+    Sposob.MEDIASTORE -> when {
+        api >= 34 -> "READ_MEDIA_IMAGES + READ_MEDIA_VISUAL_USER_SELECTED"
+        api >= 33 -> "READ_MEDIA_IMAGES"
+        else -> "READ_EXTERNAL_STORAGE"
+    }
+    Sposob.SIS_KAMERA -> if (cameraVManifeste) "CAMERA" else "—"
+    Sposob.CAMERAX -> "CAMERA"
+}
+
+fun chtoBudet(s: Sposob, api: Int, cameraVManifeste: Boolean): String = when {
+    nuzhno(s, api, cameraVManifeste) == "—" -> "работает без единого запроса разрешения"
+    s == Sposob.MEDIASTORE && api >= 34 -> "вернутся только выбранные пользователем фото — молча, без ошибки"
+    s == Sposob.MEDIASTORE -> "пустой курсор или SecurityException"
+    s == Sposob.SIS_KAMERA -> "SecurityException, хотя код камеры вы не писали"
+    else -> "камера не запускается"
+}
+
+fun main() {
+    val sh = Sposob.entries.maxOf { it.podpis.length }
+    println("разрешение при CAMERA, НЕ объявленной в манифесте:")
+    for (s in Sposob.entries) {
+        if (s == Sposob.MEDIASTORE) {
+            println("  " + s.podpis.padEnd(sh) + "  API ≤32: " + nuzhno(s, 30, false))
+            println("  " + " ".repeat(sh) + "  API  33: " + nuzhno(s, 33, false))
+            println("  " + " ".repeat(sh) + "  API 34+: " + nuzhno(s, 34, false))
+        } else {
+            println("  " + s.podpis.padEnd(sh) + "  " + nuzhno(s, 33, false))
+        }
+    }
+
+    println()
+    println("ловушка манифеста — тот же TakePicture, API 33:")
+    for (m in listOf(false, true)) {
+        val v = if (m) "объявлена   " else "не объявлена"
+        println("  <uses-permission CAMERA> $v → требуется \${nuzhno(Sposob.SIS_KAMERA, 33, m).padEnd(7)}" +
+            " → без него: \${chtoBudet(Sposob.SIS_KAMERA, 33, m)}")
+    }
+
+    println()
+    println("если разрешение не выдано (API 34, CAMERA в манифесте):")
+    for (s in Sposob.entries) {
+        val r = chtoBudet(s, 34, true)
+        if (!r.startsWith("работает")) println("  " + s.podpis.padEnd(sh) + "  " + r)
+    }
+
+    println()
+    val polnyy = 4000 to 3000
+    val minyatura = 160 to 120
+    val mpP = polnyy.first.toLong() * polnyy.second
+    val mpM = minyatura.first.toLong() * minyatura.second
+    println("две функции камеры дают разный результат:")
+    println("  TakePicture(uri)      файл по вашему URI: \${polnyy.first}×\${polnyy.second}, %.1f Мп".format(mpP / 1e6))
+    println("  TakePicturePreview()  Bitmap-миниатюра:   \${minyatura.first}×\${minyatura.second}, %.2f Мп".format(mpM / 1e6))
+    println("  разница в пикселях: в \${mpP / mpM} раз")
+}`} />
+
+Живой вывод:
+
+```text
+разрешение при CAMERA, НЕ объявленной в манифесте:
+  PickVisualMedia — системный выбор фото  —
+  запрос к MediaStore напрямую            API 34+: READ_MEDIA_IMAGES + READ_MEDIA_VISUAL_USER_SELECTED
+  TakePicture — системная камера          —
+  CameraX внутри приложения               CAMERA
+
+ловушка манифеста — тот же TakePicture, API 33:
+  <uses-permission CAMERA> не объявлена → работает без единого запроса разрешения
+  <uses-permission CAMERA> объявлена    → без запроса: SecurityException, хотя код камеры вы не писали
+
+две функции камеры дают разный результат:
+  TakePicture(uri)      файл по вашему URI: 4000×3000, 12.0 Мп
+  TakePicturePreview()  Bitmap-миниатюра:   160×120, 0.02 Мп
+  разница в пикселях: в 625 раз
+```
+
+Три факта из вывода.
+
+**Системный выбор фото не требует ничего.** `PickVisualMedia` открывает системный экран, пользователь сам выбирает, приложение получает `Uri` ровно на выбранное. Никаких `READ_MEDIA_IMAGES`, никаких диалогов. Прямой запрос к `MediaStore` — другое дело, и с Android 14 он ещё и сложнее: пользователь может выбрать «разрешить выбранные», и тогда обычное разрешение окажется не выдано молча.
+
+**Ловушка манифеста.** Системная камера через `TakePicture` сама по себе разрешения не требует — фото делает системное приложение. Но если объявить `CAMERA` в манифесте «на всякий случай», тот же самый вызов начнёт падать с `SecurityException`, пока разрешение не запрошено. Код камеры вы не писали, а исключение получили.
+
+**Две функции — разный результат.** `TakePicturePreview()` возвращает миниатюру 160×120 — в 625 раз меньше пикселей, чем полный снимок. Для аватарки хватит, для фото товара — нет. `TakePicture(uri)` пишет полноразмерный файл по вашему адресу.
+
+```kotlin
+// галерея — без разрешений
+val pickPhoto = rememberLauncherForActivityResult(
+    ActivityResultContracts.PickVisualMedia()
+) { uri -> uri?.let(onPhotoSelected) }
+
+pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+
+// камера — полный снимок в свой файл
+val takePhoto = rememberLauncherForActivityResult(
+    ActivityResultContracts.TakePicture()
+) { saved -> if (saved) onPhotoSelected(photoUri) }
+
+takePhoto.launch(photoUri)   // photoUri заранее получен через FileProvider
+```
+
+<Hint type="important">
+`TakePicture(uri)` требует, чтобы `Uri` указывал на файл, доступный системной камере, — то есть выдан через `FileProvider`, объявленный в манифесте. Прямой путь к файлу во внутреннем каталоге камера не примет. Это отдельная настройка, которую делают один раз и потом не трогают.
+</Hint>
+
+<SectionAnchor chapterId="device-features" sectionId="foto" />
+
+## Один экран, две кнопки, один `Uri`
+
+Оба пути сходятся в одном месте: приложение получает `Uri` и показывает предпросмотр. Требование «с предпросмотром» означает, что выбранное фото видно **до** отправки на сервер.
+
+```kotlin
+var photoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+
+photoUri?.let { uri ->
+    AsyncImage(model = uri, contentDescription = "Выбранное фото", modifier = Modifier.size(120.dp))
+}
+
+Row {
+    Button(onClick = { pickPhoto.launch(PickVisualMediaRequest(ImageOnly)) }) { Text("Из галереи") }
+    Button(onClick = { cameraLauncher.launch(Manifest.permission.CAMERA) }) { Text("Сделать фото") }
+}
+```
+
+`rememberSaveable` здесь не случайность: `Uri` должен пережить поворот экрана, иначе пользователь выберет фото, повернёт телефон и увидит пустое место.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="device-features" quizId="quiz-2" questions={[
+  { q: 'Какое разрешение нужно, чтобы выбрать фото из галереи через системный экран?', options: ['READ_MEDIA_IMAGES', 'Никакого: PickVisualMedia открывает системный экран, и приложение получает Uri только на выбранное', 'READ_EXTERNAL_STORAGE', 'CAMERA'], correct: 1, why: 'Разрешения нужны при прямом запросе к MediaStore — а он ещё и усложнился с Android 14.' },
+  { q: 'Объявили CAMERA в манифесте «на всякий случай», фото делает системная камера. Что изменилось?', options: ['Ничего', 'Тот же вызов TakePicture теперь падает с SecurityException, пока разрешение не запрошено — хотя код камеры вы не писали', 'Камера стала быстрее', 'Появился предпросмотр'], correct: 1, why: 'Без объявления в манифесте системная камера работает без единого запроса.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="device-features" sectionId="odin-uri" />
+
+## Уведомление: три обязательные части
+
+Локальное уведомление состоит из трёх частей, и каждая появилась в своей версии Android. Пропуск любой даёт одно и то же: уведомление **молча не показывается**.
+
+**Канал** — с Android 8. Создаётся один раз, до первого показа. Уведомление в несуществующий канал отбрасывается без ошибки.
+
+```kotlin
+val channel = NotificationChannel("reminders", "Напоминания", NotificationManager.IMPORTANCE_DEFAULT)
+context.getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+```
+
+**Разрешение** — с Android 13, `POST_NOTIFICATIONS`. Объявляется в манифесте **и** запрашивается во время работы тем же лаунчером, что и камера. Объявили, но не запросили — уведомления нет, в журнале пусто.
+
+**`PendingIntent`** — что откроется по нажатию. С Android 12 обязателен флаг `FLAG_IMMUTABLE`.
+
+```kotlin
+val pending = PendingIntent.getActivity(
+    context, 0,
+    Intent(context, MainActivity::class.java),
+    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+)
+
+val notification = NotificationCompat.Builder(context, "reminders")
+    .setSmallIcon(R.drawable.ic_notification)
+    .setContentTitle("Вы давно не заходили")
+    .setContentText("Корзина ждёт")
+    .setContentIntent(pending)
+    .setAutoCancel(true)
+    .build()
+
+NotificationManagerCompat.from(context).notify(1, notification)
+```
+
+<SectionAnchor chapterId="device-features" sectionId="uvedomlenie-chasti" />
+
+## «Через минуту, один раз» — три реализации
+
+Формулировка требования кажется простой, и первые две реализации, которые приходят в голову, её не выполняют:
+
+<KotlinPlay code={`// Модель требования: «уведомление, если пользователь не открывал приложение более минуты;
+// отправляется один раз до следующего входа». Три реализации на одной ленте времени.
+
+const val MIN_PERIODIC_SEC = 15 * 60L   // WorkManager: минимальный период работы
+
+class Lenta {
+    val vydano = mutableListOf<Pair<Long, String>>()   // когда и какой веткой
+    val vFone = mutableListOf<Long>()                  // выдано, пока приложение открыто
+}
+
+// А. Периодическая работа: просили раз в минуту
+class VariantA(val l: Lenta) {
+    private var srabotka = -1L
+    private var period = 0L
+    fun vhod(t: Long) {
+        if (period == 0L) {
+            period = maxOf(60L, MIN_PERIODIC_SEC)      // WorkManager поднимает период сам
+            srabotka = t + period
+            println("  [A] просили период 60 с, WorkManager поставил $period с")
+        }
+    }
+    fun uhod(t: Long) {}
+    fun tik(t: Long, otkryto: Boolean) {
+        if (srabotka == t) {
+            l.vydano += t to "A"
+            if (otkryto) l.vFone += t
+            srabotka = t + period
+        }
+    }
+}
+
+// Б. Отложенная задача на 60 с при уходе в фон. Без отмены, без флага.
+class VariantB(val l: Lenta) {
+    private var srabotka = -1L
+    fun vhod(t: Long) {}
+    fun uhod(t: Long) { srabotka = t + 60 }
+    fun tik(t: Long, otkryto: Boolean) {
+        if (srabotka == t) {
+            l.vydano += t to "B"
+            if (otkryto) l.vFone += t
+            srabotka = t + 60                          // «напоминаем и дальше»
+        }
+    }
+}
+
+// В. Отложенная задача + отмена при возврате + флаг «уже отправляли»
+class VariantV(val l: Lenta) {
+    private var srabotka = -1L
+    private var otpravleno = false
+    fun vhod(t: Long) { srabotka = -1L; otpravleno = false }   // отмена + сброс флага
+    fun uhod(t: Long) { if (!otpravleno) srabotka = t + 60 }
+    fun tik(t: Long, otkryto: Boolean) {
+        if (srabotka == t) {
+            srabotka = -1L
+            if (otpravleno) return
+            otpravleno = true
+            l.vydano += t to "В"
+            if (otkryto) l.vFone += t
+        }
+    }
+}
+
+fun mmss(t: Long) = "%02d:%02d".format(t / 60, t % 60)
+
+fun main() {
+    // (секунда, событие): true — открыл приложение, false — свернул
+    val sobytiya = listOf(0L to true, 10L to false, 40L to true, 90L to false, 400L to true, 410L to false)
+    val konec = 1000L
+
+    val la = Lenta(); val lb = Lenta(); val lv = Lenta()
+    val a = VariantA(la); val b = VariantB(lb); val v = VariantV(lv)
+    var otkryto = false
+
+    println("лента событий:")
+    for (t in 0..konec) {
+        sobytiya.filter { it.first == t }.forEach { (_, vhod) ->
+            otkryto = vhod
+            println("  \${mmss(t)}  " + if (vhod) "пользователь открыл приложение" else "свернул приложение")
+            if (vhod) { a.vhod(t); b.vhod(t); v.vhod(t) } else { a.uhod(t); b.uhod(t); v.uhod(t) }
+        }
+        a.tik(t, otkryto); b.tik(t, otkryto); v.tik(t, otkryto)
+    }
+
+    println()
+    println("что получил пользователь за \${mmss(konec)}:")
+    for ((imya, l) in listOf("А периодическая" to la, "Б без отмены" to lb, "В по требованию" to lv)) {
+        val kogda = l.vydano.joinToString(", ") { mmss(it.first) }
+        println("  \${imya.padEnd(16)} уведомлений: \${l.vydano.size.toString().padEnd(2)} в \${if (kogda.isEmpty()) "—" else kogda}")
+        if (l.vFone.isNotEmpty()) println("      из них при открытом приложении: \${l.vFone.joinToString(", ") { mmss(it) }}")
+    }
+    println()
+    println("уходов в фон: 3 — в 00:10, 01:30, 06:50")
+    println("  из них возврат раньше минуты: один (00:10 → 00:40), уведомления быть не должно")
+    println("  правильный ответ: 2 уведомления, в 02:30 и в 07:50")
+    println("  вариант А опоздал на \${(MIN_PERIODIC_SEC - 60) / 60} мин: минимальный период работы 900 с вместо заказанных 60")
+}`} />
+
+Живой вывод:
+
+```text
+лента событий:
+  00:10  свернул приложение
+  00:40  пользователь открыл приложение
+  01:30  свернул приложение
+  06:40  пользователь открыл приложение
+  06:50  свернул приложение
+
+что получил пользователь за 16:40:
+  А периодическая  уведомлений: 1  в 15:00
+  Б без отмены     уведомлений: 15 в 01:10, 02:30, 03:30, ...
+      из них при открытом приложении: 01:10
+  В по требованию  уведомлений: 2  в 02:30, 07:50
+
+уходов в фон: 3 — в 00:10, 01:30, 06:50
+  из них возврат раньше минуты: один (00:10 → 00:40), уведомления быть не должно
+  правильный ответ: 2 уведомления, в 02:30 и в 07:50
+  вариант А опоздал на 14 мин: минимальный период работы 900 с вместо заказанных 60
+```
+
+<Figure scheme="df-notify-minute" caption="Периодическая работа не бывает чаще 15 минут, отложенная без отмены стреляет при открытом приложении; правильный ответ даёт только отложенная с отменой" />
+
+**Вариант А — периодическая работа раз в минуту.** `WorkManager` молча поднимает период до пятнадцати минут: это его минимум, и он не сообщает об этом ни исключением, ни предупреждением. Первое уведомление приходит на четырнадцать минут позже, чем нужно.
+
+**Вариант Б — отложенная задача при каждом уходе в фон, без отмены.** Пятнадцать уведомлений за шестнадцать минут, одно из них — при открытом приложении: пользователь вернулся через полминуты, а задача, поставленная при уходе, всё равно сработала.
+
+**Вариант В — отложенная с отменой при возврате.** Ровно два уведомления, ровно тогда, когда нужно. Логика: при уходе в фон ставим одноразовую задачу с задержкой в минуту; при возврате — отменяем её, если она ещё не сработала.
+
+```kotlin
+// при уходе в фон
+val work = OneTimeWorkRequestBuilder<ReminderWorker>()
+    .setInitialDelay(1, TimeUnit.MINUTES)
+    .build()
+WorkManager.getInstance(context).enqueueUniqueWork("reminder", ExistingWorkPolicy.REPLACE, work)
+
+// при возврате
+WorkManager.getInstance(context).cancelUniqueWork("reminder")
+```
+
+`enqueueUniqueWork` с именем гарантирует, что задача одна: повторный уход в фон заменит предыдущую, а не добавит вторую. Это и есть «один раз до следующего входа».
+
+Где ловить уход в фон и возврат — не в конкретном экране, а на уровне всего процесса: `ProcessLifecycleOwner` с событиями `ON_STOP` и `ON_START`. Иначе переход между экранами приложения будет считаться уходом.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="device-features" quizId="quiz-3" questions={[
+  { q: 'Реализовали «уведомление через минуту» периодической задачей WorkManager с интервалом 60 секунд. Что произойдёт?', options: ['Уведомление придёт через минуту', 'WorkManager молча поднимет период до 15 минут — его минимума; уведомление опоздает на 14 минут без единого предупреждения', 'Задача не запустится', 'Придёт сразу'], correct: 1, why: 'В модели вариант А дал одно уведомление в 15:00 вместо двух в 02:30 и 07:50.' },
+  { q: 'Отложенное уведомление поставлено при уходе в фон. Пользователь вернулся через 30 секунд. Что нужно сделать?', options: ['Ничего, минута не прошла', 'Отменить задачу: иначе она сработает через минуту при открытом приложении', 'Поставить ещё одну', 'Показать сразу'], correct: 1, why: 'В варианте Б без отмены пришло пятнадцать уведомлений, одно из них при открытом приложении.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="device-features" sectionId="cherez-minutu" />
+
+## Виджет живёт в другом процессе
+
+Виджет на домашнем экране рисует не ваше приложение, а лаунчер. Это другой процесс со своей памятью. Отсюда факт, который ломает первую попытку почти у всех: виджет **не видит** ни `ViewModel`, ни репозиторий в памяти, ни `object`-синглтон. Всё это существует только в процессе приложения.
+
+<Figure scheme="df-widget-process" caption="Единственный мост между приложением и виджетом — то, что записано на диск" />
+
+Единственный мост — диск: `DataStore` или `Room`. Приложение пишет счётчик туда, виджет оттуда читает. Обновился счётчик — приложение просит виджет перечитать.
+
+<SectionAnchor chapterId="device-features" sectionId="vidzhet-process" />
+
+## Виджет на Glance
+
+Glance — способ писать виджеты в стиле Compose. Три части: сам виджет, его приёмник и объявление в манифесте.
+
+```kotlin
+class CounterWidget : GlanceAppWidget() {
+    override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val token = context.settings.data.first()[tokenKey]
+        val count = context.settings.data.first()[counterKey] ?: 0
+
+        provideContent {
+            if (token == null) {
+                Text("Войдите, чтобы видеть счётчик",
+                     modifier = GlanceModifier.clickable(actionStartActivity<MainActivity>()))
+            } else {
+                Text("Рядов: $count")
+            }
+        }
+    }
+}
+
+class CounterWidgetReceiver : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget = CounterWidget()
+}
+```
+
+Два состояния — ровно как требует задание. Авторизованному — счётчик. Гостю — призыв к действию, и по нажатию открывается экран входа.
+
+Обновить виджет из приложения после записи в хранилище:
+
+```kotlin
+CounterWidget().updateAll(context)
+```
+
+<Hint type="tip">
+Glance живёт в двух линиях: стабильная `1.2.0` и альфа `1.3.0`. Берите стабильную. И проверяйте виджет не только через превью в Android Studio, а добавлением на домашний экран эмулятора — превью не покажет, что виджет читает из пустого хранилища.
+</Hint>
+
+<SectionAnchor chapterId="device-features" sectionId="glance" />
+
+## Логирование и комментарии здесь
+
+Множитель из главы про чистый код действует и на этот модуль. Обязательные точки для аппаратных функций:
+
+```kotlin
+Log.i(TAG, "[ProfileScreen]: Нажата кнопка — Выбрать фото")
+Log.i(TAG, "[ProfileScreen]: Разрешение CAMERA — запрошено")
+Log.d(TAG, "[ProfileScreen]: Разрешение CAMERA — выдано")
+Log.e(TAG, "[ProfileScreen]: Разрешение CAMERA — отказ, показываем галерею")
+Log.i(TAG, "[ReminderWorker]: Уведомление — поставлено, задержка 60 с")
+```
+
+Отказ в разрешении логируют как `ERROR`, потому что это ветка, где приложение обязано перестроиться, — и именно её потом ищут в журнале, когда «камера не работает».
+
+<SectionAnchor chapterId="device-features" sectionId="logirovanie" />
+
+## Типичные ошибки
+
+**`POST_NOTIFICATIONS` объявлен, но не запрошен.** На Android 13+ уведомление не появляется. Исключения нет, в журнале пусто.
+
+**Канал не создан или создан после первого `notify()`.** Уведомление отбрасывается молча.
+
+**Периодическая задача на 60 секунд.** `WorkManager` поднимает до 15 минут без предупреждения.
+
+**Отложенное уведомление не отменяется при возврате.** Приходит при открытом приложении.
+
+**Виджет читает из `ViewModel` или синглтона.** Видит ноль: другой процесс.
+
+**`CAMERA` в манифесте «на всякий случай».** Системная камера начинает требовать разрешение и падать с `SecurityException`.
+
+**Галерея через `MediaStore` вместо `PickVisualMedia`.** На Android 14 «разрешить выбранные» оставляет обычное разрешение невыданным — молча.
+
+**`launch()` в теле `@Composable`.** Диалог на каждой рекомпозиции.
+
+**`Uri` фото в `remember` вместо `rememberSaveable`.** Поворот экрана — фото пропало.
+
+<SectionAnchor chapterId="device-features" sectionId="oshibki" />
+
+## Слова главы
+
+<Block kind="vocab">
+
+- **Разрешение времени выполнения** — выдаётся пользователем диалогом, проверяется перед каждым использованием.
+- **`rememberLauncherForActivityResult`** — регистрация обработчика результата: разрешения, фото, камеры.
+- **`PickVisualMedia`** — системный выбор фото; разрешений не требует.
+- **`TakePicture(uri)`** — полный снимок в файл через `FileProvider`.
+- **`FileProvider`** — способ дать системной камере доступ к вашему файлу.
+- **Канал уведомлений** — обязателен с Android 8; создаётся до первого показа.
+- **`POST_NOTIFICATIONS`** — разрешение на уведомления с Android 13.
+- **`PendingIntent`** — что откроется по нажатию; с Android 12 нужен `FLAG_IMMUTABLE`.
+- **`OneTimeWorkRequest` + `setInitialDelay`** — отложенная задача; периодическая не бывает чаще 15 минут.
+- **`ProcessLifecycleOwner`** — жизненный цикл всего приложения, а не экрана.
+- **Glance** — виджеты в стиле Compose; живут в процессе лаунчера, читают только с диска.
+
+</Block>
+
+<SectionAnchor chapterId="device-features" sectionId="slova" />
+
+## Тренажёр: набрать вслепую
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="device-features"
+  trainerId="trainer-device-features"
+  targetCpm={100}
+  targetAccuracy={88}
+  pools={[
+    { label: 'Разрешения и фото', snippets: [
+      'rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted -> }',
+      'pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))',
+      'var photoUri by rememberSaveable { mutableStateOf<Uri?>(null) }',
+    ] },
+    { label: 'Уведомление и виджет', snippets: [
+      'OneTimeWorkRequestBuilder<ReminderWorker>().setInitialDelay(1, TimeUnit.MINUTES).build()',
+      'WorkManager.getInstance(context).cancelUniqueWork("reminder")',
+      'PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="device-features" sectionId="trenazher" />
+
+## На чемпионате
+
+Проверка идёт руками, по каждому требованию отдельно:
+
+- **Фото.** Эксперт нажимает «Выбрать фото» и ждёт выбора: галерея **или** камера. Выбирает — на экране появляется предпросмотр. Отказывает в разрешении камеры — приложение не падает и предлагает галерею.
+- **Уведомление.** Эксперт сворачивает приложение и засекает время. Через минуту — уведомление. Возвращается, сворачивает ещё раз — ещё одно. Возвращается через полминуты — уведомления нет. Второе уведомление за один уход снимает балл так же, как его отсутствие.
+- **Виджет.** Виджет есть в системном списке и добавляется на экран. Показывает счётчик из приложения. После выхода из аккаунта — призыв войти, по нажатию открывается экран входа.
+
+Практический совет: **проверяйте на эмуляторе с Android 13 или новее** — на старых версиях разрешение на уведомления не спрашивается, и ошибка «объявили, но не запросили» не проявится. А на защите устройство может оказаться новым.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="device-features" quizId="quiz-4" questions={[
+  { q: 'Уведомление не показывается на Android 13, на Android 12 работает. Что вероятнее всего?', options: ['Разные версии библиотеки', 'POST_NOTIFICATIONS объявлен в манифесте, но не запрошен во время работы — с Android 13 это обязательно, и отказ молчаливый', 'Не тот канал', 'Ошибка в PendingIntent'], correct: 1, why: 'Поэтому проверяют на эмуляторе с Android 13 или новее: на старых версиях ошибка не проявится.' },
+  { q: 'Виджет показывает ноль, хотя в приложении счётчик 12. Почему?', options: ['Виджет не обновился', 'Виджет читает из ViewModel или синглтона — а они живут в процессе приложения, виджету недоступны; читать надо с диска', 'Ошибка в Glance', 'Нет разрешения'], correct: 1, why: 'Единственный мост между приложением и виджетом — DataStore или Room.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="device-features" sectionId="na-chempionate" />
+
+## Что дальше
+
+Приложение умеет всё, что требует задание: входит, хранит, кэширует, снимает, напоминает и живёт на домашнем экране. Осталось то, чем работу доказывают эксперту без слов: тесты. Требование там конкретное — тесты состояний для каждого компонента UI Kit и тесты сетевого слоя на каждый запрос. Об этом — следующая глава.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="device-features" quizId="quiz-5" questions={[
+  { q: 'Где ловить «пользователь свернул приложение» для отложенного уведомления?', options: ['В onPause каждого экрана', 'На уровне процесса через ProcessLifecycleOwner — иначе переход между экранами приложения будет считаться уходом', 'В MainActivity', 'В ViewModel'], correct: 1, why: 'Событие ON_STOP всего процесса означает, что ни один экран приложения не виден.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="device-features" sectionId="dalshe" />
+
+## Углубиться
+
+- `CameraX` — камера внутри приложения, когда системной недостаточно: свой интерфейс съёмки, режимы, анализ кадров.
+- `PickMultipleVisualMedia` — выбор нескольких фото за раз.
+- Группы уведомлений и `setStyle` — сворачивание нескольких уведомлений в одно, большая картинка, развёрнутый текст.
+- `AlarmManager` с точным временем — когда «через минуту» должно быть минутой, а не «примерно через минуту, когда система решит».
+- Настраиваемый виджет: несколько размеров, конфигурация при добавлении, обновление по расписанию.
+
+<SectionAnchor chapterId="device-features" sectionId="uglubitsya" />
+
+<ChapterExam chapterId="device-features" questions={[
+  { q: 'Что делает строка с разрешением в манифесте?', options: ['Выдаёт разрешение', 'Только объявляет намерение: само разрешение с Android 6 выдаёт пользователь диалогом во время работы и может отозвать', 'Запрашивает при установке', 'Ничего'], correct: 1, why: 'Поэтому разрешение проверяют перед каждым использованием, а не один раз при запуске.' },
+  { q: 'Сколько состояний у разрешения и сколько из них различает система?', options: ['Два, оба различает', 'Четыре, система различает два: «не спрашивали» и «отказал навсегда» для неё одинаковы', 'Три', 'Одно'], correct: 1, why: 'Без своего флага приложение зациклится на запросе, который больше не покажет диалог.' },
+  { q: 'Какое разрешение нужно для системного выбора фото из галереи?', options: ['READ_MEDIA_IMAGES', 'Никакого — PickVisualMedia отдаёт Uri только на выбранное пользователем', 'READ_EXTERNAL_STORAGE', 'CAMERA'], correct: 1, why: 'Разрешения нужны при прямом запросе к MediaStore, и с Android 14 там ещё одна ловушка.' },
+  { q: 'Что общего у пропущенного канала и незапрошенного POST_NOTIFICATIONS?', options: ['Приложение падает', 'Уведомление молча не показывается: ни исключения, ни записи в журнале', 'Уведомление приходит с задержкой', 'Ничего общего'], correct: 1, why: 'Три обязательные части — канал, разрешение, PendingIntent — и пропуск любой даёт тишину.' },
+  { q: 'Почему периодическая задача WorkManager не подходит для «через минуту»?', options: ['Она не запускается в фоне', 'Минимальный период — 15 минут, и WorkManager поднимает до него молча', 'Она требует разрешения', 'Она работает только раз'], correct: 1, why: 'В модели вариант А опоздал на 14 минут. Нужна одноразовая задача с задержкой и отменой при возврате.' },
+  { q: 'Почему виджет не видит ViewModel приложения?', options: ['Нужно передать ссылку', 'Виджет рисует лаунчер в другом процессе со своей памятью — общее у них только то, что записано на диск', 'ViewModel приватная', 'Glance не поддерживает ViewModel'], correct: 1, why: 'Счётчик пишут в DataStore, виджет оттуда читает, приложение просит его перечитать после записи.' },
+  { q: 'Какие два состояния обязан показывать виджет по заданию?', options: ['Загрузка и данные', 'Счётчик для авторизованного и призыв к действию для гостя, по нажатию — экран входа', 'Светлый и тёмный', 'Большой и маленький'], correct: 1, why: 'Формулировка задания: «если пользователь не прошёл авторизацию — отображать призыв к действию».' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Разрешения времени выполнения — developer.android.com](https://developer.android.com/training/permissions/requesting) — состояния, диалог, что показывать при отказе.
+- [Photo Picker](https://developer.android.com/training/data-storage/shared/photopicker) — системный выбор фото без разрешений.
+- [Уведомления: разрешение с Android 13](https://developer.android.com/develop/ui/views/notifications/notification-permission) — канал, `POST_NOTIFICATIONS`, поведение по версиям.
+- [WorkManager: отложенная работа](https://developer.android.com/develop/background-work/background-tasks/persistent/getting-started/define-work) — одноразовые и периодические задачи и их ограничения.
+- [Jetpack Glance](https://developer.android.com/develop/ui/compose/glance) — виджеты в стиле Compose.

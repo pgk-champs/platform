@@ -533,6 +533,27 @@ const ARTS: Record<string, () => React.ReactNode> = {
   /* диск помнит, память забывает — арт «data-storage» */
   /* половина оценки срезана — арт «clean-code» */
   /* база в середине: сеть пишет, экран читает — арт «cache-offline» */
+  /* три разрешения: два зелёных, одно перечёркнуто — арт «device-features» */
+  'device-features': () => (
+    <g strokeLinecap="round">
+      <rect x="20" y="40" width="160" height="92" rx="14" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="100" y="62" textAnchor="middle" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>Разрешить доступ к камере?</text>
+
+      <rect x="34" y="76" width="60" height="22" rx="7" fill={SOFT} stroke={INK} strokeWidth={2} />
+      <text x="64" y="91" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.75)" fontFamily={MONO}>Нет</text>
+      <rect x="106" y="76" width="60" height="22" rx="7" fill={ACCENT} stroke={ACCENT} strokeWidth={2} />
+      <text x="136" y="91" textAnchor="middle" fontSize="8" fontWeight={800} fill={DARK} fontFamily={MONO}>Разрешить</text>
+
+      <circle cx="46" cy="116" r="5" fill={ACCENT} />
+      <circle cx="64" cy="116" r="5" fill={ACCENT} />
+      <circle cx="82" cy="116" r="5" fill="none" stroke={INK} strokeWidth={2} />
+      <path d="M78 112l8 8M86 112l-8 8" stroke={INK} strokeWidth={2} />
+
+      <rect x="60" y="146" width="80" height="14" rx="5" fill={SOFT} stroke={ACCENT} strokeWidth={2} />
+      <text x="100" y="156" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>виджет · 12</text>
+      <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>владелец решает</text>
+    </g>
+  ),
   /* замок открыт токеном, не паролем — арт «auth-session» */
   'auth-session': () => (
     <g strokeLinecap="round">
@@ -773,8 +794,9 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'code-basics': { track: 'foundation', num: '08', title: 'Из чего состоит код' },
   'oop-basics': { track: 'foundation', num: '09', title: 'ООП простыми словами — на двух языках' },
-  'kotlin-vs-java': { track: 'mobile', num: '24', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '25', title: 'История Java, Android и Kotlin' },
+  'kotlin-vs-java': { track: 'mobile', num: '25', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '26', title: 'История Java, Android и Kotlin' },
+  'device-features': { track: 'mobile', num: '24', title: 'Возможности устройства: камера, уведомления, виджет' },
   'auth-session': { track: 'mobile', num: '23', title: 'Авторизация: вход, живая сессия и биометрия' },
   'cache-offline': { track: 'mobile', num: '21', title: 'Кэш и офлайн: база как источник истины' },
   'clean-code': { track: 'mobile', num: '22', title: 'Чистый код: комментарии и логирование, которые оценивают' },

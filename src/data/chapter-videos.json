@@ -1443,5 +1443,32 @@
       "title": "Preferences DataStore - MAD Skills",
       "channel": "Android Developers"
     }
+  ],
+  "device-features": [
+    {
+      "videoId": "6-u0UBTJ5is",
+      "title": "Проверка Permission в Android (Jetpack Compose)",
+      "channel": "Dev2Devs"
+    },
+    {
+      "videoId": "uVWbHlkra00",
+      "title": "Photo Picker: выбор фото без разрешений",
+      "channel": "Dev2Devs"
+    },
+    {
+      "videoId": "LP623htmWcI",
+      "title": "How to Send Local Notifications in Android",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "jI1LKN7jBVk",
+      "title": "Build app widgets with Jetpack Glance",
+      "channel": "Android Developers"
+    },
+    {
+      "videoId": "yzM_Dbmg5zc",
+      "title": "WorkManager: отложенная и периодическая работа",
+      "channel": "Senior Javasky"
+    }
   ]
 }

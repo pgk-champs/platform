@@ -30,6 +30,7 @@ import { dataStorageSchemes } from './figures/dataStorage';
 import { cleanCodeSchemes } from './figures/cleanCode';
 import { cacheOfflineSchemes } from './figures/cacheOffline';
 import { authSessionSchemes } from './figures/authSession';
+import { deviceFeaturesSchemes } from './figures/deviceFeatures';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -103,6 +104,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(cleanCodeSchemes),
     ...Object.keys(cacheOfflineSchemes),
     ...Object.keys(authSessionSchemes),
+    ...Object.keys(deviceFeaturesSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),
