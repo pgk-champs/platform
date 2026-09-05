@@ -1,0 +1,919 @@
+---
+title: 'Тестирование: MockWebServer, фейки и TDD'
+audience: 'мобилка'
+level: 'углубление'
+order: 25
+sidebar_position: 25
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="testing-mobile" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+import KotlinPlay from '@site/src/components/KotlinPlay';
+
+# Тестирование: MockWebServer, фейки и TDD
+
+<ChapterProgress chapterId="testing-mobile" totalSections={20} totalQuizzes={7} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="testing-mobile" />
+
+## «Я же проверил руками» — почему этого не хватает
+
+Модуль Е в конкурсном задании сформулирован в двух предложениях:
+
+> Создайте тесты состояний в библиотеке UIKit к следующим компонентам: Поле для ввода, Селект, Кнопки, BottomTabBar, Карточка. Создайте тесты на библиотеку сетевого слоя **на каждый из запросов**, по тест-кейсам.
+
+Весит он 4,7 балла — немного. Но большинство участников теряют на нём не баллы, а **время**: тесты пишут в последний час, впопыхах, и половина из них не компилируется. А ещё это единственный модуль, где эксперт видит не «работает ли», а «понимает ли участник, что именно должно работать».
+
+Главный аргумент против тестов звучит одинаково у всех: «я запустил, нажал, увидел — работает». Ниже — почему этого недостаточно, на живом примере с валидацией email из этого же задания.
+
+<SectionAnchor chapterId="testing-mobile" sectionId="pochemu" />
+
+## Не один пример, а набор кейсов
+
+Требование к email из задания: «name@domenname.ru», только строчные латинские буквы и цифры. Три реализации, которые пишут участники — от наивной до правильной. Проверим их так, как проверяют руками: три адреса. А потом — так, как проверяет тест: четырнадцать.
+
+<KotlinPlay code={`// Три реализации одной и той же проверки email из КЗ: «name@domenname.ru»,
+// только строчные латинские буквы и цифры.
+
+fun naive(email: String) = email.contains("@") && email.contains(".")
+
+val pattern = Regex("[a-z0-9]+@[a-z0-9]+\\\\.ru")
+
+fun search(email: String) = pattern.containsMatchIn(email)  // ищет вхождение
+fun strict(email: String) = pattern.matches(email)          // требует совпадения целиком
+
+// Набор тест-кейсов: строка → каким должен быть ответ.
+val eyeball = listOf(
+    "ivan@mail.ru" to true,
+    "ivan@mail" to false,
+    "ivanmail.ru" to false
+)
+
+val full = eyeball + listOf(
+    "ivan2024@shop.ru" to true,
+    "a@b.ru" to true,
+    "@mail.ru" to false,
+    "ivan@.ru" to false,
+    "Ivan@mail.ru" to false,
+    "ivan@mail.com" to false,
+    "ivan@mail.ru " to false,
+    " ivan@mail.ru" to false,
+    "Иван <ivan@mail.ru> и ещё текст" to false,
+    "ivan@@mail.ru" to false,
+    "" to false
+)
+
+// Мини-JUnit: ровно то, что делает настоящий раннер, в семь строк.
+fun run(name: String, f: (String) -> Boolean, cases: List<Pair<String, Boolean>>): List<String> {
+    val fails = mutableListOf<String>()
+    for ((input, expected) in cases) if (f(input) != expected) fails += input
+    val mark = if (fails.isEmpty()) "ЗЕЛЁНЫЙ" else "КРАСНЫЙ"
+    println("  \${name.padEnd(16)} \${"\${cases.size - fails.size}/\${cases.size}".padEnd(6)} $mark")
+    return fails
+}
+
+fun main() {
+    println("── три кейса, которые человек проверяет руками ──")
+    run("contains(\\"@\\")", ::naive, eyeball)
+    run("containsMatchIn", ::search, eyeball)
+    run("matches", ::strict, eyeball)
+    println("  все три реализации неразличимы: руками разницы не видно")
+
+    println()
+    println("── тот же код против \${full.size} тест-кейсов ──")
+    val f1 = run("contains(\\"@\\")", ::naive, full)
+    val f2 = run("containsMatchIn", ::search, full)
+    val f3 = run("matches", ::strict, full)
+
+    println()
+    println("что пропустила наивная проверка (\${f1.size}):")
+    f1.forEach { println("    «$it»") }
+    println("что пропустил регекс без якорей (\${f2.size}):")
+    f2.forEach { println("    «$it»") }
+    println("строгая проверка: \${f3.size} провалов")
+
+    println()
+    val eyePct = eyeball.size * 100 / full.size
+    println("руками проверено кейсов: \${eyeball.size} из \${full.size} = $eyePct% покрытия")
+}`} />
+
+Живой вывод:
+
+```text
+── три кейса, которые человек проверяет руками ──
+  contains("@")    3/3    ЗЕЛЁНЫЙ
+  containsMatchIn  3/3    ЗЕЛЁНЫЙ
+  matches          3/3    ЗЕЛЁНЫЙ
+  все три реализации неразличимы: руками разницы не видно
+
+── тот же код против 14 тест-кейсов ──
+  contains("@")    6/14   КРАСНЫЙ
+  containsMatchIn  10/14  КРАСНЫЙ
+  matches          14/14  ЗЕЛЁНЫЙ
+
+что пропустил регекс без якорей (4):
+    «Ivan@mail.ru»
+    «ivan@mail.ru »
+    « ivan@mail.ru»
+    «Иван <ivan@mail.ru> и ещё текст»
+
+руками проверено кейсов: 3 из 14 = 21% покрытия
+```
+
+<Figure scheme="tm-coverage" caption="На трёх кейсах все три реализации зелёные и неразличимы; разницу показал только набор из четырнадцати" />
+
+Наивная проверка через `contains("@")` — ошибка, которую все ждут. Неожиданное здесь другое: **почти правильный** регекс с `containsMatchIn` пропускает четыре адреса. Он ищет *вхождение* образца в строку, а не совпадение целиком — поэтому `«Иван <ivan@mail.ru> и ещё текст»` для него валидный email. Это та же ловушка, что `Pattern.matcher().find()` вместо `.matches()` в Java.
+
+Глазом эту разницу не поймать: на трёх адресах, которые приходят в голову, обе реализации зелёные. Разницу видит только таблица «вход → ожидаемый выход» — и ценность её ровно в тех строках, которые руками никто не набирает: пробел по краям, заглавная буква, пустая строка, мусор вокруг правильного значения.
+
+Тест — это и есть такая таблица, которая отрабатывает заново после каждой правки, а не один раз перед сдачей.
+
+<SectionAnchor chapterId="testing-mobile" sectionId="nabor-keysov" />
+
+## Куда кладут тесты и как устроен один тест
+
+В Android-проекте две папки для тестов, и это две разные вселенные:
+
+| Папка | Что это | Как запускать | Скорость |
+|---|---|---|---|
+| `src/test/` | чистая JVM, без Android | `./gradlew test` | секунды |
+| `src/androidTest/` | инструментальные, нужен эмулятор | `./gradlew connectedAndroidTest` | минуты |
+
+Валидаторы, мапперы, `ViewModel`, сетевой слой через заглушку — всё это идёт в `src/test/`. В `src/androidTest/` остаётся только то, чему без эмулятора никак: тесты `Composable`.
+
+Один тест внутри:
+
+```kotlin
+class EmailValidatorTest {
+
+    @Test
+    fun `заглавная буква не проходит`() {
+        // Arrange — подготовка
+        val input = "Ivan@mail.ru"
+
+        // Act — действие
+        val result = isValidEmail(input)
+
+        // Assert — проверка
+        assertEquals(false, result)
+    }
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: '@Test', label: 'аннотация', note: 'помечает метод как тест — раннер JUnit найдёт его сам. Без аннотации метод просто не запустится, и никто об этом не сообщит' },
+  { text: 'fun `заглавная буква не проходит`()', label: 'имя в обратных кавычках', note: 'Kotlin позволяет имя с пробелами и кириллицей. Имя теста — это его документация: при падении именно оно окажется в отчёте' },
+  { text: 'Arrange / Act / Assert', label: 'три шага', note: 'подготовить данные, выполнить одно действие, проверить один результат. Тест, который проверяет пять вещей, при падении не говорит, какая из пяти сломалась' },
+  { text: 'assertEquals(false, result)', label: 'ожидаемое, потом фактическое', note: 'именно в таком порядке. Перепутаете — тест будет работать, но сообщение об ошибке начнёт врать наоборот' },
+]} />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="testing-mobile" quizId="quiz-1" questions={[
+  { q: 'Почему регекс через containsMatchIn пропустил «Иван <ivan@mail.ru> и ещё текст»?', options: ['Регекс неправильный', 'containsMatchIn ищет вхождение образца в строку, а не совпадение целиком — внутри мусора есть валидный адрес', 'Кириллица ломает регекс', 'Пробелы не учитываются'], correct: 1, why: 'Нужен matches — он требует, чтобы вся строка совпала с образцом. Та же ловушка, что find() вместо matches() в Java.' },
+  { q: 'Написали тесты в src/androidTest/, запустили ./gradlew test. Результат: BUILD SUCCESSFUL. Тесты прошли?', options: ['Да', 'Нет — ./gradlew test не видит этот sourceSet; тесты ни разу не запускались, а Gradle ничего не сообщил', 'Прошли частично', 'Зависит от версии'], correct: 1, why: 'Чистые юнит-тесты — в src/test/. В androidTest только то, чему нужен эмулятор.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="testing-mobile" sectionId="ustroystvo" />
+
+## Два первых юнит-теста: валидатор из задания и маппер
+
+Самые быстрые баллы — тесты на то, что уже сформулировано в задании. Email по паттерну и пароль не короче восьми символов — это готовые тест-кейсы, их пишут первыми:
+
+```kotlin
+class ValidatorsTest {
+
+    @Test
+    fun `корректный email проходит`() = assertTrue(isValidEmail("ivan2024@shop.ru"))
+
+    @Test
+    fun `заглавная буква не проходит`() = assertFalse(isValidEmail("Ivan@mail.ru"))
+
+    @Test
+    fun `пробел по краям не проходит`() = assertFalse(isValidEmail(" ivan@mail.ru"))
+
+    @Test
+    fun `домен не ru не проходит`() = assertFalse(isValidEmail("ivan@mail.com"))
+
+    @Test
+    fun `пароль из 7 символов не проходит`() = assertFalse(isValidPassword("1234567"))
+
+    @Test
+    fun `пароль из 8 символов проходит`() = assertTrue(isValidPassword("12345678"))
+}
+```
+
+Второй кандидат — маппер `ProductDto → Product` из главы про слои. Он тоже чистая функция без Android внутри:
+
+```kotlin
+@Test
+fun `цена из копеек превращается в рубли`() {
+    val dto = ProductDto(id = 1, title = "Кофе", priceKopecks = 25000)
+
+    val product = dto.toDomain()
+
+    assertEquals(250.0, product.price, 0.001)
+}
+```
+
+Оба класса — образец для всех остальных: функция принимает данные, возвращает результат, тест сравнивает результат с ожиданием. Ничего не мокается, ничего не поднимается.
+
+<Hint type="tip">
+`assertEquals` для `Double` принимает третий аргумент — допуск. Без него `0.1 + 0.2` не равно `0.3`, и тест упадёт на арифметике с плавающей точкой, а не на вашей логике.
+</Hint>
+
+<SectionAnchor chapterId="testing-mobile" sectionId="pervye-testy" />
+
+## Что мешает тесту: сеть, время, база — и чем их заменяют
+
+Валидатор тестируется напрямую. А `Repository`, который ходит в сеть? Если тест по-настоящему сходит на сервер, он будет медленным, будет падать при отсутствии интернета и не сможет проверить ветку «сервер вернул 500», потому что сервер её просто не вернёт по заказу.
+
+Зависимость заменяют **тестовым дублем**. Их четыре вида, и на практике в этой главе нужен один:
+
+- **Фейк** — упрощённая рабочая реализация. Вместо сети — список в памяти. Обычный Kotlin-класс, никаких библиотек.
+- **Стаб** — отдаёт заготовленные ответы, логики нет.
+- **Мок** — записывает вызовы, чтобы потом проверить: «метод вызван один раз с такими аргументами». Обычно через библиотеку.
+- **Шпион** — настоящий объект, обёрнутый записью вызовов.
+
+Google в документации по тестовым дублям прямо пишет: фейки предпочтительнее — не требуют библиотеки моков и остаются обычными классами. Для чемпионата это ещё и практический довод: библиотеку моков нужно помнить наизусть, а фейк — это `class` с `override`.
+
+<SectionAnchor chapterId="testing-mobile" sectionId="dubli" />
+
+## Фейк вместо мока: подмена дефолтным параметром
+
+Один и тот же тест репозитория — против «настоящей» сети (задержка 300 мс и 15 % случайных отказов) и против фейка. Двадцать прогонов:
+
+<KotlinPlay code={`import kotlinx.coroutines.*
+import kotlin.random.Random
+
+// Зависимость описана интерфейсом — этого достаточно, чтобы её подменить.
+interface ProductApi {
+    suspend fun load(): List<String>
+}
+
+// «Настоящая» реализация: ходит по сети. Медленно и иногда падает.
+class RealProductApi(private val rnd: Random) : ProductApi {
+    override suspend fun load(): List<String> {
+        delay(300)                                   // сеть отвечает не мгновенно
+        if (rnd.nextInt(100) < 15) throw RuntimeException("timeout")
+        return listOf("Кофе", "Чай", "Какао")
+    }
+}
+
+// Фейк: та же роль, поведение задано вручную. Ещё и считает обращения.
+class FakeProductApi(
+    private val answer: List<String> = listOf("Кофе", "Чай", "Какао"),
+    private val fail: Boolean = false
+) : ProductApi {
+    var calls = 0
+        private set
+
+    override suspend fun load(): List<String> {
+        calls++
+        if (fail) throw RuntimeException("нет соединения")
+        return answer
+    }
+}
+
+// Граф собирается дефолтными параметрами конструктора.
+// В приложении пишут ProductRepository() — подставится настоящая реализация.
+// В тесте передают фейк, и больше ничего менять не надо.
+class ProductRepository(private val api: ProductApi = RealProductApi(Random)) {
+    private var cache: List<String>? = null
+
+    suspend fun products(): List<String> {
+        cache?.let { return it }
+        return api.load().also { cache = it }
+    }
+}
+
+fun measure(times: Int, block: suspend () -> Unit): Pair<Long, Int> {
+    var failed = 0
+    val start = System.nanoTime()
+    runBlocking {
+        repeat(times) {
+            try { block() } catch (e: Exception) { failed++ }
+        }
+    }
+    return (System.nanoTime() - start) / 1_000 to failed   // микросекунды
+}
+
+fun main() {
+    val runs = 20
+
+    println("── один и тот же тест против настоящей реализации ($runs прогонов) ──")
+    val seeded = Random(2026)
+    val (usReal, failReal) = measure(runs) {
+        val list = ProductRepository(RealProductApi(seeded)).products()
+        check(list.size == 3)
+    }
+    println("  время:  \${usReal / 1000} мс")
+    println("  упало:  $failReal из $runs   ← код не менялся, «моргнула» сеть")
+
+    println()
+    println("── тот же тест против фейка ($runs прогонов) ──")
+    val fake = FakeProductApi()
+    val (usFake, failFake) = measure(runs) {
+        val list = ProductRepository(fake).products()
+        check(list.size == 3)
+    }
+    println("  время:  $usFake мкс  (\${usFake / 1000} мс)")
+    println("  упало:  $failFake из $runs")
+    println("  разница по времени: в \${usReal / maxOf(usFake, 1)} раз")
+
+    println()
+    println("── что фейк умеет, а настоящая реализация нет ──")
+    runBlocking {
+        val counting = FakeProductApi()
+        val repo = ProductRepository(counting)
+        repeat(5) { repo.products() }
+        println("  5 обращений к репозиторию → вызовов api: \${counting.calls}  (работает кэш)")
+
+        val broken = ProductRepository(FakeProductApi(fail = true))
+        val text = try { broken.products().toString() } catch (e: Exception) { "ошибка: \${e.message}" }
+        println("  сценарий «нет сети» воспроизведён на заказ → $text")
+    }
+}`} />
+
+Живой вывод:
+
+```text
+── один и тот же тест против настоящей реализации (20 прогонов) ──
+  время:  6099 мс
+  упало:  2 из 20   ← код не менялся, «моргнула» сеть
+
+── тот же тест против фейка (20 прогонов) ──
+  время:  183 мкс  (0 мс)
+  упало:  0 из 20
+  разница по времени: в 33330 раз
+
+── что фейк умеет, а настоящая реализация нет ──
+  5 обращений к репозиторию → вызовов api: 1  (работает кэш)
+  сценарий «нет сети» воспроизведён на заказ → ошибка: нет соединения
+```
+
+<Figure scheme="tm-fake-vs-real" caption="Одна зависимость, две реализации: настоящая — шесть секунд и два случайных падения, фейк — микросекунды и ноль" />
+
+Три числа. **Шесть секунд против 183 микросекунд** — в тридцать три тысячи раз. **Два падения из двадцати** на коде, который не менялся — вот откуда берутся «мигающие» тесты, которым перестают верить и которые потом отключают. И **счётчик вызовов**: фейк знает, сколько раз его дёрнули, и тест проверяет, что кэш работает — пять обращений к репозиторию, один поход в «сеть».
+
+Как фейк попадает внутрь без DI-фреймворка — дефолтным параметром конструктора:
+
+```kotlin
+class ProductRepository(private val api: ProductApi = RealProductApi())
+```
+
+В приложении пишут `ProductRepository()` — подставится настоящая реализация. В тесте — `ProductRepository(FakeProductApi())`. Ничего больше менять не нужно. Это работает, потому что зависимость объявлена **интерфейсом**, а не конкретным классом: и настоящая реализация, и фейк — просто два `ProductApi`.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="testing-mobile" quizId="quiz-2" questions={[
+  { q: 'Тест репозитория проходит 18 раз из 20, код не менялся. Что это?', options: ['Ошибка в тесте', 'Тест зависит от настоящей сети — падения случайные, и такому тесту скоро перестанут верить; нужен фейк', 'Нормально', 'Ошибка в репозитории'], correct: 1, why: 'Против фейка тот же тест: 0 падений из 20, 183 микросекунды.' },
+  { q: 'Как подставить фейк в репозиторий без DI-фреймворка?', options: ['Через рефлексию', 'Дефолтным параметром конструктора: в приложении Repository(), в тесте Repository(FakeApi()) — зависимость объявлена интерфейсом', 'Только через Hilt', 'Глобальной переменной'], correct: 1, why: 'Фейк и настоящая реализация — два класса одного интерфейса; подмена — одна строка.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="testing-mobile" sectionId="feyk" />
+
+## Тест ViewModel: runTest и главный диспетчер
+
+`ViewModel` тестируется так же — с фейком репозитория. Но у неё две особенности, из-за которых первый тест почти всегда падает.
+
+Первая: код в ней асинхронный. Тест оборачивают в `runTest` — он перематывает `delay` мгновенно и ждёт завершения корутин:
+
+```kotlin
+@Test
+fun `после загрузки в состоянии список товаров`() = runTest {
+    val vm = ProductsViewModel(ProductRepository(FakeProductApi()))
+
+    vm.load()
+    advanceUntilIdle()
+
+    assertEquals(listOf("Кофе", "Чай", "Какао"), vm.state.value.products)
+}
+```
+
+Вторая: `viewModelScope` живёт на `Dispatchers.Main`, а в JVM-тесте главного потока нет. Падение выглядит так:
+
+```text
+IllegalStateException: Module with the Main dispatcher is missing.
+Add dependency providing the Main dispatcher, e.g. 'kotlinx-coroutines-android'
+```
+
+Совет в сообщении — ложный след. Зависимость добавлять не нужно; нужно подменить главный диспетчер тестовым:
+
+```kotlin
+class MainDispatcherRule : TestWatcher() {
+    private val dispatcher = StandardTestDispatcher()
+    override fun starting(description: Description) = Dispatchers.setMain(dispatcher)
+    override fun finished(description: Description) = Dispatchers.resetMain()
+}
+
+class ProductsViewModelTest {
+    @get:Rule
+    val mainRule = MainDispatcherRule()
+    // ...
+}
+```
+
+Правило пишется один раз и подключается в каждый тестовый класс `ViewModel`. Его набирают по памяти — на чемпионате интернета десять минут.
+
+<Hint type="important">
+`runBlockingTest`, `TestCoroutineDispatcher` и `TestCoroutineScope` устарели. В руководствах 2021–2023 годов они везде — не копируйте. Актуально: `runTest` с `StandardTestDispatcher`. У `runTest` таймаут 60 секунд по умолчанию: если тест «висит минуту и падает», скорее всего кто-то ждёт ответа, который не был поставлен в очередь.
+</Hint>
+
+<SectionAnchor chapterId="testing-mobile" sectionId="viewmodel" />
+
+## MockWebServer: настоящий HTTP, ненастоящий сервер
+
+Фейк проверяет репозиторий. Но сам сетевой слой — `Retrofit`, конвертер JSON, интерсептор с токеном — фейком не проверишь: фейк его обходит. Для этого есть `MockWebServer` из OkHttp: локальный HTTP-сервер, который отвечает тем, что вы положили в очередь.
+
+```kotlin
+class ProductApiTest {
+    private val server = MockWebServer()
+    private lateinit var api: ProductApi
+
+    @Before
+    fun setUp() {
+        server.start()
+        api = Retrofit.Builder()
+            .baseUrl(server.url("/"))
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ProductApi::class.java)
+    }
+
+    @After
+    fun tearDown() = server.shutdown()
+
+    @Test
+    fun `успешный ответ разбирается в список`() = runTest {
+        server.enqueue(MockResponse().setResponseCode(200).setBody("""[{"id":1,"title":"Кофе"}]"""))
+
+        val products = api.getProducts()
+
+        assertEquals(1, products.size)
+        assertEquals("Кофе", products[0].title)
+    }
+}
+```
+
+Запрос идёт по **настоящему HTTP** на `localhost` — значит, проверяется весь слой целиком: как `Retrofit` построил URL, как конвертер разобрал JSON, что интерсептор добавил заголовок.
+
+<Hint type="fact">
+`MockWebServer` живёт в двух артефактах: старый `com.squareup.okhttp3:mockwebserver` (пакет `okhttp3.mockwebserver`, `MockResponse().setResponseCode(200).setBody(...)`) и новый `mockwebserver3` (неизменяемый `MockResponse(body = ...)`, тело запроса — `ByteString?`). API у них разное, и копипаста из руководства 2023 года под новый артефакт не соберётся. В главе — старый, он проще и по-прежнему выпускается.
+</Hint>
+
+<SectionAnchor chapterId="testing-mobile" sectionId="mockwebserver" />
+
+## Проверять не только ответ, но и тело запроса
+
+Заглушка отвечает заготовкой на **что угодно**. Отсюда ловушка, из-за которой на чемпионате теряют баллы молча:
+
+<KotlinPlay code={`// Модель MockWebServer: заготовленные ответы в очереди и журнал принятых запросов.
+data class Recorded(val method: String, val path: String, val body: String)
+
+class MockServer {
+    private val answers = ArrayDeque<String>()
+    private val received = ArrayDeque<Recorded>()
+
+    fun enqueue(json: String) { answers.addLast(json) }
+
+    fun handle(method: String, path: String, body: String): String {
+        received.addLast(Recorded(method, path, body))
+        return answers.removeFirstOrNull() ?: error("очередь ответов пуста")
+    }
+
+    fun takeRequest(): Recorded =
+        received.removeFirstOrNull() ?: error("запросов не было")
+}
+
+data class User(val id: Int, val name: String)
+
+fun field(json: String, key: String): String =
+    json.substringAfter("\\"$key\\":").substringBefore(",").substringBefore("}").trim().trim('"')
+
+// Клиент с ошибкой: сервер ждёт поля email/password, клиент шлёт login/pass.
+class AuthClient(private val server: MockServer) {
+    fun login(email: String, password: String): User {
+        val body = "{\\"login\\":\\"$email\\",\\"pass\\":\\"$password\\"}"
+        val json = server.handle("POST", "/api/auth", body)
+        return User(field(json, "id").toInt(), field(json, "name"))
+    }
+}
+
+fun verdict(ok: Boolean) = if (ok) "ЗЕЛЁНЫЙ" else "КРАСНЫЙ"
+
+fun main() {
+    val expectedBody = "{\\"email\\":\\"ivan@mail.ru\\",\\"password\\":\\"12345678\\"}"
+
+    println("── тест №1: проверяем только разобранный ответ ──")
+    val s1 = MockServer()
+    s1.enqueue("{\\"id\\":7,\\"name\\":\\"Иван\\",\\"token\\":\\"abc\\"}")
+    val user = AuthClient(s1).login("ivan@mail.ru", "12345678")
+    println("  клиент разобрал: $user")
+    println("  тест: \${verdict(user.id == 7 && user.name == "Иван")}")
+
+    println()
+    println("── что при этом ушло на сервер ──")
+    val sent = s1.takeRequest()
+    println("  \${sent.method} \${sent.path}")
+    println("  тело:    \${sent.body}")
+    println("  ожидали: $expectedBody")
+    println("  на живом сервере это 400, а тест был зелёный")
+
+    println()
+    println("── тест №2: тот же тест плюс проверка тела запроса ──")
+    val s2 = MockServer()
+    s2.enqueue("{\\"id\\":7,\\"name\\":\\"Иван\\",\\"token\\":\\"abc\\"}")
+    val u2 = AuthClient(s2).login("ivan@mail.ru", "12345678")
+    val req = s2.takeRequest()
+    val ok = u2.id == 7 && req.path == "/api/auth" && req.body == expectedBody
+    println("  тест: \${verdict(ok)}")
+
+    println()
+    println("── заглушка отвечает на что угодно ──")
+    val s3 = MockServer()
+    s3.enqueue("{\\"id\\":7,\\"name\\":\\"Иван\\"}")
+    println("  ответ на GET /чепуха: \${s3.handle("GET", "/чепуха", "")}")
+
+    println()
+    println("── очередь ответов: строгий порядок ──")
+    val s4 = MockServer()
+    s4.enqueue("{\\"page\\":1}")
+    s4.enqueue("{\\"page\\":2}")
+    println("  первый запрос:  \${s4.handle("GET", "/items?page=1", "")}")
+    println("  второй запрос:  \${s4.handle("GET", "/items?page=2", "")}")
+    val third = try { s4.handle("GET", "/items?page=3", "") } catch (e: IllegalStateException) { "упало: \${e.message}" }
+    println("  третий запрос:  $third")
+}`} />
+
+Живой вывод:
+
+```text
+── тест №1: проверяем только разобранный ответ ──
+  клиент разобрал: User(id=7, name=Иван)
+  тест: ЗЕЛЁНЫЙ
+
+── что при этом ушло на сервер ──
+  POST /api/auth
+  тело:    {"login":"ivan@mail.ru","pass":"12345678"}
+  ожидали: {"email":"ivan@mail.ru","password":"12345678"}
+  на живом сервере это 400, а тест был зелёный
+
+── тест №2: тот же тест плюс проверка тела запроса ──
+  тест: КРАСНЫЙ
+
+── заглушка отвечает на что угодно ──
+  ответ на GET /чепуха: {"id":7,"name":"Иван"}
+
+── очередь ответов: строгий порядок ──
+  первый запрос:  {"page":1}
+  второй запрос:  {"page":2}
+  третий запрос:  упало: очередь ответов пуста
+```
+
+<Figure scheme="tm-mockwebserver" caption="Клиент шлёт login/pass, сервер ждёт email/password — тест зелёный, пока не проверено тело запроса" />
+
+Клиент отправляет `{"login":…,"pass":…}`, сервер ждёт `{"email":…,"password":…}`. Тест №1 зелёный: заглушка отдала заготовленный JSON, клиент его разобрал, ассерт прошёл. На живом сервере это `400 Bad Request` — уже после сдачи.
+
+Красным тест становится только после `takeRequest()`:
+
+```kotlin
+@Test
+fun `логин отправляет email и password`() = runTest {
+    server.enqueue(MockResponse().setBody("""{"token":"abc"}"""))
+
+    api.login(LoginRequest("ivan@mail.ru", "12345678"))
+
+    val request = server.takeRequest()
+    assertEquals("POST", request.method)
+    assertEquals("/api/auth", request.path)
+    assertEquals("""{"email":"ivan@mail.ru","password":"12345678"}""", request.body.readUtf8())
+}
+```
+
+Проверять надо **и ответ, и то, что ушло**: метод, путь, тело, заголовок `Authorization`. Именно заголовок чаще всего ломается: интерсептор не подключили, токен не подставился — и все защищённые запросы на живом сервере дают `401`, а тесты зелёные.
+
+Последний блок вывода — про очередь. Ответы отдаются строго по порядку; забыли `enqueue()` перед третьим запросом — тест не упадёт с внятной ошибкой, а **повиснет** до таймаута `runTest`.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="testing-mobile" quizId="quiz-3" questions={[
+  { q: 'Тест сетевого слоя проверяет разобранный ответ и зелёный. Клиент шлёт поля login/pass вместо email/password. Что покажет тест?', options: ['Упадёт', 'Останется зелёным — заглушка отвечает заготовкой на любой запрос; ошибка вылезет на живом сервере как 400', 'Предупреждение', 'Таймаут'], correct: 1, why: 'Красным он станет только после takeRequest() и сверки метода, пути, тела.' },
+  { q: 'Тест с MockWebServer висит минуту и падает по таймауту. Что вероятнее всего?', options: ['Сервер не запущен', 'Забыли server.enqueue() — очередь ответов пуста, клиент ждёт ответа, которого не будет', 'Неправильный URL', 'Ошибка в Retrofit'], correct: 1, why: 'Ответы отдаются строго по порядку; на каждый запрос в тесте — свой enqueue.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="testing-mobile" sectionId="telo-zaprosa" />
+
+## Тест-кейсы на каждый запрос
+
+Формулировка задания — «на каждый из запросов, по тест-кейсам». Это буквально: пять методов в интерфейсе `ApiService` — минимум пять тестовых методов. Эксперт считает соответствие.
+
+А «по тест-кейсам» означает, что у одного запроса не одна ветка. Минимальный набор на каждый:
+
+| Тест-кейс | Что кладём в очередь | Что проверяем |
+|---|---|---|
+| Успех | `200` + корректный JSON | разобранная модель, тело запроса |
+| Не авторизован | `401` | клиент бросает ожидаемое исключение или возвращает ошибку |
+| Сервер упал | `500` | то же — приложение не падает |
+| Битый JSON | `200` + `{"id":` | ошибка разбора обработана, не `crash` |
+
+```kotlin
+@Test
+fun `401 превращается в ошибку авторизации`() = runTest {
+    server.enqueue(MockResponse().setResponseCode(401))
+
+    val result = repository.loadProducts()
+
+    assertTrue(result is Result.Error)
+    assertEquals(AppError.Unauthorized, (result as Result.Error).error)
+}
+```
+
+Это тот же перевод кодов в понятные ошибки из главы про сетевые ошибки — только теперь каждая ветка закреплена тестом, и при рефакторинге сетевого слоя её невозможно сломать незаметно.
+
+<SectionAnchor chapterId="testing-mobile" sectionId="na-kazhdyy-zapros" />
+
+## Тесты Composable: семантическое дерево
+
+Тесты интерфейса живут в `src/androidTest/` и работают через `createComposeRule()`. Тест видит не пиксели, а **дерево семантики** — то же, что читает экранный диктор:
+
+```kotlin
+class PrimaryButtonTest {
+    @get:Rule
+    val composeRule = createComposeRule()
+
+    @Test
+    fun `отключённая кнопка не реагирует на нажатие`() {
+        var clicks = 0
+        composeRule.setContent {
+            PrimaryButton(text = "Войти", enabled = false, onClick = { clicks++ })
+        }
+
+        composeRule.onNodeWithText("Войти").assertIsNotEnabled()
+        composeRule.onNodeWithText("Войти").performClick()
+
+        assertEquals(0, clicks)
+    }
+}
+```
+
+Инструменты, которые нужны на практике:
+
+- **Найти узел** — `onNodeWithText`, `onNodeWithTag`, `onNodeWithContentDescription`. Тег ставится модификатором `Modifier.testTag("email_field")` и нужен там, где текст меняется.
+- **Проверить** — `assertIsDisplayed`, `assertIsEnabled` / `assertIsNotEnabled`, `assertTextEquals`, `assertIsSelected`.
+- **Действовать** — `performClick`, `performTextInput`, `performScrollTo`. Каждое действие — отдельный вызов, объединять нельзя.
+- **Отладить** — `onRoot().printToLog("TAG")` печатает всё дерево в Logcat.
+
+<Hint type="important">
+`onNodeWithTag` не находит узел, хотя `testTag` стоит: `Expected exactly '1' node but could not find any`. Причина — родитель (`Row` с `clickable`, `Button`, `ListItem`) слил семантику детей, и поиск идёт по слитому дереву. Лечится параметром `useUnmergedTree = true`; найти виновника помогает `printToLog`.
+</Hint>
+
+<SectionAnchor chapterId="testing-mobile" sectionId="composable" />
+
+## Тесты состояний UI Kit по формулировке задания
+
+«Тесты состояний» — не «компонент отрисовался». Проверяется каждое состояние из главы про UI Kit:
+
+| Компонент | Состояния, на которые нужен тест |
+|---|---|
+| Поле для ввода | пустое, заполненное, с ошибкой, отключённое |
+| Селект | закрытый, раскрытый, с выбранным значением |
+| Кнопка | обычная, нажатие вызывает `onClick`, отключённая не вызывает |
+| BottomTabBar | выбранная вкладка подсвечена, нажатие переключает |
+| Карточка | с картинкой и без, нажатие вызывает обработчик |
+
+Один компонент — один тестовый класс, одно состояние — один метод. Для поля ввода:
+
+```kotlin
+@Test
+fun `ошибка показывается под полем`() {
+    composeRule.setContent {
+        AppTextField(value = "ivan@mail", onValueChange = {}, error = "Неверный формат")
+    }
+
+    composeRule.onNodeWithText("Неверный формат").assertIsDisplayed()
+}
+
+@Test
+fun `без ошибки подписи нет`() {
+    composeRule.setContent {
+        AppTextField(value = "ivan@mail.ru", onValueChange = {}, error = null)
+    }
+
+    composeRule.onNodeWithText("Неверный формат").assertDoesNotExist()
+}
+```
+
+Пять компонентов по три–четыре состояния — пятнадцать-двадцать коротких тестов. Каждый — пять строк. Это час работы, если UI Kit собран как отдельный модуль с чистыми параметрами; и нерешаемая задача, если компоненты тянут `ViewModel` внутрь.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="testing-mobile" quizId="quiz-4" questions={[
+  { q: 'Что проверяет тест Composable — пиксели или что-то другое?', options: ['Пиксели', 'Дерево семантики — то же, что читает экранный диктор; поиск идёт по тексту, тегу или описанию', 'Скриншот', 'XML'], correct: 1, why: 'Поэтому testTag и contentDescription — не только для доступности, но и для тестов.' },
+  { q: 'Что означает «тесты состояний» для компонента Кнопка?', options: ['Кнопка отрисовалась', 'Отдельный тест на каждое состояние: обычная, нажатие вызывает onClick, отключённая не вызывает', 'Кнопка красивая', 'Один тест на все кнопки'], correct: 1, why: 'Одно состояние — один метод. Пять компонентов по три–четыре состояния — пятнадцать-двадцать тестов.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="testing-mobile" sectionId="ui-kit-sostoyaniya" />
+
+## TDD: три коммита RED / GREEN / REFACTOR
+
+В части заданий есть отдельное требование — разработка через тестирование с тремя коммитами:
+
+1. **RED** — тест написан, код ещё нет; тест падает. Коммит.
+2. **GREEN** — минимальный код, чтобы тест позеленел. Коммит.
+3. **REFACTOR** — уборка без единой правки теста. Коммит.
+
+И ограничение, написанное в задании прямо: «в случае изменения теста на данном этапе тест не будет учитываться в оценке». Тест из коммита RED обязан **дословно** совпадать с тестом в GREEN и REFACTOR. Переписали ассерт под получившийся код — тест обнулён. Ошибки нет, сборка зелёная, оценка ноль.
+
+Если тест из RED оказался неверным — честнее оставить его красным и написать рядом новый, чем править.
+
+```text
+git log --oneline
+a1b2c3d  REFACTOR: вынести регекс email в константу
+d4e5f6a  GREEN: isValidEmail по паттерну задания
+b7c8d9e  RED: тесты валидатора email
+```
+
+Практический смысл TDD для четырёхчасового модуля — не философия, а порядок: тест на валидатор пишется за две минуты, и он сразу фиксирует, что именно требуется. Код, написанный под готовый тест, редко приходится переделывать.
+
+<SectionAnchor chapterId="testing-mobile" sectionId="tdd" />
+
+## Комментарии и логирование в тестах
+
+Множитель из главы про чистый код — половина оценки за отсутствие комментариев и логирования — покрывает 101 аспект из 149. Тестовые классы **не исключение**: это такие же классы в проекте.
+
+```kotlin
+/**
+ * Тесты сетевого слоя: запросы товаров и авторизации через MockWebServer.
+ * Создан: 12-03-2026, участник 07.
+ */
+class ProductApiTest {
+
+    @Before
+    fun setUp() {
+        server.start()
+        Log.d(TAG, "[ProductApiTest]: MockWebServer запущен — ${server.url("/")}")
+    }
+}
+```
+
+Дата в формате ДД-ММ-ГГГГ и номер участника — те же, что в боевом коде. Логирование в тестах не обязано быть подробным, но `setUp` и `tearDown` — естественные точки.
+
+<SectionAnchor chapterId="testing-mobile" sectionId="kommentarii" />
+
+## Типичные ошибки
+
+**Проверен только ответ, `takeRequest()` не вызван.** Тест зелёный на неправильном запросе. На живом API — `400`, после сдачи.
+
+**Тест поправлен после RED.** По правилам задания не учитывается. Сборка зелёная, оценка ноль.
+
+**Тесты в `src/androidTest/`, гоняют `./gradlew test`.** `BUILD SUCCESSFUL`, тесты ни разу не запускались.
+
+**`assertEquals(получили, ожидали)`.** Работает, но сообщение об ошибке врёт наоборот — отладка идёт не туда.
+
+**`ViewModel` без `MainDispatcherRule`.** `Module with the Main dispatcher is missing` — и ложный совет в тексте ошибки.
+
+**`onNodeWithTag` не находит узел.** Родитель слил семантику; нужен `useUnmergedTree = true`.
+
+**Один фейк на весь класс.** Счётчик или кэш дожил из предыдущего теста; падает то один тест, то другой. Фейк создаётся в `@Before`.
+
+**Тестовый класс с опечаткой.** Не компилируется один — не компилируется весь `sourceSet`, модуль обнуляется целиком. Перед сдачей — `./gradlew test`, не только сборка приложения.
+
+<SectionAnchor chapterId="testing-mobile" sectionId="oshibki" />
+
+## Слова главы
+
+<Block kind="vocab">
+
+- **`src/test/`** — юнит-тесты на чистой JVM; `./gradlew test`.
+- **`src/androidTest/`** — инструментальные тесты; нужен эмулятор.
+- **Arrange / Act / Assert** — три шага одного теста.
+- **`assertEquals(ожидали, получили)`** — порядок аргументов.
+- **Тестовый дубль** — замена настоящей зависимости: фейк, стаб, мок, шпион.
+- **Фейк** — упрощённая рабочая реализация; предпочтителен, библиотек не требует.
+- **`runTest`** — запуск асинхронного теста с виртуальным временем.
+- **`MainDispatcherRule`** — подмена `Dispatchers.Main` для тестов `ViewModel`.
+- **`MockWebServer`** — локальный HTTP-сервер с очередью ответов.
+- **`enqueue` / `takeRequest`** — положить ответ; забрать принятый запрос для проверки.
+- **`createComposeRule`** — правило для тестов `Composable`.
+- **Дерево семантики** — то, что видит тест интерфейса; `testTag`, `useUnmergedTree`.
+- **RED / GREEN / REFACTOR** — три коммита TDD; тест после RED не меняется.
+
+</Block>
+
+<SectionAnchor chapterId="testing-mobile" sectionId="slova" />
+
+## Тренажёр: набрать вслепую
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="testing-mobile"
+  trainerId="trainer-testing-mobile"
+  targetCpm={100}
+  targetAccuracy={88}
+  pools={[
+    { label: 'Юнит-тесты и фейки', snippets: [
+      'fun `заглавная буква не проходит`() = assertFalse(isValidEmail("Ivan@mail.ru"))',
+      'class ProductRepository(private val api: ProductApi = RealProductApi())',
+      'override fun starting(description: Description) = Dispatchers.setMain(dispatcher)',
+    ] },
+    { label: 'MockWebServer и Compose', snippets: [
+      'server.enqueue(MockResponse().setResponseCode(401))',
+      'assertEquals("/api/auth", server.takeRequest().path)',
+      'composeRule.onNodeWithText("Войти").assertIsNotEnabled()',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="testing-mobile" sectionId="trenazher" />
+
+## На чемпионате
+
+Как эксперт проверяет модуль Е:
+
+- **Считает.** Пять методов в `ApiService` — ищет пять тестовых методов. Пять компонентов UI Kit — пять тестовых классов. Несоответствие видно за минуту.
+- **Запускает.** `./gradlew test` — если один класс не компилируется, весь модуль обнуляется. Проверьте это сами перед сдачей.
+- **Смотрит на тест-кейсы.** Один тест «успех» на запрос — минимум. Ветки `401` и `500` показывают, что участник понимает, зачем тесты.
+- **Сверяет коммиты TDD**, где они требуются: тест в RED и в GREEN — один и тот же файл, `git diff` между коммитами по тестовому классу пустой.
+- **Читает шапку класса** — комментарий с датой и номером участника, как в боевом коде.
+
+Порядок работы на четыре часа: валидаторы и мапперы (десять минут, готовые тест-кейсы из задания) → `MockWebServer` на каждый запрос (успех, `401`, `500`) → состояния UI Kit. Тесты `ViewModel` — если осталось время.
+
+Интернета десять минут на человека за сессию. Скелет теста, `MainDispatcherRule`, обвязка `MockWebServer` с `@Before`/`@After` — набираются по памяти. Тренажёр выше — ровно для этого.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="testing-mobile" quizId="quiz-5" questions={[
+  { q: 'В коммите RED тест ждал результат «Кофе», в GREEN исправили на «Кофе, Чай». Что с оценкой?', options: ['Ничего', 'Тест не учитывается: по правилам задания изменение теста после RED обнуляет его — сборка зелёная, оценка ноль', 'Снимут половину', 'Зависит от эксперта'], correct: 1, why: 'Тест в RED, GREEN и REFACTOR должен совпадать дословно. Неверный тест честнее оставить красным и написать новый.' },
+  { q: 'Девять тестовых классов из десяти написаны верно, в десятом опечатка в имени метода. Результат?', options: ['9 из 10 засчитаны', 'Модуль обнуляется целиком: один класс с ошибкой валит компиляцию всего sourceSet, тесты не запускаются', 'Предупреждение', 'Опечатку исправит эксперт'], correct: 1, why: 'Перед сдачей — ./gradlew test, а не только сборка приложения.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="testing-mobile" sectionId="na-chempionate" />
+
+## Что дальше
+
+Приложение собрано и доказано тестами — это конец основного маршрута мобильного трека. Дальше — две главы кругозора: чем Kotlin отличается от Java, из которой он вырос, и как Android дошёл от Java до Compose. Их читают не для баллов, а чтобы ответить эксперту на вопрос «а почему именно так».
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="testing-mobile" quizId="quiz-6" questions={[
+  { q: 'В каком порядке писать тесты на четырёхчасовом модуле?', options: ['Сначала ViewModel', 'Валидаторы и мапперы (готовые кейсы из задания) → MockWebServer на каждый запрос → состояния UI Kit → ViewModel, если осталось время', 'Сначала UI', 'В любом'], correct: 1, why: 'Первые дают баллы за десять минут; ViewModel — самые долгие из-за диспетчера и виртуального времени.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="testing-mobile" sectionId="dalshe" />
+
+## Углубиться
+
+- **Robolectric** — тесты `Composable` на чистой JVM без эмулятора: `@RunWith(RobolectricTestRunner::class)` и `isIncludeAndroidResources = true`. Заметная экономия времени, но как приём, а не основной путь.
+- **Turbine** — библиотека для тестов `Flow`: `flow.test { assertEquals(x, awaitItem()) }` вместо ручного сбора.
+- **Параметризованные тесты** — одна функция, таблица входов: тот же принцип, что в модели с четырнадцатью адресами, но средствами JUnit.
+- **MockK** — когда фейка не хватает и нужно проверить, что метод вызван с конкретными аргументами.
+- **Скриншот-тесты** — сравнение отрисовки с эталонной картинкой; ловят то, что семантическое дерево не видит.
+
+<SectionAnchor chapterId="testing-mobile" sectionId="uglubitsya" />
+
+<ChapterExam chapterId="testing-mobile" questions={[
+  { q: 'Почему ручная проверка трёх адресов не отличила регекс без якорей от правильного?', options: ['Регексы одинаковые', 'На кейсах, которые приходят в голову, обе реализации зелёные; разница — в кейсах, которые руками не набирают: пробел, заглавная буква, мусор вокруг', 'Проверяли мало времени', 'Ошибка в тесте'], correct: 1, why: 'Три из четырнадцати — 21 % покрытия. Тест — это таблица «вход → выход», отрабатывающая после каждой правки.' },
+  { q: 'Чем src/test/ отличается от src/androidTest/?', options: ['Названием', 'src/test — чистая JVM, секунды, ./gradlew test; androidTest — нужен эмулятор, минуты, connectedAndroidTest', 'Ничем', 'Версией JUnit'], correct: 1, why: 'Валидаторы, мапперы, ViewModel и MockWebServer — в src/test. В androidTest только тесты Composable.' },
+  { q: 'Почему Google рекомендует фейки, а не моки?', options: ['Моки медленнее', 'Фейк — обычный Kotlin-класс, не требует библиотеки; на чемпионате её ещё и нужно помнить наизусть', 'Моки устарели', 'Фейки точнее'], correct: 1, why: 'Подмена — дефолтным параметром конструктора, зависимость объявлена интерфейсом.' },
+  { q: 'Тест ViewModel падает: «Module with the Main dispatcher is missing». Что делать?', options: ['Добавить kotlinx-coroutines-android, как советует ошибка', 'Подменить главный диспетчер: правило с Dispatchers.setMain(StandardTestDispatcher()) до теста и resetMain() после', 'Убрать viewModelScope', 'Запустить на эмуляторе'], correct: 1, why: 'Совет в сообщении — ложный след. Правило пишется один раз и подключается в каждый класс.' },
+  { q: 'Что проверяет MockWebServer, чего не проверит фейк репозитория?', options: ['Ничего нового', 'Весь сетевой слой целиком: как Retrofit построил URL, как конвертер разобрал JSON, что интерсептор добавил заголовок — запрос идёт по настоящему HTTP', 'Скорость', 'Только коды ошибок'], correct: 1, why: 'Фейк обходит сетевой слой; MockWebServer — локальный сервер, который его принимает.' },
+  { q: 'Зачем в тесте сетевого слоя вызывать takeRequest()?', options: ['Для очистки очереди', 'Чтобы проверить, что ушло на сервер: метод, путь, тело, заголовок — иначе тест зелёный на неправильном запросе', 'Для скорости', 'Не нужно'], correct: 1, why: 'Клиент шлёт login/pass, сервер ждёт email/password — без takeRequest тест этого не увидит.' },
+  { q: 'Что означает «на каждый из запросов, по тест-кейсам»?', options: ['Один тест на ApiService', 'Пять методов — минимум пять тестов, и у каждого несколько веток: успех, 401, 500, битый JSON', 'Один тест на модуль', 'Тесты по желанию'], correct: 1, why: 'Эксперт считает соответствие методов и тестов.' },
+  { q: 'Что делать, если тест из коммита RED оказался неверным?', options: ['Исправить в GREEN', 'Оставить красным и написать рядом новый: изменённый после RED тест не учитывается в оценке', 'Удалить', 'Закомментировать'], correct: 1, why: 'Формулировка задания: «в случае изменения теста на данном этапе тест не будет учитываться».' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Основы тестирования на Android — developer.android.com](https://developer.android.com/training/testing/fundamentals) — что тестировать, где и как.
+- [Тестовые дубли: фейк предпочтительнее](https://developer.android.com/training/testing/fundamentals/test-doubles) — виды дублей и рекомендация Google.
+- [MockWebServer — OkHttp](https://github.com/square/okhttp/tree/master/mockwebserver) — очередь ответов, `takeRequest`, два артефакта.
+- [Тестирование корутин: runTest](https://developer.android.com/kotlin/coroutines/test) — `StandardTestDispatcher`, подмена `Main`.
+- [Тесты Compose](https://developer.android.com/develop/ui/compose/testing) — семантическое дерево, искатели, проверки, действия.

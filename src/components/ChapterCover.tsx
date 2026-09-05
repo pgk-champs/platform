@@ -533,6 +533,28 @@ const ARTS: Record<string, () => React.ReactNode> = {
   /* диск помнит, память забывает — арт «data-storage» */
   /* половина оценки срезана — арт «clean-code» */
   /* база в середине: сеть пишет, экран читает — арт «cache-offline» */
+  /* три кейса зелёные, четырнадцать — красные — арт «testing-mobile» */
+  'testing-mobile': () => (
+    <g strokeLinecap="round">
+      <text x="30" y="52" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>руками · 3</text>
+      {[0, 1, 2].map((i) => (
+        <circle key={i} cx={30 + i * 18} cy={66} r="6" fill={ACCENT} />
+      ))}
+
+      <text x="30" y="96" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>тестом · 14</text>
+      {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+        <circle key={i} cx={30 + i * 18} cy={110} r="6" fill={i < 3 ? ACCENT : 'none'} stroke={i < 3 ? ACCENT : INK} strokeWidth={2} />
+      ))}
+      {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+        <circle key={i} cx={30 + i * 18} cy={128} r="6" fill={i < 3 ? ACCENT : 'none'} stroke={i < 3 ? ACCENT : INK} strokeWidth={2} />
+      ))}
+      <path d="M92 104l8 8M100 104l-8 8M110 122l8 8M118 122l-8 8M146 104l8 8M154 104l-8 8M128 122l8 8M136 122l-8 8" stroke={INK} strokeWidth={2} />
+
+      <rect x="60" y="146" width="80" height="16" rx="5" fill={SOFT} stroke={ACCENT} strokeWidth={2} />
+      <text x="100" y="157" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>RED → GREEN</text>
+      <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>21% глазами</text>
+    </g>
+  ),
   /* три разрешения: два зелёных, одно перечёркнуто — арт «device-features» */
   'device-features': () => (
     <g strokeLinecap="round">
@@ -794,8 +816,9 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'code-basics': { track: 'foundation', num: '08', title: 'Из чего состоит код' },
   'oop-basics': { track: 'foundation', num: '09', title: 'ООП простыми словами — на двух языках' },
-  'kotlin-vs-java': { track: 'mobile', num: '25', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '26', title: 'История Java, Android и Kotlin' },
+  'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },
+  'testing-mobile': { track: 'mobile', num: '25', title: 'Тестирование: MockWebServer, фейки и TDD' },
   'device-features': { track: 'mobile', num: '24', title: 'Возможности устройства: камера, уведомления, виджет' },
   'auth-session': { track: 'mobile', num: '23', title: 'Авторизация: вход, живая сессия и биометрия' },
   'cache-offline': { track: 'mobile', num: '21', title: 'Кэш и офлайн: база как источник истины' },

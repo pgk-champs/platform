@@ -1470,5 +1470,32 @@
       "title": "WorkManager: отложенная и периодическая работа",
       "channel": "Senior Javasky"
     }
+  ],
+  "testing-mobile": [
+    {
+      "videoId": "Xhr4ArxXIi8",
+      "title": "Юнит-тестирование на примере Android — простым языком",
+      "channel": "Boris Pro IT"
+    },
+    {
+      "videoId": "-MzqC0jiz7A",
+      "title": "Юнит-тест для ViewModel в Android",
+      "channel": "Тимофей Коваленко"
+    },
+    {
+      "videoId": "0Q_v-yQx_pQ",
+      "title": "Network API в Android и тестирование через MockWebServer",
+      "channel": "Sweet Android"
+    },
+    {
+      "videoId": "JyUJZvJ-OV8",
+      "title": "Write your first Compose UI test",
+      "channel": "Android Developers"
+    },
+    {
+      "videoId": "tZZ2QBMLo4o",
+      "title": "TDD LiveCoding: юнит-тесты и код в прямом эфире",
+      "channel": "easyCodeRu"
+    }
   ]
 }
