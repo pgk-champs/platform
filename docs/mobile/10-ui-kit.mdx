@@ -208,17 +208,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-object Colors {
+object UiKitColors {
     val CardBackground = Color(0xFFFFFFFF)
     val ImagePlaceholder = Color(0xFFEEEEEE)
     val Badge = Color(0xFFE53935)
 }
 
-object Typography {
+object UiKitType {
     val TitleFontSize = 16.sp
     val PriceFontSize = 18.sp
     val BadgeFontSize = 12.sp
 }
+```
+
+<Hint type="important">
+Названия с префиксом `UiKit` — не украшение. В Material 3 уже есть свои
+`Typography` и `ColorScheme`, и если назвать свои объекты просто `Colors`
+и `Typography`, при первом же `import androidx.compose.material3.*`
+компилятор столкнёт два одинаковых имени. Ловится это обычно не в спокойной
+обстановке, а на чемпионате, когда подключаешь готовый компонент Material.
+
+Дальше по курсу эти объекты заменит сам `MaterialTheme` — но сначала важно
+увидеть, что он делает внутри.
+</Hint>
+
+```kotlin
 
 object Dimens {
     val CardPadding = 12.dp
@@ -244,7 +258,7 @@ fun ProductCard(title: String, price: String, discountPercent: Int) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Colors.CardBackground)
+            .background(UiKitColors.CardBackground)
             .padding(Dimens.CardPadding)
     ) {
         Box {
@@ -252,24 +266,24 @@ fun ProductCard(title: String, price: String, discountPercent: Int) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(Dimens.ImageHeight)
-                    .background(Colors.ImagePlaceholder)
+                    .background(UiKitColors.ImagePlaceholder)
             )
             Text(
                 text = "-$discountPercent%",
-                fontSize = Typography.BadgeFontSize,
+                fontSize = UiKitType.BadgeFontSize,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .background(Colors.Badge)
+                    .background(UiKitColors.Badge)
                     .padding(Dimens.BadgePadding)
             )
         }
-        Text(text = title, fontSize = Typography.TitleFontSize)
+        Text(text = title, fontSize = UiKitType.TitleFontSize)
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = price, fontSize = Typography.PriceFontSize)
+            Text(text = price, fontSize = UiKitType.PriceFontSize)
             Button(onClick = { }) {
                 Text(text = "В корзину")
             }
@@ -301,10 +315,10 @@ fun CatalogScreen() {
 
 <Block kind="quiz" title="Что переехало в ui-kit" chapterId="ui-kit" blockId="quiz-ui-kit-contents">
 <SelfCheck chapterId="ui-kit" quizId="q3" questions={[
-  { q: 'Что именно переезжает из :app в :ui-kit по итогам этого раздела?', options: ['Только object Dimens', 'Цвета, типографика (размеры шрифта), Dimens и сам переиспользуемый composable ProductCard', 'Весь модуль :app целиком', 'Только сам текст "В корзину"'], correct: 1, why: 'Всё, что раньше было либо магическими числами внутри ProductCard.kt, либо самим этим файлом — Colors, Typography, Dimens и ProductCard() — теперь живёт в :ui-kit.' },
-  { q: 'Что осталось в CatalogScreen (:app) после переноса ProductCard в :ui-kit?', options: ['Копия всего кода ProductCard на всякий случай', 'Только импорт ru.champs.uikit.ProductCard и вызовы этой функции с конкретными данными товара', 'Ничего — CatalogScreen больше не нужен', 'object Dimens, но без Colors и Typography'], correct: 1, why: ':app теперь просто вызывает готовый composable из :ui-kit, передавая только то, что меняется от товара к товару (title, price, discountPercent) — ни цветов, ни отступов там больше нет.' },
+  { q: 'Что именно переезжает из :app в :ui-kit по итогам этого раздела?', options: ['Только object Dimens', 'Цвета, типографика (размеры шрифта), Dimens и сам переиспользуемый composable ProductCard', 'Весь модуль :app целиком', 'Только сам текст "В корзину"'], correct: 1, why: 'Всё, что раньше было либо магическими числами внутри ProductCard.kt, либо самим этим файлом — UiKitColors, UiKitType, Dimens и ProductCard() — теперь живёт в :ui-kit.' },
+  { q: 'Что осталось в CatalogScreen (:app) после переноса ProductCard в :ui-kit?', options: ['Копия всего кода ProductCard на всякий случай', 'Только импорт ru.champs.uikit.ProductCard и вызовы этой функции с конкретными данными товара', 'Ничего — CatalogScreen больше не нужен', 'object Dimens, но без UiKitColors и UiKitType'], correct: 1, why: ':app теперь просто вызывает готовый composable из :ui-kit, передавая только то, что меняется от товара к товару (title, price, discountPercent) — ни цветов, ни отступов там больше нет.' },
   { q: 'Почему рефакторинг describeBadgeBefore/After печатает ОДИНАКОВЫЕ числа до и после выноса в отдельные object?', options: ['Потому что рефакторинг ничего не меняет в поведении — только в том, откуда код берёт значения', 'Это случайное совпадение чисел', 'На самом деле числа отличаются, просто выглядят одинаково', 'Потому что UiKitColors — это не настоящий object'], correct: 0, why: 'Рефакторинг по определению не должен менять результат — он меняет только структуру: где именно объявлено значение и сколько раз оно продублировано.' },
-  { q: 'Почему в примере с :ui-kit цвета объявлены как val Colors = Color(0xFF...), а не как const val, аналогично тому, что уже разбиралось для Dimens в прошлой главе?', options: ['Color — это тоже вызов функции-конструктора, а не значение, известное на этапе компиляции, поэтому const val для него, как и для Dp/Sp, не подходит', 'Цвета в Kotlin вообще нельзя объявлять внутри object', 'const val работает только с Int', 'Это опечатка, на самом деле нужен const val'], correct: 0, why: 'Тот же принцип, что и с Dp/Sp в прошлой главе: Color(0xFF...) — вызов конструктора, вычисляемый во время выполнения, а const val требует значения, известного компилятору ещё до запуска программы.' },
+  { q: 'Почему в примере с :ui-kit цвета объявлены как val UiKitColors = Color(0xFF...), а не как const val, аналогично тому, что уже разбиралось для Dimens в прошлой главе?', options: ['Color — это тоже вызов функции-конструктора, а не значение, известное на этапе компиляции, поэтому const val для него, как и для Dp/Sp, не подходит', 'Цвета в Kotlin вообще нельзя объявлять внутри object', 'const val работает только с Int', 'Это опечатка, на самом деле нужен const val'], correct: 0, why: 'Тот же принцип, что и с Dp/Sp в прошлой главе: Color(0xFF...) — вызов конструктора, вычисляемый во время выполнения, а const val требует значения, известного компилятору ещё до запуска программы.' },
 ]} />
 </Block>
 

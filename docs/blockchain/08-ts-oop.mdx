@@ -368,6 +368,25 @@ class Tx {
 }
 ```
 
+<Hint type="important">
+Короткая запись — единственная конструкция этой главы, которая **не запускается**
+через `node file.ts`. Node срезает типы, но поля в конструкторе — это не тип,
+а генерация кода, и срезать её нечем:
+
+```text
+class Tx {
+  constructor(public readonly id: string) {}
+                              ^^^^^^^^^^
+SyntaxError [ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX]: TypeScript parameter property
+is not supported in strip-only mode
+```
+
+Длинная запись выше работает без всяких оговорок. Короткую увидишь в чужом коде
+и в проектах со сборщиком — там её обрабатывает `tsc`, а не Node. Флаг
+`--erasableSyntaxOnly` в `tsconfig.json` запрещает такие конструкции заранее,
+чтобы поймать это при проверке, а не при запуске.
+</Hint>
+
 Тело конструктора пустое, а поля всё равно есть. Это называется **параметрами-свойствами**: модификатор доступа (`public`, `private`, `protected`, `readonly`) перед параметром конструктора говорит компилятору «заведи такое поле и положи туда аргумент».
 
 <Block kind="breakdown" title="Разбор по частям: параметры-свойства" chapterId="ts-oop" blockId="breakdown-param-props">
@@ -796,7 +815,11 @@ class Square extends Shape {
 
 ```ts
 class Square extends Shape {
-  constructor(private side: number) { super(); }
+  private side: number;
+  constructor(side: number) {
+    super();
+    this.side = side;
+  }
   area(): number { return this.side ** 2; }
 }
 console.log(new Square(3).describe()); // площадь 9
