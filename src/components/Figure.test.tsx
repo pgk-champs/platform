@@ -21,6 +21,7 @@ import { kotlinCoroutinesSchemes } from './figures/kotlinCoroutines';
 import { flowStreamsSchemes } from './figures/flowStreams';
 import { lazyListsSchemes } from './figures/lazyLists';
 import { materialThemeSchemes } from './figures/materialTheme';
+import { scaffoldBarsSchemes } from './figures/scaffoldBars';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -85,6 +86,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(flowStreamsSchemes),
     ...Object.keys(lazyListsSchemes),
     ...Object.keys(materialThemeSchemes),
+    ...Object.keys(scaffoldBarsSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

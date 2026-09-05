@@ -1200,5 +1200,32 @@
       "title": "Material 3 Dynamic Colors Feature in Android Studio with Jetpack Compose",
       "channel": "Stevdza-San"
     }
+  ],
+  "scaffold-bars": [
+    {
+      "videoId": "vuxfr8tsDsU",
+      "title": "Scaffold (TopAppBar, BottomBar & FAB) - Android Jetpack Compose",
+      "channel": "Neat Roots"
+    },
+    {
+      "videoId": "EqCvUETekjk",
+      "title": "Top App Bar (Toolbar) - UX With Material3",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "rbwLqUeixlI",
+      "title": "Scaffold and Slot APIs with Jetpack Compose",
+      "channel": "CodingWithMitch"
+    },
+    {
+      "videoId": "2FOShgaQk-I",
+      "title": "Managing Snackbar's with Scaffold (Jetpack Compose)",
+      "channel": "CodingWithMitch"
+    },
+    {
+      "videoId": "hQJpd78RUVg",
+      "title": "Learn What's New - Material 3 Top App Bar Component",
+      "channel": "Stevdza-San"
+    }
   ]
 }

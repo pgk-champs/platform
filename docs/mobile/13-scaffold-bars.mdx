@@ -1,0 +1,395 @@
+---
+title: 'Scaffold: каркас экрана, шапка и нижняя панель'
+audience: 'мобилка'
+level: 'база'
+order: 13
+sidebar_position: 13
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="scaffold-bars" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+import KotlinPlay from '@site/src/components/KotlinPlay';
+
+# Scaffold: каркас экрана, шапка и нижняя панель
+
+<ChapterProgress chapterId="scaffold-bars" totalSections={14} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="scaffold-bars" />
+
+## Зачем это нужно
+
+Мы умеем собрать содержимое экрана: карточки, списки, тему. Но экран приложения — это не только содержимое. Сверху обычно шапка с заголовком и кнопкой «назад», снизу — панель разделов, где-то в углу может висеть круглая кнопка действия.
+
+Всё это можно расставить вручную через `Column` и `Box`. Так делают, и так получают три проблемы разом: содержимое уезжает под шапку, нижняя панель перекрывается системными кнопками телефона, а снекбар с сообщением появляется поверх панели вместо того, чтобы встать над ней.
+
+Готовая рамка называется `Scaffold` — по-английски «строительные леса». Она знает, где у экрана верх, где низ и сколько места занимают панели, и сообщает это содержимому.
+
+На чемпионате нижняя панель разделов встречается почти в каждом задании, причём отдельным критерием идёт требование, чтобы выбранная вкладка сохранялась после перезапуска приложения. Обе темы разберём в этой главе.
+
+<SectionAnchor chapterId="scaffold-bars" sectionId="zachem" />
+
+## Четыре слота
+
+`Scaffold` — компонент со слотами, ровно в том смысле, который мы разбирали на UI Kit: вы передаёте ему разметку кусками, а он расставляет их по местам.
+
+```kotlin
+Scaffold(
+    topBar = { TopAppBar(title = { Text("Каталог") }) },
+    bottomBar = { NavigationBar { /* вкладки */ } },
+    floatingActionButton = { FloatingActionButton(onClick = {}) { Icon(Icons.Default.Add, null) } },
+) { innerPadding ->
+    ProductList(modifier = Modifier.padding(innerPadding))
+}
+```
+
+<Figure scheme="sb-slots" caption="Scaffold расставляет панели по краям и отдаёт содержимому отступы, оставшиеся от них" />
+
+Последний параметр — само содержимое, и он не просто лямбда: в него приходит `innerPadding`. Это и есть главная работа `Scaffold` — сказать содержимому, сколько места заняли панели.
+
+<SectionAnchor chapterId="scaffold-bars" sectionId="sloty" />
+
+## `innerPadding`: ошибка, которую делают все
+
+Проследим, что происходит, если этот параметр не применить:
+
+<KotlinPlay code={`data class Insets(val top: Int, val bottom: Int)
+
+fun scaffold(topBar: Int, bottomBar: Int, content: (Insets) -> Unit) {
+    println("Scaffold: шапка \$topBar dp, нижняя панель \$bottomBar dp")
+    content(Insets(topBar, bottomBar))
+}
+
+fun drawList(label: String, offsetTop: Int, offsetBottom: Int) {
+    val first = 0 + offsetTop
+    println("  \$label: первый элемент на высоте \$first dp, снизу зарезервировано \$offsetBottom dp")
+    if (offsetTop == 0) println("     ↑ первый элемент оказался ПОД шапкой — его не видно")
+}
+
+fun main() {
+    scaffold(topBar = 64, bottomBar = 80) { insets ->
+        drawList("padding проигнорирован", 0, 0)
+        drawList("padding применён", insets.top, insets.bottom)
+    }
+}`} />
+
+Живой вывод:
+
+```text
+Scaffold: шапка 64 dp, нижняя панель 80 dp
+  padding проигнорирован: первый элемент на высоте 0 dp, снизу зарезервировано 0 dp
+     ↑ первый элемент оказался ПОД шапкой — его не видно
+  padding применён: первый элемент на высоте 64 dp, снизу зарезервировано 80 dp
+```
+
+`Scaffold` **сообщает** размеры панелей, но применить их обязаны вы сами. Пропустили — первый элемент списка уезжает под шапку, а последний прячется за нижней панелью.
+
+<Figure scheme="sb-inner-padding" caption="Без применения innerPadding содержимое начинается под шапкой; с ним — сразу под её краем" />
+
+Коварство в том, что заметить это трудно. На коротком тестовом списке из трёх элементов всё выглядит нормально: под шапкой прячется первый, а его отсутствие не бросается в глаза. Проблема всплывает на реальных данных или на защите.
+
+<Hint type="important">
+Компилятор здесь не помощник: неиспользованный параметр лямбды — не ошибка и даже не предупреждение. Единственная защита — привычка. Написали `Scaffold` — сразу же напишите `Modifier.padding(innerPadding)` в содержимом, до того как наполнять его чем-то ещё.
+</Hint>
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="scaffold-bars" quizId="quiz-1" questions={[
+  { q: 'Что такое innerPadding в Scaffold?', options: ['Внутренние отступы самого Scaffold', 'Размеры, которые заняли панели: Scaffold сообщает их содержимому, а применить обязан разработчик', 'Отступы по краям экрана из макета', 'Настройка расстояния между элементами списка'], correct: 1, why: 'В примере видно: без применения первый элемент оказывается на высоте 0 — то есть под шапкой.' },
+  { q: 'Почему ошибку с innerPadding часто замечают поздно?', options: ['Она проявляется только на старых версиях Android', 'Компилятор молчит, а на коротком тестовом списке спрятанный под шапкой элемент не бросается в глаза', 'Она видна только в тёмной теме', 'Она зависит от размера экрана'], correct: 1, why: 'Неиспользованный параметр лямбды — не ошибка для компилятора. Поэтому применение padding доводят до привычки.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="scaffold-bars" sectionId="inner-padding" />
+
+## Шапка: `TopAppBar`
+
+Верхняя панель бывает четырёх размеров, и все они — готовые компоненты Material:
+
+```kotlin
+TopAppBar(
+    title = { Text("Каталог") },
+    navigationIcon = {
+        IconButton(onClick = onBack) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад")
+        }
+    },
+    actions = {
+        IconButton(onClick = onSearch) {
+            Icon(Icons.Default.Search, contentDescription = "Поиск")
+        }
+    },
+)
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'title = { Text(...) }', label: 'слот заголовка', note: 'это слот, а не строка: внутрь можно положить что угодно, например заголовок с подзаголовком в два уровня' },
+  { text: 'navigationIcon', label: 'кнопка слева', note: 'обычно «назад» или меню. Отдельный слот, потому что у неё своё место и свои отступы по спецификации' },
+  { text: 'Icons.AutoMirrored', label: 'зеркалящаяся иконка', note: 'стрелка «назад» переворачивается в языках с письмом справа налево. Для стрелок берут AutoMirrored, иначе на арабской локали она укажет не туда' },
+  { text: 'contentDescription = "Назад"', label: 'описание для озвучки', note: 'обязательный параметр: без него незрячий пользователь услышит «кнопка», а не «назад». За доступность на чемпионате тоже смотрят' },
+  { text: 'actions = { }', label: 'кнопки справа', note: 'сюда кладут поиск, фильтр, меню. Больше трёх иконок не помещается — остальное прячут в выпадающее меню' },
+]} />
+
+Варианты `CenterAlignedTopAppBar`, `MediumTopAppBar` и `LargeTopAppBar` отличаются расположением и высотой заголовка. Берите тот, что совпадает с макетом: если заголовок по центру — `CenterAlignedTopAppBar`, а не обычный с ручным выравниванием.
+
+<SectionAnchor chapterId="scaffold-bars" sectionId="topbar" />
+
+## Нижняя панель и её состояние
+
+`NavigationBar` — панель разделов внизу экрана. Устроена она так же, как все компоненты Material: сама ничего не помнит, а показывает то, что ей передали.
+
+```kotlin
+NavigationBar {
+    tabs.forEach { tab ->
+        NavigationBarItem(
+            selected = tab == selectedTab,
+            onClick = { onTabSelected(tab) },
+            icon = { Icon(tab.icon, contentDescription = tab.title) },
+            label = { Text(tab.title) },
+        )
+    }
+}
+```
+
+Обратите внимание: `selected` — не внутреннее свойство панели, а сравнение с внешним значением. Это то самое поднятие состояния из главы про состояние и события, только применённое к навигации.
+
+<Figure scheme="sb-tab-state" caption="Панель показывает переданную вкладку и сообщает о нажатии; помнит выбор тот, кто стоит выше" />
+
+Почему это важно — видно, если проследить жизнь состояния:
+
+<KotlinPlay code={`enum class Tab(val title: String) { Home("Главная"), Catalog("Каталог"), Cart("Корзина"), Profile("Профиль") }
+
+fun navigationBar(selected: Tab, onSelect: (Tab) -> Unit) {
+    val row = Tab.entries.joinToString("  ") { if (it == selected) "[\${it.title}]" else " \${it.title} " }
+    println("  панель: \$row")
+}
+
+fun main() {
+    var current = Tab.Home
+    println("экран открылся:")
+    navigationBar(current) { current = it }
+
+    println("нажали «Корзина»:")
+    navigationBar(Tab.Cart) { current = it }
+    current = Tab.Cart
+
+    println()
+    println("перезапуск приложения без сохранения:")
+    var afterRestart = Tab.Home
+    navigationBar(afterRestart) { }
+    println("     ↑ вернулись на Главную, хотя пользователь был в Корзине")
+
+    println("перезапуск с сохранением состояния:")
+    afterRestart = current
+    navigationBar(afterRestart) { }
+}`} />
+
+```text
+экран открылся:
+  панель: [Главная]   Каталог    Корзина    Профиль 
+нажали «Корзина»:
+  панель:  Главная    Каталог   [Корзина]   Профиль 
+
+перезапуск приложения без сохранения:
+  панель: [Главная]   Каталог    Корзина    Профиль 
+     ↑ вернулись на Главную, хотя пользователь был в Корзине
+перезапуск с сохранением состояния:
+  панель:  Главная    Каталог   [Корзина]   Профиль 
+```
+
+Последние четыре строки — это ровно тот критерий, который встречается в конкурсных заданиях: «необходимо сохранять состояние Bottom Bar после перезапуска приложения». Пока выбранная вкладка живёт в `remember`, она умирает вместе с экраном. Чтобы она пережила перезапуск, значение нужно сохранить в хранилище — этим займёмся в главе про данные.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="scaffold-bars" quizId="quiz-2" questions={[
+  { q: 'Где хранится информация о выбранной вкладке NavigationBar?', options: ['Внутри самой панели', 'Снаружи: панель получает selected параметром и сообщает о нажатии через onClick — это поднятие состояния', 'В системных настройках Android', 'В теме приложения'], correct: 1, why: 'Компоненты Material не хранят состояние. Панель показывает переданное значение и сообщает о нажатии наверх.' },
+  { q: 'Что нужно, чтобы выбранная вкладка пережила перезапуск приложения?', options: ['Достаточно remember', 'Сохранить значение в хранилище: remember умирает вместе с экраном, а rememberSaveable переживает только поворот', 'Использовать rememberSaveable', 'Это невозможно'], correct: 1, why: 'Перезапуск — это новый процесс. Пережить его может только то, что записано на диск: в DataStore или SharedPreferences.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="scaffold-bars" sectionId="bottombar" />
+
+## Снекбар: сообщение поверх экрана
+
+Короткое сообщение внизу экрана в Material называется снекбаром. Его тоже показывает `Scaffold` — и это как раз тот случай, где рамка окупается: снекбар сам встаёт над нижней панелью, а не под ней.
+
+```kotlin
+val snackbarHostState = remember { SnackbarHostState() }
+val scope = rememberCoroutineScope()
+
+Scaffold(
+    snackbarHost = { SnackbarHost(snackbarHostState) },
+) { innerPadding ->
+    Button(onClick = {
+        scope.launch { snackbarHostState.showSnackbar("Товар добавлен в корзину") }
+    }) { Text("В корзину") }
+}
+```
+
+`showSnackbar` — `suspend`-функция: она ждёт, пока сообщение покажется и скроется. Поэтому вызывать её нужно из корутины, и здесь пригождается `rememberCoroutineScope` из главы про жизнь состояния.
+
+<Hint type="tip">
+Снекбар — событие, а не состояние. В главе про `Flow` мы разбирали, почему такие вещи кладут в `SharedFlow`: если положить в `StateFlow`, после поворота экрана сообщение покажется второй раз. Здесь та же логика на практике.
+</Hint>
+
+<SectionAnchor chapterId="scaffold-bars" sectionId="snackbar" />
+
+## Системные панели и edge-to-edge
+
+Современный Android рисует приложение под системными панелями — часами сверху и полосой навигации снизу. Это называется edge-to-edge и с недавних версий включено принудительно.
+
+Хорошая новость: `Scaffold` про это знает. Он учитывает системные отступы при расчёте `innerPadding`, поэтому шапка не залезет под часы, а нижняя панель — под полосу навигации. Ещё одна причина не собирать каркас вручную.
+
+Отдельного внимания требует клавиатура: когда она открывается, поле ввода может оказаться под ней. Лечится модификатором:
+
+```kotlin
+Modifier.imePadding()
+```
+
+Проверять это нужно обязательно — на эмуляторе с открытой клавиатурой, а не на глаз.
+
+<SectionAnchor chapterId="scaffold-bars" sectionId="edge-to-edge" />
+
+## Когда `Scaffold` не нужен
+
+Не каждый экран требует каркаса. Диалог, экран загрузки, страница авторизации без шапки — там `Scaffold` только добавит лишний уровень вложенности.
+
+Правило простое: нужен `Scaffold`, если на экране есть хотя бы одно из — шапка, нижняя панель, плавающая кнопка, снекбар. Если ничего из этого нет, хватит обычного `Column` или `Box`.
+
+<SectionAnchor chapterId="scaffold-bars" sectionId="kogda-ne-nuzhen" />
+
+## Типичные ошибки
+
+**Не применили `innerPadding`.** Содержимое под шапкой. Самая частая ошибка главы.
+
+**Применили `innerPadding` не туда.** Отступ повесили на внутренний элемент вместо контейнера — часть содержимого сдвинулась, часть нет.
+
+**Забыли `contentDescription`.** Иконки в шапке без описания: незрячий пользователь слышит «кнопка, кнопка, кнопка».
+
+**Обычная стрелка вместо `AutoMirrored`.** На локалях с письмом справа налево стрелка «назад» указывает в противоположную сторону.
+
+**Состояние вкладки внутри `NavigationBar`.** Панель пытаются заставить помнить выбор саму — она этого не умеет и не должна.
+
+**`Scaffold` внутри `Scaffold`.** Обычно результат копирования куска другого экрана. Панели дублируются, отступы складываются дважды.
+
+<SectionAnchor chapterId="scaffold-bars" sectionId="oshibki" />
+
+## Слова главы
+
+<Block kind="vocab">
+
+- **`Scaffold`** — каркас экрана со слотами для панелей и содержимого.
+- **`innerPadding`** — отступы, оставшиеся от панелей; применять обязан разработчик.
+- **`TopAppBar`** — верхняя панель; варианты `CenterAligned`, `Medium`, `Large`.
+- **`navigationIcon` / `actions`** — слоты кнопок слева и справа в шапке.
+- **`NavigationBar` / `NavigationBarItem`** — нижняя панель разделов и её элемент.
+- **`SnackbarHostState`** — состояние снекбара; показ через `suspend`-функцию.
+- **edge-to-edge** — отрисовка под системными панелями; `Scaffold` учитывает их сам.
+- **`imePadding`** — отступ под открытую клавиатуру.
+
+</Block>
+
+<SectionAnchor chapterId="scaffold-bars" sectionId="slova" />
+
+## Тренажёр: набрать вслепую
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="scaffold-bars"
+  trainerId="trainer-scaffold"
+  targetCpm={100}
+  targetAccuracy={88}
+  pools={[
+    { label: 'Каркас', snippets: [
+      'Scaffold(topBar = { TopAppBar(title = { Text("Каталог") }) })',
+      'ProductList(modifier = Modifier.padding(innerPadding))',
+      'val snackbarHostState = remember { SnackbarHostState() }',
+    ] },
+    { label: 'Панель разделов', snippets: [
+      'NavigationBarItem(selected = tab == selectedTab, onClick = { onTabSelected(tab) })',
+      'Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад")',
+      'scope.launch { snackbarHostState.showSnackbar("Готово") }',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="scaffold-bars" sectionId="trenazher" />
+
+## На чемпионате
+
+Нижняя панель есть почти в каждом задании, и вокруг неё собирается сразу несколько критериев:
+
+- **Панель совпадает с макетом** — иконки, подписи, выделение активной вкладки.
+- **Состояние вкладки переживает перезапуск** — отдельный критерий, встречается из года в год.
+- **Содержимое не уезжает под панели** — это как раз `innerPadding`.
+- **Экраны разнесены по вкладкам правильно**: в заданиях встречается требование, чтобы разные сущности жили на разных страницах.
+
+Практический порядок: соберите `Scaffold` с обеими панелями на пустом экране в первый же день, проверьте отступы, и только потом наполняйте содержимым. Переделывать каркас под готовым экраном дороже.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="scaffold-bars" quizId="quiz-3" questions={[
+  { q: 'Экран с шапкой, нижней панелью и списком. Первый элемент списка не виден. Что проверить?', options: ['Данные в списке', 'Применён ли innerPadding к содержимому: без него список начинается под шапкой', 'Тему приложения', 'Высоту элементов списка'], correct: 1, why: 'Это самая частая причина. Scaffold сообщил высоту панелей, но отступ не применили.' },
+  { q: 'Зачем брать Icons.AutoMirrored для стрелки «назад»?', options: ['Она красивее', 'Она зеркалится на локалях с письмом справа налево, иначе укажет в противоположную сторону', 'Она меньше весит', 'Обычная стрелка устарела'], correct: 1, why: 'Локализация — часть заданий, а неверно направленная стрелка сразу видна эксперту.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="scaffold-bars" sectionId="na-chempionate" />
+
+## Что дальше
+
+Каркас есть, панели на месте, вкладки переключаются. Но пока нажатие на вкладку ничего не открывает: экраны нужно связать между собой. Дальше в треке — навигация и то, как приложение узнаёт, какой экран показывать, а следом данные, которые наполнят эти экраны настоящим содержимым.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="scaffold-bars" quizId="quiz-4" questions={[
+  { q: 'На экране только форма входа: ни шапки, ни панелей. Нужен Scaffold?', options: ['Да, всегда', 'Нет: без шапки, нижней панели, плавающей кнопки и снекбара хватит Column или Box', 'Да, ради системных отступов', 'Нужен, но пустой'], correct: 1, why: 'Scaffold решает задачу расстановки панелей. Нет панелей — нет и задачи, остаётся лишний уровень вложенности.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="scaffold-bars" sectionId="dalshe" />
+
+## Углубиться
+
+- `TopAppBarDefaults.enterAlwaysScrollBehavior()` — шапка, которая прячется при прокрутке вниз и возвращается при прокрутке вверх; требует `Modifier.nestedScroll`.
+- `NavigationRail` — та же панель разделов, но сбоку: так делают на планшетах и в горизонтальной ориентации.
+- `ModalNavigationDrawer` — выдвижное меню слева, когда разделов больше пяти.
+- `WindowInsets.safeDrawing` — ручное управление системными отступами, когда `Scaffold` не подходит.
+- `NavigationSuiteScaffold` — каркас, который сам выбирает между нижней панелью и боковой в зависимости от размера экрана.
+
+<SectionAnchor chapterId="scaffold-bars" sectionId="uglubitsya" />
+
+<ChapterExam chapterId="scaffold-bars" questions={[
+  { q: 'Какую задачу решает Scaffold?', options: ['Ускоряет отрисовку экрана', 'Расставляет панели по краям экрана и сообщает содержимому, сколько места они заняли', 'Хранит состояние экрана', 'Управляет навигацией между экранами'], correct: 1, why: 'Это рамка со слотами: topBar, bottomBar, floatingActionButton, snackbarHost — и innerPadding для содержимого.' },
+  { q: 'Что произойдёт, если не применить innerPadding?', options: ['Компилятор выдаст ошибку', 'Содержимое начнётся от самого верха: первый элемент окажется под шапкой, последний — за нижней панелью', 'Панели не отрисуются', 'Экран станет пустым'], correct: 1, why: 'В живом примере видно: без padding первый элемент оказывается на высоте 0 при шапке в 64 dp.' },
+  { q: 'Почему NavigationBar не помнит выбранную вкладку сам?', options: ['Это ошибка библиотеки', 'Компоненты Material не хранят состояние: панель получает selected параметром и сообщает о нажатии наверх', 'Помнит, но только до поворота экрана', 'Помнит, если задать id'], correct: 1, why: 'Это то же поднятие состояния, что и в главе про состояние и события, применённое к навигации.' },
+  { q: 'Что нужно, чтобы выбранная вкладка пережила перезапуск приложения?', options: ['remember', 'rememberSaveable', 'Запись значения в хранилище на диск — remember и rememberSaveable перезапуск не переживают', 'Ничего, это работает само'], correct: 2, why: 'rememberSaveable спасает при повороте, но перезапуск — новый процесс. Нужен DataStore или SharedPreferences.' },
+  { q: 'Почему showSnackbar вызывают из корутины?', options: ['Чтобы не блокировать интерфейс', 'Это suspend-функция: она ждёт, пока сообщение покажется и скроется', 'Так требует Scaffold', 'Чтобы снекбар появился поверх панели'], correct: 1, why: 'Отсюда и rememberCoroutineScope рядом: нужен scope, живущий вместе с экраном.' },
+  { q: 'Экран авторизации без шапки и панелей. Что использовать?', options: ['Scaffold с пустыми слотами', 'Column или Box: Scaffold решает задачу расстановки панелей, а панелей здесь нет', 'Обязательно Scaffold ради системных отступов', 'LazyColumn'], correct: 1, why: 'Пустой Scaffold — лишний уровень вложенности без пользы.' },
+  { q: 'Стрелка «назад» в шапке: какую иконку брать?', options: ['Icons.Default.ArrowBack', 'Icons.AutoMirrored.Filled.ArrowBack — она зеркалится на локалях с письмом справа налево', 'Любую, разницы нет', 'Собственную из ресурсов'], correct: 1, why: 'На арабской или ивритской локали обычная стрелка укажет в противоположную сторону.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Scaffold — developer.android.com](https://developer.android.com/develop/ui/compose/components/scaffold) — первоисточник по каркасу и его слотам.
+- [App bars](https://developer.android.com/develop/ui/compose/components/app-bars) — все варианты верхней панели и поведение при прокрутке.
+- [Navigation bar](https://developer.android.com/develop/ui/compose/components/navigation-bar) — нижняя панель разделов и её элементы.
+- [Edge-to-edge](https://developer.android.com/develop/ui/views/layout/edge-to-edge) — отрисовка под системными панелями и работа с отступами.
