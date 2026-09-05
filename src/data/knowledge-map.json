@@ -368,6 +368,14 @@
     "path": "blockchain/code-editor.mdx"
   },
   {
+    "id": "solidity-hello",
+    "title": "Первый контракт: из чего состоит код",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 3,
+    "path": "blockchain/solidity-hello.mdx"
+  },
+  {
     "id": "ts-vs-js",
     "title": "TypeScript и JavaScript: в чём разница",
     "audience": "блокчейн",

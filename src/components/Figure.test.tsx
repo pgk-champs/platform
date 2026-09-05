@@ -32,6 +32,7 @@ import { cacheOfflineSchemes } from './figures/cacheOffline';
 import { authSessionSchemes } from './figures/authSession';
 import { deviceFeaturesSchemes } from './figures/deviceFeatures';
 import { testingMobileSchemes } from './figures/testingMobile';
+import { solidityHelloSchemes } from './figures/solidityHello';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -107,6 +108,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(authSessionSchemes),
     ...Object.keys(deviceFeaturesSchemes),
     ...Object.keys(testingMobileSchemes),
+    ...Object.keys(solidityHelloSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

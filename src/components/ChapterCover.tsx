@@ -506,6 +506,26 @@ const ARTS: Record<string, () => React.ReactNode> = {
   /* диск помнит, память забывает — арт «data-storage» */
   /* половина оценки срезана — арт «clean-code» */
   /* база в середине: сеть пишет, экран читает — арт «cache-offline» */
+  /* текст превращается в байты: слева строки, справа блоки кода — арт «solidity-hello» */
+  'solidity-hello': () => (
+    <g strokeLinecap="round">
+      <rect x="16" y="44" width="76" height="92" rx="10" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      {[58, 72, 86, 100, 114].map((y, i) => (
+        <rect key={y} x="26" y={y} width={i % 2 === 0 ? 56 : 40} height="6" rx="3" fill="rgba(255,255,255,0.55)" />
+      ))}
+
+      <path d="M100 90h20M120 90l-6-5M120 90l-6 5" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <rect x="128" y="44" width="56" height="92" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      {[[136, 56], [152, 56], [168, 56], [136, 72], [152, 72], [168, 72], [136, 88], [152, 88], [168, 88], [136, 104], [152, 104], [168, 104]].map(([x, y], i) => (
+        <rect key={i} x={x} y={y} width="10" height="10" rx="2" fill={i % 3 === 0 ? ACCENT : 'rgba(255,255,255,0.35)'} />
+      ))}
+      <text x="156" y="130" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>0x37…</text>
+
+      <text x="100" y="160" textAnchor="middle" fontSize="10" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>364 байта</text>
+      <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>текст → байты</text>
+    </g>
+  ),
   /* три кейса зелёные, четырнадцать — красные — арт «testing-mobile» */
   'testing-mobile': () => (
     <g strokeLinecap="round">
@@ -805,6 +825,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'flow-streams': { track: 'mobile', num: '15', title: 'Flow: поток значений во времени' },
   'kotlin-coroutines': { track: 'mobile', num: '14', title: 'Корутины: как приложение не зависает' },
   'kotlin-null': { track: 'mobile', num: '02', title: 'Null-безопасность: ошибка на миллиард долларов' },
+  'solidity-hello': { track: 'blockchain', num: '03', title: 'Первый контракт: из чего состоит код' },
   'ts-vs-js': { track: 'blockchain', num: '14', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '15', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '16', title: 'Условия и циклы: как программа принимает решения' },

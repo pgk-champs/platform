@@ -32,6 +32,7 @@ import { cacheOfflineSchemes } from './figures/cacheOffline';
 import { authSessionSchemes } from './figures/authSession';
 import { deviceFeaturesSchemes } from './figures/deviceFeatures';
 import { testingMobileSchemes } from './figures/testingMobile';
+import { solidityHelloSchemes } from './figures/solidityHello';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -79,6 +80,7 @@ const SCHEMES = {
   ...authSessionSchemes,
   ...deviceFeaturesSchemes,
   ...testingMobileSchemes,
+  ...solidityHelloSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

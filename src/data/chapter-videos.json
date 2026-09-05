@@ -1443,5 +1443,32 @@
       "title": "TDD LiveCoding: юнит-тесты и код в прямом эфире",
       "channel": "easyCodeRu"
     }
+  ],
+  "solidity-hello": [
+    {
+      "videoId": "8A8-7Ks26yY",
+      "title": "Solidity и смарт-контракты Ethereum, урок #1 (АПДЕЙТ В ЗАКРЕПЕ) | Интро, Remix I",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "2lA2qpu2rbw",
+      "title": "SOLIDITY – БАЗОВЫЙ КУРС [Урок 1]",
+      "channel": "Блокчейн Разработчик"
+    },
+    {
+      "videoId": "aO4Mnz485uM",
+      "title": "Основы программирования / Урок #1 – Введение в программирование с нуля",
+      "channel": "Гоша Дударь"
+    },
+    {
+      "videoId": "AYpftDFiIgk",
+      "title": "Solidity Tutorial for Beginners - Full Course in 4 Hours (2023)",
+      "channel": "Naz Dumanskyy"
+    },
+    {
+      "videoId": "1kOaYZk-XjY",
+      "title": "Solidity Smart Contract Tutorial for Beginners | Write Your First Smart Contract",
+      "channel": "Session Bytes"
+    }
   ]
 }
