@@ -376,6 +376,14 @@
     "path": "blockchain/solidity-hello.mdx"
   },
   {
+    "id": "solidity-types",
+    "title": "Типы данных: uint, address, bool, string и деньги",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 4,
+    "path": "blockchain/solidity-types.mdx"
+  },
+  {
     "id": "ts-vs-js",
     "title": "TypeScript и JavaScript: в чём разница",
     "audience": "блокчейн",

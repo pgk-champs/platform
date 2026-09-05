@@ -1470,5 +1470,32 @@
       "title": "Solidity Smart Contract Tutorial for Beginners | Write Your First Smart Contract",
       "channel": "Session Bytes"
     }
+  ],
+  "solidity-types": [
+    {
+      "videoId": "alK0PY-Qa4Q",
+      "title": "Solidity и смарт-контракты Ethereum, урок #2 | Типы данных bool, uint, int",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "WTmyFzfwn04",
+      "title": "Solidity и смарт-контракты Ethereum, урок #3 | Типы данных string, address, mapp",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "NzERtzf6dBE",
+      "title": "Типы данных в Solidity (uint, address, bool, string, bytes) / Data types in Soli",
+      "channel": "Alex Klimov"
+    },
+    {
+      "videoId": "_pvup5lyC3Q",
+      "title": "Unchecked Math | Solidity 0.8",
+      "channel": "Smart Contract Programmer"
+    },
+    {
+      "videoId": "D40r0q3d-Zo",
+      "title": "Solidity Primitives Explained – bool, uint, int, address & bytes | Solidity Tuto",
+      "channel": "thebasicsdotacademy"
+    }
   ]
 }

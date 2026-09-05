@@ -339,6 +339,25 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="136" textAnchor="middle" fontSize="12" fontWeight={800} fill="#fff" fontFamily={MONO}>JVM</text>
     </g>
   ),
+  /* линейка типов: числа без дробей, адрес, флажок — арт «solidity-types» */
+  'solidity-types': () => (
+    <g strokeLinecap="round">
+      <rect x="16" y="46" width="168" height="26" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="30" y="64" fontSize="10" fontWeight={800} fill="rgba(255,255,255,0.75)" fontFamily={MONO}>uint256</text>
+      <text x="174" y="64" textAnchor="end" fontSize="9" fontWeight={800} fill={ACCENT} fontFamily={MONO}>78 знаков</text>
+
+      <rect x="16" y="80" width="168" height="26" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="30" y="98" fontSize="10" fontWeight={800} fill="rgba(255,255,255,0.75)" fontFamily={MONO}>address</text>
+      <text x="174" y="98" textAnchor="end" fontSize="9" fontWeight={800} fill={ACCENT} fontFamily={MONO}>20 байт</text>
+
+      <rect x="16" y="114" width="168" height="26" rx="8" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="30" y="132" fontSize="10" fontWeight={800} fill="rgba(255,255,255,0.75)" fontFamily={MONO}>1 ether</text>
+      <text x="174" y="132" textAnchor="end" fontSize="9" fontWeight={800} fill={ACCENT} fontFamily={MONO}>10¹⁸ wei</text>
+
+      <text x="100" y="164" textAnchor="middle" fontSize="10" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>дробей нет</text>
+      <text x="100" y="182" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>только целые</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -826,6 +845,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'kotlin-coroutines': { track: 'mobile', num: '14', title: 'Корутины: как приложение не зависает' },
   'kotlin-null': { track: 'mobile', num: '02', title: 'Null-безопасность: ошибка на миллиард долларов' },
   'solidity-hello': { track: 'blockchain', num: '03', title: 'Первый контракт: из чего состоит код' },
+  'solidity-types': { track: 'blockchain', num: '04', title: 'Типы данных: uint, address, bool, string и деньги' },
   'ts-vs-js': { track: 'blockchain', num: '14', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '15', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '16', title: 'Условия и циклы: как программа принимает решения' },
