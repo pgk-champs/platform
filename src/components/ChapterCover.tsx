@@ -358,6 +358,19 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="182" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>только целые</text>
     </g>
   ),
+  /* щит с проверкой: одна ветка проходит, две отбиты — арт «solidity-errors» */
+  'solidity-errors': () => (
+    <g strokeLinecap="round">
+      <path d="M100 40l58 20v44c0 30-24 52-58 66-34-14-58-36-58-66V60z" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="92" textAnchor="middle" fontSize="11" fontWeight={800} fill={ACCENT} fontFamily={MONO}>require</text>
+
+      <path d="M62 118h76" stroke="rgba(255,255,255,0.35)" strokeWidth={2} />
+      <path d="M74 134l10 10 20-22" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M112 128l16 16M128 128l-16 16" stroke="rgba(255,140,140,0.9)" strokeWidth={3} />
+
+      <text x="100" y="184" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>откат целиком</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -846,6 +859,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'kotlin-null': { track: 'mobile', num: '02', title: 'Null-безопасность: ошибка на миллиард долларов' },
   'solidity-hello': { track: 'blockchain', num: '03', title: 'Первый контракт: из чего состоит код' },
   'solidity-types': { track: 'blockchain', num: '04', title: 'Типы данных: uint, address, bool, string и деньги' },
+  'solidity-errors': { track: 'blockchain', num: '05', title: 'Ошибки и проверки: require, revert, assert' },
   'ts-vs-js': { track: 'blockchain', num: '14', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '15', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '16', title: 'Условия и циклы: как программа принимает решения' },

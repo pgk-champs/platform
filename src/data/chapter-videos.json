@@ -1497,5 +1497,32 @@
       "title": "Solidity Primitives Explained – bool, uint, int, address & bytes | Solidity Tuto",
       "channel": "thebasicsdotacademy"
     }
+  ],
+  "solidity-errors": [
+    {
+      "videoId": "lZgdN678PPM",
+      "title": "События и кастомные ошибки в Solidity: полный разбор на примере токена",
+      "channel": "Guide DAO"
+    },
+    {
+      "videoId": "ZzK15vkO38c",
+      "title": "Solidity и смарт-контракты Ethereum, урок #7 | События, модификаторы, require/re",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "fO4yPWUTWuw",
+      "title": "Разработка смарт-контрактов и Dapp на Solidity #7 - Обработка ошибок, Модификато",
+      "channel": "Alefman"
+    },
+    {
+      "videoId": "Pl4uXlnYACM",
+      "title": "Как обрабатываются ошибки в смарт контрактах ? | Require (); Assert();",
+      "channel": "Ruslan Ravana"
+    },
+    {
+      "videoId": "DAJLXWBZeYQ",
+      "title": "How to Handle Errors in Solidity | Custom Errors, require, revert & assert | Sma",
+      "channel": "thebasicsdotacademy"
+    }
   ]
 }

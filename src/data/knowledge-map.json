@@ -384,6 +384,14 @@
     "path": "blockchain/solidity-types.mdx"
   },
   {
+    "id": "solidity-errors",
+    "title": "Ошибки и проверки: require, revert, assert",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 5,
+    "path": "blockchain/solidity-errors.mdx"
+  },
+  {
     "id": "ts-vs-js",
     "title": "TypeScript и JavaScript: в чём разница",
     "audience": "блокчейн",
