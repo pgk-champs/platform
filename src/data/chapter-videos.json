@@ -1281,5 +1281,32 @@
       "title": "Repository Setup (MVVM Jetpack Compose)",
       "channel": "CodingWithMitch"
     }
+  ],
+  "network-retrofit": [
+    {
+      "videoId": "t6Sql3WMAnk",
+      "title": "The Ultimate Retrofit Crash Course",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "S-10lLA0nbk",
+      "title": "Coroutines with Retrofit - Kotlin Coroutines",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "SvadOJrNdio",
+      "title": "The Only Retrofit Tutorial You'll Ever Need! (with Jetpack Compose)",
+      "channel": "Android Knowledge"
+    },
+    {
+      "videoId": "aaChg9aJDW4",
+      "title": "Retrofit Setup - MVVM Pokédex App with Jetpack Compose",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "8IhNq0ng-wk",
+      "title": "Retrofit Android Tutorial - Make API Calls",
+      "channel": "Ahmed Guedmioui"
+    }
   ]
 }

@@ -1,0 +1,433 @@
+---
+title: 'Сеть: тот же экран, но с настоящими данными'
+audience: 'мобилка'
+level: 'углубление'
+order: 18
+sidebar_position: 18
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="network-retrofit" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+import KotlinPlay from '@site/src/components/KotlinPlay';
+
+# Сеть: тот же экран, но с настоящими данными
+
+<ChapterProgress chapterId="network-retrofit" totalSections={15} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="network-retrofit" />
+
+## Зачем это нужно
+
+В прошлой главе мы поставили репозиторий и подменили его реализацию — из фейковой в сетевую. Само подключение к серверу тогда осталось за кадром: `NetworkRepository` печатал «сходил в сеть» и возвращал готовый список.
+
+Теперь напишем эту реализацию по-настоящему. Задача сформулирована ровно так же, как в конкурсном спринте: экран уже готов и работает на зашитых данных, нужно, чтобы он показывал то, что отдаёт сервер. Ни `ViewModel`, ни разметка при этом не меняются — если предыдущая глава сделана правильно.
+
+Сеть в заданиях весит много: модуль клиент-серверного взаимодействия вырос до четверти всех баллов, и он же требует, чтобы сетевой слой был отдельной библиотекой, подключаемой через абстракцию. К этому мы придём в конце главы.
+
+<SectionAnchor chapterId="network-retrofit" sectionId="zachem" />
+
+## HTTP за пять минут
+
+Прежде чем брать библиотеку, полезно понимать, что она делает. Запрос к серверу — это текст определённого формата:
+
+<KotlinPlay code={`data class Request(val method: String, val path: String, val headers: Map<String, String>, val body: String?)
+data class Response(val code: Int, val body: String)
+
+fun describe(r: Request) {
+    println("  \${r.method} \${r.path}")
+    r.headers.forEach { (k, v) -> println("  \$k: \$v") }
+    if (r.body != null) println("\\n  \${r.body}")
+}
+
+fun main() {
+    println("── запрос списка товаров ──")
+    describe(Request("GET", "/api/products?page=1", mapOf("Accept" to "application/json"), null))
+
+    println()
+    println("── добавление в корзину ──")
+    describe(Request("POST", "/api/basket", mapOf(
+        "Content-Type" to "application/json",
+        "Authorization" to "Bearer <токен>",
+    ), """{"productId":7,"count":1}"""))
+
+    println()
+    listOf(Response(200, "ок"), Response(401, "токен протух"), Response(404, "нет такого"), Response(500, "сервер упал"))
+        .forEach { println("  \${it.code} — \${it.body}") }
+}`} />
+
+```text
+── запрос списка товаров ──
+  GET /api/products?page=1
+  Accept: application/json
+
+── добавление в корзину ──
+  POST /api/basket
+  Content-Type: application/json
+  Authorization: Bearer <токен>
+
+  {"productId":7,"count":1}
+
+  200 — ок
+  401 — токен протух
+  404 — нет такого
+  500 — сервер упал
+```
+
+<Figure scheme="nl-request" caption="Запрос состоит из метода, пути, заголовков и необязательного тела; ответ приходит с кодом состояния" />
+
+Четыре метода покрывают почти всё: `GET` — получить, `POST` — создать, `PUT` — заменить, `DELETE` — удалить. Коды ответов группируются по первой цифре: `2xx` — получилось, `4xx` — ошибка на стороне клиента (не туда постучались, не тот токен), `5xx` — сломался сервер.
+
+<Hint type="tip">
+Различать `4xx` и `5xx` важно практически: на `4xx` есть смысл что-то исправить в приложении — обновить токен, поправить параметры. На `5xx` исправлять нечего, остаётся показать пользователю ошибку и предложить повторить. Это пригодится в следующей главе, целиком посвящённой ошибкам.
+</Hint>
+
+<SectionAnchor chapterId="network-retrofit" sectionId="http" />
+
+## Смотрим API до всякого кода
+
+Прежде чем писать, надо прочитать документацию сервера. В конкурсных заданиях список эндпоинтов выдают заранее, и выглядит он примерно так:
+
+```text
+GET    /products              список товаров
+GET    /products/{id}         один товар
+GET    /categories            категории
+GET    /basket                корзина текущего пользователя
+POST   /basket                добавить товар
+DELETE /basket/{id}           убрать товар
+POST   /auth/login            вход, возвращает токен
+```
+
+Полезная привычка: прежде чем описывать интерфейс, дёрнуть пару эндпоинтов вручную — через браузер или Postman — и посмотреть настоящий ответ. Так вы увидите реальные имена полей, а не те, что кажутся логичными. Половина ошибок в разборе JSON происходит из-за того, что поле называется `product_name`, а в коде написали `productName`.
+
+<SectionAnchor chapterId="network-retrofit" sectionId="api" />
+
+## Интерфейс вместо кода запроса
+
+Запрос можно собирать руками, но так никто не делает. Сравним подходы:
+
+<KotlinPlay code={`fun manual(baseUrl: String, id: Int, token: String): String {
+    val sb = StringBuilder()
+    sb.append("GET ").append(baseUrl).append("/products/").append(id)
+    sb.append("\\nAuthorization: Bearer ").append(token)
+    sb.append("\\nAccept: application/json")
+    return sb.toString()
+}
+
+fun declared(baseUrl: String, id: Int, token: String): String {
+    val template = "/products/{id}"
+    val path = template.replace("{id}", id.toString())
+    return "GET \$baseUrl\$path\\nAuthorization: Bearer \$token\\nAccept: application/json"
+}
+
+fun main() {
+    println("── руками, в каждом методе ──")
+    println(manual("https://api.shop.ru", 7, "abc123"))
+    println("  ↑ забыл заголовок в одном из двадцати методов — поймаешь на защите")
+
+    println()
+    println("── описанием: @GET(\\"products/{id}\\") ──")
+    println(declared("https://api.shop.ru", 7, "abc123"))
+    println("  ↑ заголовки и базовый адрес заданы один раз для всех методов")
+}`} />
+
+Результат одинаковый, но во втором случае повторяющаяся часть вынесена. Именно это делает Retrofit: вы описываете, **что** за запрос, а склеиванием строк и разбором ответа занимается он.
+
+```kotlin
+interface ProductApi {
+
+    @GET("products")
+    suspend fun getProducts(@Query("page") page: Int = 1): List<ProductDto>
+
+    @GET("products/{id}")
+    suspend fun getProduct(@Path("id") id: Int): ProductDto
+
+    @POST("basket")
+    suspend fun addToBasket(@Body request: AddToBasketDto)
+
+    @DELETE("basket/{id}")
+    suspend fun removeFromBasket(@Path("id") id: Int)
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'interface ProductApi', label: 'только интерфейс', note: 'реализацию Retrofit создаёт сам во время работы программы. Вы описываете контракт, а не пишете код запросов' },
+  { text: '@GET("products")', label: 'метод и путь', note: 'путь дописывается к базовому адресу, заданному один раз при сборке. Ведущий слэш здесь не нужен — он ломает склейку' },
+  { text: '@Query("page")', label: 'параметр в строке запроса', note: 'превратится в products?page=1. Если значение null, параметр просто не добавится — удобно для необязательных фильтров' },
+  { text: '@Path("id")', label: 'подстановка в путь', note: 'имя в скобках обязано совпадать с именем в фигурных скобках пути. Не совпало — падение при первом же вызове' },
+  { text: '@Body request', label: 'тело запроса', note: 'объект превратится в JSON конвертером. Только для методов, у которых тело бывает: POST, PUT, PATCH' },
+  { text: 'suspend fun', label: 'приостанавливаемая функция', note: 'Retrofit умеет suspend напрямую: вызов приостановит корутину, пока идёт запрос, и не заблокирует поток' },
+]} />
+
+<Figure scheme="nl-interface" caption="Описание запроса вместо его сборки: общая часть задаётся один раз, а не повторяется в каждом методе" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="network-retrofit" quizId="quiz-1" questions={[
+  { q: 'Почему ProductApi — это интерфейс, а не класс?', options: ['Так короче', 'Мы описываем контракт: какие запросы бывают и как выглядят, а реализацию создаёт Retrofit во время работы программы', 'Классы нельзя использовать с аннотациями', 'Чтобы можно было наследоваться'], correct: 1, why: 'Отсюда и смысл подхода: вы отвечаете за правильное описание, а не за правильную склейку строк.' },
+  { q: 'Что делает аннотация @Path("id")?', options: ['Задаёт путь к файлу', 'Подставляет значение параметра в фигурные скобки внутри пути — имена обязаны совпадать', 'Добавляет параметр после знака вопроса', 'Задаёт заголовок'], correct: 1, why: 'Параметр после знака вопроса — это @Query. Несовпадение имён в @Path даёт падение при первом вызове.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="network-retrofit" sectionId="interface" />
+
+## JSON превращается в объект
+
+Сервер отвечает текстом в формате JSON. Превращает его в объекты конвертер, а классы для этого — наши DTO из прошлой главы:
+
+```kotlin
+@Serializable
+data class ProductDto(
+    @SerialName("product_id") val id: Int? = null,
+    @SerialName("product_name") val name: String? = null,
+    @SerialName("price_kopecks") val priceKopecks: Long? = null,
+)
+```
+
+`@SerialName` решает главную бытовую проблему: на сервере поля называются `product_name` в змеином регистре, а в Kotlin принято `name`. Аннотация связывает одно с другим, и уродливые имена не расползаются по коду.
+
+Значения по умолчанию (`= null`) — не перестраховка. Сервер может не прислать поле вовсе, и без значения по умолчанию разбор упадёт с ошибкой о пропущенном поле. Мы уже видели в прошлой главе, что бывает дальше: маппер превращает пустоту в нули и пустые строки, и остальной код работает с заполненными полями.
+
+<Figure scheme="nl-path" caption="Данные меняют форму на границах слоёв: JSON становится DTO, DTO — доменной моделью, та — состоянием экрана" />
+
+<SectionAnchor chapterId="network-retrofit" sectionId="json" />
+
+## Сборка клиента
+
+Три части: сам HTTP-клиент, конвертер и Retrofit поверх них.
+
+```kotlin
+private val json = Json {
+    ignoreUnknownKeys = true
+    coerceInputValues = true
+}
+
+private val client = OkHttpClient.Builder()
+    .addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
+    .connectTimeout(15, TimeUnit.SECONDS)
+    .readTimeout(15, TimeUnit.SECONDS)
+    .build()
+
+val api: ProductApi = Retrofit.Builder()
+    .baseUrl("https://api.shop.ru/")
+    .client(client)
+    .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+    .build()
+    .create(ProductApi::class.java)
+```
+
+Три настройки, которые экономят часы отладки.
+
+**`ignoreUnknownKeys = true`** — не падать, если сервер прислал поля, которых нет в вашем DTO. Без этого добавление нового поля на сервере ломает приложение, хотя вы этим полем не пользуетесь.
+
+**`HttpLoggingInterceptor`** — печатает в Logcat весь запрос и весь ответ. Первое, что нужно включить, и первое, куда смотреть, когда «не работает».
+
+**Слэш в конце `baseUrl`** — обязателен. Без него склейка адреса ломается непредсказуемо, и это одна из самых частых ошибок при первом запуске.
+
+<Hint type="important">
+Не забудьте разрешение в манифесте: `<uses-permission android:name="android.permission.INTERNET" />`. Без него запрос падает с `SecurityException`, а причина не очевидна — код выглядит правильным. И второе: с Android 9 запрещён незашифрованный трафик, поэтому адрес на `http://` не заработает без отдельной настройки. Если тестовый сервер отдаёт `http`, нужен `usesCleartextTraffic` или конфигурация сетевой безопасности.
+</Hint>
+
+<SectionAnchor chapterId="network-retrofit" sectionId="sborka" />
+
+## Репозиторий меняет внутренности
+
+Собираем всё вместе. Интерфейс из прошлой главы не меняется ни на строку:
+
+```kotlin
+class ProductRepositoryImpl(
+    private val api: ProductApi,
+) : ProductRepository {
+
+    override suspend fun getProducts(): List<Product> =
+        withContext(Dispatchers.IO) {
+            api.getProducts().map { it.toDomain() }
+        }
+}
+```
+
+Три строки, и в них вся глава: сходили в сеть, получили список DTO, превратили в доменные модели.
+
+`withContext(Dispatchers.IO)` переключает выполнение на поток для ввода-вывода. Строго говоря, Retrofit и сам выполняет запрос не в главном потоке, так что для одного вызова это необязательно. Но привычка полезная: как только рядом появится разбор большого ответа или работа с базой, переключение окажется нужным.
+
+Теперь тот самый момент, ради которого строились слои: `ViewModel` не изменилась, экран не изменился, задача «Экран Главная (Network)» закрыта заменой одного класса.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="network-retrofit" quizId="quiz-2" questions={[
+  { q: 'Зачем ignoreUnknownKeys = true?', options: ['Ускоряет разбор', 'Чтобы приложение не падало, когда сервер присылает поля, которых нет в DTO — иначе новое поле на сервере ломает работающее приложение', 'Позволяет не писать @SerialName', 'Разрешает null в полях'], correct: 1, why: 'Сервер развивается независимо от приложения, и появление нового поля не должно быть поводом для падения.' },
+  { q: 'Что изменится во ViewModel при переходе с фейкового репозитория на сетевой?', options: ['Нужно добавить обработку сети', 'Ничего: она зависит от интерфейса, а меняется только реализация', 'Нужно поменять тип возвращаемых данных', 'Нужно добавить suspend'], correct: 1, why: 'Ради этого и ставили интерфейс в прошлой главе: задача «Экран (Network)» сводится к замене одного класса.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="network-retrofit" sectionId="repozitoriy" />
+
+## Токен авторизации: один раз для всех запросов
+
+Почти каждый запрос требует заголовок с токеном. Писать `@Header("Authorization")` в каждом методе — тот самый случай «забыл в одном из двадцати». Правильное место — перехватчик:
+
+```kotlin
+class AuthInterceptor(private val tokenProvider: () -> String?) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val token = tokenProvider()
+        val request = if (token == null) chain.request()
+        else chain.request().newBuilder()
+            .addHeader("Authorization", "Bearer $token")
+            .build()
+        return chain.proceed(request)
+    }
+}
+```
+
+Перехватчик видит каждый запрос перед отправкой и может его дополнить. Токен при этом приходит функцией, а не значением: он меняется при входе и выходе, и клиент должен брать актуальный, а не тот, что был при сборке.
+
+<SectionAnchor chapterId="network-retrofit" sectionId="token" />
+
+## Сетевой слой отдельной библиотекой
+
+В конкурсных заданиях 2026 года сетевой слой требуется вынести в отдельный проект — с собственным репозиторием и версионированием, как UI Kit. И отдельным критерием проверяется, что приложение зависит от абстракции, а не от конкретной реализации: «код зависит от `IHttpClient`, а не от `OkHttp`».
+
+На практике это значит вот что: `ProductApi` и DTO живут в отдельном модуле, наружу торчит интерфейс, а `Retrofit` спрятан внутри. Приложение подключает модуль и знает только интерфейс.
+
+Звучит как бюрократия, но проверить это легко: попробуйте мысленно заменить Retrofit на что-то другое. Если для этого нужно править экраны — зависимость протекла.
+
+<SectionAnchor chapterId="network-retrofit" sectionId="biblioteka" />
+
+## Типичные ошибки
+
+**Нет разрешения `INTERNET`.** `SecurityException` при первом запросе. Код правильный, а причина в манифесте.
+
+**Нет слэша в конце `baseUrl`.** Адрес склеивается не так, как ожидается, и сервер отвечает `404`.
+
+**Ведущий слэш в пути аннотации.** `@GET("/products")` при `baseUrl` с путём затирает базовый путь целиком.
+
+**Имена в `@Path` не совпали.** `@GET("products/{id}")` с параметром `@Path("productId")` — падение при вызове.
+
+**Разбор упал на пропущенном поле.** Сервер не прислал поле, а в DTO нет значения по умолчанию.
+
+**Адрес на `http://`.** С Android 9 незашифрованный трафик запрещён по умолчанию — запрос не уходит вовсе.
+
+**DTO уехал в `UiState`.** Слои формально есть, но экран получил модель сервера со всеми её `null`.
+
+<SectionAnchor chapterId="network-retrofit" sectionId="oshibki" />
+
+## Слова главы
+
+<Block kind="vocab">
+
+- **HTTP-запрос** — метод, путь, заголовки и необязательное тело.
+- **Код ответа** — `2xx` получилось, `4xx` ошибка клиента, `5xx` ошибка сервера.
+- **Retrofit** — библиотека, собирающая запрос по описанию интерфейса.
+- **`@GET` / `@POST` / `@Path` / `@Query` / `@Body`** — описание метода, пути, параметров и тела.
+- **Конвертер** — превращает JSON в объекты и обратно.
+- **`@SerialName`** — связывает имя поля на сервере с именем в коде.
+- **`OkHttpClient`** — HTTP-клиент, который выполняет запрос.
+- **Перехватчик** — код, дополняющий каждый запрос: токен, логирование.
+- **`baseUrl`** — общий адрес; слэш в конце обязателен.
+
+</Block>
+
+<SectionAnchor chapterId="network-retrofit" sectionId="slova" />
+
+## Тренажёр: набрать вслепую
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="network-retrofit"
+  trainerId="trainer-network"
+  targetCpm={100}
+  targetAccuracy={88}
+  pools={[
+    { label: 'Описание запросов', snippets: [
+      '@GET("products/{id}") suspend fun getProduct(@Path("id") id: Int): ProductDto',
+      '@POST("basket") suspend fun addToBasket(@Body request: AddToBasketDto)',
+      '@SerialName("product_name") val name: String? = null',
+    ] },
+    { label: 'Сборка клиента', snippets: [
+      'Retrofit.Builder().baseUrl("https://api.shop.ru/").client(client).build()',
+      'val json = Json { ignoreUnknownKeys = true }',
+      'withContext(Dispatchers.IO) { api.getProducts().map { it.toDomain() } }',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="network-retrofit" sectionId="trenazher" />
+
+## На чемпионате
+
+Клиент-серверное взаимодействие — второй по весу модуль после вёрстки, и в 2026 году он вырос почти вдвое. Что проверяют:
+
+- **Каждый эндпоинт из списка реализован.** Задания перечисляют их поимённо: список товаров, категории, корзина, профиль, заказы, уведомления, вход и регистрация.
+- **Сетевой слой — отдельная библиотека**, подключаемая через интерфейс.
+- **Приложение не падает без сети.** Об этом целиком следующая глава.
+- **Тесты сетевого слоя.** В заданиях есть требование покрыть тестами каждый запрос, и проверяется это их запуском.
+
+Практический совет по порядку работы: первым делом соберите клиент и дёрните **один** самый простой эндпоинт, убедившись, что ответ приходит и разбирается. Только потом описывайте остальные двадцать. Если сразу написать весь интерфейс, а потом получить `404`, искать причину придётся среди двадцати мест вместо одного.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="network-retrofit" quizId="quiz-3" questions={[
+  { q: 'Запрос падает с SecurityException, код выглядит правильным. Что проверить?', options: ['Адрес сервера', 'Разрешение INTERNET в манифесте', 'Версию Retrofit', 'Настройки конвертера'], correct: 1, why: 'Без разрешения запрос не уходит вовсе, а причина не видна в коде запроса.' },
+  { q: 'Сервер отвечает 404 на все запросы, хотя пути правильные. Что вероятнее всего?', options: ['Сервер выключен', 'Нет слэша в конце baseUrl — адрес склеивается не так, как ожидается', 'Не хватает токена', 'Неверный конвертер'], correct: 1, why: 'Это одна из самых частых ошибок при первом запуске, и она не даёт ни компиляционной ошибки, ни внятного сообщения.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="network-retrofit" sectionId="na-chempionate" />
+
+## Что дальше
+
+Сейчас код написан так, будто сеть всегда работает. В жизни она не работает: интернет пропадает, сервер отвечает ошибкой, ответ приходит в неожиданном формате. Следующая глава — про то, что делать с каждым из этих случаев и почему их нельзя ловить одним `catch`.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="network-retrofit" quizId="quiz-4" questions={[
+  { q: 'Почему токен добавляют перехватчиком, а не аннотацией @Header в каждом методе?', options: ['Аннотация не работает с токенами', 'Заголовок нужен почти всем запросам, и написать его двадцать раз — значит однажды забыть; перехватчик добавляет его всем сразу', 'Перехватчик работает быстрее', 'Так требует Retrofit'], correct: 1, why: 'Плюс токен меняется при входе и выходе — перехватчик берёт актуальный, а не тот, что был при сборке клиента.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="network-retrofit" sectionId="dalshe" />
+
+## Углубиться
+
+- `@Multipart` и загрузка файлов: как отправить выбранное фото на сервер.
+- Пагинация: `@Query("page")`, `@Query("limit")` и как понять, что страницы кончились.
+- `MockWebServer` — поднять фальшивый сервер в тесте и проверить, что ушло и что разобралось.
+- Кэш OkHttp: заголовки `Cache-Control` и когда ответ можно не запрашивать заново.
+- `CallAdapter` — свой тип возвращаемого значения вместо голого объекта, например `Result`.
+
+<SectionAnchor chapterId="network-retrofit" sectionId="uglubitsya" />
+
+<ChapterExam chapterId="network-retrofit" questions={[
+  { q: 'Из чего состоит HTTP-запрос?', options: ['Только из адреса', 'Метод, путь, заголовки и необязательное тело', 'Из имени файла и параметров', 'Из токена и адреса'], correct: 1, why: 'Ответ приходит с кодом состояния: 2xx получилось, 4xx ошибка клиента, 5xx ошибка сервера.' },
+  { q: 'Почему интерфейс API описывают аннотациями, а не собирают запрос вручную?', options: ['Аннотации быстрее', 'Общая часть — адрес, заголовки, разбор ответа — задаётся один раз, а не повторяется в каждом методе, где её можно забыть', 'Так требует Kotlin', 'Вручную вообще нельзя'], correct: 1, why: 'Забытый заголовок в одном методе из двадцати обнаруживается в самый неудобный момент.' },
+  { q: 'Что делает @SerialName("product_name")?', options: ['Переименовывает класс', 'Связывает имя поля на сервере с именем свойства в Kotlin, чтобы имена сервера не расползались по коду', 'Задаёт значение по умолчанию', 'Помечает поле обязательным'], correct: 1, why: 'На сервере змеиный регистр, в Kotlin — свой стиль; аннотация соединяет одно с другим в единственном месте.' },
+  { q: 'Зачем DTO полям значения по умолчанию (= null)?', options: ['Для краткости', 'Сервер может не прислать поле вовсе — без значения по умолчанию разбор упадёт с ошибкой о пропущенном поле', 'Так требует Retrofit', 'Чтобы работал ignoreUnknownKeys'], correct: 1, why: 'Дальше пустоту разбирает маппер, и остальной код работает с заполненными полями.' },
+  { q: 'Что происходит при переходе с фейкового репозитория на сетевой?', options: ['Переписывается ViewModel', 'Меняется только реализация репозитория: интерфейс, ViewModel и экран остаются нетронутыми', 'Переписывается экран', 'Добавляется второй экран'], correct: 1, why: 'Ради этого репозиторий и ставили заранее — задача «Экран (Network)» сводится к замене класса.' },
+  { q: 'Первый запрос падает с SecurityException. Причина?', options: ['Неверный токен', 'Нет разрешения INTERNET в манифесте', 'Сервер недоступен', 'Ошибка в конвертере'], correct: 1, why: 'Код при этом выглядит совершенно правильным — искать нужно в манифесте.' },
+  { q: 'Как правильно начинать работу над сетевым слоем?', options: ['Описать все эндпоинты, потом проверить', 'Собрать клиент и дёрнуть один простой эндпоинт, убедиться, что ответ приходит и разбирается, и только потом описывать остальные', 'Начать с авторизации', 'Сначала написать тесты'], correct: 1, why: 'Если сразу описать двадцать методов и получить 404, причину придётся искать среди двадцати мест вместо одного.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Retrofit — официальная документация](https://square.github.io/retrofit/) — аннотации, конвертеры и поведение методов.
+- [OkHttp Interceptors](https://square.github.io/okhttp/features/interceptors/) — как устроены перехватчики и чем они отличаются друг от друга.
+- [kotlinx.serialization — руководство](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/serialization-guide.md) — `@SerialName`, значения по умолчанию, настройки разбора.
+- [Сетевые запросы в Android](https://developer.android.com/develop/connectivity/network-ops/connecting) — разрешения, безопасность трафика и работа с состоянием сети.

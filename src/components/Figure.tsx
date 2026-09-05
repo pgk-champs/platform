@@ -24,6 +24,7 @@ import { materialThemeSchemes } from './figures/materialTheme';
 import { scaffoldBarsSchemes } from './figures/scaffoldBars';
 import { viewModelStateSchemes } from './figures/viewModelState';
 import { appLayersSchemes } from './figures/appLayers';
+import { networkLayerSchemes } from './figures/networkLayer';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -63,6 +64,7 @@ const SCHEMES = {
   ...scaffoldBarsSchemes,
   ...viewModelStateSchemes,
   ...appLayersSchemes,
+  ...networkLayerSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

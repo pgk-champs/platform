@@ -528,6 +528,26 @@ const ARTS: Record<string, () => React.ReactNode> = {
   /* рамка экрана: шапка, содержимое, нижняя панель — арт «scaffold-bars» */
   /* экран пересоздаётся, состояние остаётся — арт «viewmodel-state» */
   /* три слоя и стрелки внутрь — арт «app-layers» */
+  /* запрос уходит, ответ приходит — арт «network-retrofit» */
+  'network-retrofit': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="46" width="64" height="108" rx="11" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="46" y="106" textAnchor="middle" fontSize="11" fontWeight={800} fill="rgba(255,255,255,0.8)" fontFamily={MONO}>app</text>
+
+      <path d="M88 78h60M148 78l-7-6M148 78l-7 6" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <text x="118" y="68" textAnchor="middle" fontSize="10" fontWeight={800} fill={ACCENT} fontFamily={MONO}>GET</text>
+
+      <path d="M148 122H88M88 122l7-6M88 122l7 6" stroke={INK} strokeWidth={3} fill="none" />
+      <text x="118" y="142" textAnchor="middle" fontSize="10" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>200</text>
+
+      <rect x="156" y="46" width="30" height="108" rx="9" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <circle cx="171" cy="72" r="4" fill={ACCENT} />
+      <circle cx="171" cy="100" r="4" fill={ACCENT} />
+      <circle cx="171" cy="128" r="4" fill={ACCENT} />
+
+      <text x="100" y="176" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>настоящие данные</text>
+    </g>
+  ),
   'app-layers': () => (
     <g strokeLinecap="round">
       <rect x="14" y="44" width="172" height="30" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
@@ -670,8 +690,9 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'code-basics': { track: 'foundation', num: '08', title: 'Из чего состоит код' },
   'oop-basics': { track: 'foundation', num: '09', title: 'ООП простыми словами — на двух языках' },
-  'kotlin-vs-java': { track: 'mobile', num: '18', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '19', title: 'История Java, Android и Kotlin' },
+  'kotlin-vs-java': { track: 'mobile', num: '19', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '20', title: 'История Java, Android и Kotlin' },
+  'network-retrofit': { track: 'mobile', num: '18', title: 'Сеть: тот же экран, но с настоящими данными' },
   'app-layers': { track: 'mobile', num: '17', title: 'Слои приложения: data, domain и репозиторий' },
   'viewmodel-state': { track: 'mobile', num: '16', title: 'ViewModel: состояние, которое переживает поворот' },
   'scaffold-bars': { track: 'mobile', num: '13', title: 'Scaffold: каркас экрана, шапка и нижняя панель' },
