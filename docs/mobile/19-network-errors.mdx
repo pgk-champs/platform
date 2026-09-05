@@ -1,0 +1,435 @@
+---
+title: 'Когда сети нет: ошибки, повторы и что видит пользователь'
+audience: 'мобилка'
+level: 'углубление'
+order: 19
+sidebar_position: 19
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="network-errors" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+import KotlinPlay from '@site/src/components/KotlinPlay';
+
+# Когда сети нет: ошибки, повторы и что видит пользователь
+
+<ChapterProgress chapterId="network-errors" totalSections={14} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="network-errors" />
+
+## Зачем это нужно
+
+Код из прошлой главы написан так, будто сеть работает всегда. В жизни она не работает регулярно: метро, лифт, кончился трафик, сервер перезагружают, ответ приходит в неожиданном виде.
+
+Разница между учебным приложением и рабочим — почти целиком в этом. Экран, который показывает список при хорошем интернете, пишет любой. Экран, который внятно объясняет, что происходит, когда интернета нет, — уже работа.
+
+В конкурсных заданиях это отдельные критерии, и они повторяются в каждом спринте: «в случае отсутствия соединения с сетью Интернет необходимо вернуть ошибку» и «отобразить экран, указанный в макете». То есть проверяют не факт обработки, а именно то, что видит пользователь.
+
+<SectionAnchor chapterId="network-errors" sectionId="zachem" />
+
+## Три разных «не получилось»
+
+Первое, что нужно принять: отказы бывают разной природы, и лечатся они по-разному.
+
+<KotlinPlay code={`class NoInternet : Exception("сеть недоступна")
+class ServerError(val code: Int) : Exception("сервер ответил \$code")
+class BadFormat : Exception("ответ не разобрался")
+
+sealed interface Outcome {
+    data class Ok(val data: String) : Outcome
+    data class Fail(val userText: String, val canRetry: Boolean) : Outcome
+}
+
+fun handle(e: Exception): Outcome = when (e) {
+    is NoInternet -> Outcome.Fail("Нет соединения. Проверьте интернет", canRetry = true)
+    is ServerError -> when (e.code) {
+        401 -> Outcome.Fail("Нужно войти заново", canRetry = false)
+        in 500..599 -> Outcome.Fail("Сервер недоступен, попробуйте позже", canRetry = true)
+        else -> Outcome.Fail("Запрос не прошёл (\${e.code})", canRetry = false)
+    }
+    is BadFormat -> Outcome.Fail("Что-то пошло не так", canRetry = false)
+    else -> Outcome.Fail("Неизвестная ошибка", canRetry = false)
+}
+
+fun main() {
+    println("── один catch на всё ──")
+    listOf(NoInternet(), ServerError(500), ServerError(401), BadFormat()).forEach {
+        println("  «Ошибка загрузки»   ← пользователь видит одно и то же на \${it::class.simpleName}")
+    }
+    println()
+    println("── разбор по типу ──")
+    listOf(NoInternet(), ServerError(500), ServerError(401), BadFormat()).forEach {
+        val r = handle(it) as Outcome.Fail
+        println("  \${it::class.simpleName?.padEnd(12)} → «\${r.userText}», кнопка «Повторить»: \${r.canRetry}")
+    }
+}`} />
+
+Живой вывод:
+
+```text
+── один catch на всё ──
+  «Ошибка загрузки»   ← пользователь видит одно и то же на NoInternet
+  «Ошибка загрузки»   ← пользователь видит одно и то же на ServerError
+  «Ошибка загрузки»   ← пользователь видит одно и то же на ServerError
+  «Ошибка загрузки»   ← пользователь видит одно и то же на BadFormat
+
+── разбор по типу ──
+  NoInternet   → «Нет соединения. Проверьте интернет», кнопка «Повторить»: true
+  ServerError  → «Сервер недоступен, попробуйте позже», кнопка «Повторить»: true
+  ServerError  → «Нужно войти заново», кнопка «Повторить»: false
+  BadFormat    → «Что-то пошло не так», кнопка «Повторить»: false
+```
+
+<Figure scheme="ne-three-kinds" caption="Отказы разной природы требуют разного текста и разного поведения: где-то уместна кнопка «Повторить», где-то нужен вход заново" />
+
+Обратите внимание на второй столбец: `canRetry`. Кнопка «Повторить» уместна не всегда. При протухшем токене повтор даст ту же ошибку сколько угодно раз — нужен вход. При сломанном формате ответа повтор тоже бессмысленен: сервер пришлёт то же самое.
+
+<Block kind="cheatsheet">
+
+| Что случилось | Кто виноват | Что показать | Повтор |
+|---|---|---|---|
+| `IOException` | нет связи | «Проверьте интернет» | да |
+| `4xx`, кроме 401 | запрос неверный | что именно не так | нет |
+| `401` | токен протух | «Войдите заново» | нет |
+| `5xx` | сервер | «Попробуйте позже» | да |
+| ошибка разбора | несовпал формат | «Что-то пошло не так» | нет |
+| таймаут | связь медленная | «Долго не отвечает» | да |
+
+</Block>
+
+<SectionAnchor chapterId="network-errors" sectionId="tri-otkaza" />
+
+## Где ловить
+
+Ошибку можно поймать в трёх местах, и выбор не произвольный.
+
+**В репозитории** — правильное место. Здесь известно, что за источник данных, здесь исключения сетевой библиотеки превращаются в понятные приложению типы. Наружу репозиторий отдаёт не исключение, а результат:
+
+```kotlin
+sealed interface DataResult<out T> {
+    data class Success<T>(val data: T) : DataResult<T>
+    data class Failure(val error: AppError) : DataResult<Nothing>
+}
+
+sealed interface AppError {
+    data object NoConnection : AppError
+    data object Unauthorized : AppError
+    data class Server(val code: Int) : AppError
+    data object Unknown : AppError
+}
+```
+
+```kotlin
+override suspend fun getProducts(): DataResult<List<Product>> = try {
+    DataResult.Success(api.getProducts().map { it.toDomain() })
+} catch (e: IOException) {
+    DataResult.Failure(AppError.NoConnection)
+} catch (e: HttpException) {
+    DataResult.Failure(
+        if (e.code() == 401) AppError.Unauthorized else AppError.Server(e.code())
+    )
+} catch (e: Exception) {
+    DataResult.Failure(AppError.Unknown)
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'sealed interface DataResult', label: 'закрытый набор исходов', note: 'у операции ровно два конца: получилось или нет. Компилятор проверит, что обработаны оба — забыть ветку не выйдет' },
+  { text: 'catch (e: IOException)', label: 'сеть не доступна', note: 'запрос не ушёл вовсе: нет интернета, сервер не отвечает, оборвалось соединение. Ловится первым, потому что тип более общий поймал бы и его' },
+  { text: 'catch (e: HttpException)', label: 'сервер ответил ошибкой', note: 'запрос дошёл, но код ответа не 2xx. Внутри есть code() — по нему различаем протухший токен и падение сервера' },
+  { text: 'catch (e: Exception)', label: 'всё остальное', note: 'последним и обязательно: непредвиденное всё равно случится, и приложение не должно от этого падать' },
+]} />
+
+**Во `ViewModel`** ловить нечего — она получает готовый `DataResult` и переводит его в состояние экрана.
+
+**В `Composable`** ловить нельзя вообще. Разметка рисует то, что ей дали, и не занимается обработкой.
+
+<Hint type="important">
+Один `catch (e: Exception)` вокруг всего — не обработка, а её видимость. Он поглощает и ошибки сети, и ошибки в собственном коде: опечатка в мапперe, обращение к пустому списку, деление на ноль. Всё это превращается в «Ошибка загрузки», и вы будете искать причину вслепую. Ловите конкретное, а общий `catch` держите последним.
+</Hint>
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="network-errors" quizId="quiz-1" questions={[
+  { q: 'Где правильно ловить сетевые ошибки?', options: ['В Composable, ближе к отображению', 'В репозитории: там известен источник данных, и там исключения превращаются в понятные приложению типы', 'Во ViewModel', 'В любом месте, разницы нет'], correct: 1, why: 'Наружу репозиторий отдаёт результат, а не исключение — тогда ViewModel просто переводит его в состояние экрана.' },
+  { q: 'Чем плох один catch (e: Exception) вокруг всего?', options: ['Он медленный', 'Он поглощает и ошибки сети, и ошибки в собственном коде — опечатка в мапперe превратится в «Ошибка загрузки», и причину придётся искать вслепую', 'Он не ловит IOException', 'Так нельзя по правилам Kotlin'], correct: 1, why: 'Ловят конкретные типы, а общий catch держат последним — как страховку от непредвиденного.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="network-errors" sectionId="gde-lovit" />
+
+## Что показать пользователю
+
+Состояние экрана из главы про `ViewModel` теперь наполняется смыслом:
+
+```kotlin
+fun load() {
+    viewModelScope.launch {
+        _uiState.update { it.copy(isLoading = true, error = null) }
+
+        when (val result = repository.getProducts()) {
+            is DataResult.Success ->
+                _uiState.update { it.copy(isLoading = false, items = result.data) }
+            is DataResult.Failure ->
+                _uiState.update { it.copy(isLoading = false, error = result.error) }
+        }
+    }
+}
+```
+
+<Figure scheme="ne-ui-states" caption="Три состояния экрана и отдельно — разница между пустым результатом и неудачей" />
+
+Три вещи, которые различают аккуратную работу от небрежной.
+
+**Пустой список — не ошибка.** Сервер ответил успешно и вернул ноль товаров: это «ничего не найдено», отдельный экран по макету. Показывать здесь «не удалось загрузить» — неправда.
+
+**Ошибка не должна быть стектрейсом.** `e.toString()` на экране — распространённая небрежность. Пользователю нужен текст на его языке, разработчику — тот же стектрейс, но в логах.
+
+**Кнопка «Повторить» — только там, где повтор поможет.** Это тот самый `canRetry` из первого примера.
+
+<SectionAnchor chapterId="network-errors" sectionId="chto-pokazat" />
+
+## Повтор с нарастающей паузой
+
+Иногда сбой временный: сеть моргнула, сервер перезагружался. Логично попробовать ещё раз — но не сразу и не бесконечно.
+
+<KotlinPlay code={`import kotlinx.coroutines.*
+
+suspend fun <T> retry(times: Int, initialDelay: Long, block: suspend (Int) -> T): T {
+    var delayMs = initialDelay
+    repeat(times - 1) { attempt ->
+        try {
+            return block(attempt + 1)
+        } catch (e: Exception) {
+            println("  попытка \${attempt + 1} не прошла, ждём \$delayMs мс")
+            delay(delayMs)
+            delayMs *= 2
+        }
+    }
+    return block(times)
+}
+
+var calls = 0
+suspend fun flakyServer(attempt: Int): String {
+    calls++
+    if (calls < 3) throw RuntimeException("сервер занят")
+    return "данные получены с попытки \$attempt"
+}
+
+fun main() = runBlocking {
+    println("── повтор с нарастающей паузой ──")
+    println("  " + retry(times = 4, initialDelay = 100) { flakyServer(it) })
+    println()
+    println("  всего обращений к серверу: \$calls")
+    println("  без паузы это были бы 3 запроса подряд за миллисекунды")
+}`} />
+
+```text
+── повтор с нарастающей паузой ──
+  попытка 1 не прошла, ждём 100 мс
+  попытка 2 не прошла, ждём 200 мс
+  данные получены с попытки 3
+
+  всего обращений к серверу: 3
+  без паузы это были бы 3 запроса подряд за миллисекунды
+```
+
+<Figure scheme="ne-retry" caption="Пауза удваивается с каждой попыткой: сервер получает время подняться вместо пачки одинаковых запросов" />
+
+Пауза удваивается не для красоты. Если сервер перегружен, три мгновенных повтора от каждого клиента добивают его окончательно. Растущая задержка даёт время подняться.
+
+Два ограничения. **Повторяют только повторяемое** — `IOException` и `5xx`, но не `401` и не ошибку разбора. И **бесконечных повторов не бывает**: три-четыре попытки, дальше показываем ошибку и отдаём решение пользователю.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="network-errors" quizId="quiz-2" questions={[
+  { q: 'Зачем в повторе нарастающая пауза, а не мгновенные попытки?', options: ['Так красивее', 'Если сервер перегружен, мгновенные повторы добивают его; растущая задержка даёт время подняться, а сети — восстановиться', 'Это требование Retrofit', 'Чтобы не разряжать батарею'], correct: 1, why: 'В примере три попытки заняли 300 мс вместо мгновенной пачки запросов.' },
+  { q: 'Сервер ответил 401. Стоит повторять запрос?', options: ['Да, три раза с паузой', 'Нет: повтор даст ту же ошибку — токен протух, и нужен вход заново', 'Да, но с большей паузой', 'Зависит от сервера'], correct: 1, why: 'Повторяют только то, что имеет шанс сработать: обрыв связи и падение сервера.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="network-errors" sectionId="povtor" />
+
+## Таймауты
+
+Худший вид отказа — не ошибка, а тишина. Сервер принял соединение и молчит, приложение ждёт, пользователь смотрит на индикатор. Без таймаута ожидание может длиться минуты.
+
+```kotlin
+OkHttpClient.Builder()
+    .connectTimeout(15, TimeUnit.SECONDS)   // сколько ждём установки соединения
+    .readTimeout(15, TimeUnit.SECONDS)      // сколько ждём ответа
+    .writeTimeout(15, TimeUnit.SECONDS)     // сколько ждём отправки
+    .build()
+```
+
+Пятнадцать секунд — разумная отправная точка. По истечении прилетит `SocketTimeoutException`, который наследуется от `IOException`, — то есть обработается той же веткой, что и отсутствие сети. Если нужен отдельный текст «сервер долго не отвечает», ловите его до общего `IOException`.
+
+<SectionAnchor chapterId="network-errors" sectionId="taymauty" />
+
+## Проверять связь заранее или ловить по факту
+
+Соблазн: перед запросом спросить систему, есть ли интернет, и не ходить в сеть впустую.
+
+На практике это ненадёжно. Система отвечает, что сеть есть, когда телефон подключён к Wi-Fi без интернета — в кафе с формой входа, в гостинице, в метро на переходе. Проверка скажет «связь есть», запрос всё равно упадёт.
+
+Поэтому основной механизм — обработка по факту, а проверку связи используют только для уточнения текста: если система уверенно говорит, что сети нет, можно сразу написать «нет соединения», не тратя пятнадцать секунд на таймаут.
+
+<SectionAnchor chapterId="network-errors" sectionId="proverka-svyazi" />
+
+## Отмена — не ошибка
+
+Одна тонкость, на которой спотыкаются даже опытные. Когда пользователь уходит с экрана, `viewModelScope` отменяет корутины, и внутри бросается `CancellationException`. Общий `catch (e: Exception)` её поймает — и покажет ошибку на экране, которого уже нет.
+
+```kotlin
+try {
+    val data = api.getProducts()
+} catch (e: CancellationException) {
+    throw e                      // отмену пропускаем дальше
+} catch (e: Exception) {
+    // здесь только настоящие ошибки
+}
+```
+
+Правило: `CancellationException` перехватывать нельзя, её всегда пробрасывают дальше. Отмена — штатное поведение, а не сбой.
+
+<SectionAnchor chapterId="network-errors" sectionId="otmena" />
+
+## Типичные ошибки
+
+**Пустой `catch`.** Ошибка проглочена, экран пустой, в логах ничего. Отлаживать невозможно.
+
+**Стектрейс на экране.** `e.toString()` в тексте ошибки — пользователь читает `retrofit2.HttpException: HTTP 500`.
+
+**Один `catch` на всё.** Ошибка в мапперe выглядит как проблема сети.
+
+**Перехваченная `CancellationException`.** Ошибка показывается при уходе с экрана.
+
+**Бесконечный повтор.** Цикл `while (true)` с запросом — приложение греет телефон и разряжает батарею.
+
+**Нет таймаута.** Индикатор крутится минутами.
+
+**Ошибка вместо пустого списка.** Сервер вернул ноль товаров, а экран пишет «не удалось загрузить».
+
+<SectionAnchor chapterId="network-errors" sectionId="oshibki" />
+
+## Слова главы
+
+<Block kind="vocab">
+
+- **`IOException`** — запрос не ушёл: нет связи, оборвалось соединение.
+- **`HttpException`** — сервер ответил кодом не из `2xx`.
+- **`SocketTimeoutException`** — истекло ожидание; наследник `IOException`.
+- **`CancellationException`** — корутина отменена; не ошибка, пробрасывается дальше.
+- **`DataResult`** — свой тип результата вместо исключений наружу.
+- **`AppError`** — набор ошибок на языке приложения, а не библиотеки.
+- **Повтор с нарастающей паузой** — задержка удваивается с каждой попыткой.
+- **Таймаут** — предел ожидания: соединения, ответа, отправки.
+
+</Block>
+
+<SectionAnchor chapterId="network-errors" sectionId="slova" />
+
+## Тренажёр: набрать вслепую
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="network-errors"
+  trainerId="trainer-network-errors"
+  targetCpm={100}
+  targetAccuracy={88}
+  pools={[
+    { label: 'Обработка', snippets: [
+      'catch (e: IOException) { DataResult.Failure(AppError.NoConnection) }',
+      'catch (e: CancellationException) { throw e }',
+      'sealed interface DataResult<out T>',
+    ] },
+    { label: 'Настройки и состояние', snippets: [
+      '.connectTimeout(15, TimeUnit.SECONDS)',
+      '_uiState.update { it.copy(isLoading = false, error = result.error) }',
+      'if (e.code() == 401) AppError.Unauthorized else AppError.Server(e.code())',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="network-errors" sectionId="trenazher" />
+
+## На чемпионате
+
+Обработка отказов проверяется в каждом спринте отдельными критериями, и формулировки повторяются из года в год: «в случае отсутствия соединения с сетью Интернет необходимо вернуть ошибку» и «отобразить экран, указанный в макете».
+
+Что делают на защите: включают авиарежим и открывают экран. Дальше смотрят:
+
+- **приложение не падает** — это главное;
+- **показан экран из макета**, а не пустое место и не стектрейс;
+- **есть способ повторить** — кнопка или жест обновления;
+- **после включения сети данные появляются** без перезапуска приложения.
+
+Проверьте это сами до защиты, ровно в таком порядке. Авиарежим на эмуляторе включается за две секунды, а находит он больше, чем час чтения кода.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="network-errors" quizId="quiz-3" questions={[
+  { q: 'Сервер успешно ответил, но вернул пустой список. Что показать?', options: ['Ошибку «не удалось загрузить»', 'Экран «ничего не найдено» по макету: запрос прошёл, данных просто нет — это не отказ', 'Пустой экран', 'Индикатор загрузки'], correct: 1, why: 'Пустой результат и неудача — разные состояния, и в заданиях под них разные экраны.' },
+  { q: 'Что проверяют на защите первым делом при отключённой сети?', options: ['Скорость загрузки', 'Что приложение не падает и показывает экран из макета с возможностью повторить', 'Размер приложения', 'Количество запросов'], correct: 1, why: 'Эксперт включает авиарежим и открывает экран — проверьте этот сценарий сами до защиты.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="network-errors" sectionId="na-chempionate" />
+
+## Что дальше
+
+Сейчас при отсутствии сети экран пуст: показать нечего, потому что данные жили только в памяти. Но если товары уже загружались раньше, их можно было сохранить и показать даже без интернета. Следующая глава — про хранение данных на устройстве, а за ней — про кэш, который превращает «нет сети» из тупика в неудобство.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="network-errors" quizId="quiz-4" questions={[
+  { q: 'Почему CancellationException нельзя перехватывать?', options: ['Она не наследуется от Exception', 'Отмена — штатное поведение: её перехват покажет ошибку на экране, с которого пользователь уже ушёл', 'Она перехватывается автоматически', 'Её нельзя пробросить'], correct: 1, why: 'Поэтому её ловят отдельной веткой и сразу пробрасывают дальше через throw e.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="network-errors" sectionId="dalshe" />
+
+## Углубиться
+
+- `NetworkCapabilities` и `ConnectivityManager` — как узнать состояние сети и подписаться на его изменения.
+- Перехватчик повторов в OkHttp: повтор на уровне клиента вместо ручного кода в репозитории.
+- `Result` из стандартной библиотеки Kotlin и почему для слоёв часто удобнее свой тип.
+- Глобальная обработка `401`: перехватчик, который обновляет токен и повторяет запрос сам.
+- `WorkManager` — отложенная отправка, когда действие нужно выполнить, как только сеть появится.
+
+<SectionAnchor chapterId="network-errors" sectionId="uglubitsya" />
+
+<ChapterExam chapterId="network-errors" questions={[
+  { q: 'Почему разные отказы нельзя обрабатывать одинаково?', options: ['Так медленнее', 'Пользователю нужно разное: при обрыве связи — проверить интернет, при 401 — войти заново, при 5xx — подождать; один текст на всё не помогает никому', 'Так требует Retrofit', 'Разницы действительно нет'], correct: 1, why: 'В живом примере один catch дал четыре одинаковых «Ошибка загрузки» на четыре разные причины.' },
+  { q: 'Где правильно превращать исключения в понятные приложению ошибки?', options: ['В Composable', 'В репозитории: он знает про источник данных и отдаёт наружу результат, а не исключение', 'Во ViewModel', 'В интерфейсе API'], correct: 1, why: 'Тогда ViewModel просто переводит готовый результат в состояние экрана.' },
+  { q: 'Какое исключение прилетит при отсутствии интернета?', options: ['HttpException', 'IOException — запрос не ушёл вовсе', 'CancellationException', 'NullPointerException'], correct: 1, why: 'HttpException означает, что запрос дошёл, но сервер ответил кодом не из 2xx.' },
+  { q: 'Сервер ответил 401. Показывать кнопку «Повторить»?', options: ['Да, обязательно', 'Нет: повтор даст ту же ошибку, нужен вход заново', 'Да, но с задержкой', 'Только при плохой связи'], correct: 1, why: 'Кнопка повтора уместна там, где повтор имеет шанс сработать: обрыв связи и падение сервера.' },
+  { q: 'Зачем в повторе удваивать паузу?', options: ['Для экономии батареи', 'Перегруженный сервер добивается пачкой мгновенных повторов; растущая пауза даёт ему время подняться', 'Так требует OkHttp', 'Чтобы пользователь успел прочитать сообщение'], correct: 1, why: 'Три попытки в примере заняли 300 мс вместо мгновенной пачки запросов.' },
+  { q: 'Почему CancellationException пробрасывают, а не обрабатывают?', options: ['Она не ловится', 'Отмена — штатное поведение при уходе с экрана; её перехват покажет ошибку на уже закрытом экране', 'Она всегда критическая', 'Так короче код'], correct: 1, why: 'Ловят её отдельной веткой прямо перед общим catch и сразу делают throw e.' },
+  { q: 'Сервер вернул пустой список товаров. Это ошибка?', options: ['Да, показать «не удалось загрузить»', 'Нет: запрос прошёл успешно, данных просто нет — нужен отдельный экран «ничего не найдено» по макету', 'Да, повторить запрос', 'Показать индикатор загрузки'], correct: 1, why: 'Подмена пустого результата ошибкой — распространённая небрежность, которую видно сразу.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Обработка ошибок в корутинах](https://kotlinlang.org/docs/exception-handling.html) — как исключения ведут себя внутри корутин и почему отмена особенная.
+- [OkHttp: таймауты и повторы](https://square.github.io/okhttp/recipes/) — настройки клиента и типовые рецепты.
+- [Состояние сети в Android](https://developer.android.com/develop/connectivity/network-ops/reading-network-state) — как узнать про соединение и почему это не гарантия.
+- [Слой данных: обработка ошибок](https://developer.android.com/topic/architecture/data-layer#error-handling) — рекомендация Google по возврату результата вместо исключений.

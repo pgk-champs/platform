@@ -529,6 +529,21 @@ const ARTS: Record<string, () => React.ReactNode> = {
   /* экран пересоздаётся, состояние остаётся — арт «viewmodel-state» */
   /* три слоя и стрелки внутрь — арт «app-layers» */
   /* запрос уходит, ответ приходит — арт «network-retrofit» */
+  /* оборванная связь и запасной путь — арт «network-errors» */
+  'network-errors': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="52" width="56" height="96" rx="11" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <rect x="130" y="52" width="56" height="96" rx="11" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+
+      <path d="M78 84h14M108 84h14" stroke={INK} strokeWidth={3} fill="none" />
+      <path d="M95 74l10 20M105 74l-10 20" stroke="rgba(255,140,140,0.95)" strokeWidth={3} fill="none" />
+
+      <rect x="78" y="112" width="44" height="24" rx="8" fill={SOFT} stroke={ACCENT} strokeWidth={2.5} />
+      <path d="M88 124h24M112 124l-5-4M112 124l-5 4" stroke={ACCENT} strokeWidth={2.5} fill="none" />
+
+      <text x="100" y="172" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>повторить</text>
+    </g>
+  ),
   'network-retrofit': () => (
     <g strokeLinecap="round">
       <rect x="14" y="46" width="64" height="108" rx="11" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
@@ -690,8 +705,9 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'code-basics': { track: 'foundation', num: '08', title: 'Из чего состоит код' },
   'oop-basics': { track: 'foundation', num: '09', title: 'ООП простыми словами — на двух языках' },
-  'kotlin-vs-java': { track: 'mobile', num: '19', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '20', title: 'История Java, Android и Kotlin' },
+  'kotlin-vs-java': { track: 'mobile', num: '20', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '21', title: 'История Java, Android и Kotlin' },
+  'network-errors': { track: 'mobile', num: '19', title: 'Когда сети нет: ошибки, повторы и что видит пользователь' },
   'network-retrofit': { track: 'mobile', num: '18', title: 'Сеть: тот же экран, но с настоящими данными' },
   'app-layers': { track: 'mobile', num: '17', title: 'Слои приложения: data, domain и репозиторий' },
   'viewmodel-state': { track: 'mobile', num: '16', title: 'ViewModel: состояние, которое переживает поворот' },

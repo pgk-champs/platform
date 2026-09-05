@@ -25,6 +25,7 @@ import { scaffoldBarsSchemes } from './figures/scaffoldBars';
 import { viewModelStateSchemes } from './figures/viewModelState';
 import { appLayersSchemes } from './figures/appLayers';
 import { networkLayerSchemes } from './figures/networkLayer';
+import { networkErrorsSchemes } from './figures/networkErrors';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -65,6 +66,7 @@ const SCHEMES = {
   ...viewModelStateSchemes,
   ...appLayersSchemes,
   ...networkLayerSchemes,
+  ...networkErrorsSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

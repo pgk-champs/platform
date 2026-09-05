@@ -1308,5 +1308,32 @@
       "title": "Retrofit Android Tutorial - Make API Calls",
       "channel": "Ahmed Guedmioui"
     }
+  ],
+  "network-errors": [
+    {
+      "videoId": "MiLN2vs2Oe0",
+      "title": "This Is My FAVORITE Error Handling Class",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "VWlwkqmTLHc",
+      "title": "In-Depth Guide to Coroutine Cancellation & Exception Handling",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "VfOQqmCpK7U",
+      "title": "Top 3 Coroutine Cancellation Traps That Lead to Errors",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "1mn5wRftxlk",
+      "title": "Advanced Error Handling in Android (Custom Exceptions)",
+      "channel": "K Apps"
+    },
+    {
+      "videoId": "eCmX2w9HXPA",
+      "title": "Android Retrofit Tutorial: MVVM with Error Handling",
+      "channel": "Modern Android Development"
+    }
   ]
 }
