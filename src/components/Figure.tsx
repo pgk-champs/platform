@@ -23,6 +23,7 @@ import { lazyListsSchemes } from './figures/lazyLists';
 import { materialThemeSchemes } from './figures/materialTheme';
 import { scaffoldBarsSchemes } from './figures/scaffoldBars';
 import { viewModelStateSchemes } from './figures/viewModelState';
+import { appLayersSchemes } from './figures/appLayers';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -61,6 +62,7 @@ const SCHEMES = {
   ...materialThemeSchemes,
   ...scaffoldBarsSchemes,
   ...viewModelStateSchemes,
+  ...appLayersSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

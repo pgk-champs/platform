@@ -1254,5 +1254,32 @@
       "title": "Android Jetpack: ViewModel",
       "channel": "Android Developers"
     }
+  ],
+  "app-layers": [
+    {
+      "videoId": "r5AseKQh2ZE",
+      "title": "Architecture: The data layer - MAD Skills",
+      "channel": "Android Developers"
+    },
+    {
+      "videoId": "gIhjCh3U88I",
+      "title": "Architecture: The Domain Layer - MAD Skills",
+      "channel": "Android Developers"
+    },
+    {
+      "videoId": "-QExSMcBvOg",
+      "title": "The Ultimate Beginner's Roadmap to Android App Architecture",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "KmnEsiQdd0M",
+      "title": "Do You Have to Learn Clean Architecture as a Beginner?",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "SQ0czZdQPRA",
+      "title": "Repository Setup (MVVM Jetpack Compose)",
+      "channel": "CodingWithMitch"
+    }
   ]
 }

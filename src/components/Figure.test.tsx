@@ -23,6 +23,7 @@ import { lazyListsSchemes } from './figures/lazyLists';
 import { materialThemeSchemes } from './figures/materialTheme';
 import { scaffoldBarsSchemes } from './figures/scaffoldBars';
 import { viewModelStateSchemes } from './figures/viewModelState';
+import { appLayersSchemes } from './figures/appLayers';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -89,6 +90,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(materialThemeSchemes),
     ...Object.keys(scaffoldBarsSchemes),
     ...Object.keys(viewModelStateSchemes),
+    ...Object.keys(appLayersSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

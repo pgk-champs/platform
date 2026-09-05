@@ -527,6 +527,24 @@ const ARTS: Record<string, () => React.ReactNode> = {
   /* светлая и тёмная половины одной палитры — арт «material-theme» */
   /* рамка экрана: шапка, содержимое, нижняя панель — арт «scaffold-bars» */
   /* экран пересоздаётся, состояние остаётся — арт «viewmodel-state» */
+  /* три слоя и стрелки внутрь — арт «app-layers» */
+  'app-layers': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="44" width="172" height="30" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="26" y="64" fontSize="12" fontWeight={800} fill="rgba(255,255,255,0.85)" fontFamily={MONO}>ui</text>
+
+      <rect x="14" y="84" width="172" height="30" rx="9" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="26" y="104" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>domain</text>
+
+      <rect x="14" y="124" width="172" height="30" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="26" y="144" fontSize="12" fontWeight={800} fill="rgba(255,255,255,0.85)" fontFamily={MONO}>data</text>
+
+      <path d="M160 74v10M160 84l-4-4M160 84l4-4" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M160 124v-10M160 114l-4 4M160 114l4 4" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <text x="100" y="176" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>стрелки внутрь</text>
+    </g>
+  ),
   'viewmodel-state': () => (
     <g strokeLinecap="round">
       <rect x="14" y="40" width="76" height="96" rx="11" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} strokeDasharray="7 5" />
@@ -652,8 +670,9 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'code-basics': { track: 'foundation', num: '08', title: 'Из чего состоит код' },
   'oop-basics': { track: 'foundation', num: '09', title: 'ООП простыми словами — на двух языках' },
-  'kotlin-vs-java': { track: 'mobile', num: '17', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '18', title: 'История Java, Android и Kotlin' },
+  'kotlin-vs-java': { track: 'mobile', num: '18', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '19', title: 'История Java, Android и Kotlin' },
+  'app-layers': { track: 'mobile', num: '17', title: 'Слои приложения: data, domain и репозиторий' },
   'viewmodel-state': { track: 'mobile', num: '16', title: 'ViewModel: состояние, которое переживает поворот' },
   'scaffold-bars': { track: 'mobile', num: '13', title: 'Scaffold: каркас экрана, шапка и нижняя панель' },
   'material-theme': { track: 'mobile', num: '12', title: 'Material 3: тема, которую вам уже сгенерировали' },

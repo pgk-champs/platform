@@ -280,11 +280,19 @@
     "path": "mobile/viewmodel-state.mdx"
   },
   {
+    "id": "app-layers",
+    "title": "Слои приложения: data, domain и репозиторий",
+    "audience": "мобилка",
+    "level": "углубление",
+    "order": 17,
+    "path": "mobile/app-layers.mdx"
+  },
+  {
     "id": "kotlin-vs-java",
     "title": "Kotlin и Java: в чём разница",
     "audience": "мобилка",
     "level": "база",
-    "order": 17,
+    "order": 18,
     "path": "mobile/kotlin-vs-java.mdx"
   },
   {
@@ -292,7 +300,7 @@
     "title": "История Java, Android и Kotlin",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 18,
+    "order": 19,
     "path": "mobile/kotlin-history.mdx"
   },
   {
