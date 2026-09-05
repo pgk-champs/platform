@@ -523,6 +523,17 @@ const ARTS: Record<string, () => React.ReactNode> = {
   ),
   /* две дорожки времени: сплошная занятая и прерывистая свободная — арт «kotlin-coroutines» */
   /* поток значений во времени против одного хранимого — арт «flow-streams» */
+  /* видимое окно поверх длинной ленты — арт «lazy-lists» */
+  'lazy-lists': () => (
+    <g strokeLinecap="round">
+      {[38, 58, 78, 98, 118, 138].map((y, i) => (
+        <rect key={y} x="14" y={y} width="172" height="14" rx="5"
+          fill={i >= 1 && i <= 3 ? ACCENT : SOFT} stroke={i >= 1 && i <= 3 ? ACCENT : INK} strokeWidth={2} />
+      ))}
+      <rect x="8" y="52" width="184" height="62" rx="10" fill="none" stroke={ACCENT} strokeWidth={3} strokeDasharray="7 5" />
+      <text x="100" y="170" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>только видимое</text>
+    </g>
+  ),
   'flow-streams': () => (
     <g strokeLinecap="round">
       <text x="14" y="34" fontSize="11" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>Flow</text>
@@ -596,10 +607,11 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'code-basics': { track: 'foundation', num: '08', title: 'Из чего состоит код' },
   'oop-basics': { track: 'foundation', num: '09', title: 'ООП простыми словами — на двух языках' },
-  'kotlin-vs-java': { track: 'mobile', num: '13', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '14', title: 'История Java, Android и Kotlin' },
-  'flow-streams': { track: 'mobile', num: '12', title: 'Flow: поток значений во времени' },
-  'kotlin-coroutines': { track: 'mobile', num: '11', title: 'Корутины: как приложение не зависает' },
+  'kotlin-vs-java': { track: 'mobile', num: '14', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '15', title: 'История Java, Android и Kotlin' },
+  'lazy-lists': { track: 'mobile', num: '11', title: 'Списки: LazyColumn и всё, что не нарисовать циклом' },
+  'flow-streams': { track: 'mobile', num: '13', title: 'Flow: поток значений во времени' },
+  'kotlin-coroutines': { track: 'mobile', num: '12', title: 'Корутины: как приложение не зависает' },
   'kotlin-null': { track: 'mobile', num: '02', title: 'Null-безопасность: ошибка на миллиард долларов' },
   'ts-vs-js': { track: 'blockchain', num: '03', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '04', title: 'Значения и переменные: числа, строки, типы' },

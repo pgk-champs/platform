@@ -19,6 +19,7 @@ import { kotlinOopSchemes } from './figures/kotlinOop';
 import { kotlinHistorySchemes } from './figures/kotlinHistory';
 import { kotlinCoroutinesSchemes } from './figures/kotlinCoroutines';
 import { flowStreamsSchemes } from './figures/flowStreams';
+import { lazyListsSchemes } from './figures/lazyLists';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -53,6 +54,7 @@ const SCHEMES = {
   ...kotlinHistorySchemes,
   ...kotlinCoroutinesSchemes,
   ...flowStreamsSchemes,
+  ...lazyListsSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

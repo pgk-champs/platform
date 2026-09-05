@@ -1146,5 +1146,32 @@
       "title": "Миграция с LiveData на Coroutines Flow",
       "channel": "Android Broadcast. Все об Андроид разработке"
     }
+  ],
+  "lazy-lists": [
+    {
+      "videoId": "1ANt65eoNhQ",
+      "title": "Lazy layouts in Compose",
+      "channel": "Android Developers"
+    },
+    {
+      "videoId": "1Thp0bB5Ev0",
+      "title": "Lists - Android Jetpack Compose - Part 8",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "j88wrM4eRPs",
+      "title": "Lazy Lists In Jetpack Compose - (Lazy Column, Row, Grid)",
+      "channel": "Ahmed Guedmioui"
+    },
+    {
+      "videoId": "s8h7GJTZa4E",
+      "title": "Top 3 Hacks to Remove LazyColumn Lag in Jetpack Compose",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "Y547UHx5Rc0",
+      "title": "The FULL Nested Scrolling Guide for Jetpack Compose",
+      "channel": "Philipp Lackner"
+    }
   ]
 }
