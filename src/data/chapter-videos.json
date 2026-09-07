@@ -1524,5 +1524,32 @@
       "title": "How to Handle Errors in Solidity | Custom Errors, require, revert & assert | Sma",
       "channel": "thebasicsdotacademy"
     }
+  ],
+  "solidity-flow": [
+    {
+      "videoId": "Sdp-azBAom4",
+      "title": "Учимся писать смарт контракты  Ethereum | If else в Solidity",
+      "channel": "Ruslan Ravana"
+    },
+    {
+      "videoId": "gEFNykHv8Sw",
+      "title": "Solidity и смарт-контракты Ethereum, урок #33 | Тесты, управление временем, BigN",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "eGGLl_4MvE8",
+      "title": "Solidity и смарт-контракты Ethereum, урок #23 | Timelock: ставим транзакции в оч",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "GLrz3Qyi4io",
+      "title": "Are You Still Using Block.Timestamp like this? Solidity Best Practices",
+      "channel": "EatTheBlocks"
+    },
+    {
+      "videoId": "VvHkM2wfesE",
+      "title": "Loops in Solidity Tutorial | for vs while + Gas Optimization",
+      "channel": "Conflux Network"
+    }
   ]
 }

@@ -371,6 +371,25 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="184" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>откат целиком</text>
     </g>
   ),
+  /* развилка из трёх веток и часы блока — арт «solidity-flow» */
+  'solidity-flow': () => (
+    <g strokeLinecap="round">
+      <circle cx="40" cy="90" r="10" fill={ACCENT} />
+      <path d="M50 90h30M80 90l24-28M80 90h24M80 90l24 28" stroke={INK} strokeWidth={3} fill="none" />
+
+      <rect x="110" y="46" width="72" height="24" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      <text x="146" y="63" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>seed · 0</text>
+
+      <rect x="110" y="78" width="72" height="24" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      <text x="146" y="95" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>priv · 0.00075</text>
+
+      <rect x="110" y="110" width="72" height="24" rx="7" fill={SOFT} stroke={ACCENT} strokeWidth={2.5} />
+      <text x="146" y="127" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>pub · 0.001</text>
+
+      <text x="100" y="160" textAnchor="middle" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>301-я секунда</text>
+      <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>первая истинная</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -860,6 +879,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'solidity-hello': { track: 'blockchain', num: '03', title: 'Первый контракт: из чего состоит код' },
   'solidity-types': { track: 'blockchain', num: '04', title: 'Типы данных: uint, address, bool, string и деньги' },
   'solidity-errors': { track: 'blockchain', num: '05', title: 'Ошибки и проверки: require, revert, assert' },
+  'solidity-flow': { track: 'blockchain', num: '06', title: 'Условия, циклы и время: как контракт принимает решения' },
   'ts-vs-js': { track: 'blockchain', num: '14', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '15', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '16', title: 'Условия и циклы: как программа принимает решения' },

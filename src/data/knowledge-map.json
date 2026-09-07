@@ -392,6 +392,14 @@
     "path": "blockchain/solidity-errors.mdx"
   },
   {
+    "id": "solidity-flow",
+    "title": "Условия, циклы и время: как контракт принимает решения",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 6,
+    "path": "blockchain/solidity-flow.mdx"
+  },
+  {
     "id": "ts-vs-js",
     "title": "TypeScript и JavaScript: в чём разница",
     "audience": "блокчейн",
