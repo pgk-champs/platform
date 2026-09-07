@@ -645,6 +645,23 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="186" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>форма данных</text>
     </g>
   ),
+  /* восклицательный знак в круге и лестница стека — арт «ts-errors» */
+  'ts-errors': () => (
+    <g strokeLinecap="round">
+      <circle cx="62" cy="88" r="30" fill={SOFT} stroke={ACCENT} strokeWidth={4} />
+      <path d="M62 72v20" stroke={ACCENT} strokeWidth={5} />
+      <circle cx="62" cy="102" r="3.5" fill={ACCENT} />
+
+      {[0, 1, 2].map((i) => (
+        <rect key={i} x={108 + i * 6} y={68 + i * 20} width={72 - i * 6} height="14" rx="4"
+          fill="rgba(255,255,255,0.28)" />
+      ))}
+      <text x="144" y="132" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>стек вызовов</text>
+
+      <text x="100" y="160" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>код выхода 1</text>
+      <text x="100" y="184" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>отката нет</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -1166,6 +1183,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'ts-run': { track: 'blockchain', num: '19', title: 'Как запустить код: Node, tsc и первая программа' },
   'ts-null': { track: 'blockchain', num: '21', title: 'Пусто: null, undefined и строгие проверки' },
   'ts-types': { track: 'blockchain', num: '26', title: 'Свои типы: интерфейсы, объединения и обобщения' },
+  'ts-errors': { track: 'blockchain', num: '29', title: 'Ошибки: throw, try/catch и результат вместо исключения' },
   'ts-vs-js': { track: 'blockchain', num: '18', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '20', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '22', title: 'Условия и циклы: как программа принимает решения' },

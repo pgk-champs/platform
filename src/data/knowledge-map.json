@@ -568,6 +568,14 @@
     "path": "blockchain/ts-inheritance.mdx"
   },
   {
+    "id": "ts-errors",
+    "title": "Ошибки: throw, try/catch и результат вместо исключения",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 29,
+    "path": "blockchain/ts-errors.mdx"
+  },
+  {
     "id": "ts-async",
     "title": "Асинхронность: промисы, async/await и цикл событий",
     "audience": "блокчейн",

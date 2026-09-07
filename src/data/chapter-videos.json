@@ -1956,5 +1956,32 @@
       "title": "Type Narrowing and Type Widening in TypeScript",
       "channel": "TypeScript with Benny Code"
     }
+  ],
+  "ts-errors": [
+    {
+      "videoId": "_OEoZmIt_60",
+      "title": "try catch throw | Обработка ошибок в JS [Курс 2024]",
+      "channel": "Какие-то уроки [Frontend]"
+    },
+    {
+      "videoId": "ubYPpR9acQc",
+      "title": "Обработка ошибок в JavaScript — try catch finally, throw, класс Error",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "JESs8zEMlU8",
+      "title": "TypeScript: обработка ошибок и асинхронность | Разбор книги Бориса Чёрного",
+      "channel": "Сергей Лебедев | QA"
+    },
+    {
+      "videoId": "1U44SbOa7rE",
+      "title": "The PROBLEM With Error Handling in Typescript (and how to fix it)",
+      "channel": "Ethan Niser"
+    },
+    {
+      "videoId": "Q1euMQFI35I",
+      "title": "Try Catch Error Handling With TypeScript",
+      "channel": "ByteGrad"
+    }
   ]
 }
