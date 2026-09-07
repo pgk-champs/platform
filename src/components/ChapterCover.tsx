@@ -625,6 +625,26 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="184" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>значения нет</text>
     </g>
   ),
+  /* две формы и развилка объединения — арт «ts-types» */
+  'ts-types': () => (
+    <g strokeLinecap="round">
+      <rect x="66" y="42" width="68" height="30" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="100" y="62" textAnchor="middle" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>Result</text>
+
+      <path d="M100 76v10M84 86h32M84 86v12M116 86v12" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <rect x="20" y="100" width="72" height="40" rx="9" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="56" y="118" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>ok: true</text>
+      <text x="56" y="132" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>data</text>
+
+      <rect x="108" y="100" width="72" height="40" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="144" y="118" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>ok: false</text>
+      <text x="144" y="132" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>error</text>
+
+      <text x="100" y="164" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>метка различает варианты</text>
+      <text x="100" y="186" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>форма данных</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -1145,6 +1165,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'proxy-upgrade': { track: 'blockchain', num: '17', title: 'Прокси: обновление логики без смены адреса' },
   'ts-run': { track: 'blockchain', num: '19', title: 'Как запустить код: Node, tsc и первая программа' },
   'ts-null': { track: 'blockchain', num: '21', title: 'Пусто: null, undefined и строгие проверки' },
+  'ts-types': { track: 'blockchain', num: '26', title: 'Свои типы: интерфейсы, объединения и обобщения' },
   'ts-vs-js': { track: 'blockchain', num: '18', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '20', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '22', title: 'Условия и циклы: как программа принимает решения' },

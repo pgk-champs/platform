@@ -544,6 +544,14 @@
     "path": "blockchain/ts-collections.mdx"
   },
   {
+    "id": "ts-types",
+    "title": "Свои типы: интерфейсы, объединения и обобщения",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 26,
+    "path": "blockchain/ts-types.mdx"
+  },
+  {
     "id": "ts-oop",
     "title": "Классы на TypeScript: объекты, поля и инкапсуляция",
     "audience": "блокчейн",

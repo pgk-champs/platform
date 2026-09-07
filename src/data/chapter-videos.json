@@ -1929,5 +1929,32 @@
       "title": "Are You Using Null And Undefined Wrong?",
       "channel": "Web Dev Simplified"
     }
+  ],
+  "ts-types": [
+    {
+      "videoId": "P2Ny05sAYoY",
+      "title": "TypeScript - Union типы и TypeGuards",
+      "channel": "PurpleSchool | Anton Larichev"
+    },
+    {
+      "videoId": "k16Hgi753XQ",
+      "title": "Дженерики в TypeScript с нуля (Generic, Extends, Параметры по Умолчанию + Пример",
+      "channel": "Василий Муравьев"
+    },
+    {
+      "videoId": "hGdx0hpZsvs",
+      "title": "Разница между Интерфейсом и Типом в Тайпскрипт 2021. TypeScript Interface vs Typ",
+      "channel": "wise.js"
+    },
+    {
+      "videoId": "LKFgiSFeTDU",
+      "title": "TypeScript / Урок 9. Union Type",
+      "channel": "Игорь Антонов — про JavaScript и разработку"
+    },
+    {
+      "videoId": "MBmFvFVrtGk",
+      "title": "Type Narrowing and Type Widening in TypeScript",
+      "channel": "TypeScript with Benny Code"
+    }
   ]
 }
