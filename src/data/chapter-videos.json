@@ -1821,5 +1821,32 @@
       "title": "DeFi Primitives in Solidity: ERC4626 (Part1)",
       "channel": "Layers"
     }
+  ],
+  "proxy-upgrade": [
+    {
+      "videoId": "cz0BC2HSFA8",
+      "title": "Solidity и смарт-контракты Ethereum, урок #28 | Паттерн Proxy/Upgradeable: Trans",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "WON6VttFTe0",
+      "title": "Solidity и Ethereum, урок #59 | Как работают transparent upgradeable proxy и ERC",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "Awm6BYDGYOE",
+      "title": "Solidity и Ethereum, урок #78 | Beacon и proxy: один маячок для управления всеми",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "uawCDnxFJ-0",
+      "title": "Delegatecall | Solidity 0.8",
+      "channel": "Smart Contract Programmer"
+    },
+    {
+      "videoId": "vcID3QRzPHo",
+      "title": "Proxy Patterns and Storage Layouts — Forge College",
+      "channel": "Forge College"
+    }
   ]
 }

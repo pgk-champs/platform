@@ -571,6 +571,24 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="188" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>цена доли</text>
     </g>
   ),
+  /* корпус с постоянным адресом и сменной вставкой — арт «proxy-upgrade» */
+  'proxy-upgrade': () => (
+    <g strokeLinecap="round">
+      <rect x="24" y="56" width="152" height="76" rx="12" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="100" y="78" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>0xe7f1…0512</text>
+
+      <rect x="42" y="88" width="52" height="32" rx="8" fill={SOFT} stroke={ACCENT} strokeWidth={3} strokeDasharray="5 4" />
+      <text x="68" y="109" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>V1</text>
+
+      <path d="M102 104h14M116 104l-5-4M116 104l-5 4" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <rect x="122" y="88" width="40" height="32" rx="8" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="142" y="109" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>V2</text>
+
+      <text x="100" y="152" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>данные остались</text>
+      <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>адрес тот же</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -1071,6 +1089,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'erc20-scratch': { track: 'blockchain', num: '14', title: 'ERC20 с нуля: как устроен токен' },
   'erc20-oz': { track: 'blockchain', num: '15', title: 'Готовый ERC20: OpenZeppelin и что он делает за вас' },
   'erc4626': { track: 'blockchain', num: '16', title: 'ERC4626: доли хранилища вместо баланса' },
+  'proxy-upgrade': { track: 'blockchain', num: '17', title: 'Прокси: обновление логики без смены адреса' },
   'ts-vs-js': { track: 'blockchain', num: '18', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '19', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '20', title: 'Условия и циклы: как программа принимает решения' },

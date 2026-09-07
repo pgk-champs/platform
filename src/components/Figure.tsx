@@ -46,6 +46,7 @@ import { solPatternsSchemes } from './figures/solPatterns';
 import { erc20ScratchSchemes } from './figures/erc20Scratch';
 import { erc20OzSchemes } from './figures/erc20Oz';
 import { erc4626Schemes } from './figures/erc4626';
+import { proxyUpgradeSchemes } from './figures/proxyUpgrade';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -107,6 +108,7 @@ const SCHEMES = {
   ...erc20ScratchSchemes,
   ...erc20OzSchemes,
   ...erc4626Schemes,
+  ...proxyUpgradeSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

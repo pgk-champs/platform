@@ -480,6 +480,14 @@
     "path": "blockchain/erc4626.mdx"
   },
   {
+    "id": "proxy-upgrade",
+    "title": "Прокси: обновление логики без смены адреса",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 17,
+    "path": "blockchain/proxy-upgrade.mdx"
+  },
+  {
     "id": "ts-vs-js",
     "title": "TypeScript и JavaScript: в чём разница",
     "audience": "блокчейн",
