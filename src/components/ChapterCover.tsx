@@ -608,6 +608,23 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="182" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>три пути</text>
     </g>
   ),
+  /* две пустые коробки и перечёркнутая точка — арт «ts-null» */
+  'ts-null': () => (
+    <g strokeLinecap="round">
+      <rect x="20" y="62" width="76" height="48" rx="10" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} strokeDasharray="6 5" />
+      <text x="58" y="92" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>undefined</text>
+
+      <rect x="104" y="62" width="76" height="48" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="142" y="92" textAnchor="middle" fontSize="9" fontWeight={800} fill={ACCENT} fontFamily={MONO}>null</text>
+
+      <text x="58" y="128" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>возникло само</text>
+      <text x="142" y="128" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>положили</text>
+
+      <circle cx="100" cy="150" r="12" fill="none" stroke="rgba(255,140,140,0.9)" strokeWidth={3} />
+      <path d="M92 142l16 16" stroke="rgba(255,140,140,0.9)" strokeWidth={3} />
+      <text x="100" y="184" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>значения нет</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -1127,6 +1144,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'erc4626': { track: 'blockchain', num: '16', title: 'ERC4626: доли хранилища вместо баланса' },
   'proxy-upgrade': { track: 'blockchain', num: '17', title: 'Прокси: обновление логики без смены адреса' },
   'ts-run': { track: 'blockchain', num: '19', title: 'Как запустить код: Node, tsc и первая программа' },
+  'ts-null': { track: 'blockchain', num: '21', title: 'Пусто: null, undefined и строгие проверки' },
   'ts-vs-js': { track: 'blockchain', num: '18', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '20', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '22', title: 'Условия и циклы: как программа принимает решения' },

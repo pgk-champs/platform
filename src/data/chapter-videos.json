@@ -1902,5 +1902,32 @@
       "title": "How to Setup Node.js with TypeScript in 2023",
       "channel": "Beyond Fireship"
     }
+  ],
+  "ts-null": [
+    {
+      "videoId": "F7f7aX5LWHw",
+      "title": "null и undefined / Как проверить значение на null (для новичков)",
+      "channel": "Игорь Антонов — про JavaScript и разработку"
+    },
+    {
+      "videoId": "3VbhngxP83M",
+      "title": "Опциональная цепочка в JavaScript / Optional Chaining",
+      "channel": "Игорь Антонов — про JavaScript и разработку"
+    },
+    {
+      "videoId": "W5Aq-wJ6JZw",
+      "title": "Опциональная цепочка в JavaScript",
+      "channel": "Open JS"
+    },
+    {
+      "videoId": "BRwOQudoywo",
+      "title": "TypeScript 5.6 - Nullish and Truthy Checks",
+      "channel": "PurpleSchool | Anton Larichev"
+    },
+    {
+      "videoId": "7bpQUVK9Gn4",
+      "title": "Are You Using Null And Undefined Wrong?",
+      "channel": "Web Dev Simplified"
+    }
   ]
 }

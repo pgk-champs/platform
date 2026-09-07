@@ -512,6 +512,14 @@
     "path": "blockchain/ts-values.mdx"
   },
   {
+    "id": "ts-null",
+    "title": "Пусто: null, undefined и строгие проверки",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 21,
+    "path": "blockchain/ts-null.mdx"
+  },
+  {
     "id": "ts-flow",
     "title": "Условия и циклы: как программа принимает решения",
     "audience": "блокчейн",

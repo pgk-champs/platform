@@ -48,6 +48,7 @@ import { erc20OzSchemes } from './figures/erc20Oz';
 import { erc4626Schemes } from './figures/erc4626';
 import { proxyUpgradeSchemes } from './figures/proxyUpgrade';
 import { tsRunSchemes } from './figures/tsRun';
+import { tsNullSchemes } from './figures/tsNull';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -111,6 +112,7 @@ const SCHEMES = {
   ...erc4626Schemes,
   ...proxyUpgradeSchemes,
   ...tsRunSchemes,
+  ...tsNullSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,
