@@ -1875,5 +1875,32 @@
       "title": "TypeScript Tutorial #15 — Interfaces",
       "channel": "Net Ninja"
     }
+  ],
+  "ts-run": [
+    {
+      "videoId": "D5Fa6ga8kPU",
+      "title": "Уроки Node js с нуля / #1 – Установка и запуск программы.",
+      "channel": "Программист86"
+    },
+    {
+      "videoId": "5IHc2qufxxM",
+      "title": "TypeScript: первая программа, компиляция ts в js, типы данных: number, string, b",
+      "channel": "Канал Алекса Лущенко"
+    },
+    {
+      "videoId": "a46zYhn0R9g",
+      "title": "Что такое Node.js?",
+      "channel": "Merion Academy"
+    },
+    {
+      "videoId": "2Je_8TyYOaE",
+      "title": "Установка и конфигурация TypeScript [49] #typescript #javascript",
+      "channel": "Developer In US"
+    },
+    {
+      "videoId": "H91aqUHn8sE",
+      "title": "How to Setup Node.js with TypeScript in 2023",
+      "channel": "Beyond Fireship"
+    }
   ]
 }

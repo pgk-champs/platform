@@ -47,6 +47,7 @@ import { erc20ScratchSchemes } from './figures/erc20Scratch';
 import { erc20OzSchemes } from './figures/erc20Oz';
 import { erc4626Schemes } from './figures/erc4626';
 import { proxyUpgradeSchemes } from './figures/proxyUpgrade';
+import { tsRunSchemes } from './figures/tsRun';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -137,6 +138,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(erc20OzSchemes),
     ...Object.keys(erc4626Schemes),
     ...Object.keys(proxyUpgradeSchemes),
+    ...Object.keys(tsRunSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

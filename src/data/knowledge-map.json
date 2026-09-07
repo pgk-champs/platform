@@ -496,6 +496,14 @@
     "path": "blockchain/ts-vs-js.mdx"
   },
   {
+    "id": "ts-run",
+    "title": "Как запустить код: Node, tsc и первая программа",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 19,
+    "path": "blockchain/ts-run.mdx"
+  },
+  {
     "id": "ts-values",
     "title": "Значения и переменные: числа, строки, типы",
     "audience": "блокчейн",
