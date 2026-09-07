@@ -52,6 +52,7 @@ import { tsNullSchemes } from './figures/tsNull';
 import { tsTypesSchemes } from './figures/tsTypes';
 import { tsErrorsSchemes } from './figures/tsErrors';
 import { tsAsyncNetSchemes } from './figures/tsAsyncNet';
+import { tsModulesSchemes } from './figures/tsModules';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -119,6 +120,7 @@ const SCHEMES = {
   ...tsTypesSchemes,
   ...tsErrorsSchemes,
   ...tsAsyncNetSchemes,
+  ...tsModulesSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

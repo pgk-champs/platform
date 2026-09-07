@@ -592,6 +592,14 @@
     "path": "blockchain/ts-async-net.mdx"
   },
   {
+    "id": "ts-modules",
+    "title": "Модули и проект: import, export и структура папок",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 32,
+    "path": "blockchain/ts-modules.mdx"
+  },
+  {
     "id": "ts-history",
     "title": "История JavaScript и TypeScript",
     "audience": "блокчейн",

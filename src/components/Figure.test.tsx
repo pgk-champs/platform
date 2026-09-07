@@ -52,6 +52,7 @@ import { tsNullSchemes } from './figures/tsNull';
 import { tsTypesSchemes } from './figures/tsTypes';
 import { tsErrorsSchemes } from './figures/tsErrors';
 import { tsAsyncNetSchemes } from './figures/tsAsyncNet';
+import { tsModulesSchemes } from './figures/tsModules';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -147,6 +148,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(tsTypesSchemes),
     ...Object.keys(tsErrorsSchemes),
     ...Object.keys(tsAsyncNetSchemes),
+    ...Object.keys(tsModulesSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

@@ -2010,5 +2010,32 @@
       "title": "🚫 How to Cancel Fetch Requests in JavaScript | AbortController Explained",
       "channel": "BitBuddy"
     }
+  ],
+  "ts-modules": [
+    {
+      "videoId": "vA5iT8rN5HU",
+      "title": "Модули в JavaScript, import и export, декомпозиция кода",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "Szz_kigD6_U",
+      "title": "Все про модули в JavaScript. Как делать import и export. Пример с кодом",
+      "channel": "ВебКадеми | Юрий Ключевский"
+    },
+    {
+      "videoId": "ZyG5ssnPvOc",
+      "title": "Урок 8. Модули в JavaScript (CommonJS, AMD, UMD, ESM)",
+      "channel": "Алексей Волков про JavaScript"
+    },
+    {
+      "videoId": "F3sRPOdgzjM",
+      "title": "TypeScript Fundamentals #11 - Imports & Exports",
+      "channel": "Code With Blake"
+    },
+    {
+      "videoId": "6_JNPmjSevo",
+      "title": "Import vs Require: The Biggest JavaScript Divide",
+      "channel": "Matt Pocock"
+    }
   ]
 }

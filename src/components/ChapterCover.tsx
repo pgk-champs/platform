@@ -680,6 +680,25 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>обычный HTTP</text>
     </g>
   ),
+  /* три файла со стрелками экспорта — арт «ts-modules» */
+  'ts-modules': () => (
+    <g strokeLinecap="round">
+      <rect x="18" y="52" width="54" height="40" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="45" y="77" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>util</text>
+
+      <rect x="128" y="52" width="54" height="40" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="155" y="77" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>types</text>
+
+      <rect x="70" y="118" width="60" height="42" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="144" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>deploy</text>
+
+      <path d="M55 96l32 18M145 96l-32 18" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M87 114l-9-1M87 114l-3-8M113 114l9-1M113 114l3-8" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <text x="100" y="106" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>import</text>
+      <text x="100" y="184" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>по файлам</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -1203,6 +1222,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'ts-types': { track: 'blockchain', num: '26', title: 'Свои типы: интерфейсы, объединения и обобщения' },
   'ts-errors': { track: 'blockchain', num: '29', title: 'Ошибки: throw, try/catch и результат вместо исключения' },
   'ts-async-net': { track: 'blockchain', num: '31', title: 'Запросы к узлу: fetch, JSON-RPC и таймауты' },
+  'ts-modules': { track: 'blockchain', num: '32', title: 'Модули и проект: import, export и структура папок' },
   'ts-vs-js': { track: 'blockchain', num: '18', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '20', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '22', title: 'Условия и циклы: как программа принимает решения' },
