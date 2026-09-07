@@ -400,6 +400,14 @@
     "path": "blockchain/solidity-flow.mdx"
   },
   {
+    "id": "solidity-functions",
+    "title": "Функции: видимость, view, payable и модификаторы",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 7,
+    "path": "blockchain/solidity-functions.mdx"
+  },
+  {
     "id": "ts-vs-js",
     "title": "TypeScript и JavaScript: в чём разница",
     "audience": "блокчейн",

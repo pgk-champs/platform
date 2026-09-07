@@ -1551,5 +1551,32 @@
       "title": "Loops in Solidity Tutorial | for vs while + Gas Optimization",
       "channel": "Conflux Network"
     }
+  ],
+  "solidity-functions": [
+    {
+      "videoId": "H2_I4TgDbl0",
+      "title": "Solidity и смарт-контракты Ethereum, урок #6 | Функции, транзакции, pure, view, ",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "XCmwOyiv_Nw",
+      "title": "90% новичков путают view, pure и payable — разбор на примерах",
+      "channel": "Guide DAO"
+    },
+    {
+      "videoId": "ZTc4ByHrRsk",
+      "title": "Учебник по функциям Solidity | Область видимости, параметры и возвращаемые значе",
+      "channel": "Conflux Russian"
+    },
+    {
+      "videoId": "xSOWMITKj7U",
+      "title": "Solidity | Урок 12. Модификаторы функций",
+      "channel": "Артем Кукуруза"
+    },
+    {
+      "videoId": "UAPpFmccsSU",
+      "title": "Solidity Functions Full Guide | Return Multiple Values, Named Returns & Array In",
+      "channel": "thebasicsdotacademy"
+    }
   ]
 }

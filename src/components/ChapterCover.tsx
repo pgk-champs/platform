@@ -390,6 +390,22 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>первая истинная</text>
     </g>
   ),
+  /* воронка вызова: вход, обёртка-модификатор, тело — арт «solidity-functions» */
+  'solidity-functions': () => (
+    <g strokeLinecap="round">
+      <rect x="20" y="52" width="160" height="30" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="100" y="72" textAnchor="middle" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>public · view</text>
+
+      <rect x="34" y="90" width="132" height="30" rx="9" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="110" textAnchor="middle" fontSize="9" fontWeight={800} fill={ACCENT} fontFamily={MONO}>modifier _;</text>
+
+      <rect x="52" y="128" width="96" height="28" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="100" y="147" textAnchor="middle" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.75)" fontFamily={MONO}>тело</text>
+
+      <path d="M100 34v12M100 46l-5-5M100 46l5-5" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>кто и почём</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -880,6 +896,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'solidity-types': { track: 'blockchain', num: '04', title: 'Типы данных: uint, address, bool, string и деньги' },
   'solidity-errors': { track: 'blockchain', num: '05', title: 'Ошибки и проверки: require, revert, assert' },
   'solidity-flow': { track: 'blockchain', num: '06', title: 'Условия, циклы и время: как контракт принимает решения' },
+  'solidity-functions': { track: 'blockchain', num: '07', title: 'Функции: видимость, view, payable и модификаторы' },
   'ts-vs-js': { track: 'blockchain', num: '14', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '15', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '16', title: 'Условия и циклы: как программа принимает решения' },
