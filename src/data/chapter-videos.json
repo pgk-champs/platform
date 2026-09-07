@@ -1632,5 +1632,32 @@
       "title": "Enum | Solidity 0.8",
       "channel": "Smart Contract Programmer"
     }
+  ],
+  "sol-inheritance": [
+    {
+      "videoId": "xkjFcdkAJpg",
+      "title": "Solidity и смарт-контракты Ethereum, урок #11 | Наследование, конструкторы, supe",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "6I95-Tf8dO0",
+      "title": "Solidity | Урок 6. Наследование, require, import",
+      "channel": "Артем Кукуруза"
+    },
+    {
+      "videoId": "3CjpEw0ztPs",
+      "title": "Основы Solidity: Наследование | Введение в разработку смарт-контрактов",
+      "channel": "Conflux Russian"
+    },
+    {
+      "videoId": "u1SQEt6nTGc",
+      "title": "Создаем свой токен ERC 20 в Solidity с помощью библиотеки Openzeppelin. Ethereum",
+      "channel": "Alex Klimov"
+    },
+    {
+      "videoId": "Ck5PUwL2D6I",
+      "title": "Inheritance | Solidity 0.8",
+      "channel": "Smart Contract Programmer"
+    }
   ]
 }

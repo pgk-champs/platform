@@ -445,6 +445,27 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>объект, не файл</text>
     </g>
   ),
+  /* база сверху, два наследника снизу, стрелка вниз — арт «sol-inheritance» */
+  'sol-inheritance': () => (
+    <g strokeLinecap="round">
+      <rect x="60" y="40" width="80" height="32" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="100" y="61" textAnchor="middle" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>ERC20</text>
+
+      <path d="M100 76v18M84 94h32" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M84 94v14M116 94v14" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <rect x="34" y="110" width="100" height="0" rx="0" fill="none" />
+      <rect x="30" y="110" width="70" height="42" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="65" y="130" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>decimals</text>
+      <text x="65" y="145" textAnchor="middle" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>18</text>
+
+      <rect x="106" y="110" width="70" height="42" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="141" y="130" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>override</text>
+      <text x="141" y="145" textAnchor="middle" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>12</text>
+
+      <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>взять и дописать</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -938,6 +959,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'solidity-functions': { track: 'blockchain', num: '07', title: 'Функции: видимость, view, payable и модификаторы' },
   'solidity-storage': { track: 'blockchain', num: '08', title: 'Хранение данных: mapping, struct, массивы и события' },
   'sol-contracts-oop': { track: 'blockchain', num: '09', title: 'Контракт как объект: конструктор, enum и роли' },
+  'sol-inheritance': { track: 'blockchain', num: '10', title: 'Наследование: is, virtual, override и super' },
   'ts-vs-js': { track: 'blockchain', num: '14', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '15', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '16', title: 'Условия и циклы: как программа принимает решения' },

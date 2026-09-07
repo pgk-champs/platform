@@ -1,0 +1,449 @@
+---
+title: 'Наследование: is, virtual, override и super'
+audience: 'блокчейн'
+level: 'база'
+order: 10
+sidebar_position: 10
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="sol-inheritance" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+
+# Наследование: is, virtual, override и super
+
+<ChapterProgress chapterId="sol-inheritance" totalSections={16} totalQuizzes={5} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="sol-inheritance" />
+
+## Зачем это нужно
+
+Первая строка кода в эталонном контракте задания устроена не так, как всё, что мы писали до сих пор:
+
+```solidity
+contract Token is ERC20("CryptoMonster", "CMON")
+```
+
+Свой контракт получает всё, что умеет чужой: балансы, переводы, выпуск токенов, события. Написано это одним словом — `is`. А ниже в том же файле стоит
+
+```solidity
+function decimals() public view virtual override returns (uint8) { return 12; }
+```
+
+Три слова подряд, каждое из которых обязательно. Разберём, что они означают, — и заодно увидим, как одна строка в конструкторе базового контракта выпускает разное количество токенов в зависимости от того, кто её унаследовал.
+
+<SectionAnchor chapterId="sol-inheritance" sectionId="zachem" />
+
+## Слово is читается как «является»
+
+```solidity
+contract MiniERC20 { … }              // базовый контракт
+contract Token is MiniERC20 { … }     // наследник
+```
+
+**Базовый контракт** (base) — тот, у кого берут. **Наследник** (derived) — тот, кто берёт и дописывает. Всё `public` и `internal` из базового становится доступно внутри наследника напрямую, без всяких префиксов: пишете `balanceOf(owner)` — и это работает, хотя функция объявлена в другом контракте.
+
+Базовых контрактов может быть несколько — тогда их перечисляют через запятую.
+
+<Hint type="fact">
+В эталонном контракте задания на этом месте опечатка: `contract Token are ERC20(...)`. Компилятор отвечает `ParserError: Expected '{' but got identifier` и ставит стрелки под словом `are`. Это первая строка отчёта по синтаксису в модуле В.
+</Hint>
+
+<SectionAnchor chapterId="sol-inheritance" sectionId="is" />
+
+## Базовый токен пишем сами
+
+На площадке чемпионата интернета нет, а значит, готовую библиотеку из сети не поставить. Поэтому базовый токен для моделей этой главы написан вручную — сорок строк, которые умеют главное:
+
+```solidity
+contract MiniERC20 {
+    string public name;
+    string public symbol;
+    uint256 public totalSupply;
+    mapping(address => uint256) public balanceOf;
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    constructor(string memory _name, string memory _symbol, uint256 _supply) {
+        name = _name;
+        symbol = _symbol;
+        _mint(msg.sender, _supply * 10 ** decimals());
+    }
+
+    function decimals() public view virtual returns (uint8) {
+        return 18;
+    }
+
+    function transfer(address to, uint256 value) public returns (bool) {
+        _transfer(msg.sender, to, value);
+        return true;
+    }
+
+    function _transfer(address from, address to, uint256 value) internal { … }
+    function _mint(address to, uint256 value) internal { … }
+}
+```
+
+Функции с подчёркиванием в начале имени помечены `internal`: они доступны самому контракту и наследникам, но не снаружи. Это соглашение об именовании — подчёркивание намекает читателю «служебное».
+
+<SectionAnchor chapterId="sol-inheritance" sectionId="bazovyy" />
+
+## Аргументы базовому конструктору
+
+Если у базового контракта конструктор с параметрами, наследник **обязан** их передать. Два способа:
+
+```solidity
+// 1. Прямо в списке is — когда значения известны заранее (так в эталоне КЗ)
+contract Token12 is MiniERC20("CryptoMonster", "CMON", 10_000_000) { … }
+
+// 2. В заголовке своего конструктора — когда значения приходят при развёртывании
+contract Square is Shape {
+    constructor(uint256 _side) Shape("square") { side = _side; }
+}
+```
+
+Забыли передать — `TypeError: No arguments passed to the base constructor. Specify the arguments or mark "Token" as abstract.` Передали дважды, обоими способами сразу, — тоже ошибка.
+
+<SectionAnchor chapterId="sol-inheritance" sectionId="argumenty" />
+
+## virtual и override: разрешение и подтверждение
+
+```solidity
+// в базовом контракте
+function decimals() public view virtual returns (uint8) { return 18; }
+
+// в наследнике
+function decimals() public view virtual override returns (uint8) { return 12; }
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'virtual', label: 'в базе: «можно переписать»', note: 'без этого слова наследник не имеет права заменить тело. Компилятор: Trying to override non-virtual function. Did you forget to add "virtual"?' },
+  { text: 'override', label: 'в наследнике: «я переписываю»', note: 'подтверждение намерения. Без него: Overriding function is missing "override" specifier' },
+  { text: 'virtual override', label: 'оба сразу', note: 'наследник переписал и разрешает переписать дальше — если у него самого будут наследники. Ровно так стоит в эталонном контракте задания' },
+]} />
+
+Зачем два слова вместо одного? Это защита от случайности. Без `virtual` в базе автор наследника не может незаметно подменить поведение чужого кода; без `override` в наследнике совпадение имён не превратится в тихую подмену.
+
+<SectionAnchor chapterId="sol-inheritance" sectionId="virtual-override" />
+
+## Конструктор базы вызывает функцию наследника
+
+Первая модель разворачивает два наследника одного базового токена: один оставляет `decimals()` как есть, другой возвращает 12 — как в эталонном контракте.
+
+```text
+── один и тот же базовый контракт, два наследника ──
+  E18: decimals() = 18, 1 токен = 1000000000000000000 минимальных единиц
+  CMON: decimals() = 12, 1 токен = 1000000000000 минимальных единиц
+  разница: в 1000000 раз
+
+── конструктор базового контракта вызвал decimals() наследника ──
+  оба создавались с _supply = 10 000 000
+  totalSupply E18  = 10000000000000000000000000
+  totalSupply CMON = 10000000000000000000
+  код _mint один и тот же, число разное — decimals() подменил наследник
+
+── переводим «1 токен», посчитанный по привычке как 10^18 ──
+  ушло минимальных единиц: 1000000000000000000
+  у получателя CMON:       1000000.0
+  в 18-значном токене это был бы 1 токен, в 12-значном — миллион
+
+── правильно: считать через decimals() контракта ──
+  ещё один перевод на 1000000000000 единиц → у получателя 1000001.0 CMON
+```
+
+<Figure scheme="si-virtual-call" caption="Строка _mint написана в базовом контракте, но количество зависит от наследника: виртуальный вызов уходит вниз даже из конструктора" />
+
+Главное здесь — вторая часть вывода. Строка `_mint(msg.sender, _supply * 10 ** decimals())` написана **в конструкторе базового контракта**. Но `decimals()` виртуальная, и вызов уходит к наследнику. Один и тот же код выпустил 10²⁵ единиц в одном случае и 10¹⁹ — в другом.
+
+Ровно так устроена и строка `uint256 dec = 10**decimals();` в эталонном контракте задания.
+
+Третья часть — про ошибку на демонстрации. Привычка «один токен — это 10¹⁸» в 12-значном токене превращает один токен в миллион. Правило: **количество всегда считают через `decimals()` самого контракта**, а не по памяти.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="sol-inheritance" quizId="quiz-1" questions={[
+  { q: 'Зачем нужны два слова — virtual в базе и override в наследнике?', options: ['Для читаемости', 'Это защита от случайности: без virtual нельзя подменить чужое поведение, без override совпадение имён не станет тихой подменой', 'Требование версии 0.8', 'virtual для функций, override для переменных'], correct: 1, why: 'Пропуск любого из слов даёт отдельную ошибку компилятора.' },
+  { q: 'Строка _mint(…, supply * 10 ** decimals()) стоит в конструкторе базы. У наследника decimals() = 12. Сколько выпустится?', options: ['Как в базе: 10^18 на токен', 'По правилу наследника: 10^12 на токен — виртуальный вызов уходит вниз даже из конструктора', 'Ошибка компиляции', 'Ноль'], correct: 1, why: 'Тот же код выпустил 10^25 единиц в одном случае и 10^19 — в другом.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="sol-inheritance" sectionId="virtualnyy-vyzov" />
+
+## Порядок конструкторов и слово super
+
+Когда наследников несколько уровней, важен порядок. Вторая модель строит «ромб»: общий предок `A`, от него `B` и `C`, от них обоих — `D`.
+
+```text
+── D1: конструкторы (порядок событий при деплое) ──
+  constructor A
+  constructor B
+  constructor C
+  constructor D1
+── D1.who(): цепочка super ──
+  who: D1
+  who: C
+  who: B
+  who: A
+  событий: 4, A вызван один раз; газ who(): 28430
+
+── D2: конструкторы (порядок событий при деплое) ──
+  constructor A
+  constructor C
+  constructor B
+  constructor D2
+── D2.who(): цепочка super ──
+  who: D2
+  who: B
+  who: C
+  who: A
+
+── вывод ──
+  контракт D1 is B, C: super в C идёт в B, хотя в коде C написано только «is A»
+  контракт D2 is C, B: super в B идёт в C — порядок задаёт список после is
+  конструкторы всегда: базовые сначала, наследник последним; каждый ровно один раз
+```
+
+<Figure scheme="si-linearization" caption="super — «следующий в очереди», и очередь задаётся списком после is; общий предок выполняется один раз" />
+
+Два правила.
+
+**Конструкторы идут от базовых к наследнику**, и общий предок выполняется **ровно один раз**, сколько бы путей к нему ни вело. Четыре события, а не пять.
+
+**`super` — это «следующий в очереди», а не «мой родитель».** Интуиция подсказывает, что `super` внутри `C` уйдёт в `A` — ведь в коде `C` написано `is A`. На деле в `D is B, C` цепочка идёт `D → C → B → A`. Порядок задаёт **список после `is` у самого нижнего контракта**, и переставив в нём два имени, вы переставляете вызовы.
+
+Отсюда правило записи: после `is` перечисляют **от самого базового к самому производному**. Нарушение даёт `TypeError: Linearization of inheritance graph impossible`.
+
+<SectionAnchor chapterId="sol-inheritance" sectionId="super" />
+
+## abstract: заготовка, которую нельзя развернуть
+
+Если у функции есть только заголовок и точка с запятой, контракт неполон:
+
+```solidity
+abstract contract Shape {
+    string public kind;
+    uint256 internal scale = 2;
+
+    constructor(string memory _kind) { kind = _kind; }
+
+    function area() public view virtual returns (uint256);   // тела нет
+
+    function describe() public view returns (string memory, uint256) {
+        return (kind, area() * scale);
+    }
+}
+```
+
+Слово `abstract` означает «развернуть нельзя, только унаследовать». Забыли его — `TypeError: Contract "Shape" should be marked as abstract.`
+
+Неочевидное: `describe()` вызывает `area()`, которой у самого `Shape` нет. И это работает — потому что к моменту развёртывания наследник её обязательно допишет. Модель показывает результат: `Square(7).describe()` даёт 98 — это площадь 49 от наследника, умноженная на `scale = 2` из базового контракта.
+
+<SectionAnchor chapterId="sol-inheritance" sectionId="abstract" />
+
+## private против internal — вот ради чего они разные
+
+В главе про функции было четыре уровня видимости. Наследование — та самая разница, ради которой существуют два из них:
+
+- `internal` — видно самому контракту **и наследникам**;
+- `private` — только самому контракту.
+
+Наследник, который попробует прочитать приватное поле базового контракта, получит `DeclarationError: Undeclared identifier.` — для него этого имени просто нет.
+
+<SectionAnchor chapterId="sol-inheritance" sectionId="private-internal" />
+
+## Восемь ошибок наследования
+
+Третья модель прогоняет восемь заведомо сломанных контрактов через настоящий компилятор и печатает тексты:
+
+```text
+1. в базе нет virtual, наследник переопределяет
+  TypeError: Trying to override non-virtual function. Did you forget to add "virtual"?
+
+2. в наследнике нет override
+  TypeError: Overriding function is missing "override" specifier.
+
+3. наследник читает private-поле базового
+  DeclarationError: Undeclared identifier.
+
+4. неверный порядок в is: производный раньше базового
+  TypeError: Linearization of inheritance graph impossible
+
+5. функция без тела, а abstract не написано
+  TypeError: Contract "Shape" should be marked as abstract.
+
+6. базовому конструктору нужны аргументы, а их не передали
+  TypeError: No arguments passed to the base constructor.
+  Specify the arguments or mark "Token" as abstract.
+
+7. функция есть в двух родителях, override без списка
+  TypeError: Function needs to specify overridden contracts "B" and "C".
+
+8. опечатка из эталона КЗ: are вместо is
+  ParserError: Expected '{' but got identifier
+```
+
+<Figure scheme="si-errors" caption="Восемь способов сломать наследование и точный текст компилятора для каждого" />
+
+Седьмая строка — единственная, которую стоит пояснить. Если одна и та же функция объявлена у **двух** родителей, наследник обязан перечислить обоих:
+
+```solidity
+function who() public view override(B, C) returns (string memory) { … }
+```
+
+Компилятор требует явности: он не станет угадывать, какую версию вы имели в виду.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="sol-inheritance" quizId="quiz-2" questions={[
+  { q: 'D is B, C. В коде C написано «is A». Куда уйдёт super из C?', options: ['В A', 'В B — super это «следующий в очереди», а очередь задана списком после is у D', 'Никуда', 'Зависит от функции'], correct: 1, why: 'Переставив B и C местами в списке, вы переставите и цепочку вызовов.' },
+  { q: 'Наследник читает private-поле базового контракта. Что скажет компилятор?', options: ['Соберёт', 'DeclarationError: Undeclared identifier — для наследника этого имени просто нет', 'Предупредит', 'Откат при выполнении'], correct: 1, why: 'Для наследников существует internal; private — только сам контракт.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="sol-inheritance" sectionId="oshibki-model" />
+
+## Типичные ошибки
+
+**`are` вместо `is`.** `ParserError: Expected '{' but got identifier` — строка из эталонного контракта.
+
+**Нет `virtual` в базе.** `Trying to override non-virtual function. Did you forget to add "virtual"?`
+
+**Нет `override` в наследнике.** `Overriding function is missing "override" specifier.`
+
+**Аргументы базовому конструктору не переданы.** `No arguments passed to the base constructor.`
+
+**Аргументы переданы дважды** — и в списке `is`, и в заголовке конструктора: `Base constructor arguments given twice.`
+
+**Неверный порядок в `is`.** `Linearization of inheritance graph impossible`; перечислять надо от базового к производному.
+
+**Определение наследника раньше базового в файле.** `Definition of base has to precede definition of derived contract.`
+
+**`private` вместо `internal`.** Наследник не видит поле — `Undeclared identifier`.
+
+**Расчёт количества токенов по памяти.** Ошибки нет вообще: перевод «одного токена» как 10¹⁸ в 12-значном токене отправляет миллион. Считать через `decimals()`.
+
+<SectionAnchor chapterId="sol-inheritance" sectionId="oshibki" />
+
+## Слова главы
+
+<Block kind="vocab">
+
+- **`is`** — «является»: наследник получает содержимое базового контракта.
+- **Базовый контракт** (base) и **наследник** (derived).
+- **`virtual`** — в базе: функцию можно переписать; **`override`** — в наследнике: переписываю.
+- **`override(B, C)`** — когда функция пришла от двух родителей.
+- **`super`** — следующий в очереди наследования, а не обязательно прямой родитель.
+- **Линеаризация** — порядок, в котором выстраиваются контракты; задаётся списком после `is`.
+- **`abstract contract`** — заготовка с функциями без тела; развернуть нельзя, только унаследовать.
+- **`internal` против `private`** — видно наследникам или только самому контракту.
+- **Аргументы базовому конструктору** — в списке `is` либо в заголовке своего конструктора, но не дважды.
+
+</Block>
+
+<SectionAnchor chapterId="sol-inheritance" sectionId="slova" />
+
+## Тренажёр: набрать вслепую
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="sol-inheritance"
+  trainerId="trainer-sol-inheritance"
+  targetCpm={100}
+  targetAccuracy={88}
+  pools={[
+    { label: 'Наследование', snippets: [
+      'contract Token is MiniERC20("CryptoMonster", "CMON", 10_000_000) {',
+      'function decimals() public view virtual override returns (uint8) {',
+      'constructor(uint256 _side) Shape("square") {',
+    ] },
+    { label: 'Иерархия', snippets: [
+      'abstract contract Shape {',
+      'function area() public view virtual returns (uint256);',
+      'return super.who();',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="sol-inheritance" sectionId="trenazher" />
+
+## На чемпионате
+
+**Модуль А, 37 баллов.** Требование задания сформулировано прямо: «все токены системы, кроме shares token, соответствуют стандарту ERC20; shares token соответствует стандарту ERC4626». На языке этой главы каждый токен системы — это `contract X is ERC20` с переопределённым `decimals()` и своими именем и символом из таблицы метаданных.
+
+В задании 2026 года таких токенов несколько: USDC и залоговые токены по стандарту ERC20, доли хранилища — по ERC4626. Все они строятся одинаково: базовый контракт плюс наследник с параметрами конструктора.
+
+**Модуль В, 14 баллов.** Из этой главы в отчёты идут:
+
+- *Синтаксис:* `are` вместо `is` — первая же строка эталонного контракта.
+- *Логика:* расчёты, где количество токенов посчитано без учёта `decimals()`.
+- *Функционал:* описание, что именно наследник переопределил и зачем — это и есть «пояснения к работе функций», которых требует задание.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="sol-inheritance" quizId="quiz-3" questions={[
+  { q: 'Как по заданию строится токен со своими именем и точностью?', options: ['Пишется с нуля', 'Наследованием от базового ERC20: contract X is ERC20(имя, символ) с переопределённым decimals()', 'Копированием чужого файла', 'Через библиотеку из интернета'], correct: 1, why: 'На площадке интернета нет, поэтому базовый контракт либо привезён в проекте, либо написан руками.' },
+  { q: 'Перевод «одного токена» посчитали как 10^18, а decimals() контракта = 12. Что произойдёт?', options: ['Откат', 'Уйдёт миллион токенов вместо одного — ошибки не будет вообще, перевод пройдёт', 'Ошибка компиляции', 'Получатель получит один токен'], correct: 1, why: 'Количество всегда считают через decimals() самого контракта.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="sol-inheritance" sectionId="na-chempionate" />
+
+## Что дальше
+
+Наследование связывает контракты, которые пишет один человек. Но в системе из задания контракты должны общаться и с **чужими**: хранилище вызывает токен, маркет вызывает хранилище. Для этого нужен договор — описание функций без их реализации. Об этом следующая глава: интерфейсы, приведение адреса к интерфейсу и двухшаговый протокол «разрешить — списать», на котором держится любой перевод токенов.
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="sol-inheritance" quizId="quiz-4" questions={[
+  { q: 'Сколько раз выполнится конструктор общего предка при ромбовидном наследовании?', options: ['По разу на каждый путь', 'Ровно один раз — конструкторы идут от базовых к наследнику, каждый однократно', 'Ни разу', 'Дважды'], correct: 1, why: 'В модели при развёртывании было четыре события, а не пять.' },
+]} />
+
+</Block>
+
+<SectionAnchor chapterId="sol-inheritance" sectionId="dalshe" />
+
+## Углубиться
+
+- **Как спросить порядок линеаризации у компилятора** — в разобранном дереве кода есть поле со списком базовых контрактов в вычисленном порядке.
+- **Виртуальные модификаторы** — `modifier m() virtual` и `override` для них тоже работают.
+- **Множественное наследование без ромба** — когда родители не пересекаются, порядок почти не важен; проблемы начинаются с общего предка.
+- **Переопределение переменных** — почему `public`-переменную нельзя переопределить, а функцию-читалку можно.
+- **Композиция вместо наследования** — когда лучше держать чужой контракт по адресу, а не наследовать его; про это следующая глава.
+
+<SectionAnchor chapterId="sol-inheritance" sectionId="uglubitsya" />
+
+<ChapterExam chapterId="sol-inheritance" questions={[
+  { q: 'Что делает слово is?', options: ['Сравнивает контракты', 'Наследует: контракт получает всё public и internal из базового и может дописать своё', 'Импортирует файл', 'Создаёт копию контракта'], correct: 1, why: 'В эталонном контракте задания на этом месте опечатка are — первая строка отчёта по синтаксису.' },
+  { q: 'В базе нет слова virtual, наследник переопределяет функцию. Что скажет компилятор?', options: ['Соберёт', 'Trying to override non-virtual function. Did you forget to add "virtual"?', 'Предупредит', 'Откат при вызове'], correct: 1, why: 'Без override в наследнике — своя ошибка: Overriding function is missing "override" specifier.' },
+  { q: 'Конструктор базы вызывает decimals(), у наследника она переопределена. Чья версия сработает?', options: ['Базовая', 'Наследника: виртуальный вызов уходит вниз даже из конструктора базы', 'Ни та ни другая', 'Зависит от порядка полей'], correct: 1, why: 'Один и тот же _mint выпустил 10^25 единиц у одного наследника и 10^19 у другого.' },
+  { q: 'D is B, C, оба наследуют A. Сколько раз выполнится конструктор A?', options: ['Дважды', 'Один раз: конструкторы идут от базовых к наследнику, каждый однократно', 'Ни разу', 'Трижды'], correct: 1, why: 'В модели при развёртывании было ровно четыре события.' },
+  { q: 'Что означает super внутри переопределённой функции?', options: ['Прямого родителя', 'Следующего в очереди наследования — очередь задаёт список после is у самого нижнего контракта', 'Базовый контракт с индексом 0', 'Самого себя'], correct: 1, why: 'В D is B, C цепочка идёт D → C → B → A, хотя в коде C написано только is A.' },
+  { q: 'Функция объявлена без тела. Что нужно контракту?', options: ['Ничего', 'Слово abstract: развернуть его нельзя, только унаследовать и дописать', 'Слово virtual', 'Слово interface'], correct: 1, why: 'Иначе: Contract "Shape" should be marked as abstract.' },
+  { q: 'Наследник не видит поле базового контракта. В чём причина?', options: ['Ошибка компилятора', 'Поле объявлено private: наследникам видно только internal и public', 'Забыт virtual', 'Неверный порядок в is'], correct: 1, why: 'Наследование — та самая разница, ради которой private и internal существуют раздельно.' },
+  { q: 'Как правильно перечислять контракты после is?', options: ['В любом порядке', 'От самого базового к самому производному — иначе Linearization of inheritance graph impossible', 'По алфавиту', 'Сначала абстрактные'], correct: 1, why: 'Порядок в списке задаёт и цепочку super, и порядок конструкторов.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Наследование — docs.soliditylang.org](https://docs.soliditylang.org/en/latest/contracts.html#inheritance) — `is`, множественное наследование, порядок.
+- [Переопределение функций](https://docs.soliditylang.org/en/latest/contracts.html#function-overriding) — `virtual`, `override`, `override(B, C)`.
+- [Абстрактные контракты](https://docs.soliditylang.org/en/latest/contracts.html#abstract-contracts) — функции без тела.
+- [Стандарт ERC-20](https://eips.ethereum.org/EIPS/eip-20) — что именно наследуют токены из задания.
+- [Стандарт ERC-4626](https://eips.ethereum.org/EIPS/eip-4626) — доли хранилища, требуемые модулем А.

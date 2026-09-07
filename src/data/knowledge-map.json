@@ -424,6 +424,14 @@
     "path": "blockchain/sol-contracts-oop.mdx"
   },
   {
+    "id": "sol-inheritance",
+    "title": "Наследование: is, virtual, override и super",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 10,
+    "path": "blockchain/sol-inheritance.mdx"
+  },
+  {
     "id": "ts-vs-js",
     "title": "TypeScript и JavaScript: в чём разница",
     "audience": "блокчейн",
