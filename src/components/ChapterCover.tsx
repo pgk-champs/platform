@@ -662,6 +662,24 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="184" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>отката нет</text>
     </g>
   ),
+  /* клиент и узел, стрелки запроса и ответа — арт «ts-async-net» */
+  'ts-async-net': () => (
+    <g strokeLinecap="round">
+      <rect x="14" y="70" width="56" height="48" rx="10" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="42" y="99" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>скрипт</text>
+
+      <path d="M76 84h48M124 84l-6-4M124 84l-6 4" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M124 104H76M76 104l6-4M76 104l6 4" stroke="rgba(255,255,255,0.45)" strokeWidth={3} fill="none" />
+      <text x="100" y="72" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>POST</text>
+      <text x="100" y="122" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>0x1263b4c</text>
+
+      <rect x="130" y="70" width="56" height="48" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="158" y="99" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>узел</text>
+
+      <text x="100" y="152" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>таймаут 500 мс</text>
+      <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>обычный HTTP</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -1184,6 +1202,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'ts-null': { track: 'blockchain', num: '21', title: 'Пусто: null, undefined и строгие проверки' },
   'ts-types': { track: 'blockchain', num: '26', title: 'Свои типы: интерфейсы, объединения и обобщения' },
   'ts-errors': { track: 'blockchain', num: '29', title: 'Ошибки: throw, try/catch и результат вместо исключения' },
+  'ts-async-net': { track: 'blockchain', num: '31', title: 'Запросы к узлу: fetch, JSON-RPC и таймауты' },
   'ts-vs-js': { track: 'blockchain', num: '18', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '20', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '22', title: 'Условия и циклы: как программа принимает решения' },

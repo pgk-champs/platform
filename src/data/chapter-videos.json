@@ -1983,5 +1983,32 @@
       "title": "Try Catch Error Handling With TypeScript",
       "channel": "ByteGrad"
     }
+  ],
+  "ts-async-net": [
+    {
+      "videoId": "6JzPr_8bMbk",
+      "title": "Лучший Гайд по HTTP для Начинающих за 25 Мин с Нуля",
+      "channel": "Vlad Mishustin"
+    },
+    {
+      "videoId": "klVGCxWsN2A",
+      "title": "JavaScript запросы fetch — клиент-серверное взаимодействие на практике",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "SHiUyM_fFME",
+      "title": "Урок 8. JavaScript. Как работает Async, Await. Работа с сервером c fetch",
+      "channel": "Владилен Минин"
+    },
+    {
+      "videoId": "vmGdIkn0CK8",
+      "title": "RPC и REST — в чём разница? Часть 1: RPC",
+      "channel": "Русский Айтишник"
+    },
+    {
+      "videoId": "eAa0h7WLLGw",
+      "title": "🚫 How to Cancel Fetch Requests in JavaScript | AbortController Explained",
+      "channel": "BitBuddy"
+    }
   ]
 }

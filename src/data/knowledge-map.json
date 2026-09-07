@@ -584,6 +584,14 @@
     "path": "blockchain/ts-async.mdx"
   },
   {
+    "id": "ts-async-net",
+    "title": "Запросы к узлу: fetch, JSON-RPC и таймауты",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 31,
+    "path": "blockchain/ts-async-net.mdx"
+  },
+  {
     "id": "ts-history",
     "title": "История JavaScript и TypeScript",
     "audience": "блокчейн",
