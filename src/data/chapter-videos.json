@@ -1740,5 +1740,32 @@
       "title": "Ownable | Solidity 0.8",
       "channel": "Smart Contract Programmer"
     }
+  ],
+  "erc20-scratch": [
+    {
+      "videoId": "u1SQEt6nTGc",
+      "title": "Создаем свой токен ERC 20 в Solidity с помощью библиотеки Openzeppelin. Ethereum",
+      "channel": "Alex Klimov"
+    },
+    {
+      "videoId": "p6wDJCWEYB0",
+      "title": "Что такое ERC20 токены - Стандарт ERC20",
+      "channel": "CryptoInside"
+    },
+    {
+      "videoId": "8vDJjpJOM_8",
+      "title": "Solidity и смарт-контракты Ethereum, урок #48 | ERC2612, ERC20Permit, аппрув без",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "t_EmyKgniKI",
+      "title": "КРИПТО РАЗРАБОТКА на Solidity / Урок #1 – Введение в криптовалюты. Создание моне",
+      "channel": "Школа itProger / Программирование"
+    },
+    {
+      "videoId": "gwn1rVDuGL0",
+      "title": "ERC20 | Solidity 0.8",
+      "channel": "Smart Contract Programmer"
+    }
   ]
 }

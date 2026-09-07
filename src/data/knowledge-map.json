@@ -456,6 +456,14 @@
     "path": "blockchain/sol-patterns.mdx"
   },
   {
+    "id": "erc20-scratch",
+    "title": "ERC20 с нуля: как устроен токен",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 14,
+    "path": "blockchain/erc20-scratch.mdx"
+  },
+  {
     "id": "ts-vs-js",
     "title": "TypeScript и JavaScript: в чём разница",
     "audience": "блокчейн",

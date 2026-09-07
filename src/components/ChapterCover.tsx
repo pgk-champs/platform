@@ -523,6 +523,22 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="184" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>порядок строк</text>
     </g>
   ),
+  /* монета с шестью насечками — арт «erc20-scratch» */
+  'erc20-scratch': () => (
+    <g strokeLinecap="round">
+      <circle cx="100" cy="98" r="46" fill={SOFT} stroke={ACCENT} strokeWidth={4} />
+      <text x="100" y="106" textAnchor="middle" fontSize="20" fontWeight={800} fill={ACCENT} fontFamily={MONO}>20</text>
+      {[0, 1, 2, 3, 4, 5].map((i) => {
+        const a = (i * Math.PI) / 3;
+        return (
+          <line key={i} x1={100 + Math.cos(a) * 52} y1={98 + Math.sin(a) * 52}
+            x2={100 + Math.cos(a) * 60} y2={98 + Math.sin(a) * 60} stroke={ACCENT} strokeWidth={4} />
+        );
+      })}
+      <text x="100" y="168" textAnchor="middle" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>6 функций · 2 события</text>
+      <text x="100" y="188" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>договор</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -1020,6 +1036,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'sol-interfaces': { track: 'blockchain', num: '11', title: 'Интерфейсы: договор между контрактами' },
   'sol-libraries': { track: 'blockchain', num: '12', title: 'Библиотеки, import и хеши: keccak256 и abi.encode' },
   'sol-patterns': { track: 'blockchain', num: '13', title: 'Паттерны безопасности: владелец, реентерабельность, выплаты' },
+  'erc20-scratch': { track: 'blockchain', num: '14', title: 'ERC20 с нуля: как устроен токен' },
   'ts-vs-js': { track: 'blockchain', num: '18', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '19', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '20', title: 'Условия и циклы: как программа принимает решения' },
