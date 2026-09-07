@@ -36,9 +36,9 @@ test('новые главы стоят в своих треках', () => {
     ['ts-flow', 'БЛОКЧЕЙН', '22'],
     ['ts-functions', 'БЛОКЧЕЙН', '23'],
     ['ts-collections', 'БЛОКЧЕЙН', '24'],
-    ['ts-oop', 'БЛОКЧЕЙН', '27'],
-    ['ts-history', 'БЛОКЧЕЙН', '33'],
-    ['ts-async', 'БЛОКЧЕЙН', '30'],
+    ['ts-oop', 'БЛОКЧЕЙН', '26'],
+    ['ts-history', 'БЛОКЧЕЙН', '32'],
+    ['ts-async', 'БЛОКЧЕЙН', '29'],
   ] as const;
   for (const [id, track, num] of cases) {
     const { container, unmount } = render(<ChapterCover chapterId={id} />);

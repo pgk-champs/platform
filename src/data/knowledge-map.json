@@ -548,7 +548,7 @@
     "title": "Свои типы: интерфейсы, объединения и обобщения",
     "audience": "блокчейн",
     "level": "углубление",
-    "order": 26,
+    "order": 25,
     "path": "blockchain/ts-types.mdx"
   },
   {
@@ -556,7 +556,7 @@
     "title": "Классы на TypeScript: объекты, поля и инкапсуляция",
     "audience": "блокчейн",
     "level": "углубление",
-    "order": 27,
+    "order": 26,
     "path": "blockchain/ts-oop.mdx"
   },
   {
@@ -564,7 +564,7 @@
     "title": "Наследование и интерфейсы в TypeScript",
     "audience": "блокчейн",
     "level": "углубление",
-    "order": 28,
+    "order": 27,
     "path": "blockchain/ts-inheritance.mdx"
   },
   {
@@ -572,7 +572,7 @@
     "title": "Ошибки: throw, try/catch и результат вместо исключения",
     "audience": "блокчейн",
     "level": "углубление",
-    "order": 29,
+    "order": 28,
     "path": "blockchain/ts-errors.mdx"
   },
   {
@@ -580,7 +580,7 @@
     "title": "Асинхронность: промисы, async/await и цикл событий",
     "audience": "блокчейн",
     "level": "углубление",
-    "order": 30,
+    "order": 29,
     "path": "blockchain/ts-async.mdx"
   },
   {
@@ -588,7 +588,7 @@
     "title": "Запросы к узлу: fetch, JSON-RPC и таймауты",
     "audience": "блокчейн",
     "level": "углубление",
-    "order": 31,
+    "order": 30,
     "path": "blockchain/ts-async-net.mdx"
   },
   {
@@ -596,7 +596,7 @@
     "title": "Модули и проект: import, export и структура папок",
     "audience": "блокчейн",
     "level": "углубление",
-    "order": 32,
+    "order": 31,
     "path": "blockchain/ts-modules.mdx"
   },
   {
@@ -604,7 +604,7 @@
     "title": "История JavaScript и TypeScript",
     "audience": "блокчейн",
     "level": "углубление",
-    "order": 33,
+    "order": 32,
     "path": "blockchain/ts-history.mdx"
   },
   {
@@ -612,7 +612,7 @@
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 34,
+    "order": 33,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]
