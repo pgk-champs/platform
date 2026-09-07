@@ -1794,5 +1794,32 @@
       "title": "Solidity Tutorial | Creating an ERC-20 Token in Solidity with OpenZeppelin (for ",
       "channel": "Techmaker Studio"
     }
+  ],
+  "erc4626": [
+    {
+      "videoId": "_WYMTciYrD0",
+      "title": "Solidity и смарт-контракты Ethereum, урок #49 | ERC4626: Tokenized vaults (храни",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "8vDJjpJOM_8",
+      "title": "Solidity и смарт-контракты Ethereum, урок #48 | ERC2612, ERC20Permit, аппрув без",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "LHtNg30nNgA",
+      "title": "Solidity и смарт-контракты Ethereum, урок #12 | Интерфейсы, библиотеки, тесты",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "k7WNibJOBXE",
+      "title": "Vault Math - How much shares to mint? How much token to withdraw? | DeFi",
+      "channel": "Smart Contract Programmer"
+    },
+    {
+      "videoId": "gdh5geJUtlw",
+      "title": "DeFi Primitives in Solidity: ERC4626 (Part1)",
+      "channel": "Layers"
+    }
   ]
 }

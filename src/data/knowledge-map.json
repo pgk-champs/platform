@@ -472,6 +472,14 @@
     "path": "blockchain/erc20-oz.mdx"
   },
   {
+    "id": "erc4626",
+    "title": "ERC4626: доли хранилища вместо баланса",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 16,
+    "path": "blockchain/erc4626.mdx"
+  },
+  {
     "id": "ts-vs-js",
     "title": "TypeScript и JavaScript: в чём разница",
     "audience": "блокчейн",

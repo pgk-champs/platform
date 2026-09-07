@@ -555,6 +555,22 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="188" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>чужой код</text>
     </g>
   ),
+  /* сосуд с растущим уровнем и долями — арт «erc4626» */
+  'erc4626': () => (
+    <g strokeLinecap="round">
+      <path d="M52 44h96v92a48 48 0 0 1-96 0z" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <path d="M56 100h88v36a44 44 0 0 1-88 0z" fill={SOFT} stroke="none" />
+      <path d="M56 100h88" stroke={ACCENT} strokeWidth={3} />
+
+      {[0, 1, 2].map((i) => (
+        <rect key={i} x={64 + i * 26} y={116} width="18" height="18" rx="4" fill={ACCENT} opacity={0.85 - i * 0.22} />
+      ))}
+
+      <path d="M158 96l14-12M172 84l-2 8M172 84l-8 2" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <text x="100" y="170" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>1.00 → 1.30 → 1.47</text>
+      <text x="100" y="188" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>цена доли</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -1054,6 +1070,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'sol-patterns': { track: 'blockchain', num: '13', title: 'Паттерны безопасности: владелец, реентерабельность, выплаты' },
   'erc20-scratch': { track: 'blockchain', num: '14', title: 'ERC20 с нуля: как устроен токен' },
   'erc20-oz': { track: 'blockchain', num: '15', title: 'Готовый ERC20: OpenZeppelin и что он делает за вас' },
+  'erc4626': { track: 'blockchain', num: '16', title: 'ERC4626: доли хранилища вместо баланса' },
   'ts-vs-js': { track: 'blockchain', num: '18', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '19', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '20', title: 'Условия и циклы: как программа принимает решения' },
