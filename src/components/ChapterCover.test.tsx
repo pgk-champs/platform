@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import ChapterCover, { CHAPTER_IDS, TrackBanner, coverFontSize } from './ChapterCover';
 
 test('покрыты все 43 главы', () => {
-  expect(CHAPTER_IDS).toHaveLength(70);
+  expect(CHAPTER_IDS).toHaveLength(71);
 });
 
 test('заголовок обложки умещается в ширину 800', () => {
@@ -32,13 +32,13 @@ test('новые главы стоят в своих треках', () => {
     ['first-compose-screen', 'МОБИЛКА', '07'],
     ['ui-kit', 'МОБИЛКА', '10'],
     ['ts-vs-js', 'БЛОКЧЕЙН', '18'],
-    ['ts-values', 'БЛОКЧЕЙН', '19'],
-    ['ts-flow', 'БЛОКЧЕЙН', '20'],
-    ['ts-functions', 'БЛОКЧЕЙН', '21'],
-    ['ts-collections', 'БЛОКЧЕЙН', '22'],
-    ['ts-oop', 'БЛОКЧЕЙН', '23'],
-    ['ts-history', 'БЛОКЧЕЙН', '25'],
-    ['ts-async', 'БЛОКЧЕЙН', '24'],
+    ['ts-values', 'БЛОКЧЕЙН', '20'],
+    ['ts-flow', 'БЛОКЧЕЙН', '22'],
+    ['ts-functions', 'БЛОКЧЕЙН', '23'],
+    ['ts-collections', 'БЛОКЧЕЙН', '24'],
+    ['ts-oop', 'БЛОКЧЕЙН', '27'],
+    ['ts-history', 'БЛОКЧЕЙН', '33'],
+    ['ts-async', 'БЛОКЧЕЙН', '30'],
   ] as const;
   for (const [id, track, num] of cases) {
     const { container, unmount } = render(<ChapterCover chapterId={id} />);

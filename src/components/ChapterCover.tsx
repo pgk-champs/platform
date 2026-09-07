@@ -655,6 +655,23 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="140" y="124" textAnchor="middle" fontSize="11" fontWeight={800} fill={ACCENT} fontFamily={MONO}>value</text>
     </g>
   ),
+  /* родитель и наследник, договор пунктиром — арт «ts-inheritance» */
+  'ts-inheritance': () => (
+    <g strokeLinecap="round">
+      <rect x="62" y="44" width="76" height="30" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="100" y="64" textAnchor="middle" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>Tx</text>
+
+      <path d="M100 78v16M100 94l-5-5M100 94l5-5" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <rect x="40" y="98" width="120" height="30" rx="9" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="118" textAnchor="middle" fontSize="9" fontWeight={800} fill={ACCENT} fontFamily={MONO}>extends Tx</text>
+
+      <rect x="40" y="136" width="120" height="26" rx="8" fill="none" stroke={ACCENT} strokeWidth={3} strokeDasharray="6 5" />
+      <text x="100" y="154" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>implements Signer</text>
+
+      <text x="100" y="184" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>по форме, не по имени</text>
+    </g>
+  ),
   /* чертёж и три изделия по нему — арт «ts-oop» */
   'ts-oop': () => (
     <g strokeLinecap="round">
@@ -1055,7 +1072,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'layout-by-mockup': { track: 'mobile', num: '09', title: 'Вёрстка по макету' },
   'ui-kit': { track: 'mobile', num: '10', title: 'Многомодульность и UI Kit' },
   'what-is-blockchain': { track: 'blockchain', num: '01', title: 'Что такое блокчейн' },
-  'waves-first-network': { track: 'blockchain', num: '26', title: 'Первая сеть на Waves Enterprise' },
+  'waves-first-network': { track: 'blockchain', num: '34', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },
@@ -1091,13 +1108,14 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'erc4626': { track: 'blockchain', num: '16', title: 'ERC4626: доли хранилища вместо баланса' },
   'proxy-upgrade': { track: 'blockchain', num: '17', title: 'Прокси: обновление логики без смены адреса' },
   'ts-vs-js': { track: 'blockchain', num: '18', title: 'TypeScript и JavaScript: в чём разница' },
-  'ts-values': { track: 'blockchain', num: '19', title: 'Значения и переменные: числа, строки, типы' },
-  'ts-flow': { track: 'blockchain', num: '20', title: 'Условия и циклы: как программа принимает решения' },
-  'ts-functions': { track: 'blockchain', num: '21', title: 'Функции: как код перестаёт повторяться' },
-  'ts-collections': { track: 'blockchain', num: '22', title: 'Массивы и объекты: как хранят много данных сразу' },
-  'ts-oop': { track: 'blockchain', num: '23', title: 'ООП на TypeScript: классы, наследование, интерфейсы' },
-  'ts-history': { track: 'blockchain', num: '25', title: 'История JavaScript и TypeScript' },
-  'ts-async': { track: 'blockchain', num: '24', title: 'Асинхронность: промисы, async/await и цикл событий' },
+  'ts-values': { track: 'blockchain', num: '20', title: 'Значения и переменные: числа, строки, типы' },
+  'ts-flow': { track: 'blockchain', num: '22', title: 'Условия и циклы: как программа принимает решения' },
+  'ts-functions': { track: 'blockchain', num: '23', title: 'Функции: как код перестаёт повторяться' },
+  'ts-collections': { track: 'blockchain', num: '24', title: 'Массивы и объекты: как хранят много данных сразу' },
+  'ts-inheritance': { track: 'blockchain', num: '28', title: 'Наследование и интерфейсы в TypeScript' },
+  'ts-oop': { track: 'blockchain', num: '27', title: 'Классы на TypeScript: объекты, поля и инкапсуляция' },
+  'ts-history': { track: 'blockchain', num: '33', title: 'История JavaScript и TypeScript' },
+  'ts-async': { track: 'blockchain', num: '30', title: 'Асинхронность: промисы, async/await и цикл событий' },
   'grep-regex': { track: 'advanced', num: '01', title: 'Регулярные выражения для grep' },
   'ssh-keys-deep': { track: 'advanced', num: '02', title: 'SSH-ключи глубоко' },
   'git-rebase': { track: 'advanced', num: '03', title: 'Rebase мастерски' },

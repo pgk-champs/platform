@@ -1848,5 +1848,32 @@
       "title": "Proxy Patterns and Storage Layouts — Forge College",
       "channel": "Forge College"
     }
+  ],
+  "ts-inheritance": [
+    {
+      "videoId": "VVgCfVfbkA8",
+      "title": "TypeScript — Наследование",
+      "channel": "Artsofte Education"
+    },
+    {
+      "videoId": "asl8B4lMYQI",
+      "title": "Наследование в TypeScript: полное руководство",
+      "channel": "WebDev с нуля. Канал Алекса Лущенко"
+    },
+    {
+      "videoId": "ZHMQ2NJIUW0",
+      "title": "JavaScript ООП #5: наследование классов, переопределение методов",
+      "channel": "selfedu"
+    },
+    {
+      "videoId": "o_HntOTCqks",
+      "title": "Что такое prototype: прототипы и прототипное наследование",
+      "channel": "Василий Муравьев"
+    },
+    {
+      "videoId": "VbW6vWTaHOY",
+      "title": "TypeScript Tutorial #15 — Interfaces",
+      "channel": "Net Ninja"
+    }
   ]
 }

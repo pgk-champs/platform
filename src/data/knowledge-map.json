@@ -500,7 +500,7 @@
     "title": "Значения и переменные: числа, строки, типы",
     "audience": "блокчейн",
     "level": "база",
-    "order": 19,
+    "order": 20,
     "path": "blockchain/ts-values.mdx"
   },
   {
@@ -508,7 +508,7 @@
     "title": "Условия и циклы: как программа принимает решения",
     "audience": "блокчейн",
     "level": "база",
-    "order": 20,
+    "order": 22,
     "path": "blockchain/ts-flow.mdx"
   },
   {
@@ -516,7 +516,7 @@
     "title": "Функции: как код перестаёт повторяться",
     "audience": "блокчейн",
     "level": "база",
-    "order": 21,
+    "order": 23,
     "path": "blockchain/ts-functions.mdx"
   },
   {
@@ -524,23 +524,31 @@
     "title": "Массивы и объекты: как хранят много данных сразу",
     "audience": "блокчейн",
     "level": "база",
-    "order": 22,
+    "order": 24,
     "path": "blockchain/ts-collections.mdx"
   },
   {
     "id": "ts-oop",
-    "title": "ООП на TypeScript: классы, наследование, интерфейсы",
+    "title": "Классы на TypeScript: объекты, поля и инкапсуляция",
     "audience": "блокчейн",
     "level": "углубление",
-    "order": 23,
+    "order": 27,
     "path": "blockchain/ts-oop.mdx"
+  },
+  {
+    "id": "ts-inheritance",
+    "title": "Наследование и интерфейсы в TypeScript",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 28,
+    "path": "blockchain/ts-inheritance.mdx"
   },
   {
     "id": "ts-async",
     "title": "Асинхронность: промисы, async/await и цикл событий",
     "audience": "блокчейн",
     "level": "углубление",
-    "order": 24,
+    "order": 30,
     "path": "blockchain/ts-async.mdx"
   },
   {
@@ -548,7 +556,7 @@
     "title": "История JavaScript и TypeScript",
     "audience": "блокчейн",
     "level": "углубление",
-    "order": 25,
+    "order": 33,
     "path": "blockchain/ts-history.mdx"
   },
   {
@@ -556,7 +564,7 @@
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 26,
+    "order": 34,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]

@@ -1,0 +1,731 @@
+---
+title: 'Классы на TypeScript: объекты, поля и инкапсуляция'
+audience: 'блокчейн'
+level: 'углубление'
+order: 27
+sidebar_position: 27
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="ts-oop" />
+
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import CodeTyping from '@site/src/components/CodeTyping';
+
+# Классы на TypeScript: объекты, поля и инкапсуляция
+
+<ChapterProgress chapterId="ts-oop" totalSections={17} totalQuizzes={3} totalTrainers={1} />
+
+## Зачем это нужно
+
+В Solidity контракт сам по себе был объектом: состояние и поведение в одной коробке, и другого способа их разложить язык не давал. В TypeScript объект — не единственный вариант: те же данные можно держать в обычной записи, а работу с ними — в отдельных функциях. Значит, появляется выбор, и вместе с ним вопрос: зачем всё-таки класс.
+
+Эта глава — про то, как класс записывается в TypeScript, что при этом происходит в памяти, где он ломается и во что превращается после компиляции. Наследование, интерфейсы и то, что под капотом, — в следующей главе.
+
+Разница между «понимать идею ООП» и «уметь писать классы» примерно как между «понимать, что такое рычаг» и «уметь чинить велосипед». Идея простая, а деталей — тридцать штук, и каждая ломается по-своему.
+
+Что дальше встретится в настоящем коде:
+
+- SDK любого блокчейна — это классы. `new Signer(...)`, `wallet.sign(tx)`, `provider.getBalance(addr)` — за каждым вызовом класс с полями и методами.
+- Ошибки — тоже классы: `class InsufficientFunds extends Error`. Без наследования не написать своё исключение.
+- Тесты, контроллеры, сервисы — везде классы с интерфейсами.
+
+Глава разбирает всё по порядку: от `class` и `new` до прототипов, на которых это построено. Каждый пример проверен запуском на Node.js 24 и компиляцией TypeScript 6 в строгом режиме — включая тексты ошибок с их настоящими номерами.
+
+<CollapsibleToc toc={toc} chapterId="ts-oop" />
+
+<SectionAnchor chapterId="ts-oop" sectionId="why" />
+
+## Объект руками: почему этого мало
+
+Начнём с того, что уже умеем. Транзакцию можно описать обычным объектом:
+
+```js
+const tx = { id: 'a1', amount: 5000 };
+console.log(tx.amount * 0.001); // 5
+```
+
+Работает. Проблемы начинаются, когда транзакций становится много.
+
+```js
+const tx1 = { id: 'a1', amount: 5000 };
+const tx2 = { id: 'b7', amount: 120 };
+const tx3 = { id: 'c3', amount: 48000 };
+console.log(tx1.amount * 0.001, tx2.amount * 0.001, tx3.amount * 0.001);
+```
+
+Формула комиссии написана три раза. Меняется ставка — правим в трёх местах, и в одном обязательно забудем. Первое решение мы уже знаем — функция:
+
+```js
+function fee(tx) {
+  return tx.amount * 0.001;
+}
+```
+
+Стало лучше, но появилась новая беда: функция `fee` живёт отдельно от объекта. Ничто не мешает передать в неё что угодно — например, объект пользователя, у которого поля `amount` нет вовсе. Получится `undefined * 0.001`, то есть `NaN`, и без единой ошибки.
+
+Второе решение — **фабричная функция**: она собирает объект вместе с его методами.
+
+```js
+function makeTx(id, amount) {
+  return {
+    id,
+    amount,
+    fee() {
+      return this.amount * 0.001;
+    },
+  };
+}
+const t = makeTx('a1', 5000);
+console.log(t.fee()); // 5
+```
+
+Уже почти то, что надо: данные и работа с ними в одном месте. Осталась одна неприятность — **каждый объект носит с собой свою копию функции `fee`**. Для трёх транзакций всё равно, для тридцати тысяч записей из ответа ноды — уже нет.
+
+Класс решает ровно эту задачу: держит данные у каждого объекта свои, а методы — общие на всех.
+
+<SectionAnchor chapterId="ts-oop" sectionId="by-hand" />
+
+## Класс: чертёж и изделие
+
+```js
+class Tx {
+  constructor(id, amount) {
+    this.id = id;
+    this.amount = amount;
+  }
+  fee() {
+    return this.amount * 0.001;
+  }
+}
+
+const t = new Tx('a1', 5000);
+console.log(t.id, t.amount, t.fee()); // a1 5000 5
+```
+
+Живой запуск даёт `a1 5000 5`.
+
+<Block kind="breakdown" title="Разбор по частям: объявление класса" chapterId="ts-oop" blockId="breakdown-class">
+<SyntaxBreakdown parts={[
+  { text: 'class', label: 'ключевое слово', note: 'дальше идёт описание типа объектов, а не сам объект' },
+  { text: 'Tx', label: 'имя класса', note: 'с большой буквы — соглашение, которому следуют все; нарушение не ошибка, но выглядит как чужой код' },
+  { text: '{ … }', label: 'тело класса', note: 'внутри только объявления полей и методов; запятые между ними НЕ ставятся — в отличие от объекта' },
+  { text: 'constructor', label: 'конструктор', note: 'особый метод: запускается один раз при создании объекта; имя фиксировано' },
+  { text: 'this', label: 'создаваемый объект', note: 'внутри конструктора — тот самый объект, который сейчас собирают' },
+  { text: 'fee() { … }', label: 'метод', note: 'функция, привязанная к классу; слова function здесь нет' },
+  { text: 'new Tx(…)', label: 'создание объекта', note: 'без new класс вызвать нельзя — будет TypeError' },
+]} />
+</Block>
+
+Три различия, из-за которых класс путают с объектом:
+
+| | объект `{ }` | класс `class` |
+| --- | --- | --- |
+| Между полями | запятая | ничего |
+| Пара «имя — значение» | `amount: 5000` | `amount = 5000` |
+| Что это такое | готовая вещь | чертёж вещи |
+
+<Figure scheme="to-blueprint-instances" caption="Класс — чертёж. Из одного чертежа делают сколько угодно объектов: поля у каждого свои, а метод существует в единственном экземпляре и лежит в прототипе." />
+
+Проверим главное обещание — что метод один на всех:
+
+```js
+const a = new Tx('a1', 5000);
+const b = new Tx('b7', 120);
+console.log(a.fee === b.fee);            // true
+console.log(a.hasOwnProperty('fee'));    // false
+console.log('fee' in a);                 // true
+```
+
+`a.fee === b.fee` даёт `true`: это буквально одна и та же функция. При этом сам объект поля `fee` не имеет (`hasOwnProperty` — `false`), но найти его через объект можно (`in` — `true`). Куда именно смотрит поиск, разберём в разделе про прототипы.
+
+<SectionAnchor chapterId="ts-oop" sectionId="class-basics" />
+
+## Конструктор: что происходит при `new`
+
+Слово `new` делает четыре вещи подряд:
+
+1. Создаёт новый пустой объект.
+2. Привязывает к нему прототип класса — так объект получает доступ к методам.
+3. Запускает `constructor`, где `this` — этот новый объект.
+4. Возвращает объект (`return` писать не нужно).
+
+Отсюда следствия, которые полезно проверить руками.
+
+```js
+class Tx {
+  constructor(id, amount) {
+    this.id = id;
+    this.amount = amount;
+  }
+}
+console.log(typeof Tx);         // function
+console.log(new Tx('a', 1));    // Tx { id: 'a', amount: 1 }
+```
+
+Вывод — `Tx { id: 'a', amount: 1 }`: Node печатает имя класса перед фигурными скобками, и по этому имени в консоли удобно отличать «просто объект» от объекта класса.
+
+Вызов без `new` запрещён:
+
+```js
+Tx('a', 1);
+// TypeError: Class constructor Tx cannot be invoked without 'new'
+```
+
+Конструктор можно не писать вовсе — тогда используется пустой:
+
+```js
+class Empty {}
+console.log(new Empty()); // Empty {}
+```
+
+Значения по умолчанию задаются как у обычной функции:
+
+```js
+class Tx {
+  constructor(id, amount = 0, fee = amount * 0.001) {
+    this.id = id;
+    this.amount = amount;
+    this.fee = fee;
+  }
+}
+console.log(new Tx('a')); // Tx { id: 'a', amount: 0, fee: 0 }
+```
+
+<Hint id="ts-oop-h1" type="important">
+Конструктор — не место для тяжёлой работы. Сетевой запрос, чтение файла, разбор большого файла — всё это внутри конструктора превращается в мину: объект нельзя создать быстро, нельзя создать в тесте, и ошибку из конструктора неудобно ловить.
+
+Приём, который применяют вместо этого: конструктор только раскладывает переданное по полям, а «дорогое» создание выносят в статический метод:
+
+```js
+class Wallet {
+  constructor(key) { this.key = key; }
+  static async fromFile(path) {
+    const key = await readFile(path, 'utf8');
+    return new Wallet(key.trim());
+  }
+}
+```
+
+Такой метод называют фабричным. Он ещё и читается лучше: `Wallet.fromFile('key.txt')` говорит больше, чем `new Wallet(...)` с непонятным аргументом.
+</Hint>
+
+<SectionAnchor chapterId="ts-oop" sectionId="constructor" />
+
+## Методы: код, общий для всех объектов
+
+Метод — обычная функция, записанная внутри тела класса без слова `function`:
+
+```js
+class Tx {
+  constructor(amount) { this.amount = amount; }
+  fee() { return this.amount * 0.001; }
+  total() { return this.amount + this.fee(); }
+  toString() { return `${this.amount} (комиссия ${this.fee()})`; }
+}
+const t = new Tx(5000);
+console.log(t.total());   // 5005
+console.log(`${t}`);      // 5000 (комиссия 5)
+```
+
+Три вещи, которые здесь стоит заметить.
+
+**Метод зовёт метод через `this`.** Внутри `total` нельзя написать просто `fee()` — такой функции в области видимости нет, будет `ReferenceError`. Только `this.fee()`.
+
+**`toString` — особое имя.** Его вызывает сам язык, когда объект попадает в строку: в шаблонной строке, при склейке через `+`, в `String(t)`. Свой `toString` — самый дешёвый способ сделать объект читаемым в логах.
+
+**В `JSON.stringify` попадают только поля.**
+
+```js
+console.log(JSON.stringify(t)); // {"amount":5000}
+```
+
+Методов в JSON нет и не будет: они лежат не в объекте. Отсюда важное следствие для сетевого кода — объект, вернувшийся из `JSON.parse`, **не является** объектом класса. Он выглядит похоже, но методов у него нет:
+
+```js
+const back = JSON.parse(JSON.stringify(t));
+console.log(back.amount);   // 5000
+console.log(back instanceof Tx); // false
+back.fee();                 // TypeError: back.fee is not a function
+```
+
+Это одна из самых частых неожиданностей у тех, кто пришёл из языков со строгими типами: данные по сети ходят без классов, и класс приходится собирать заново — `new Tx(back.amount)`.
+
+<SectionAnchor chapterId="ts-oop" sectionId="methods" />
+
+## `this`: главная ловушка
+
+`this` — не «текущий класс». `this` — **тот объект, который стоял слева от точки в момент вызова**. Не при объявлении, а при вызове. Отсюда почти все загадочные ошибки в классах.
+
+```js
+class Tx {
+  constructor(amount) { this.amount = amount; }
+  fee() { return this.amount * 0.001; }
+}
+const t = new Tx(5000);
+
+console.log(t.fee());   // 5 — слева от точки стоит t
+
+const f = t.fee;
+f();
+// TypeError: Cannot read properties of undefined (reading 'amount')
+```
+
+Во второй строке метод достали из объекта и положили в переменную. Функция та же самая, но точки при вызове больше нет — и `this` внутри оказывается `undefined`. Ошибка при этом жалуется не на `this`, а на чтение `amount` у `undefined`, и найти причину по тексту сложно.
+
+<Figure scheme="to-this-binding" caption="Три способа вызвать один и тот же метод. Связь с объектом даёт точка при вызове; стоит её потерять — и this становится undefined." />
+
+Где это случается на практике: почти всегда там, где метод передают дальше как значение.
+
+```js
+// все три строки сломаются одинаково
+setTimeout(t.fee, 100);
+[1, 2, 3].forEach(t.fee);
+button.addEventListener('click', t.fee);
+```
+
+Три надёжных способа починить:
+
+```js
+setTimeout(() => t.fee(), 100);        // 1. обёртка-стрелка: точка на месте
+setTimeout(t.fee.bind(t), 100);        // 2. bind: делает новую функцию с приклеенным this
+```
+
+```js
+class Tx {
+  amount = 5000;
+  fee = () => this.amount * 0.001;     // 3. стрелка в поле объекта
+}
+const g = new Tx().fee;
+console.log(g()); // 5 — работает даже без точки
+```
+
+Третий способ работает, потому что у стрелочной функции **своего `this` нет**: она берёт его из места объявления, а объявлена она внутри создаваемого объекта. Цена — такое поле принадлежит объекту, а не прототипу, то есть у каждого объекта своя копия функции. Для обработчиков событий это нормально, для класса, которого создают десятки тысяч, — нет.
+
+<Hint id="ts-oop-h2" type="fact">
+TypeScript умеет ловить потерю `this` заранее. Флаг `strictBindCallApply` проверяет `bind`, `call` и `apply`, а отдельный псевдопараметр `this` в сигнатуре метода позволяет прямо запретить вызов без нужного контекста:
+
+```ts
+class Tx {
+  amount = 0;
+  fee(this: Tx) { return this.amount * 0.001; }
+}
+const f = new Tx().fee;
+f(); // ошибка ещё до запуска
+```
+
+Такой параметр не настоящий: он существует только в типах и в JavaScript не попадает.
+</Hint>
+
+<Block kind="quiz" title="Классы, конструктор, this" chapterId="ts-oop" blockId="quiz-basics">
+<SelfCheck chapterId="ts-oop" quizId="quiz-basics" questions={[
+  { q: 'Чем класс отличается от объекта?', options: ['Ничем, это синонимы', 'Класс — описание, объект — созданная по нему вещь', 'Класс быстрее', 'Объект нельзя менять'], correct: 1, why: 'Из одного класса делают сколько угодно объектов: поля у каждого свои, методы общие.' },
+  { q: 'Что произойдёт при вызове Tx() без new?', options: ['Создастся объект', 'TypeError: Class constructor cannot be invoked without new', 'Вернётся undefined', 'Ничего не произойдёт'], correct: 1, why: 'Классы, в отличие от старых функций-конструкторов, вызывать без new запрещено на уровне языка.' },
+  { q: 'Сколько копий метода fee существует при трёх созданных объектах?', options: ['Три — по одной на объект', 'Одна: метод лежит в прототипе класса', 'Ноль, пока метод не вызвали', 'Зависит от размера объекта'], correct: 1, why: 'Проверяется прямо: a.fee === b.fee даёт true. Поэтому же a.hasOwnProperty("fee") — false.' },
+  { q: 'const f = t.fee; f(). Почему падает?', options: ['Метод приватный', 'Потерялась точка, поэтому this внутри — undefined', 'Функция ещё не объявлена', 'Не хватает аргументов'], correct: 1, why: 'this определяется в момент вызова тем, что стоит слева от точки. Чинится обёрткой-стрелкой, bind или стрелкой в поле.' },
+  { q: 'Что вернёт JSON.parse(JSON.stringify(t)) instanceof Tx?', options: ['true', 'false: JSON хранит только поля, класс не восстанавливается', 'Ошибку', 'undefined'], correct: 1, why: 'Данные по сети ходят без классов. Чтобы получить объект класса, его собирают заново: new Tx(back.amount).' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="ts-oop" sectionId="this" />
+
+## Поля прямо в конструкторе: сокращение TypeScript
+
+В TypeScript у класса появляется то, чего в JavaScript нет: поля объявляют с типами, а конструктор умеет объявлять их сам.
+
+Длинная запись — та же, что в JavaScript, плюс типы:
+
+```ts
+class Tx {
+  id: string;
+  amount: number;
+  constructor(id: string, amount: number) {
+    this.id = id;
+    this.amount = amount;
+  }
+}
+```
+
+Имя поля повторяется четыре раза. Короткая запись делает то же самое:
+
+```ts
+class Tx {
+  constructor(
+    public readonly id: string,
+    private amount: number,
+    protected fee = 0.001,
+  ) {}
+  total(): number {
+    return this.amount + this.fee;
+  }
+}
+```
+
+<Hint type="important">
+Короткая запись — единственная конструкция этой главы, которая **не запускается**
+через `node file.ts`. Node срезает типы, но поля в конструкторе — это не тип,
+а генерация кода, и срезать её нечем:
+
+```text
+class Tx {
+  constructor(public readonly id: string) {}
+                              ^^^^^^^^^^
+SyntaxError [ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX]: TypeScript parameter property
+is not supported in strip-only mode
+```
+
+Длинная запись выше работает без всяких оговорок. Короткую увидишь в чужом коде
+и в проектах со сборщиком — там её обрабатывает `tsc`, а не Node. Флаг
+`--erasableSyntaxOnly` в `tsconfig.json` запрещает такие конструкции заранее,
+чтобы поймать это при проверке, а не при запуске.
+</Hint>
+
+Тело конструктора пустое, а поля всё равно есть. Это называется **параметрами-свойствами**: модификатор доступа (`public`, `private`, `protected`, `readonly`) перед параметром конструктора говорит компилятору «заведи такое поле и положи туда аргумент».
+
+<Block kind="breakdown" title="Разбор по частям: параметры-свойства" chapterId="ts-oop" blockId="breakdown-param-props">
+<SyntaxBreakdown parts={[
+  { text: 'public', label: 'доступно снаружи', note: 'поведение по умолчанию; пишут явно, чтобы включить сокращение' },
+  { text: 'readonly', label: 'только для чтения', note: 'присвоить можно один раз, в конструкторе; дальше только читать' },
+  { text: 'private', label: 'только внутри класса', note: 'проверка выполняется компилятором; в готовом JavaScript ограничения не остаётся' },
+  { text: 'protected', label: 'внутри класса и наследников', note: 'середина между private и public' },
+  { text: 'id: string', label: 'имя и тип', note: 'то же, что у обычного параметра функции' },
+  { text: 'fee = 0.001', label: 'значение по умолчанию', note: 'тип number выведется сам, писать его не нужно' },
+  { text: '{}', label: 'пустое тело', note: 'присваивания this.id = id компилятор допишет сам' },
+]} />
+</Block>
+
+Вот что из этого получится после компиляции — реальный вывод `tsc --target es2022`:
+
+```js
+class Tx {
+    id;
+    amount;
+    constructor(id, amount) {
+        this.id = id;
+        this.amount = amount;
+    }
+}
+```
+
+Компилятор дописал ровно то, что мы поленились написать руками. Все модификаторы при этом исчезли.
+
+<Hint id="ts-oop-h3" type="tip">
+Поле, объявленное без значения и без присваивания в конструкторе, — ошибка в строгом режиме:
+
+```ts
+class C {
+  name: string;
+}
+// error TS2564: Property 'name' has no initializer
+// and is not definitely assigned in the constructor.
+```
+
+Три законных выхода: дать значение по умолчанию (`name = ''`), присвоить в конструкторе или честно признать, что поля может не быть (`name?: string`). Четвёртый выход — приписка `name!: string` — говорит компилятору «поверь мне на слово»; ей пользуются, когда значение проставляет фреймворк, и в обычном коде она означает, что что-то спроектировано неудачно.
+</Hint>
+
+<SectionAnchor chapterId="ts-oop" sectionId="param-props" />
+
+## Инкапсуляция: `private`, `protected` и `#`
+
+Инкапсуляция — это ответ на вопрос «к чему снаружи можно прикасаться, а к чему нельзя». Без неё любой чужой код может залезть в середину объекта и сломать его согласованность.
+
+В TypeScript есть три модификатора и одна возможность самого JavaScript.
+
+```ts
+class Tx {
+  constructor(
+    public readonly id: string,
+    private amount: number,
+    protected fee = 0.001,
+  ) {}
+  total(): number { return this.amount + this.fee; }
+}
+
+const t = new Tx('a1', 100);
+t.id = 'b2';            // error TS2540: Cannot assign to 'id' because it is a read-only property.
+console.log(t.amount);  // error TS2341: Property 'amount' is private and only accessible within class 'Tx'.
+console.log(t.fee);     // error TS2445: Property 'fee' is protected and only accessible within class 'Tx' and its subclasses.
+```
+
+Все три ошибки — настоящий вывод компилятора. И у всех трёх есть общая особенность, о которой обязательно нужно знать.
+
+<Hint id="ts-oop-h4" type="important">
+`private` в TypeScript — **не защита, а договорённость, проверяемая до запуска**. В скомпилированном JavaScript от него не остаётся ничего: поле обычное, и любой код, работающий с готовым файлом, спокойно его прочитает.
+
+Настоящую защиту даёт возможность самого JavaScript — поле с решёткой:
+
+```js
+class Wallet {
+  #key = 'секрет';
+  reveal() { return this.#key.length; }
+}
+const w = new Wallet();
+console.log(w.reveal());          // 6
+console.log(Object.keys(w));      // []
+console.log(JSON.stringify(w));   // {}
+w.#key;                           // SyntaxError на этапе разбора файла
+```
+
+Живой запуск: `6`, пустой массив ключей, пустой JSON. Поле `#key` не видно ни через `Object.keys`, ни в JSON, ни отладчиком снаружи, и обращение к нему из чужого кода — синтаксическая ошибка ещё до запуска.
+
+Правило простое: секрет (ключ, пароль, токен) — `#`. Внутренняя кухня, о которой просто не нужно знать снаружи, — `private`.
+</Hint>
+
+TypeScript знает и про `#`, и ошибка у него отдельная:
+
+```ts
+console.log(t.#hash);
+// error TS18013: Property '#hash' is not accessible outside class 'Tx'
+// because it has a private identifier.
+```
+
+<SectionAnchor chapterId="ts-oop" sectionId="encapsulation" />
+
+## Геттеры и сеттеры
+
+Иногда поле нужно не хранить, а вычислять — но обращаться к нему хочется как к полю, без скобок. Для этого есть `get`:
+
+```js
+class Block {
+  constructor(txs) { this.txs = txs; }
+  get total() { return this.txs.reduce((s, x) => s + x, 0); }
+}
+const b = new Block([1, 2, 3]);
+console.log(b.total);        // 6 — без скобок!
+console.log(Object.keys(b)); // [ 'txs' ] — поля total не существует
+```
+
+Живой запуск подтверждает: `b.total` даёт `6`, но среди собственных полей объекта `total` нет — это метод, замаскированный под поле.
+
+Парный `set` перехватывает присваивание и позволяет проверить значение до того, как оно попадёт внутрь:
+
+```js
+class Wallet {
+  #balance = 0;
+  get balance() { return this.#balance; }
+  set balance(v) {
+    if (v < 0) throw new RangeError('баланс не может быть отрицательным');
+    this.#balance = v;
+  }
+}
+const w = new Wallet();
+w.balance = 100;   // проходит через сеттер
+w.balance = -5;    // RangeError: баланс не может быть отрицательным
+```
+
+Такая пара — типовой приём: хранит `#balance`, а наружу выставляет `balance` с проверкой. Снаружи это выглядит как обычное поле, и вызывающий код ничего не подозревает.
+
+<Hint id="ts-oop-h5" type="tip">
+Геттер обязан быть дешёвым. Читающий код видит `b.total` и считает, что это просто чтение поля, — а внутри может оказаться перебор десяти тысяч элементов, который выполнится при каждом обращении в цикле.
+
+Правило: если работа дорогая, делайте её методом со скобками — `b.computeTotal()`. Скобки честно предупреждают «здесь что-то происходит».
+</Hint>
+
+<SectionAnchor chapterId="ts-oop" sectionId="accessors" />
+
+## `readonly`: поле, которое нельзя переписать
+
+`readonly` разрешает присвоить значение только один раз — при объявлении или в конструкторе:
+
+```ts
+class Tx {
+  constructor(public readonly id: string) {}
+  rename(next: string) {
+    this.id = next; // error TS2540: Cannot assign to 'id' because it is a read-only property.
+  }
+}
+```
+
+Ошибка возникает даже внутри класса — в этом весь смысл: идентификатор транзакции не должен меняться никогда и ни у кого.
+
+Разница с `const` и с `Object.freeze`:
+
+| | что защищает | когда проверяется |
+| --- | --- | --- |
+| `const` | имя переменной | до запуска и во время работы |
+| `readonly` | поле объекта | только до запуска, компилятором |
+| `Object.freeze` | все поля объекта | во время работы, молча не даёт изменить |
+
+И `readonly`, как всё остальное из TypeScript, исчезает при компиляции. Если объект уезжает в чужой код, который на TypeScript не написан, защиты нет.
+
+<SectionAnchor chapterId="ts-oop" sectionId="readonly" />
+
+## `static`: принадлежит классу, а не объекту
+
+Статическое поле или метод живёт у самого класса. У объектов его нет.
+
+```js
+class Counter {
+  static made = 0;
+  constructor() { Counter.made += 1; }
+}
+new Counter();
+new Counter();
+console.log(Counter.made);        // 2
+console.log(new Counter().made);  // undefined
+```
+
+Живой запуск: `2` и `undefined`. Это ровно то, что смущает в первый раз — обращаться нужно через имя класса, не через объект.
+
+Для чего это применяют на практике:
+
+```ts
+class Address {
+  private constructor(public readonly value: string) {}
+
+  static readonly PREFIX = '3P';           // константа класса
+
+  static isValid(s: string): boolean {      // проверка, которой не нужен объект
+    return s.startsWith(Address.PREFIX) && s.length === 35;
+  }
+
+  static from(s: string): Address {          // фабричный метод
+    if (!Address.isValid(s)) throw new Error(`не адрес: ${s}`);
+    return new Address(s);
+  }
+}
+
+const a = Address.from('3P8fH2...');
+```
+
+Три типовых применения статики видны здесь сразу: **константа** класса, **проверка**, которой не нужен готовый объект, и **фабричный метод**, создающий объект вместо `new`. Обратите внимание на `private constructor` — из-за него объект нельзя создать напрямую, и единственная дверь внутрь идёт через `Address.from`, где выполняется проверка.
+
+<Hint id="ts-oop-h6" type="fact">
+`static` — соблазн написать класс, который на самом деле не нужен:
+
+```ts
+class MathUtils {
+  static add(a: number, b: number) { return a + b; }
+  static sub(a: number, b: number) { return a - b; }
+}
+```
+
+Класс, у которого всё статическое, — это модуль, переодетый классом. В JavaScript и TypeScript для этого есть настоящие модули: просто `export function add(...)` в отдельном файле. Так короче, так лучше работает удаление неиспользуемого кода при сборке, и `new` по ошибке никто не напишет.
+</Hint>
+
+<Block kind="quiz" title="Инкапсуляция, геттеры, static" chapterId="ts-oop" blockId="quiz-encapsulation">
+<SelfCheck chapterId="ts-oop" quizId="quiz-encapsulation" questions={[
+  { q: 'Что останется от private в скомпилированном JavaScript?', options: ['Поле станет недоступным', 'Ничего: поле обычное, ограничение было только для компилятора', 'Поле удалится', 'Появится проверка во время работы'], correct: 1, why: 'Настоящую защиту во время работы даёт только поле с решёткой: #key не виден снаружи, в Object.keys и в JSON.' },
+  { q: 'Что покажет JSON.stringify для объекта с полем #key?', options: ['{"#key":"секрет"}', '{} — приватные поля в JSON не попадают', '{"key":"секрет"}', 'Ошибку'], correct: 1, why: 'Проверено запуском: Object.keys даёт пустой массив, JSON.stringify — пустой объект. Ровно то, что нужно для ключей и токенов.' },
+  { q: 'Чем get total отличается от метода total()?', options: ['Ничем', 'Обращаются без скобок, как к полю, но код выполняется при каждом чтении', 'Он быстрее', 'Он статический'], correct: 1, why: 'Отсюда правило: геттер обязан быть дешёвым. Дорогую работу делают методом со скобками — они честно предупреждают о вычислении.' },
+  { q: 'Что вернёт new Counter().made при static made?', options: ['Текущее значение счётчика', 'undefined: статика принадлежит классу, а не объекту', '0', 'Ошибку'], correct: 1, why: 'Обращаться нужно через имя класса: Counter.made. У объектов статических полей нет.' },
+  { q: 'Зачем классу private constructor?', options: ['Чтобы ускорить создание', 'Чтобы объект нельзя было создать мимо проверки — только через статический фабричный метод', 'Чтобы запретить наследование', 'Чтобы поля стали приватными'], correct: 1, why: 'Приём даёт единственную дверь внутрь: Address.from проверяет строку и только потом создаёт объект.' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="ts-oop" sectionId="static" />
+
+## Типичные ошибки: текст, перевод, причина, починка
+
+| Что видно | Перевод | Причина | Как чинить |
+| --- | --- | --- | --- |
+| `TypeError: Class constructor Tx cannot be invoked without 'new'` | Конструктор класса нельзя вызвать без `new` | Забыли `new` | Добавить `new` |
+| `TypeError: Cannot read properties of undefined (reading 'amount')` внутри метода | Чтение поля у `undefined` | Потеряли `this`: метод вызвали без точки | Обёртка-стрелка, `bind` или стрелка в поле |
+| `TypeError: back.fee is not a function` | У объекта нет такого метода | Объект пришёл из `JSON.parse` — это не объект класса | Собрать заново: `new Tx(back.amount)` |
+| `error TS2564: Property 'name' has no initializer` | У поля нет начального значения | Поле объявлено, но не заполнено | Значение по умолчанию, присваивание в конструкторе или `name?: string` |
+| `error TS2341: Property 'amount' is private` | Поле приватное | Обращение снаружи класса | Геттер, публичный метод — или признать, что поле должно быть публичным |
+| `error TS2540: Cannot assign to 'id'` | Поле только для чтения | Присваивание в `readonly` после конструктора | Убрать `readonly` или создавать новый объект вместо изменения |
+| `error TS18013: Property '#hash' is not accessible outside class` | Поле с решёткой недоступно снаружи | Обращение к `#`-полю извне | Публичный метод или геттер внутри класса |
+| `SyntaxError [ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX]` | Node не умеет эту конструкцию | Параметры-свойства при запуске `node file.ts` | Длинная запись полей либо сборка через `tsc` |
+
+<SectionAnchor chapterId="ts-oop" sectionId="errors" />
+
+## Тренажёр: классы вслепую
+
+<Block kind="trainer" title="Классы: набери вслепую" chapterId="ts-oop" blockId="trainer-oop-typing">
+<CodeTyping pools={[
+  { label: 'Класс и объект', snippets: [
+    'class Tx { constructor(public readonly id: string) {} }',
+    'const tx = new Tx("a1");',
+    'get total(): number { return this.amount + this.fee; }',
+  ] },
+  { label: 'Поля и статика', snippets: [
+    'static from(raw: string): Tx { return new Tx(raw.trim()); }',
+    '#secret = process.env.PRIVATE_KEY ?? "";',
+    'private constructor(private readonly value: string) {}',
+  ] },
+]} keyboard chapterId="ts-oop" trainerId="trainer-oop-typing" targetCpm={110} targetAccuracy={90} />
+</Block>
+
+<SectionAnchor chapterId="ts-oop" sectionId="trainer" />
+
+## Символы этой главы
+
+<Block kind="cheatsheet" title="Знаки и слова, встреченные в главе" chapterId="ts-oop" blockId="cheatsheet-symbols">
+
+| Знак или слово | Название | Что делает |
+| --- | --- | --- |
+| `class` | класс | объявляет чертёж объектов |
+| `new` | создание объекта | создаёт объект, привязывает прототип, запускает конструктор |
+| `constructor` | конструктор | метод, выполняемый один раз при создании |
+| `this` | текущий объект | то, что стояло слева от точки при вызове |
+| `static` | статический член | принадлежит классу, а не объектам |
+| `get` / `set` | геттер и сеттер | метод, к которому обращаются как к полю |
+| `#поле` | приватное поле JavaScript | настоящая недоступность снаружи, в том числе после компиляции |
+| `private` | приватное поле TypeScript | проверка компилятором; в готовом JS ограничения нет |
+| `protected` | защищённое поле | доступно классу и его наследникам |
+| `public` | публичное поле | поведение по умолчанию; пишут ради параметров-свойств |
+| `readonly` | только для чтения | присвоить можно один раз, в конструкторе |
+
+</Block>
+
+<SectionAnchor chapterId="ts-oop" sectionId="symbols" />
+
+## Что дальше
+
+Класс умеет держать данные и поведение в одном месте, прятать внутренности и раздавать доступ через геттеры. Следующая глава — про то, как классы связывают друг с другом: наследование, абстрактные классы, интерфейсы и композиция. Там же выяснится, что `class` — надстройка над механизмом, который в языке был всегда, и что типы здесь сравниваются по форме, а не по имени.
+
+<SectionAnchor chapterId="ts-oop" sectionId="dalshe" />
+
+<details>
+<summary>Углубиться</summary>
+
+**`new.target`.** Внутри конструктора доступно `new.target` — тот класс, от которого на самом деле шёл `new`. Приём применяют, чтобы запретить прямое создание базового класса.
+
+**Классы против чистых функций.** Заметная часть современного кода на TypeScript классов почти не использует: данные держат в обычных объектах и типах, а поведение — в функциях. Спор решается по задаче: там, где у объекта есть состояние и жизненный цикл (соединение, кошелёк, сессия), класс уместнее; там, где идёт преобразование данных, — функция.
+
+**`Object.freeze`.** Ещё один способ запретить изменение — заморозить объект целиком во время выполнения. В отличие от `readonly`, работает не до запуска, а в нём.
+
+Дальше по теме:
+- [MDN: классы](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Classes) — полный справочник со всеми формами записи
+- [TypeScript Handbook: Classes](https://www.typescriptlang.org/docs/handbook/2/classes.html) — модификаторы, параметры-свойства
+
+</details>
+
+<SectionAnchor chapterId="ts-oop" sectionId="deep" />
+
+<Block kind="quiz" title="Экзамен главы" chapterId="ts-oop" blockId="exam">
+<ChapterExam chapterId="ts-oop" questions={[
+  { q: 'Чем класс принципиально лучше фабричной функции, возвращающей объект с методами?', options: ['Ничем', 'Методы лежат в прототипе — одна копия на все объекты, а не по копии у каждого', 'Класс быстрее создаётся', 'Класс нельзя изменить'], correct: 1, why: 'Для трёх объектов разницы нет, для тридцати тысяч записей из ответа узла — есть. Проверяется через a.fee === b.fee.' },
+  { q: 'Что из перечисленного НЕ делает оператор new?', options: ['Создаёт пустой объект', 'Привязывает прототип класса', 'Запускает конструктор', 'Копирует методы в новый объект'], correct: 3, why: 'Методы не копируются никогда — объект получает к ним доступ через прототип. Именно поэтому их нет в Object.keys и в JSON.' },
+  { q: 'Внутри метода total() нужно вызвать метод fee() того же класса. Как?', options: ['fee()', 'this.fee()', 'super.fee()', 'Tx.fee()'], correct: 1, why: 'Просто fee() даст ReferenceError: такой функции в области видимости нет.' },
+  { q: 'setTimeout(t.fee, 100) падает с TypeError. Какое исправление НЕ сработает?', options: ['setTimeout(() => t.fee(), 100)', 'setTimeout(t.fee.bind(t), 100)', 'Сделать fee стрелкой в поле класса', 'setTimeout(t.fee(), 100)'], correct: 3, why: 'Последний вариант вызывает метод немедленно и передаёт в setTimeout результат, а не функцию.' },
+  { q: 'Объект пришёл из JSON.parse. Что с ним не так?', options: ['Ничего', 'Это обычный объект: методов класса у него нет, instanceof даёт false', 'У него потеряны поля', 'Он заморожен'], correct: 1, why: 'Классы по сети не ходят. Объект собирают заново через конструктор — типовой шаг при работе с любым узлом или сервисом.' },
+  { q: 'Чем #key отличается от private key в TypeScript?', options: ['Ничем, это синонимы', '#key недоступно снаружи и после компиляции; private — проверка только до запуска', 'private надёжнее', '#key работает только в классах-наследниках'], correct: 1, why: 'Ключи, пароли и токены держат в #: Object.keys даёт пустой массив, JSON.stringify — пустой объект.' },
+  { q: 'Что вернёт new Counter().made, если made объявлено как static?', options: ['Значение счётчика', 'undefined', '0', 'Ошибку'], correct: 1, why: 'Статика принадлежит классу. Обращаться нужно через Counter.made.' },
+  { q: 'Зачем классу приватный конструктор?', options: ['Чтобы ускорить создание', 'Чтобы объект нельзя было создать мимо проверки — только через статический фабричный метод', 'Чтобы запретить наследование', 'Чтобы поля стали приватными'], correct: 1, why: 'Приём даёт единственную дверь внутрь: фабричный метод проверяет данные и только потом создаёт объект.' },
+]} />
+</Block>
+
+## Куда дальше: проверенные ресурсы
+
+<Block kind="cheatsheet" title="Классы в TypeScript: официальные источники" chapterId="ts-oop" blockId="cheatsheet-resources">
+
+- [MDN: классы](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Classes) — справочник по всем формам записи, на русском.
+- [MDN: приватные поля](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Classes/Private_properties) — поля с решёткой и их ограничения.
+- [MDN: this](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Operators/this) — все случаи, включая стрелки и `bind`.
+- [TypeScript Handbook: Classes](https://www.typescriptlang.org/docs/handbook/2/classes.html) — модификаторы доступа, параметры-свойства.
+- [Learn JavaScript: классы](https://learn.javascript.ru/classes) — подробный русскоязычный раздел с задачами.
+
+</Block>
+
+<SectionAnchor chapterId="ts-oop" sectionId="resources" />
