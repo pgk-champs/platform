@@ -432,6 +432,14 @@
     "path": "blockchain/sol-inheritance.mdx"
   },
   {
+    "id": "sol-interfaces",
+    "title": "Интерфейсы: договор между контрактами",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 11,
+    "path": "blockchain/sol-interfaces.mdx"
+  },
+  {
     "id": "ts-vs-js",
     "title": "TypeScript и JavaScript: в чём разница",
     "audience": "блокчейн",

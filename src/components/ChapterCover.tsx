@@ -466,6 +466,24 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>взять и дописать</text>
     </g>
   ),
+  /* два контракта и договор-мост между ними — арт «sol-interfaces» */
+  'sol-interfaces': () => (
+    <g strokeLinecap="round">
+      <rect x="16" y="70" width="60" height="52" rx="10" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="46" y="101" textAnchor="middle" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>Vault</text>
+
+      <rect x="124" y="70" width="60" height="52" rx="10" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="154" y="101" textAnchor="middle" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>Token</text>
+
+      <rect x="80" y="80" width="40" height="32" rx="8" fill={SOFT} stroke={ACCENT} strokeWidth={3} strokeDasharray="5 4" />
+      <text x="100" y="101" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>I</text>
+
+      <path d="M78 96h2M120 96h2" stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="140" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>approve → transferFrom</text>
+
+      <text x="100" y="176" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>договор без тела</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -960,6 +978,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'solidity-storage': { track: 'blockchain', num: '08', title: 'Хранение данных: mapping, struct, массивы и события' },
   'sol-contracts-oop': { track: 'blockchain', num: '09', title: 'Контракт как объект: конструктор, enum и роли' },
   'sol-inheritance': { track: 'blockchain', num: '10', title: 'Наследование: is, virtual, override и super' },
+  'sol-interfaces': { track: 'blockchain', num: '11', title: 'Интерфейсы: договор между контрактами' },
   'ts-vs-js': { track: 'blockchain', num: '14', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '15', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '16', title: 'Условия и циклы: как программа принимает решения' },

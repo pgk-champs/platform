@@ -1659,5 +1659,32 @@
       "title": "Inheritance | Solidity 0.8",
       "channel": "Smart Contract Programmer"
     }
+  ],
+  "sol-interfaces": [
+    {
+      "videoId": "LHtNg30nNgA",
+      "title": "Solidity и смарт-контракты Ethereum, урок #12 | Интерфейсы, библиотеки, тесты",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "BqpUfSKUeX4",
+      "title": "Интерфейсы в Solidity: Пишем работающий обменник токенов с нуля",
+      "channel": "Guide DAO"
+    },
+    {
+      "videoId": "Q9YSnybXepY",
+      "title": "Solidity | Урок 9. interfaces",
+      "channel": "Артем Кукуруза"
+    },
+    {
+      "videoId": "6_oGo0YehDg",
+      "title": "4007 Язык Solidity  Часть 5  Вызов функций из других смарт контрактов",
+      "channel": "Programming Innopolis STEM"
+    },
+    {
+      "videoId": "GWZmklp7RTg",
+      "title": "Solidity Interface Tutorial | How To Connect The Lego Bricks Of DeFi",
+      "channel": "James Bachini"
+    }
   ]
 }
