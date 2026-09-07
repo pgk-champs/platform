@@ -1767,5 +1767,32 @@
       "title": "ERC20 | Solidity 0.8",
       "channel": "Smart Contract Programmer"
     }
+  ],
+  "erc20-oz": [
+    {
+      "videoId": "u1SQEt6nTGc",
+      "title": "Создаем свой токен ERC 20 в Solidity с помощью библиотеки Openzeppelin. Ethereum",
+      "channel": "Alex Klimov"
+    },
+    {
+      "videoId": "CoJUviuVl3o",
+      "title": "Обновление ERC-20 токена с помощью OpenZeppelin",
+      "channel": "nodejsprogrammer"
+    },
+    {
+      "videoId": "zJk_tVdlOmw",
+      "title": "Как создать токен ERC20 и ERC721 и запустить на Polygon",
+      "channel": "CRYPTUS"
+    },
+    {
+      "videoId": "9YOctt6FBWo",
+      "title": "3- Understanding the OpenZeppelin ERC20 Solidity Code",
+      "channel": "BlockEater"
+    },
+    {
+      "videoId": "DILDtLTrx_s",
+      "title": "Solidity Tutorial | Creating an ERC-20 Token in Solidity with OpenZeppelin (for ",
+      "channel": "Techmaker Studio"
+    }
   ]
 }

@@ -464,6 +464,14 @@
     "path": "blockchain/erc20-scratch.mdx"
   },
   {
+    "id": "erc20-oz",
+    "title": "Готовый ERC20: OpenZeppelin и что он делает за вас",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 15,
+    "path": "blockchain/erc20-oz.mdx"
+  },
+  {
     "id": "ts-vs-js",
     "title": "TypeScript и JavaScript: в чём разница",
     "audience": "блокчейн",

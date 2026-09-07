@@ -539,6 +539,22 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="188" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>договор</text>
     </g>
   ),
+  /* готовый блок с щитом: наследуешь — получаешь — арт «erc20-oz» */
+  'erc20-oz': () => (
+    <g strokeLinecap="round">
+      <rect x="28" y="46" width="144" height="34" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="100" y="68" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>@openzeppelin</text>
+
+      <path d="M100 84v14M100 98l-5-5M100 98l5-5" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <rect x="42" y="104" width="116" height="44" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="124" textAnchor="middle" fontSize="9" fontWeight={800} fill={ACCENT} fontFamily={MONO}>is ERC20</text>
+      <text x="100" y="140" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>_update</text>
+
+      <text x="100" y="170" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>3670 байт против 3976</text>
+      <text x="100" y="188" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>чужой код</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -1037,6 +1053,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'sol-libraries': { track: 'blockchain', num: '12', title: 'Библиотеки, import и хеши: keccak256 и abi.encode' },
   'sol-patterns': { track: 'blockchain', num: '13', title: 'Паттерны безопасности: владелец, реентерабельность, выплаты' },
   'erc20-scratch': { track: 'blockchain', num: '14', title: 'ERC20 с нуля: как устроен токен' },
+  'erc20-oz': { track: 'blockchain', num: '15', title: 'Готовый ERC20: OpenZeppelin и что он делает за вас' },
   'ts-vs-js': { track: 'blockchain', num: '18', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '19', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '20', title: 'Условия и циклы: как программа принимает решения' },
