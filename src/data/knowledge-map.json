@@ -408,6 +408,14 @@
     "path": "blockchain/solidity-functions.mdx"
   },
   {
+    "id": "solidity-storage",
+    "title": "Хранение данных: mapping, struct, массивы и события",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 8,
+    "path": "blockchain/solidity-storage.mdx"
+  },
+  {
     "id": "ts-vs-js",
     "title": "TypeScript и JavaScript: в чём разница",
     "audience": "блокчейн",

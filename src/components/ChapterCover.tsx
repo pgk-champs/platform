@@ -406,6 +406,26 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>кто и почём</text>
     </g>
   ),
+  /* ячейки хранилища: две заняты, одна обнулена — арт «solidity-storage» */
+  'solidity-storage': () => (
+    <g strokeLinecap="round">
+      {[0, 1, 2].map((i) => (
+        <g key={i}>
+          <rect x={24 + i * 54} y="48" width="46" height="46" rx="8"
+            fill={i === 1 ? 'rgba(0,0,0,0.35)' : SOFT} stroke={i === 1 ? INK : ACCENT} strokeWidth={3}
+            strokeDasharray={i === 1 ? '5 4' : undefined} />
+          <text x={47 + i * 54} y="77" textAnchor="middle" fontSize="10" fontWeight={800}
+            fill={i === 1 ? 'rgba(255,255,255,0.45)' : ACCENT} fontFamily={MONO}>{i === 1 ? '0' : (i === 0 ? '7' : '9')}</text>
+        </g>
+      ))}
+      <text x="100" y="112" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>длина всё ещё 3</text>
+
+      <rect x="24" y="124" width="152" height="30" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="100" y="144" textAnchor="middle" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>emit → журнал</text>
+
+      <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>итоги и история</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -897,6 +917,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'solidity-errors': { track: 'blockchain', num: '05', title: 'Ошибки и проверки: require, revert, assert' },
   'solidity-flow': { track: 'blockchain', num: '06', title: 'Условия, циклы и время: как контракт принимает решения' },
   'solidity-functions': { track: 'blockchain', num: '07', title: 'Функции: видимость, view, payable и модификаторы' },
+  'solidity-storage': { track: 'blockchain', num: '08', title: 'Хранение данных: mapping, struct, массивы и события' },
   'ts-vs-js': { track: 'blockchain', num: '14', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '15', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '16', title: 'Условия и циклы: как программа принимает решения' },

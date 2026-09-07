@@ -1578,5 +1578,32 @@
       "title": "Solidity Functions Full Guide | Return Multiple Values, Named Returns & Array In",
       "channel": "thebasicsdotacademy"
     }
+  ],
+  "solidity-storage": [
+    {
+      "videoId": "WTmyFzfwn04",
+      "title": "Solidity и смарт-контракты Ethereum, урок #3 | Типы данных string, address, mapp",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "QPk0W_S7lVI",
+      "title": "Solidity и смарт-контракты Ethereum, урок #4 | Типы данных array, bytes, enum, s",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "OMjT9VZwCpo",
+      "title": "Как УБИТЬ 50% газа? Практика storage, memory и calldata",
+      "channel": "Guide DAO"
+    },
+    {
+      "videoId": "ZzK15vkO38c",
+      "title": "Solidity и смарт-контракты Ethereum, урок #7 | События, модификаторы, require/re",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "wOCIhzAuhgs",
+      "title": "Storage, Memory and Calldata | Solidity 0.8",
+      "channel": "Smart Contract Programmer"
+    }
   ]
 }
