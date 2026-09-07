@@ -1713,5 +1713,32 @@
       "title": "Solidity Encoding Explained: abi.encode vs abi.encodePacked vs bytes vs decode",
       "channel": "CodeByAnkita"
     }
+  ],
+  "sol-patterns": [
+    {
+      "videoId": "GVTZuuzCbIs",
+      "title": "Solidity и смарт-контракты Ethereum, урок #16 | Безопасность: Reentrancy, DoS",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "ZzK15vkO38c",
+      "title": "Solidity и смарт-контракты Ethereum, урок #7 | События, модификаторы, require/re",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "xOvO_09f2_g",
+      "title": "Уязвимости смарт-контрактов. Reentrancy. Взлом DAO. Хардфорк ETH #solidity #ауди",
+      "channel": "Dima HideCrypto - Web3 | Solidity"
+    },
+    {
+      "videoId": "MQ_o0p6R2vU",
+      "title": "What Is Check-Effects-Interactions?",
+      "channel": "Owen Thurm"
+    },
+    {
+      "videoId": "QEJYSuyYOfw",
+      "title": "Ownable | Solidity 0.8",
+      "channel": "Smart Contract Programmer"
+    }
   ]
 }

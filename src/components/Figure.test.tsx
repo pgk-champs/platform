@@ -42,6 +42,7 @@ import { solContractsOopSchemes } from './figures/solContractsOop';
 import { solInheritanceSchemes } from './figures/solInheritance';
 import { solInterfacesSchemes } from './figures/solInterfaces';
 import { solLibrariesSchemes } from './figures/solLibraries';
+import { solPatternsSchemes } from './figures/solPatterns';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -127,6 +128,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(solInheritanceSchemes),
     ...Object.keys(solInterfacesSchemes),
     ...Object.keys(solLibrariesSchemes),
+    ...Object.keys(solPatternsSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

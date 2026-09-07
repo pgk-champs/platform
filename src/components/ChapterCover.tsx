@@ -506,6 +506,23 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="188" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>и отпечаток</text>
     </g>
   ),
+  /* замок и стрелка, возвращающаяся назад — арт «sol-patterns» */
+  'sol-patterns': () => (
+    <g strokeLinecap="round">
+      <rect x="66" y="86" width="68" height="52" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <path d="M84 86V70a16 16 0 0 1 32 0v16" fill="none" stroke={ACCENT} strokeWidth={3} />
+      <circle cx="100" cy="110" r="6" fill={ACCENT} />
+
+      <path d="M40 128c-14 22 4 40 26 34" fill="none" stroke="rgba(255,140,140,0.9)" strokeWidth={3} />
+      <path d="M66 162l-8-4M66 162l-6 6" stroke="rgba(255,140,140,0.9)" strokeWidth={3} fill="none" />
+      <text x="34" y="112" fontSize="8" fontWeight={800} fill="rgba(255,170,170,0.95)" fontFamily={MONO}>call</text>
+
+      <path d="M160 128c14 22-4 40-26 34" fill="none" stroke={INK} strokeWidth={3} />
+      <text x="150" y="112" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>_;</text>
+
+      <text x="100" y="184" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>порядок строк</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -1002,6 +1019,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'sol-inheritance': { track: 'blockchain', num: '10', title: 'Наследование: is, virtual, override и super' },
   'sol-interfaces': { track: 'blockchain', num: '11', title: 'Интерфейсы: договор между контрактами' },
   'sol-libraries': { track: 'blockchain', num: '12', title: 'Библиотеки, import и хеши: keccak256 и abi.encode' },
+  'sol-patterns': { track: 'blockchain', num: '13', title: 'Паттерны безопасности: владелец, реентерабельность, выплаты' },
   'ts-vs-js': { track: 'blockchain', num: '14', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '15', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '16', title: 'Условия и циклы: как программа принимает решения' },

@@ -42,6 +42,7 @@ import { solContractsOopSchemes } from './figures/solContractsOop';
 import { solInheritanceSchemes } from './figures/solInheritance';
 import { solInterfacesSchemes } from './figures/solInterfaces';
 import { solLibrariesSchemes } from './figures/solLibraries';
+import { solPatternsSchemes } from './figures/solPatterns';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -99,6 +100,7 @@ const SCHEMES = {
   ...solInheritanceSchemes,
   ...solInterfacesSchemes,
   ...solLibrariesSchemes,
+  ...solPatternsSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

@@ -448,6 +448,14 @@
     "path": "blockchain/sol-libraries.mdx"
   },
   {
+    "id": "sol-patterns",
+    "title": "Паттерны безопасности: владелец, реентерабельность, выплаты",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 13,
+    "path": "blockchain/sol-patterns.mdx"
+  },
+  {
     "id": "ts-vs-js",
     "title": "TypeScript и JavaScript: в чём разница",
     "audience": "блокчейн",
