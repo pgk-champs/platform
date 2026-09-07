@@ -440,6 +440,14 @@
     "path": "blockchain/sol-interfaces.mdx"
   },
   {
+    "id": "sol-libraries",
+    "title": "Библиотеки, import и хеши: keccak256 и abi.encode",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 12,
+    "path": "blockchain/sol-libraries.mdx"
+  },
+  {
     "id": "ts-vs-js",
     "title": "TypeScript и JavaScript: в чём разница",
     "audience": "блокчейн",

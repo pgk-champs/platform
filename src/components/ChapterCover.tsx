@@ -484,6 +484,28 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="176" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>договор без тела</text>
     </g>
   ),
+  /* блок-библиотека и решётка хеша — арт «sol-libraries» */
+  'sol-libraries': () => (
+    <g strokeLinecap="round">
+      <rect x="20" y="52" width="72" height="60" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="56" y="78" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>library</text>
+      <path d="M32 90h48M32 100h32" stroke="rgba(255,255,255,0.5)" strokeWidth={3} />
+
+      <path d="M100 82h16M116 82l-5-4M116 82l-5 4" stroke={INK} strokeWidth={3} fill="none" />
+
+      <rect x="124" y="52" width="60" height="60" rx="10" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      {[0, 1, 2, 3].map((r) => (
+        [0, 1, 2, 3].map((c) => (
+          <rect key={`${r}-${c}`} x={132 + c * 12} y={60 + r * 12} width="8" height="8" rx="2"
+            fill={(r + c) % 3 === 0 ? ACCENT : 'rgba(255,255,255,0.3)'} />
+        ))
+      ))}
+
+      <text x="100" y="136" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>keccak256 → 32 байта</text>
+      <text x="100" y="172" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>общий код</text>
+      <text x="100" y="188" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>и отпечаток</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -979,6 +1001,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'sol-contracts-oop': { track: 'blockchain', num: '09', title: 'Контракт как объект: конструктор, enum и роли' },
   'sol-inheritance': { track: 'blockchain', num: '10', title: 'Наследование: is, virtual, override и super' },
   'sol-interfaces': { track: 'blockchain', num: '11', title: 'Интерфейсы: договор между контрактами' },
+  'sol-libraries': { track: 'blockchain', num: '12', title: 'Библиотеки, import и хеши: keccak256 и abi.encode' },
   'ts-vs-js': { track: 'blockchain', num: '14', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '15', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '16', title: 'Условия и циклы: как программа принимает решения' },

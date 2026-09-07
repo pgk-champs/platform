@@ -1686,5 +1686,32 @@
       "title": "Solidity Interface Tutorial | How To Connect The Lego Bricks Of DeFi",
       "channel": "James Bachini"
     }
+  ],
+  "sol-libraries": [
+    {
+      "videoId": "LHtNg30nNgA",
+      "title": "Solidity и смарт-контракты Ethereum, урок #12 | Интерфейсы, библиотеки, тесты",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "aYKt-usrPw8",
+      "title": "Solidity и смарт-контракты Ethereum, урок #8 | Древо Меркла, хэши, encode, циклы",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "tmjct2g-OCY",
+      "title": "Solidity | Урок 4. Функция хеширования, приведение типов и события",
+      "channel": "Артем Кукуруза"
+    },
+    {
+      "videoId": "tlo_suXqfIA",
+      "title": "Ethereum #1: Хэш функции, keccak256, применение в Ethereum",
+      "channel": "Dmitry Strukovsky"
+    },
+    {
+      "videoId": "Y9psclZ_Ow8",
+      "title": "Solidity Encoding Explained: abi.encode vs abi.encodePacked vs bytes vs decode",
+      "channel": "CodeByAnkita"
+    }
   ]
 }
