@@ -1605,5 +1605,32 @@
       "title": "Storage, Memory and Calldata | Solidity 0.8",
       "channel": "Smart Contract Programmer"
     }
+  ],
+  "sol-contracts-oop": [
+    {
+      "videoId": "QPk0W_S7lVI",
+      "title": "Solidity и смарт-контракты Ethereum, урок #4 | Типы данных array, bytes, enum, s",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "xkjFcdkAJpg",
+      "title": "Solidity и смарт-контракты Ethereum, урок #11 | Наследование, конструкторы, supe",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "gQtaEtSCpPE",
+      "title": "Solidity и смарт-контракты Ethereum, урок #36 | Ролевая система (access control)",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "7XwWBr4TAz4",
+      "title": "Constructor | Solidity 0.8",
+      "channel": "Smart Contract Programmer"
+    },
+    {
+      "videoId": "5Ojnbn0rkmI",
+      "title": "Enum | Solidity 0.8",
+      "channel": "Smart Contract Programmer"
+    }
   ]
 }

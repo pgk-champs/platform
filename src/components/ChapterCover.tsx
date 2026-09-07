@@ -426,6 +426,25 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>итоги и история</text>
     </g>
   ),
+  /* один чертёж и два объекта с разными адресами — арт «sol-contracts-oop» */
+  'sol-contracts-oop': () => (
+    <g strokeLinecap="round">
+      <rect x="66" y="40" width="68" height="34" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="100" y="62" textAnchor="middle" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>.sol</text>
+
+      <path d="M92 78L52 104M108 78l40 26" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <rect x="16" y="106" width="70" height="46" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="51" y="126" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>0x5FbD…</text>
+      <text x="51" y="142" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>count 3</text>
+
+      <rect x="114" y="106" width="70" height="46" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="149" y="126" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>0x8464…</text>
+      <text x="149" y="142" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>count 0</text>
+
+      <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>объект, не файл</text>
+    </g>
+  ),
   /* типы TypeScript снимаются при компиляции, остаётся тот же JS — арт «ts-vs-js» */
   'ts-vs-js': () => (
     <g strokeLinecap="round">
@@ -918,6 +937,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'solidity-flow': { track: 'blockchain', num: '06', title: 'Условия, циклы и время: как контракт принимает решения' },
   'solidity-functions': { track: 'blockchain', num: '07', title: 'Функции: видимость, view, payable и модификаторы' },
   'solidity-storage': { track: 'blockchain', num: '08', title: 'Хранение данных: mapping, struct, массивы и события' },
+  'sol-contracts-oop': { track: 'blockchain', num: '09', title: 'Контракт как объект: конструктор, enum и роли' },
   'ts-vs-js': { track: 'blockchain', num: '14', title: 'TypeScript и JavaScript: в чём разница' },
   'ts-values': { track: 'blockchain', num: '15', title: 'Значения и переменные: числа, строки, типы' },
   'ts-flow': { track: 'blockchain', num: '16', title: 'Условия и циклы: как программа принимает решения' },

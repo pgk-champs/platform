@@ -38,6 +38,7 @@ import { solidityErrorsSchemes } from './figures/solidityErrors';
 import { solidityFlowSchemes } from './figures/solidityFlow';
 import { solidityFunctionsSchemes } from './figures/solidityFunctions';
 import { solidityStorageSchemes } from './figures/solidityStorage';
+import { solContractsOopSchemes } from './figures/solContractsOop';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -91,6 +92,7 @@ const SCHEMES = {
   ...solidityFlowSchemes,
   ...solidityFunctionsSchemes,
   ...solidityStorageSchemes,
+  ...solContractsOopSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

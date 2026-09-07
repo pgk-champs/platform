@@ -38,6 +38,7 @@ import { solidityErrorsSchemes } from './figures/solidityErrors';
 import { solidityFlowSchemes } from './figures/solidityFlow';
 import { solidityFunctionsSchemes } from './figures/solidityFunctions';
 import { solidityStorageSchemes } from './figures/solidityStorage';
+import { solContractsOopSchemes } from './figures/solContractsOop';
 import { kotlinNullSchemes } from './figures/kotlinNull';
 import { tsJsSchemes } from './figures/tsJs';
 import { tsValuesSchemes } from './figures/tsValues';
@@ -119,6 +120,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(solidityFlowSchemes),
     ...Object.keys(solidityFunctionsSchemes),
     ...Object.keys(solidityStorageSchemes),
+    ...Object.keys(solContractsOopSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),
