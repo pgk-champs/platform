@@ -460,7 +460,7 @@
     "title": "TypeScript и JavaScript: в чём разница",
     "audience": "блокчейн",
     "level": "база",
-    "order": 14,
+    "order": 18,
     "path": "blockchain/ts-vs-js.mdx"
   },
   {
@@ -468,7 +468,7 @@
     "title": "Значения и переменные: числа, строки, типы",
     "audience": "блокчейн",
     "level": "база",
-    "order": 15,
+    "order": 19,
     "path": "blockchain/ts-values.mdx"
   },
   {
@@ -476,7 +476,7 @@
     "title": "Условия и циклы: как программа принимает решения",
     "audience": "блокчейн",
     "level": "база",
-    "order": 16,
+    "order": 20,
     "path": "blockchain/ts-flow.mdx"
   },
   {
@@ -484,7 +484,7 @@
     "title": "Функции: как код перестаёт повторяться",
     "audience": "блокчейн",
     "level": "база",
-    "order": 17,
+    "order": 21,
     "path": "blockchain/ts-functions.mdx"
   },
   {
@@ -492,7 +492,7 @@
     "title": "Массивы и объекты: как хранят много данных сразу",
     "audience": "блокчейн",
     "level": "база",
-    "order": 18,
+    "order": 22,
     "path": "blockchain/ts-collections.mdx"
   },
   {
@@ -500,7 +500,7 @@
     "title": "ООП на TypeScript: классы, наследование, интерфейсы",
     "audience": "блокчейн",
     "level": "углубление",
-    "order": 19,
+    "order": 23,
     "path": "blockchain/ts-oop.mdx"
   },
   {
@@ -508,7 +508,7 @@
     "title": "Асинхронность: промисы, async/await и цикл событий",
     "audience": "блокчейн",
     "level": "углубление",
-    "order": 20,
+    "order": 24,
     "path": "blockchain/ts-async.mdx"
   },
   {
@@ -516,7 +516,7 @@
     "title": "История JavaScript и TypeScript",
     "audience": "блокчейн",
     "level": "углубление",
-    "order": 21,
+    "order": 25,
     "path": "blockchain/ts-history.mdx"
   },
   {
@@ -524,7 +524,7 @@
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 22,
+    "order": 26,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]

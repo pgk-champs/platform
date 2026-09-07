@@ -31,14 +31,14 @@ test('новые главы стоят в своих треках', () => {
     ['kotlin-null', 'МОБИЛКА', '02'],
     ['first-compose-screen', 'МОБИЛКА', '07'],
     ['ui-kit', 'МОБИЛКА', '10'],
-    ['ts-vs-js', 'БЛОКЧЕЙН', '14'],
-    ['ts-values', 'БЛОКЧЕЙН', '15'],
-    ['ts-flow', 'БЛОКЧЕЙН', '16'],
-    ['ts-functions', 'БЛОКЧЕЙН', '17'],
-    ['ts-collections', 'БЛОКЧЕЙН', '18'],
-    ['ts-oop', 'БЛОКЧЕЙН', '19'],
-    ['ts-history', 'БЛОКЧЕЙН', '21'],
-    ['ts-async', 'БЛОКЧЕЙН', '20'],
+    ['ts-vs-js', 'БЛОКЧЕЙН', '18'],
+    ['ts-values', 'БЛОКЧЕЙН', '19'],
+    ['ts-flow', 'БЛОКЧЕЙН', '20'],
+    ['ts-functions', 'БЛОКЧЕЙН', '21'],
+    ['ts-collections', 'БЛОКЧЕЙН', '22'],
+    ['ts-oop', 'БЛОКЧЕЙН', '23'],
+    ['ts-history', 'БЛОКЧЕЙН', '25'],
+    ['ts-async', 'БЛОКЧЕЙН', '24'],
   ] as const;
   for (const [id, track, num] of cases) {
     const { container, unmount } = render(<ChapterCover chapterId={id} />);
