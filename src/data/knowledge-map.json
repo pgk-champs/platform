@@ -688,11 +688,19 @@
     "path": "blockchain/web-react.mdx"
   },
   {
+    "id": "web-state",
+    "title": "Состояние и эффекты: интерфейс с памятью",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 43,
+    "path": "blockchain/web-state.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 43,
+    "order": 44,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]

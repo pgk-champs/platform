@@ -410,6 +410,31 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="176" textAnchor="middle" fontSize="7.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>2.10 мс</text>
     </g>
   ),
+  /* Состояние и эффекты: интерфейс с памятью */
+  'web-state': () => (
+    <g strokeLinecap="round">
+      <rect x="56" y="40" width="88" height="34" rx="9" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="62" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>amount</text>
+
+      <rect x="20" y="104" width="62" height="30" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="51" y="124" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>input</text>
+
+      <rect x="92" y="104" width="46" height="30" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="115" y="124" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>btn</text>
+
+      <rect x="148" y="104" width="34" height="30" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="165" y="124" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>hint</text>
+
+      <path d="M80 74l-25 24M100 74v24M120 74l42 24" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M55 98l1-7M55 98l6-3M100 98l-4-6M100 98l4-6M162 98l-6-2M162 98l0-7" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <path d="M40 100 Q20 88 44 74" stroke="rgba(255,140,140,0.8)" strokeWidth={3} fill="none" />
+      <path d="M44 74l-7 1M44 74l-1 7" stroke="rgba(255,140,140,0.8)" strokeWidth={3} fill="none" />
+
+      <text x="100" y="164" textAnchor="middle" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>useState</text>
+      <text x="100" y="184" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>useEffect → уборка</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1398,7 +1423,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'web-layout': { track: 'blockchain', num: '40', title: 'Вёрстка: поток, flex и grid' },
   'web-dom': { track: 'blockchain', num: '41', title: 'DOM и события: страница начинает отвечать' },
   'web-react': { track: 'blockchain', num: '42', title: 'React: компоненты вместо ручного DOM' },
-  'waves-first-network': { track: 'blockchain', num: '43', title: 'Первая сеть на Waves Enterprise' },
+  'web-state': { track: 'blockchain', num: '43', title: 'Состояние и эффекты: интерфейс с памятью' },
+  'waves-first-network': { track: 'blockchain', num: '44', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },

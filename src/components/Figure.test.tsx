@@ -72,6 +72,7 @@ import { webCssSchemes } from './figures/webCss';
 import { webLayoutSchemes } from './figures/webLayout';
 import { webDomSchemes } from './figures/webDom';
 import { webReactSchemes } from './figures/webReact';
+import { webStateSchemes } from './figures/webState';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -169,6 +170,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(webLayoutSchemes),
     ...Object.keys(webDomSchemes),
     ...Object.keys(webReactSchemes),
+    ...Object.keys(webStateSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

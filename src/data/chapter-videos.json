@@ -2307,5 +2307,32 @@
       "title": "Урок 1.14. Рендеринг списков в React",
       "channel": "Web-garage"
     }
+  ],
+  "web-state": [
+    {
+      "videoId": "JLC_hCDwu_k",
+      "title": "#15 React для НАЧИНАЮЩИХ (Хук useState)",
+      "channel": "Какие-то уроки [Frontend]"
+    },
+    {
+      "videoId": "s2fWu6YcNIg",
+      "title": "#16 React для НАЧИНАЮЩИХ (Хук useEffect)",
+      "channel": "Какие-то уроки [Frontend]"
+    },
+    {
+      "videoId": "heBRA9LVpsA",
+      "title": "Управляемые и неуправляемые компоненты в React. Хук useRef и работа с DOM",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "FuBNh_ehZqg",
+      "title": "10 - Контролируемые инпуты в React — useState и формы",
+      "channel": "Дюжев Алексей. с 0 в IT. "
+    },
+    {
+      "videoId": "g3e6Eyvm3kI",
+      "title": "Урок 1.15. Управляемые и неуправляемые компоненты в React",
+      "channel": "Web-garage"
+    }
   ]
 }
