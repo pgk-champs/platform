@@ -246,6 +246,30 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <path d="M100 140v12" stroke={ACCENT} strokeWidth={3} fill="none" />
     </g>
   ),
+  /* hardhat.config.ts: настройки и сборка контрактов */
+  'hh-config': () => (
+    <g strokeLinecap="round">
+      <rect x="22" y="46" width="72" height="108" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="58" y="70" textAnchor="middle" fontSize="6.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>config</text>
+      <text x="58" y="92" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>plugins</text>
+      <text x="58" y="110" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>solidity</text>
+      <text x="58" y="128" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>networks</text>
+
+      <path d="M94 100h26" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M120 100l-6-4M120 100l-6 4" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <rect x="124" y="46" width="56" height="30" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="152" y="66" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>abi</text>
+
+      <rect x="124" y="86" width="56" height="30" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="152" y="106" textAnchor="middle" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>bytecode</text>
+
+      <rect x="124" y="126" width="56" height="30" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="152" y="146" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>build-info</text>
+
+      <text x="100" y="180" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>2253 → 1115 байт</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1226,6 +1250,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'what-is-blockchain': { track: 'blockchain', num: '01', title: 'Что такое блокчейн' },
   'geth-network': { track: 'blockchain', num: '33', title: 'Свой узел: приватная сеть на geth' },
   'hh-start': { track: 'blockchain', num: '34', title: 'Hardhat: пакет, npx и структура проекта' },
+  'hh-config': { track: 'blockchain', num: '35', title: 'hardhat.config.ts: настройки и сборка контрактов' },
   'waves-first-network': { track: 'blockchain', num: '38', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },

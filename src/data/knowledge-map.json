@@ -624,6 +624,14 @@
     "path": "blockchain/hh-start.mdx"
   },
   {
+    "id": "hh-config",
+    "title": "hardhat.config.ts: настройки и сборка контрактов",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 35,
+    "path": "blockchain/hh-config.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",

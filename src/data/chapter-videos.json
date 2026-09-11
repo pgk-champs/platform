@@ -2091,5 +2091,32 @@
       "title": "Intro to Hardhat",
       "channel": "Chainlink"
     }
+  ],
+  "hh-config": [
+    {
+      "videoId": "GD6fz56-cEQ",
+      "title": "Solidity и Ethereum, урок #5 (ОБНОВЛЁННЫЙ 2023) | Hardhat, автотесты, ethers",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "8mMMq7YUcwU",
+      "title": "Что такое ByteCode? | Байткод в EVM",
+      "channel": "Future Markt"
+    },
+    {
+      "videoId": "pz8NeV6bo3E",
+      "title": "Solidity и Ethereum, урок #38 | Разбор байткода, opcodes, деплой",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "JcMo_UDH6b0",
+      "title": "Compiling Contracts and Inspecting Hardhat Build Artifacts",
+      "channel": "Forge College"
+    },
+    {
+      "videoId": "sq3Qtefl2bc",
+      "title": "What is Solidity Compiler, Bytecode and ABI?",
+      "channel": "Blockchain Training"
+    }
   ]
 }

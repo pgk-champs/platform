@@ -64,6 +64,7 @@ import { tsHistorySchemes } from './figures/tsHistory';
 import { tsAsyncSchemes } from './figures/tsAsync';
 import { gethNetworkSchemes } from './figures/gethNetwork';
 import { hardhatStartSchemes } from './figures/hardhatStart';
+import { hardhatConfigSchemes } from './figures/hardhatConfig';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -125,6 +126,7 @@ const SCHEMES = {
   ...tsModulesSchemes,
   ...gethNetworkSchemes,
   ...hardhatStartSchemes,
+  ...hardhatConfigSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,
