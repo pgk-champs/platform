@@ -2226,5 +2226,32 @@
       "title": "Наследование, специфичность и каскадность в CSS",
       "channel": "Артём - dozen web"
     }
+  ],
+  "web-layout": [
+    {
+      "videoId": "YG8Vhz1pAsU",
+      "title": "12. CSS Flexbox Layout. Флексы в CSS. Гайд по флексбокс",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "eVZEwEQg4pg",
+      "title": "Flexbox CSS практический курс за 6 минут. Все свойства",
+      "channel": "Ulbi TV"
+    },
+    {
+      "videoId": "JrKOHNRnRMg",
+      "title": "15. CSS Grid Layout. Грид-сетка. Гайд по гридам в CSS",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "MEOR2b69Pl4",
+      "title": "Grid CSS полный курс за 13 минут. Все свойства",
+      "channel": "Ulbi TV"
+    },
+    {
+      "videoId": "Wq5tzAaYfxA",
+      "title": "CSS Grid с нуля №4. Адаптивный грид без медиа-запросов",
+      "channel": "MaxGraph - cайты как страсть"
+    }
   ]
 }

@@ -346,6 +346,26 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="182" textAnchor="middle" fontSize="7.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>border-box</text>
     </g>
   ),
+  /* Вёрстка: поток, flex и grid */
+  'web-layout': () => (
+    <g strokeLinecap="round">
+      <rect x="24" y="44" width="152" height="24" rx="6" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="61" textAnchor="middle" fontSize="6.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>header</text>
+
+      <rect x="24" y="78" width="44" height="62" rx="6" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="46" y="113" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>nav</text>
+
+      <rect x="78" y="78" width="46" height="28" rx="5" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      <rect x="132" y="78" width="44" height="28" rx="5" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      <rect x="78" y="112" width="46" height="28" rx="5" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      <rect x="132" y="112" width="44" height="28" rx="5" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+
+      <rect x="24" y="150" width="152" height="20" rx="6" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="164" textAnchor="middle" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>footer</text>
+
+      <text x="100" y="188" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>auto-fit · 1fr</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1331,7 +1351,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'hh-deploy': { track: 'blockchain', num: '37', title: 'Развёртывание: скрипты, Ignition и своя сеть' },
   'web-html': { track: 'blockchain', num: '38', title: 'HTML: из чего состоит страница' },
   'web-css': { track: 'blockchain', num: '39', title: 'CSS: как страница получает вид' },
-  'waves-first-network': { track: 'blockchain', num: '40', title: 'Первая сеть на Waves Enterprise' },
+  'web-layout': { track: 'blockchain', num: '40', title: 'Вёрстка: поток, flex и grid' },
+  'waves-first-network': { track: 'blockchain', num: '41', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },

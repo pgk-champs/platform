@@ -664,11 +664,19 @@
     "path": "blockchain/web-css.mdx"
   },
   {
+    "id": "web-layout",
+    "title": "Вёрстка: поток, flex и grid",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 40,
+    "path": "blockchain/web-layout.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 40,
+    "order": 41,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]
