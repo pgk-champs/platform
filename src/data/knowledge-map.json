@@ -680,11 +680,19 @@
     "path": "blockchain/web-dom.mdx"
   },
   {
+    "id": "web-react",
+    "title": "React: компоненты вместо ручного DOM",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 42,
+    "path": "blockchain/web-react.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 42,
+    "order": 43,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]

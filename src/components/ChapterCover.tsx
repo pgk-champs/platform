@@ -388,6 +388,28 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="188" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>click ↑ всплывает</text>
     </g>
   ),
+  /* React: компоненты вместо ручного DOM */
+  'web-react': () => (
+    <g strokeLinecap="round">
+      <rect x="66" y="38" width="68" height="30" rx="8" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="58" textAnchor="middle" fontSize="6.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>App</text>
+
+      <rect x="20" y="96" width="60" height="30" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="50" y="116" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>Balance</text>
+
+      <rect x="88" y="96" width="44" height="30" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="110" y="116" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>Form</text>
+
+      <rect x="140" y="96" width="44" height="30" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="162" y="116" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>Ops</text>
+
+      <path d="M100 68v14M100 82l-50 10M100 82h10M100 82l62 10" stroke={INK} strokeWidth={2.5} fill="none" />
+      <path d="M50 92l-4-6M50 92l4-6M110 92l-4-6M110 92l4-6M162 92l-4-6M162 92l4-6" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <text x="100" y="152" textAnchor="middle" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>props ↓</text>
+      <text x="100" y="176" textAnchor="middle" fontSize="7.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>2.10 мс</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1375,7 +1397,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'web-css': { track: 'blockchain', num: '39', title: 'CSS: как страница получает вид' },
   'web-layout': { track: 'blockchain', num: '40', title: 'Вёрстка: поток, flex и grid' },
   'web-dom': { track: 'blockchain', num: '41', title: 'DOM и события: страница начинает отвечать' },
-  'waves-first-network': { track: 'blockchain', num: '42', title: 'Первая сеть на Waves Enterprise' },
+  'web-react': { track: 'blockchain', num: '42', title: 'React: компоненты вместо ручного DOM' },
+  'waves-first-network': { track: 'blockchain', num: '43', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },

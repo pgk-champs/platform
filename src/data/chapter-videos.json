@@ -2280,5 +2280,32 @@
       "title": "#6 Фазы события, Всплытие и Делегирование на JavaScript",
       "channel": "ITDoctor"
     }
+  ],
+  "web-react": [
+    {
+      "videoId": "kz23xxukY5s",
+      "title": "React JS c Нуля – ПОЛНЫЙ Курс для начинающих (2025)",
+      "channel": "Владилен Минин"
+    },
+    {
+      "videoId": "8EXUlJ80Vec",
+      "title": "JSX в React: особенности синтаксиса, подводные камни, условный рендеринг и списки",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "jtC_gyCIVdU",
+      "title": "Props в React. Что такое пропсы, как передавать данные и зачем нужен children",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "D3x0VdzMbNI",
+      "title": "Ключи (keys) в React простым языком",
+      "channel": "Дмитрий Герасимов - о разработке в сфере IT просто"
+    },
+    {
+      "videoId": "cJ52THD6yNo",
+      "title": "Урок 1.14. Рендеринг списков в React",
+      "channel": "Web-garage"
+    }
   ]
 }
