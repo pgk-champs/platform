@@ -68,6 +68,7 @@ import { hardhatConfigSchemes } from './figures/hardhatConfig';
 import { hardhatTestSchemes } from './figures/hardhatTest';
 import { hardhatDeploySchemes } from './figures/hardhatDeploy';
 import { webHtmlSchemes } from './figures/webHtml';
+import { webCssSchemes } from './figures/webCss';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -133,6 +134,7 @@ const SCHEMES = {
   ...hardhatTestSchemes,
   ...hardhatDeploySchemes,
   ...webHtmlSchemes,
+  ...webCssSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

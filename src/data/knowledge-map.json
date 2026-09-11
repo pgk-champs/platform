@@ -656,11 +656,19 @@
     "path": "blockchain/web-html.mdx"
   },
   {
+    "id": "web-css",
+    "title": "CSS: как страница получает вид",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 39,
+    "path": "blockchain/web-css.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 39,
+    "order": 40,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]

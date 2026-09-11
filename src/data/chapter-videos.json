@@ -2199,5 +2199,32 @@
       "title": "ЯЗЫК РАЗМЕТКИ HTML ЗА 40 МИНУТ ДЛЯ НАЧИНАЮЩИХ. ВСЕ ТЕГИ ВКЛЮЧЕНЫ.",
       "channel": "wise.js "
     }
+  ],
+  "web-css": [
+    {
+      "videoId": "PEQ3i9q3ez8",
+      "title": "1. CSS для начинающих. Введение. Подключение, базовые концепции: каскад, специфичность, наследование",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "GctszxSvbeQ",
+      "title": "2. Гайд по CSS-селекторам, расчёт специфичности в CSS. Приоритет и вес стилей",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "oQDNPNZ72Ig",
+      "title": "3. Блочная модель в CSS — свойства display, width, height, padding, margin, border и box-sizing",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "IH_V0duSGLo",
+      "title": "box sizing border box что это? и как его использовать",
+      "channel": "От 0 до 1"
+    },
+    {
+      "videoId": "taRq8wITU_k",
+      "title": "Наследование, специфичность и каскадность в CSS",
+      "channel": "Артём - dozen web"
+    }
   ]
 }

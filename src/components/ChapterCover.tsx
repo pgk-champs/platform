@@ -333,6 +333,19 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="182" textAnchor="middle" fontSize="7.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>{'<!doctype html>'}</text>
     </g>
   ),
+  /* CSS: как страница получает вид */
+  'web-css': () => (
+    <g strokeLinecap="round">
+      <rect x="30" y="46" width="140" height="72" rx="10" fill="rgba(255,140,140,0.10)" stroke="rgba(255,140,140,0.7)" strokeWidth={3} />
+      <rect x="46" y="60" width="108" height="44" rx="6" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} strokeDasharray="4 4" />
+      <rect x="62" y="72" width="76" height="20" rx="4" fill={SOFT} stroke={ACCENT} strokeWidth={2.5} />
+      <text x="100" y="87" textAnchor="middle" fontSize="6.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>width</text>
+      <text x="100" y="134" textAnchor="middle" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>padding · border</text>
+
+      <text x="100" y="160" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>200 → 250</text>
+      <text x="100" y="182" textAnchor="middle" fontSize="7.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>border-box</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1317,7 +1330,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'hh-test': { track: 'blockchain', num: '36', title: 'Тесты контрактов: Solidity и TypeScript рядом' },
   'hh-deploy': { track: 'blockchain', num: '37', title: 'Развёртывание: скрипты, Ignition и своя сеть' },
   'web-html': { track: 'blockchain', num: '38', title: 'HTML: из чего состоит страница' },
-  'waves-first-network': { track: 'blockchain', num: '39', title: 'Первая сеть на Waves Enterprise' },
+  'web-css': { track: 'blockchain', num: '39', title: 'CSS: как страница получает вид' },
+  'waves-first-network': { track: 'blockchain', num: '40', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },
