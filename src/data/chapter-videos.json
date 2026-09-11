@@ -2145,5 +2145,32 @@
       "title": "Foundry Cheat Codes That Will 10x Your Solidity Testing",
       "channel": "What The Func? w/ Ed Zynda"
     }
+  ],
+  "hh-deploy": [
+    {
+      "videoId": "CRg_lit1RYY",
+      "title": "HARDHAT 3.0 | Гайд и Обзор Обновлений. Деплой, Верификация, Скрипты",
+      "channel": "Блокчейн Разработчик"
+    },
+    {
+      "videoId": "FK7_D0ecFTQ",
+      "title": "Как задеплоить смарт-контракт через HardHat? Deploy в любой EVM сети",
+      "channel": "Future Markt"
+    },
+    {
+      "videoId": "AJduzEcD0QY",
+      "title": "Деплой смарт-контракта с помощью Hardhat. Верификация контрактов с аргументами. #solidity #hardhat",
+      "channel": "Dima HideCrypto - Web3 | Solidity"
+    },
+    {
+      "videoId": "UDTsXhw8nEI",
+      "title": "Hardhat Ignition: Smart Contract Deployment Tutorial",
+      "channel": "Soft.Tomatoes"
+    },
+    {
+      "videoId": "wMDPn46Bt48",
+      "title": "Меняем код задеплоенного контракта. Create | Create2 Низкоуровневые инструкции в #solidity #deploy",
+      "channel": "Dima HideCrypto - Web3 | Solidity"
+    }
   ]
 }

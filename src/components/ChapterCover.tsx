@@ -294,6 +294,26 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="176" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>13 passing</text>
     </g>
   ),
+  /* Развёртывание: скрипты, Ignition и своя сеть */
+  'hh-deploy': () => (
+    <g strokeLinecap="round">
+      <rect x="20" y="50" width="70" height="34" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="55" y="72" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>to: —</text>
+
+      <rect x="20" y="96" width="70" height="34" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="55" y="118" textAnchor="middle" fontSize="6.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>bytecode</text>
+
+      <path d="M94 90h28" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M122 90l-6-4M122 90l-6 4" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <rect x="126" y="62" width="56" height="56" rx="12" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="154" y="86" textAnchor="middle" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>0x8464</text>
+      <text x="154" y="102" textAnchor="middle" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>135c…</text>
+
+      <text x="100" y="150" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>nonce 0</text>
+      <text x="100" y="172" textAnchor="middle" fontSize="7.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>586 384 gas</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1276,6 +1296,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'hh-start': { track: 'blockchain', num: '34', title: 'Hardhat: пакет, npx и структура проекта' },
   'hh-config': { track: 'blockchain', num: '35', title: 'hardhat.config.ts: настройки и сборка контрактов' },
   'hh-test': { track: 'blockchain', num: '36', title: 'Тесты контрактов: Solidity и TypeScript рядом' },
+  'hh-deploy': { track: 'blockchain', num: '37', title: 'Развёртывание: скрипты, Ignition и своя сеть' },
   'waves-first-network': { track: 'blockchain', num: '38', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },

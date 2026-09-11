@@ -640,6 +640,14 @@
     "path": "blockchain/hh-test.mdx"
   },
   {
+    "id": "hh-deploy",
+    "title": "Развёртывание: скрипты, Ignition и своя сеть",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 37,
+    "path": "blockchain/hh-deploy.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
