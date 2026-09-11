@@ -696,11 +696,19 @@
     "path": "blockchain/web-state.mdx"
   },
   {
+    "id": "web-vite",
+    "title": "Проект на Vite: от исходников к готовым файлам",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 44,
+    "path": "blockchain/web-vite.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 44,
+    "order": 45,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]

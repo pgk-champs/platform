@@ -73,6 +73,7 @@ import { webLayoutSchemes } from './figures/webLayout';
 import { webDomSchemes } from './figures/webDom';
 import { webReactSchemes } from './figures/webReact';
 import { webStateSchemes } from './figures/webState';
+import { webViteSchemes } from './figures/webVite';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -143,6 +144,7 @@ const SCHEMES = {
   ...webDomSchemes,
   ...webReactSchemes,
   ...webStateSchemes,
+  ...webViteSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

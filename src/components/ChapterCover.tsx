@@ -435,6 +435,31 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="184" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>useEffect → уборка</text>
     </g>
   ),
+  /* Проект на Vite: от исходников к готовым файлам */
+  'web-vite': () => (
+    <g strokeLinecap="round">
+      <rect x="18" y="60" width="52" height="68" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="44" y="88" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>.tsx</text>
+      <text x="44" y="106" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>.css</text>
+
+      <path d="M74 94h20" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M94 94l-6-4M94 94l-6 4" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <rect x="98" y="56" width="46" height="76" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="121" y="88" textAnchor="middle" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>tsc</text>
+      <text x="121" y="106" textAnchor="middle" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>build</text>
+
+      <path d="M148 94h18" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M166 94l-6-4M166 94l-6 4" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <rect x="150" y="60" width="34" height="68" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="167" y="88" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>dist</text>
+      <text x="167" y="106" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>288K</text>
+
+      <text x="100" y="162" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>497 мс</text>
+      <text x="100" y="182" textAnchor="middle" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>222 кБ → 69 кБ</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1424,7 +1449,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'web-dom': { track: 'blockchain', num: '41', title: 'DOM и события: страница начинает отвечать' },
   'web-react': { track: 'blockchain', num: '42', title: 'React: компоненты вместо ручного DOM' },
   'web-state': { track: 'blockchain', num: '43', title: 'Состояние и эффекты: интерфейс с памятью' },
-  'waves-first-network': { track: 'blockchain', num: '44', title: 'Первая сеть на Waves Enterprise' },
+  'web-vite': { track: 'blockchain', num: '44', title: 'Проект на Vite: от исходников к готовым файлам' },
+  'waves-first-network': { track: 'blockchain', num: '45', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },

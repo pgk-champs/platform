@@ -2334,5 +2334,32 @@
       "title": "Урок 1.15. Управляемые и неуправляемые компоненты в React",
       "channel": "Web-garage"
     }
+  ],
+  "web-vite": [
+    {
+      "videoId": "Rku2F5OGPzU",
+      "title": "Как создать проект на React через Vite. Установка, настройка и структура проекта",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "Ib7Pj38m0wQ",
+      "title": "Vite — лучший сборщик для фронтенда в 2025: почему его выбирают все",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "sFY1HcKKBaI",
+      "title": "Vite | сборщик нового поколения #16 - Переменные окружения",
+      "channel": "Игорь Бабко"
+    },
+    {
+      "videoId": "l62pclYbUmo",
+      "title": "Vite | сборщик нового поколения #33 - Деплоймент Vite проекта",
+      "channel": "Игорь Бабко"
+    },
+    {
+      "videoId": "cobTXj0pjdA",
+      "title": "Как происходит сборка фронтенда | proxy, bundler, vite",
+      "channel": "Даниил Лаптев | ДЕВ РОЙ"
+    }
   ]
 }
