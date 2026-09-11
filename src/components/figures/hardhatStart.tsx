@@ -50,7 +50,7 @@ export const hardhatStartSchemes: Schemes = {
             fill={r.keep ? SOFT : 'rgba(255,140,140,0.12)'} stroke={r.keep ? ACCENT : RED} strokeWidth={1.6} />
           <text x={46} y={r.y + 20} fontSize={11} fontFamily={MONO} fill={r.keep ? ACCENT : RED_TEXT}>{r.n}</text>
           <text x={264} y={r.y + 20} fontSize={11} fill={FADE}>{r.d}</text>
-          <text x={744} y={r.y + 20} fontSize={11} fontWeight={600} fill={r.keep ? ACCENT : RED_TEXT}>{r.keep ? 'в репозиторий' : 'не класть'}</text>
+          <text x={724} y={r.y + 20} fontSize={11} fontWeight={600} fill={r.keep ? ACCENT : RED_TEXT}>{r.keep ? 'в репозиторий' : 'не класть'}</text>
         </g>
       ))}
 
