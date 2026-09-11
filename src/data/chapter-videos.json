@@ -2172,5 +2172,32 @@
       "title": "Меняем код задеплоенного контракта. Create | Create2 Низкоуровневые инструкции в #solidity #deploy",
       "channel": "Dima HideCrypto - Web3 | Solidity"
     }
+  ],
+  "web-html": [
+    {
+      "videoId": "SKRydSA2bYA",
+      "title": "Основы HTML для Начинающих (актуально в 2026)",
+      "channel": "Сергей Дмитриевский"
+    },
+    {
+      "videoId": "aDGJ3St-jqU",
+      "title": "3. Блочные и строчные теги в HTML. Теги div, span",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "7ZZK9Iprw5c",
+      "title": "15. Семантические теги HTML: header, main, footer, section, aside, nav и остальные. Семантика HTML5",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "_in4LAdxAUA",
+      "title": "11. HTML формы. Теги form, fieldset, legend, label и поле ввода input",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "lZ0x7DAwiJU",
+      "title": "ЯЗЫК РАЗМЕТКИ HTML ЗА 40 МИНУТ ДЛЯ НАЧИНАЮЩИХ. ВСЕ ТЕГИ ВКЛЮЧЕНЫ.",
+      "channel": "wise.js "
+    }
   ]
 }

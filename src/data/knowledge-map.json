@@ -648,11 +648,19 @@
     "path": "blockchain/hh-deploy.mdx"
   },
   {
+    "id": "web-html",
+    "title": "HTML: из чего состоит страница",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 38,
+    "path": "blockchain/web-html.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 38,
+    "order": 39,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]

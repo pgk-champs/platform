@@ -314,6 +314,25 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="172" textAnchor="middle" fontSize="7.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>586 384 gas</text>
     </g>
   ),
+  /* HTML: из чего состоит страница */
+  'web-html': () => (
+    <g strokeLinecap="round">
+      <rect x="26" y="44" width="148" height="116" rx="11" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <rect x="26" y="44" width="148" height="26" rx="11" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="62" textAnchor="middle" fontSize="6.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>header</text>
+
+      <rect x="38" y="82" width="52" height="30" rx="7" fill="rgba(0,0,0,0.35)" stroke={INK} strokeWidth={2.5} />
+      <text x="64" y="101" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>nav</text>
+
+      <rect x="98" y="82" width="64" height="30" rx="7" fill="rgba(0,0,0,0.35)" stroke={INK} strokeWidth={2.5} />
+      <text x="130" y="101" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>main</text>
+
+      <rect x="38" y="122" width="124" height="26" rx="7" fill="rgba(0,0,0,0.35)" stroke={INK} strokeWidth={2.5} />
+      <text x="100" y="139" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>footer</text>
+
+      <text x="100" y="182" textAnchor="middle" fontSize="7.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>{'<!doctype html>'}</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1297,7 +1316,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'hh-config': { track: 'blockchain', num: '35', title: 'hardhat.config.ts: настройки и сборка контрактов' },
   'hh-test': { track: 'blockchain', num: '36', title: 'Тесты контрактов: Solidity и TypeScript рядом' },
   'hh-deploy': { track: 'blockchain', num: '37', title: 'Развёртывание: скрипты, Ignition и своя сеть' },
-  'waves-first-network': { track: 'blockchain', num: '38', title: 'Первая сеть на Waves Enterprise' },
+  'web-html': { track: 'blockchain', num: '38', title: 'HTML: из чего состоит страница' },
+  'waves-first-network': { track: 'blockchain', num: '39', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },
