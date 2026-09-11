@@ -225,6 +225,27 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="180" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>:8545</text>
     </g>
   ),
+  /* Hardhat: пакет, npx и структура проекта */
+  'hh-start': () => (
+    <g strokeLinecap="round">
+      <rect x="20" y="44" width="76" height="36" rx="9" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="58" y="67" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>package</text>
+
+      <rect x="112" y="44" width="68" height="36" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="146" y="67" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>lock</text>
+
+      <rect x="20" y="100" width="160" height="40" rx="10" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="100" y="118" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>node_modules/.bin</text>
+      <text x="100" y="133" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>hardhat</text>
+
+      <path d="M58 80v18M146 80v18" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M58 98l-4-6M58 98l4-6M146 98l-4-6M146 98l4-6" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <rect x="52" y="154" width="96" height="30" rx="8" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="174" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>npx hardhat</text>
+      <path d="M100 140v12" stroke={ACCENT} strokeWidth={3} fill="none" />
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1204,6 +1225,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'ui-kit': { track: 'mobile', num: '10', title: 'Многомодульность и UI Kit' },
   'what-is-blockchain': { track: 'blockchain', num: '01', title: 'Что такое блокчейн' },
   'geth-network': { track: 'blockchain', num: '33', title: 'Свой узел: приватная сеть на geth' },
+  'hh-start': { track: 'blockchain', num: '34', title: 'Hardhat: пакет, npx и структура проекта' },
   'waves-first-network': { track: 'blockchain', num: '38', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },

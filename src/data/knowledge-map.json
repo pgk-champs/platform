@@ -616,6 +616,14 @@
     "path": "blockchain/geth-network.mdx"
   },
   {
+    "id": "hh-start",
+    "title": "Hardhat: пакет, npx и структура проекта",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 34,
+    "path": "blockchain/hh-start.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",

@@ -2064,5 +2064,32 @@
       "title": "Part 1 - Build your Own Private Geth PoA Ethereum Network (Blockholic) - 4K Video",
       "channel": "Blockholic"
     }
+  ],
+  "hh-start": [
+    {
+      "videoId": "E9kkzeFiCrY",
+      "title": "Установка и настройка Hardhat для работы со смарт-контрактами Ethereum",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "avUoCXhuITQ",
+      "title": "Что такое HardHat? Лучшее IDE для Ethereum разработки.",
+      "channel": "Future Markt"
+    },
+    {
+      "videoId": "GWteV6lxzvg",
+      "title": "package-lock.json - что это и зачем (npm ci)",
+      "channel": "dev_unicorn"
+    },
+    {
+      "videoId": "IsRl03T9VMo",
+      "title": "NPM для начинающих. Полный гайд: установка, команды, флаги, разбор package.json",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "gThHQ4Jdff4",
+      "title": "Intro to Hardhat",
+      "channel": "Chainlink"
+    }
   ]
 }
