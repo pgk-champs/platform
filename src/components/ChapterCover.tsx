@@ -204,6 +204,27 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <path d="M26 86h24M26 100h16M150 86h24M150 100h16" stroke="rgba(255,255,255,0.45)" strokeWidth={4} />
     </g>
   ),
+  /* Свой узел: приватная сеть на geth */
+  'geth-network': () => (
+    <g strokeLinecap="round">
+      <rect x="22" y="46" width="156" height="58" rx="12" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="100" y="70" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>datadir</text>
+      <text x="100" y="88" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.45)" fontFamily={MONO}>chain · state · keys</text>
+
+      <rect x="26" y="124" width="40" height="34" rx="8" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="46" y="146" textAnchor="middle" fontSize="9" fontWeight={800} fill={ACCENT} fontFamily={MONO}>0</text>
+      <rect x="80" y="124" width="40" height="34" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="100" y="146" textAnchor="middle" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>1</text>
+      <rect x="134" y="124" width="40" height="34" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="154" y="146" textAnchor="middle" fontSize="9" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>2</text>
+
+      <path d="M66 141h10M120 141h10" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M76 141l-5-4M76 141l-5 4M130 141l-5-4M130 141l-5 4" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M100 104v14" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <text x="100" y="180" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>:8545</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1182,7 +1203,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'layout-by-mockup': { track: 'mobile', num: '09', title: 'Вёрстка по макету' },
   'ui-kit': { track: 'mobile', num: '10', title: 'Многомодульность и UI Kit' },
   'what-is-blockchain': { track: 'blockchain', num: '01', title: 'Что такое блокчейн' },
-  'waves-first-network': { track: 'blockchain', num: '33', title: 'Первая сеть на Waves Enterprise' },
+  'geth-network': { track: 'blockchain', num: '33', title: 'Свой узел: приватная сеть на geth' },
+  'waves-first-network': { track: 'blockchain', num: '38', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },

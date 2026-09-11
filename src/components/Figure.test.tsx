@@ -62,6 +62,7 @@ import { tsCollectionsSchemes } from './figures/tsCollections';
 import { tsOopSchemes } from './figures/tsOop';
 import { tsHistorySchemes } from './figures/tsHistory';
 import { tsAsyncSchemes } from './figures/tsAsync';
+import { gethNetworkSchemes } from './figures/gethNetwork';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -149,6 +150,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(tsErrorsSchemes),
     ...Object.keys(tsAsyncNetSchemes),
     ...Object.keys(tsModulesSchemes),
+    ...Object.keys(gethNetworkSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

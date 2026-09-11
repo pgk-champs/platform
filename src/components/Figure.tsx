@@ -62,6 +62,7 @@ import { tsCollectionsSchemes } from './figures/tsCollections';
 import { tsOopSchemes } from './figures/tsOop';
 import { tsHistorySchemes } from './figures/tsHistory';
 import { tsAsyncSchemes } from './figures/tsAsync';
+import { gethNetworkSchemes } from './figures/gethNetwork';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -121,6 +122,7 @@ const SCHEMES = {
   ...tsErrorsSchemes,
   ...tsAsyncNetSchemes,
   ...tsModulesSchemes,
+  ...gethNetworkSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

@@ -2037,5 +2037,32 @@
       "title": "Import vs Require: The Biggest JavaScript Divide",
       "channel": "Matt Pocock"
     }
+  ],
+  "geth-network": [
+    {
+      "videoId": "pw7dl7u5R54",
+      "title": "3022 Настройка приватной сети Ethereum",
+      "channel": "Programming Innopolis STEM"
+    },
+    {
+      "videoId": "l7_vikjGoq0",
+      "title": "Ethereum для начинающих. Geth Intro. Private chain.",
+      "channel": "doIT"
+    },
+    {
+      "videoId": "DNKKIzR1tv0",
+      "title": "Ethereum для начинающих. Geth JSON-RPC API.",
+      "channel": "doIT"
+    },
+    {
+      "videoId": "Juv1tGHngY8",
+      "title": "3012 Процесс и мотивация синхронизации состояний узлов в сети Ethereum, Genesis block",
+      "channel": "Programming Innopolis STEM"
+    },
+    {
+      "videoId": "pz7-JGG6T2Y",
+      "title": "Part 1 - Build your Own Private Geth PoA Ethereum Network (Blockholic) - 4K Video",
+      "channel": "Blockholic"
+    }
   ]
 }

@@ -47,6 +47,10 @@ scripts/
   knowledge-map.test.mjs    3 юнита
 src/components/             173 файла: тренажёры, Block, Hint, SelfCheck, ChapterExam…
   figures/kit.tsx           ЕДИНСТВЕННЫЙ источник примитивов схем: ACCENT/DARK/INK/SOFT/FADE/MONO, Panel, Arrow, FileIcon
+  BlockExam.tsx             экзамен по блоку глав: <BlockExam blockId= title= chapterIds={[…]} questions=>
+                            в КОНЦЕ последней главы блока ПОСЛЕ её ChapterExam; пишет в store под
+                            block:<id>, в totalQuizzes НЕ считается (атрибут chapterIds — страж
+                            chapter-ids его намеренно не видит)
   figures/<модуль>.tsx      схемы по главам, по модулю на тему
   Figure.tsx                собирает все модули в один SCHEMES
   ChapterCover.tsx          ART (svg-арт) + CHAPTERS (track/num/title) на каждую главу

@@ -177,6 +177,7 @@ const config: Config = {
       copyright: `Copyright © ${new Date().getFullYear()} PGK Champs. Built with Docusaurus.`,
     },
     prism: {
+      additionalLanguages: ['solidity'],
       // Светлая тема github красит комментарии в #999988 (2.71:1 на фоне блока),
       // числа в #36acaa (2.58) и строки в #e3116c (4.32) — для чтения кода это
       // мало, а комментарии в учебнике несут половину смысла. Подменяем только

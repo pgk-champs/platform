@@ -608,11 +608,19 @@
     "path": "blockchain/ts-history.mdx"
   },
   {
+    "id": "geth-network",
+    "title": "Свой узел: приватная сеть на geth",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 33,
+    "path": "blockchain/geth-network.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 33,
+    "order": 38,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]
