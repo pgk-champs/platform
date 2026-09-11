@@ -65,6 +65,7 @@ import { tsAsyncSchemes } from './figures/tsAsync';
 import { gethNetworkSchemes } from './figures/gethNetwork';
 import { hardhatStartSchemes } from './figures/hardhatStart';
 import { hardhatConfigSchemes } from './figures/hardhatConfig';
+import { hardhatTestSchemes } from './figures/hardhatTest';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -155,6 +156,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(gethNetworkSchemes),
     ...Object.keys(hardhatStartSchemes),
     ...Object.keys(hardhatConfigSchemes),
+    ...Object.keys(hardhatTestSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

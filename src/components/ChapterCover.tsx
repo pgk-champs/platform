@@ -270,6 +270,30 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="180" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>2253 → 1115 байт</text>
     </g>
   ),
+  /* Тесты контрактов: Solidity и TypeScript рядом */
+  'hh-test': () => (
+    <g strokeLinecap="round">
+      <rect x="18" y="48" width="78" height="104" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="57" y="70" textAnchor="middle" fontSize="6.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>Vault.t.sol</text>
+      {[92, 108, 124, 140].map((y, i) => (
+        <g key={y}>
+          <path d={`M32 ${y}l5 5 9-11`} stroke={ACCENT} strokeWidth={3} fill="none" />
+          <rect x="54" y={y - 5} width={i === 3 ? 20 : 32} height="5" rx="2.5" fill="rgba(255,255,255,0.3)" />
+        </g>
+      ))}
+
+      <rect x="104" y="48" width="78" height="104" rx="10" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="143" y="70" textAnchor="middle" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>Vault.ts</text>
+      {[92, 108, 124, 140].map((y, i) => (
+        <g key={y}>
+          <path d={`M118 ${y}l5 5 9-11`} stroke={ACCENT} strokeWidth={3} fill="none" />
+          <rect x="140" y={y - 5} width={i === 1 ? 22 : 34} height="5" rx="2.5" fill="rgba(255,255,255,0.3)" />
+        </g>
+      ))}
+
+      <text x="100" y="176" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>13 passing</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1251,6 +1275,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'geth-network': { track: 'blockchain', num: '33', title: 'Свой узел: приватная сеть на geth' },
   'hh-start': { track: 'blockchain', num: '34', title: 'Hardhat: пакет, npx и структура проекта' },
   'hh-config': { track: 'blockchain', num: '35', title: 'hardhat.config.ts: настройки и сборка контрактов' },
+  'hh-test': { track: 'blockchain', num: '36', title: 'Тесты контрактов: Solidity и TypeScript рядом' },
   'waves-first-network': { track: 'blockchain', num: '38', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },

@@ -632,6 +632,14 @@
     "path": "blockchain/hh-config.mdx"
   },
   {
+    "id": "hh-test",
+    "title": "Тесты контрактов: Solidity и TypeScript рядом",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 36,
+    "path": "blockchain/hh-test.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",

@@ -2118,5 +2118,32 @@
       "title": "What is Solidity Compiler, Bytecode and ABI?",
       "channel": "Blockchain Training"
     }
+  ],
+  "hh-test": [
+    {
+      "videoId": "oHU3eme6l40",
+      "title": "Solidity и смарт-контракты Ethereum, урок #5, АПДЕЙТ в закрепе | Тестирование, Hardhat, Ethers, Chai",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "VJyd02Qq3x4",
+      "title": "Запускаем тесты на HardHat",
+      "channel": "Роман Р"
+    },
+    {
+      "videoId": "gEFNykHv8Sw",
+      "title": "Solidity и смарт-контракты Ethereum, урок #33 | Тесты, управление временем, BigNumber, хелперы HH",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "3skrTtpPqZo",
+      "title": "Тестирование смарт-контрактов в Foundry. Установка foundry на mac os. #solidity #foundry",
+      "channel": "Dima HideCrypto - Web3 | Solidity"
+    },
+    {
+      "videoId": "oewGIV2sTS8",
+      "title": "Foundry Cheat Codes That Will 10x Your Solidity Testing",
+      "channel": "What The Func? w/ Ed Zynda"
+    }
   ]
 }
