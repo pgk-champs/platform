@@ -2253,5 +2253,32 @@
       "title": "CSS Grid с нуля №4. Адаптивный грид без медиа-запросов",
       "channel": "MaxGraph - cайты как страсть"
     }
+  ],
+  "web-dom": [
+    {
+      "videoId": "toXX_yk1s0s",
+      "title": "JavaScript в браузере — DOM (Document Object Model) и BOM (Browser Object Model)",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "yp5Cj36g5Uw",
+      "title": "Уроки Javascript #5. Как Работать с DOM в JS? (+ 26 упражнений для полной прокачки).",
+      "channel": "Василий Муравьев"
+    },
+    {
+      "videoId": "BY4lw9uykFk",
+      "title": "События JavaScript: делегирование, поведение браузера по умолчанию, генерация собственных событий",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "nxwNhad4jtk",
+      "title": "JS Браузерные события: всплытие и погружение, способы обработки событий, отмена всплытия",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "prmY04RJb4A",
+      "title": "#6 Фазы события, Всплытие и Делегирование на JavaScript",
+      "channel": "ITDoctor"
+    }
   ]
 }

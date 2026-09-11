@@ -672,11 +672,19 @@
     "path": "blockchain/web-layout.mdx"
   },
   {
+    "id": "web-dom",
+    "title": "DOM и события: страница начинает отвечать",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 41,
+    "path": "blockchain/web-dom.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 41,
+    "order": 42,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]

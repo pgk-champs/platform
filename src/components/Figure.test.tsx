@@ -70,6 +70,7 @@ import { hardhatDeploySchemes } from './figures/hardhatDeploy';
 import { webHtmlSchemes } from './figures/webHtml';
 import { webCssSchemes } from './figures/webCss';
 import { webLayoutSchemes } from './figures/webLayout';
+import { webDomSchemes } from './figures/webDom';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -165,6 +166,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(webHtmlSchemes),
     ...Object.keys(webCssSchemes),
     ...Object.keys(webLayoutSchemes),
+    ...Object.keys(webDomSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

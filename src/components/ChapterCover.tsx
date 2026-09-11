@@ -366,6 +366,28 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="188" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>auto-fit · 1fr</text>
     </g>
   ),
+  /* DOM и события: страница начинает отвечать */
+  'web-dom': () => (
+    <g strokeLinecap="round">
+      <rect x="74" y="40" width="52" height="26" rx="7" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="58" textAnchor="middle" fontSize="6.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>body</text>
+
+      <rect x="26" y="92" width="52" height="26" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="52" y="110" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>ul</text>
+
+      <rect x="122" y="92" width="52" height="26" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="148" y="110" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>form</text>
+
+      <rect x="98" y="144" width="60" height="26" rx="7" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="128" y="162" textAnchor="middle" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>button</text>
+
+      <path d="M100 66v18M100 84l-48 6M100 84l48 6M148 118v22" stroke={INK} strokeWidth={2.5} fill="none" />
+      <path d="M128 140v-14M128 126l-4 6M128 126l4 6" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M148 88V72M148 72l-4 6M148 72l4 6" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <text x="100" y="188" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>click ↑ всплывает</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1352,7 +1374,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'web-html': { track: 'blockchain', num: '38', title: 'HTML: из чего состоит страница' },
   'web-css': { track: 'blockchain', num: '39', title: 'CSS: как страница получает вид' },
   'web-layout': { track: 'blockchain', num: '40', title: 'Вёрстка: поток, flex и grid' },
-  'waves-first-network': { track: 'blockchain', num: '41', title: 'Первая сеть на Waves Enterprise' },
+  'web-dom': { track: 'blockchain', num: '41', title: 'DOM и события: страница начинает отвечать' },
+  'waves-first-network': { track: 'blockchain', num: '42', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },
