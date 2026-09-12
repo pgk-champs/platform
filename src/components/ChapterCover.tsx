@@ -549,6 +549,31 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="188" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>7 → 1 вызов</text>
     </g>
   ),
+  /* Redux Toolkit: срезы, селекторы и связь с React */
+  'web-rtk': () => (
+    <g strokeLinecap="round">
+      <rect x="22" y="52" width="70" height="92" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="57" y="76" textAnchor="middle" fontSize="6.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>slice</text>
+      <text x="57" y="98" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>name</text>
+      <text x="57" y="116" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>state</text>
+      <text x="57" y="134" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>reducers</text>
+
+      <path d="M96 98h20" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M116 98l-6-4M116 98l-6 4" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <rect x="120" y="52" width="58" height="26" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="149" y="70" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>reducer</text>
+
+      <rect x="120" y="86" width="58" height="26" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="149" y="104" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>actions</text>
+
+      <rect x="120" y="120" width="58" height="24" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="149" y="136" textAnchor="middle" fontSize="5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>vault/set</text>
+
+      <text x="100" y="170" textAnchor="middle" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>useSelector</text>
+      <text x="100" y="188" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>s.vault.amount</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1543,7 +1568,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'web-forms': { track: 'blockchain', num: '46', title: 'Формы: ввод, проверка и суммы' },
   'web-router': { track: 'blockchain', num: '47', title: 'Навигация: несколько экранов в одном приложении' },
   'web-redux': { track: 'blockchain', num: '48', title: 'Redux: общее состояние приложения' },
-  'waves-first-network': { track: 'blockchain', num: '49', title: 'Первая сеть на Waves Enterprise' },
+  'web-rtk': { track: 'blockchain', num: '49', title: 'Redux Toolkit: срезы, селекторы и связь с React' },
+  'waves-first-network': { track: 'blockchain', num: '50', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },

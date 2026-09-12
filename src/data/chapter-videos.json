@@ -2469,5 +2469,32 @@
       "title": "Redux ЛУЧШЕ useContext? Это МИФ!",
       "channel": "Алексей Волков про JavaScript"
     }
+  ],
+  "web-rtk": [
+    {
+      "videoId": "7Bdnm6WoA9o",
+      "title": "Урок 4.1. Redux Toolkit. Часть 1",
+      "channel": "Web-garage"
+    },
+    {
+      "videoId": "cFWpwtkto1s",
+      "title": "1. Redux Toolkit. Сделай redux код проще!",
+      "channel": "Ulbi TV"
+    },
+    {
+      "videoId": "C0fBnil_Im4",
+      "title": "Redux Toolkit для управления состоянием в React-приложении",
+      "channel": "Михаил Непомнящий"
+    },
+    {
+      "videoId": "uF26VRIscyk",
+      "title": "Redux-toolkit простым языком",
+      "channel": "Дмитрий Герасимов - о разработке в сфере IT просто"
+    },
+    {
+      "videoId": "R53-n499cGU",
+      "title": "Учимся работать с Redux Toolkit (RTK) на примере управления продуктами и корзиной",
+      "channel": "Салимов Руслан IT"
+    }
   ]
 }

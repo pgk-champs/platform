@@ -736,11 +736,19 @@
     "path": "blockchain/web-redux.mdx"
   },
   {
+    "id": "web-rtk",
+    "title": "Redux Toolkit: срезы, селекторы и связь с React",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 49,
+    "path": "blockchain/web-rtk.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 49,
+    "order": 50,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]

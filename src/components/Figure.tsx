@@ -78,6 +78,7 @@ import { webFetchSchemes } from './figures/webFetch';
 import { webFormsSchemes } from './figures/webForms';
 import { webRouterSchemes } from './figures/webRouter';
 import { webReduxSchemes } from './figures/webRedux';
+import { webRtkSchemes } from './figures/webRtk';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -153,6 +154,7 @@ const SCHEMES = {
   ...webFormsSchemes,
   ...webRouterSchemes,
   ...webReduxSchemes,
+  ...webRtkSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,
