@@ -2496,5 +2496,32 @@
       "title": "Учимся работать с Redux Toolkit (RTK) на примере управления продуктами и корзиной",
       "channel": "Салимов Руслан IT"
     }
+  ],
+  "web-rtk-async": [
+    {
+      "videoId": "6RTbC8Acj1M",
+      "title": "Асинхронная работа с Redux Toolkit и createAsyncThunk",
+      "channel": "Михаил Непомнящий"
+    },
+    {
+      "videoId": "-LkEhq4LW7I",
+      "title": "Урок 4.4. Redux Toolkit / createAsyncThunk. Часть 1",
+      "channel": "Web-garage"
+    },
+    {
+      "videoId": "cV5VW12ccuw",
+      "title": "Урок 4.5. Redux Toolkit / createAsyncThunk. Часть 2 / abort, rejectWithValue, condition",
+      "channel": "Web-garage"
+    },
+    {
+      "videoId": "uSwe-5dPrV8",
+      "title": "RTK Query или альтернативный Redux по работе с API",
+      "channel": "Михаил Непомнящий"
+    },
+    {
+      "videoId": "v0lCpxkKupQ",
+      "title": "RTK Query: понятный курс на реальных примерах",
+      "channel": "Салимов Руслан IT"
+    }
   ]
 }

@@ -574,6 +574,30 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="188" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>s.vault.amount</text>
     </g>
   ),
+  /* Асинхронность в Redux: запросы и состояние */
+  'web-rtk-async': () => (
+    <g strokeLinecap="round">
+      <rect x="52" y="38" width="96" height="26" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="100" y="56" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>dispatch(load)</text>
+
+      <path d="M100 64v14" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M100 78l-4-6M100 78l4-6" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <rect x="46" y="84" width="108" height="24" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="100" y="101" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>pending</text>
+
+      <rect x="16" y="126" width="80" height="26" rx="7" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="56" y="144" textAnchor="middle" fontSize="5.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>fulfilled</text>
+
+      <rect x="106" y="126" width="80" height="26" rx="7" fill="rgba(255,140,140,0.16)" stroke="rgba(255,140,140,0.8)" strokeWidth={3} />
+      <text x="146" y="144" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,170,170,0.95)" fontFamily={MONO}>rejected</text>
+
+      <path d="M88 108l-24 12M112 108l24 12" stroke={INK} strokeWidth={2.5} fill="none" />
+      <path d="M64 120l6-1M64 120l1-6M136 120l-6-1M136 120l-1-6" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <text x="100" y="178" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>три действия сами</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1569,7 +1593,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'web-router': { track: 'blockchain', num: '47', title: 'Навигация: несколько экранов в одном приложении' },
   'web-redux': { track: 'blockchain', num: '48', title: 'Redux: общее состояние приложения' },
   'web-rtk': { track: 'blockchain', num: '49', title: 'Redux Toolkit: срезы, селекторы и связь с React' },
-  'waves-first-network': { track: 'blockchain', num: '50', title: 'Первая сеть на Waves Enterprise' },
+  'web-rtk-async': { track: 'blockchain', num: '50', title: 'Асинхронность в Redux: запросы и состояние' },
+  'waves-first-network': { track: 'blockchain', num: '51', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },

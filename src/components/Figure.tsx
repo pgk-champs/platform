@@ -79,6 +79,7 @@ import { webFormsSchemes } from './figures/webForms';
 import { webRouterSchemes } from './figures/webRouter';
 import { webReduxSchemes } from './figures/webRedux';
 import { webRtkSchemes } from './figures/webRtk';
+import { webRtkAsyncSchemes } from './figures/webRtkAsync';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -155,6 +156,7 @@ const SCHEMES = {
   ...webRouterSchemes,
   ...webReduxSchemes,
   ...webRtkSchemes,
+  ...webRtkAsyncSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,
