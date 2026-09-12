@@ -144,6 +144,14 @@
     "path": "foundation/foundation-final.mdx"
   },
   {
+    "id": "sprint-format",
+    "title": "Формат чемпионата: спринты, критерии и вопросы",
+    "audience": "все",
+    "level": "углубление",
+    "order": 9,
+    "path": "advanced/sprint-format.mdx"
+  },
+  {
     "id": "android-studio",
     "title": "Android Studio: знакомство с IDE",
     "audience": "мобилка",

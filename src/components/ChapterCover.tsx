@@ -1117,6 +1117,31 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="216" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>сначала работает, потом как</text>
     </g>
   ),
+  /* Формат чемпионата: спринты и критерии */
+  'sprint-format': () => (
+    <g strokeLinecap="round">
+      <path d="M30 60 L170 60" stroke={INK} strokeWidth={3} />
+      <text x="30" y="50" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.45)" fontFamily={MONO}>main</text>
+
+      {[0, 1, 2].map((i) => {
+        const x = 52 + i * 46;
+        return (
+          <g key={i}>
+            <path d={`M${x} 60 L${x} 96 L${x + 24} 96 L${x + 24} 60`} stroke={ACCENT} strokeWidth={3} fill="none" />
+            <circle cx={x + 12} cy="96" r="6" fill={SOFT} stroke={ACCENT} strokeWidth={2.5} />
+            <text x={x + 12} y="116" textAnchor="middle" fontSize="5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>{`sprint-${i + 1}`}</text>
+          </g>
+        );
+      })}
+
+      <rect x="26" y="136" width="148" height="56" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      <text x="38" y="154" fontSize="5.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>✓ ветка за день</text>
+      <text x="38" y="168" fontSize="5.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>✓ запрос закрыт</text>
+      <text x="38" y="182" fontSize="5.5" fontWeight={800} fill="rgba(255,170,170,0.9)" fontFamily={MONO}>✗ проект архивом</text>
+
+      <text x="100" y="210" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>спринт = рабочий день</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -2200,6 +2225,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'fabric-lifecycle': { track: 'blockchain', num: '60', title: 'Жизненный цикл чейнкода: пять шагов' },
   'fabric-tx': { track: 'blockchain', num: '61', title: 'Путь транзакции: почему «успешно» не значит «записано»' },
   'fabric-vs-eth': { track: 'blockchain', num: '62', title: 'Fabric и Ethereum: одна задача, два решения' },
+  'sprint-format': { track: 'advanced', num: '09', title: 'Формат чемпионата: спринты, критерии и вопросы' },
   'waves-first-network': { track: 'blockchain', num: '63', title: 'Первая сеть на Waves Enterprise' },
   'waves-account': { track: 'blockchain', num: '64', title: 'Аккаунт в Waves: сид, ключи, адрес' },
   'waves-tx': { track: 'blockchain', num: '65', title: 'Транзакции Waves: тип, комиссия, подпись' },

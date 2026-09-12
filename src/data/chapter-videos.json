@@ -3193,5 +3193,32 @@
       "title": "Layouts in Jetpack Compose | Row, Column, Box, LazyColumn Explained (EP 2)",
       "channel": "ComposeNCode"
     }
+  ],
+  "sprint-format": [
+    {
+      "videoId": "MzicAnIEt0o",
+      "title": "Pull request на GitHub — инструкция для новичков | Хекслет",
+      "channel": "Хекслет - нормальные it-курсы"
+    },
+    {
+      "videoId": "G_HKJJLozUc",
+      "title": "Git - Pull request на практике / GitHub",
+      "channel": "Тимофей Коваленко"
+    },
+    {
+      "videoId": "Svx5wiDqWyE",
+      "title": "Что такое Pull Request \\ Merge Request. \"Git - это просто!\" - Урок 9",
+      "channel": "JavaClass"
+    },
+    {
+      "videoId": "SZARWakrCro",
+      "title": "Git branch — работа с ветками",
+      "channel": "Хороший программист"
+    },
+    {
+      "videoId": "x-I9XQ2QWdw",
+      "title": "IDEA+Git (ветки, пулл реквесты). ПОДРОБНО! Новый интерфейс, подводные камни. Установка с 0.",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    }
   ]
 }

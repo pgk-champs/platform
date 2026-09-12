@@ -104,6 +104,7 @@ import { wavesClientSchemes } from './figures/wavesClient';
 import { sdachaRepoSchemes } from './figures/sdachaRepo';
 import { demoShowSchemes } from './figures/demoShow';
 import { layoutCardSchemes } from './figures/layoutCard';
+import { sprintFlowSchemes } from './figures/sprintFlow';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -233,6 +234,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(sdachaRepoSchemes),
     ...Object.keys(demoShowSchemes),
     ...Object.keys(layoutCardSchemes),
+    ...Object.keys(sprintFlowSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),
