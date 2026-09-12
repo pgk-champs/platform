@@ -499,6 +499,30 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="184" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>2.5 → 2500000000000000000</text>
     </g>
   ),
+  /* Навигация: несколько экранов в одном приложении */
+  'web-router': () => (
+    <g strokeLinecap="round">
+      <rect x="18" y="44" width="164" height="26" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="32" y="62" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>/ops/0xabc</text>
+
+      <rect x="18" y="88" width="48" height="26" rx="7" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="42" y="105" textAnchor="middle" fontSize="5.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>/</text>
+
+      <rect x="76" y="88" width="48" height="26" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="100" y="105" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>/ops</text>
+
+      <rect x="134" y="88" width="48" height="26" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="158" y="105" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>*</text>
+
+      <rect x="50" y="128" width="100" height="36" rx="9" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="151" textAnchor="middle" fontSize="6.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>OpCard</text>
+
+      <path d="M42 114v8M100 114v8M158 114v8M42 122h116M100 122v6" stroke={INK} strokeWidth={2.5} fill="none" />
+      <path d="M100 128l-4-6M100 128l4-6" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <text x="100" y="184" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>без перезагрузки</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1491,7 +1515,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'web-vite': { track: 'blockchain', num: '44', title: 'Проект на Vite: от исходников к готовым файлам' },
   'web-fetch': { track: 'blockchain', num: '45', title: 'Данные из сети: загрузка, отказ, гонка ответов' },
   'web-forms': { track: 'blockchain', num: '46', title: 'Формы: ввод, проверка и суммы' },
-  'waves-first-network': { track: 'blockchain', num: '47', title: 'Первая сеть на Waves Enterprise' },
+  'web-router': { track: 'blockchain', num: '47', title: 'Навигация: несколько экранов в одном приложении' },
+  'waves-first-network': { track: 'blockchain', num: '48', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },

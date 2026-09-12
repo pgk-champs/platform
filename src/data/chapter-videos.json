@@ -2415,5 +2415,32 @@
       "title": "013. Нативная валидация как фреймворк — Павел Ловцевич",
       "channel": "Yandex for Frontend"
     }
+  ],
+  "web-router": [
+    {
+      "videoId": "iuY791JBKZw",
+      "title": "Учимся работать с React Router DOM v7 - делаем роутинг страниц, изучаем хуки, работаем с меню",
+      "channel": "Салимов Руслан IT"
+    },
+    {
+      "videoId": "5ri5EC--az8",
+      "title": "JavaScript в браузере: Location и History API, URL страницы и история браузера",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "VDOdieM9Np0",
+      "title": "Маршрутизация в React без библиотек. Как реализовать переходы между страницами",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "48ZNH_xUGw4",
+      "title": "React с Нуля 12: Руководство React Router. Тот еще МАРШРУТИЗАТОР",
+      "channel": "Всё просто в IT"
+    },
+    {
+      "videoId": "h7MTWLv3xvw",
+      "title": "React Router V7 Tutorial - Routing, Nested Routes, Data Loading, Layouts...",
+      "channel": "PedroTech"
+    }
   ]
 }

@@ -720,11 +720,19 @@
     "path": "blockchain/web-forms.mdx"
   },
   {
+    "id": "web-router",
+    "title": "Навигация: несколько экранов в одном приложении",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 47,
+    "path": "blockchain/web-router.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 47,
+    "order": 48,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]
