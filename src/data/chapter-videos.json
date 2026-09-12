@@ -2631,5 +2631,32 @@
       "title": "Ворую эфир со смарт-контракта Solidity в рамках тестового на аудитора безопасности смарт-контрактов",
       "channel": "Блокчейн-разработка с Юлией Бедросовой"
     }
+  ],
+  "audit-tools": [
+    {
+      "videoId": "Dxex3b-eMq0",
+      "title": "Find Smart Contract Vulnerabilities with Slither",
+      "channel": "Smart Contract Programmer"
+    },
+    {
+      "videoId": "bakRWW05Uoc",
+      "title": "Slither: How it works and how to use it",
+      "channel": "trailofbits"
+    },
+    {
+      "videoId": "v0WOjg8WWgA",
+      "title": "Smart contract auditor: from zero to hero 👾 Сергей Прилуцкий",
+      "channel": "Cyber Academy"
+    },
+    {
+      "videoId": "dMXVlA9PQ6M",
+      "title": "🦊 Проводит аудит Web3 контракта на solidity",
+      "channel": "kirjs"
+    },
+    {
+      "videoId": "3eeAV9akvDA",
+      "title": "Static Analysis Tools: Slither & Mythril Overview — Forge College",
+      "channel": "Forge College"
+    }
   ]
 }

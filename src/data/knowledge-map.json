@@ -784,11 +784,19 @@
     "path": "blockchain/audit-vulns.mdx"
   },
   {
+    "id": "audit-tools",
+    "title": "Инструменты аудита: что находит машина",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 55,
+    "path": "blockchain/audit-tools.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 55,
+    "order": 56,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]

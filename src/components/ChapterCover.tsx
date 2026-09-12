@@ -689,6 +689,24 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="184" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>checks · effects · interactions</text>
     </g>
   ),
+  /* Инструменты аудита: что находит машина */
+  'audit-tools': () => (
+    <g strokeLinecap="round">
+      {[
+        { y: 40, w: 156, t: 'compiler', fill: 'rgba(0,0,0,0.3)', stroke: INK, c: 'rgba(255,255,255,0.6)' },
+        { y: 76, w: 126, t: 'solhint', fill: 'rgba(0,0,0,0.3)', stroke: INK, c: 'rgba(255,255,255,0.6)' },
+        { y: 112, w: 96, t: 'slither', fill: 'rgba(0,0,0,0.3)', stroke: INK, c: 'rgba(255,255,255,0.6)' },
+        { y: 148, w: 66, t: 'tests', fill: SOFT, stroke: ACCENT, c: ACCENT },
+      ].map((r) => (
+        <g key={r.y}>
+          <rect x={100 - r.w / 2} y={r.y} width={r.w} height={28} rx={7} fill={r.fill} stroke={r.stroke} strokeWidth={3} />
+          <text x="100" y={r.y + 19} textAnchor="middle" fontSize="6.5" fontWeight={800} fill={r.c} fontFamily={MONO}>{r.t}</text>
+        </g>
+      ))}
+      <path d="M100 68v6M100 104v6M100 140v6" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <text x="100" y="190" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>замысел — только здесь</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1689,7 +1707,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'wallet-sign': { track: 'blockchain', num: '52', title: 'Подписи: доказать, не отправляя транзакцию' },
   'dapp-full': { track: 'blockchain', num: '53', title: 'dApp целиком: чтение, транзакция, события' },
   'audit-vulns': { track: 'blockchain', num: '54', title: 'Уязвимости: как из контрактов уходят деньги' },
-  'waves-first-network': { track: 'blockchain', num: '55', title: 'Первая сеть на Waves Enterprise' },
+  'audit-tools': { track: 'blockchain', num: '55', title: 'Инструменты аудита: что находит машина' },
+  'waves-first-network': { track: 'blockchain', num: '56', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },
