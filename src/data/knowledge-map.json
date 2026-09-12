@@ -752,11 +752,19 @@
     "path": "blockchain/web-rtk-async.mdx"
   },
   {
+    "id": "wallet-connect",
+    "title": "Кошелёк в браузере: подключение и сеть",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 51,
+    "path": "blockchain/wallet-connect.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 51,
+    "order": 52,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]

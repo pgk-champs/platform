@@ -598,6 +598,28 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="178" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>три действия сами</text>
     </g>
   ),
+  /* Кошелёк в браузере: подключение и сеть */
+  'wallet-connect': () => (
+    <g strokeLinecap="round">
+      <rect x="20" y="56" width="70" height="80" rx="10" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="55" y="82" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>страница</text>
+      <rect x="32" y="94" width="46" height="16" rx="4" fill={SOFT} stroke={ACCENT} strokeWidth={2} />
+      <text x="55" y="106" textAnchor="middle" fontSize="5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>connect</text>
+
+      <path d="M94 88h26M120 108H94" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M120 88l-6-4M120 88l-6 4M94 108l6-4M94 108l6 4" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <text x="107" y="78" textAnchor="middle" fontSize="4.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>request</text>
+      <text x="107" y="126" textAnchor="middle" fontSize="4.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>0xf39F…</text>
+
+      <rect x="124" y="56" width="58" height="80" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="153" y="82" textAnchor="middle" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>кошелёк</text>
+      <rect x="136" y="94" width="34" height="26" rx="5" fill="rgba(0,0,0,0.35)" stroke={INK} strokeWidth={2} />
+      <path d="M147 108h12M147 104h12M147 112h8" stroke={ACCENT} strokeWidth={2} fill="none" />
+
+      <text x="100" y="162" textAnchor="middle" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>ключ не выходит</text>
+      <text x="100" y="182" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>chainId 0x539</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1594,7 +1616,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'web-redux': { track: 'blockchain', num: '48', title: 'Redux: общее состояние приложения' },
   'web-rtk': { track: 'blockchain', num: '49', title: 'Redux Toolkit: срезы, селекторы и связь с React' },
   'web-rtk-async': { track: 'blockchain', num: '50', title: 'Асинхронность в Redux: запросы и состояние' },
-  'waves-first-network': { track: 'blockchain', num: '51', title: 'Первая сеть на Waves Enterprise' },
+  'wallet-connect': { track: 'blockchain', num: '51', title: 'Кошелёк в браузере: подключение и сеть' },
+  'waves-first-network': { track: 'blockchain', num: '52', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },

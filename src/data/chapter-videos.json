@@ -2523,5 +2523,32 @@
       "title": "RTK Query: понятный курс на реальных примерах",
       "channel": "Салимов Руслан IT"
     }
+  ],
+  "wallet-connect": [
+    {
+      "videoId": "xmlqmiE4ZK4",
+      "title": "Подключаем MetaMask к web3 приложению. Делаем интерфейс для токена. Часть 2.",
+      "channel": "Future Markt"
+    },
+    {
+      "videoId": "K608okBC3L0",
+      "title": "Работа со смарт-контрактами Ethereum с помощью Ethers.js",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "j841AxPF52I",
+      "title": "Подключаем контракт через библиотеку ethers.js. Фронт web3 приложения. Предоновогоднее видео #ethers",
+      "channel": "Dima HideCrypto - Web3 | Solidity"
+    },
+    {
+      "videoId": "bzzf0ANyq70",
+      "title": "Solidity и смарт-контракты Ethereum, урок #43 | Ethers.js v6 - апдейты, BigInt, перегрузка, импорты",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "VdPUC-Gbnsk",
+      "title": "Connect a Crypto Wallet with JavaScript - MetaMask - UI/UX & Code",
+      "channel": "DesignCourse"
+    }
   ]
 }
