@@ -2388,5 +2388,32 @@
       "title": "React Урок 8: Как делать запросы к API? useEffect + Fetch шаг за шагом!",
       "channel": "DevHotSpot"
     }
+  ],
+  "web-forms": [
+    {
+      "videoId": "pofiCNm5-U4",
+      "title": "Формы в React: управление вводом и простая валидация без сторонних библиотек",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "4pEfCpJpPTg",
+      "title": "JavaScript валидация форм — validity свойство у полей формы. Классовый компонент валидации форм",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "Lq4tky_6fN0",
+      "title": "14. Формы в HTML. Атрибуты required, disabled, readonly, placeholder, inputmode, type и autocomplete",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "WADswtZB-qg",
+      "title": "Валидация форм на React JS. Простая валидация. Урок 1.",
+      "channel": "Ulbi TV"
+    },
+    {
+      "videoId": "9G8CSNgCxE8",
+      "title": "013. Нативная валидация как фреймворк — Павел Ловцевич",
+      "channel": "Yandex for Frontend"
+    }
   ]
 }

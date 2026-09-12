@@ -482,6 +482,23 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="180" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>cancelled = true</text>
     </g>
   ),
+  /* Формы: ввод, проверка и суммы */
+  'web-forms': () => (
+    <g strokeLinecap="round">
+      <rect x="24" y="44" width="152" height="28" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="40" y="63" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>2.5</text>
+      <text x="160" y="63" textAnchor="end" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>ETH</text>
+
+      <rect x="24" y="84" width="152" height="28" rx="7" fill="rgba(255,140,140,0.14)" stroke="rgba(255,140,140,0.8)" strokeWidth={3} />
+      <text x="40" y="103" fontSize="6" fontWeight={800} fill="rgba(255,170,170,0.95)" fontFamily={MONO}>0xf39F…2267</text>
+      <text x="100" y="126" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,170,170,0.95)" fontFamily={MONO}>bad address checksum</text>
+
+      <rect x="52" y="140" width="96" height="28" rx="8" fill="rgba(0,0,0,0.25)" stroke={INK} strokeWidth={3} strokeDasharray="5 4" />
+      <text x="100" y="159" textAnchor="middle" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.4)" fontFamily={MONO}>Отправить</text>
+
+      <text x="100" y="184" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>2.5 → 2500000000000000000</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1473,7 +1490,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'web-state': { track: 'blockchain', num: '43', title: 'Состояние и эффекты: интерфейс с памятью' },
   'web-vite': { track: 'blockchain', num: '44', title: 'Проект на Vite: от исходников к готовым файлам' },
   'web-fetch': { track: 'blockchain', num: '45', title: 'Данные из сети: загрузка, отказ, гонка ответов' },
-  'waves-first-network': { track: 'blockchain', num: '46', title: 'Первая сеть на Waves Enterprise' },
+  'web-forms': { track: 'blockchain', num: '46', title: 'Формы: ввод, проверка и суммы' },
+  'waves-first-network': { track: 'blockchain', num: '47', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },

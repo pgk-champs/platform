@@ -712,11 +712,19 @@
     "path": "blockchain/web-fetch.mdx"
   },
   {
+    "id": "web-forms",
+    "title": "Формы: ввод, проверка и суммы",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 46,
+    "path": "blockchain/web-forms.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 46,
+    "order": 47,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]
