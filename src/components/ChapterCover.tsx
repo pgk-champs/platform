@@ -2089,6 +2089,41 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="138" fontSize="11" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>.value</text>
     </g>
   ),
+  /* Компонент библиотеки: кнопки и слоты */
+  'kit-buttons': () => (
+    <g strokeLinecap="round">
+      <rect x="34" y="40" width="132" height="34" rx="9" fill={ACCENT} />
+      <text x="100" y="61" textAnchor="middle" fontSize="7" fontWeight={800} fill="#10202a" fontFamily={MONO}>Primary</text>
+
+      <rect x="34" y="84" width="132" height="34" rx="9" fill="none" stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="105" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>Secondary</text>
+
+      <text x="100" y="141" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>Ghost</text>
+
+      <rect x="34" y="156" width="132" height="34" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} strokeDasharray="5 4" />
+      <text x="100" y="177" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>leading slot</text>
+
+      <text x="100" y="208" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>слот вместо флагов</text>
+    </g>
+  ),
+  /* Поля ввода: подпись, ошибка, клавиатура */
+  'kit-inputs': () => (
+    <g strokeLinecap="round">
+      <text x="36" y="44" fontSize="5.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>Почта</text>
+      <rect x="30" y="50" width="140" height="30" rx="7" fill="rgba(0,0,0,0.3)" stroke={ACCENT} strokeWidth={2.5} />
+      <text x="42" y="69" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>oleg@pgk63.ru</text>
+
+      <text x="36" y="104" fontSize="5.5" fontWeight={800} fill="rgba(255,170,170,0.95)" fontFamily={MONO}>Пароль</text>
+      <rect x="30" y="110" width="140" height="30" rx="7" fill="rgba(255,140,140,0.12)" stroke="rgba(255,140,140,0.85)" strokeWidth={2.5} />
+      <text x="42" y="129" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>••••••</text>
+      <text x="36" y="152" fontSize="5" fontWeight={800} fill="rgba(255,170,170,0.9)" fontFamily={MONO}>Нужен пробел</text>
+
+      <rect x="30" y="164" width="140" height="26" rx="6" fill={SOFT} stroke={ACCENT} strokeWidth={2} />
+      <text x="100" y="181" textAnchor="middle" fontSize="5.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>value ↑ onValueChange ↓</text>
+
+      <text x="100" y="208" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>текст живёт снаружи</text>
+    </g>
+  ),
   'kotlin-coroutines': () => (
     <g strokeLinecap="round">
       <rect x="14" y="44" width="172" height="30" rx="9" fill={SOFT} stroke={INK} strokeWidth={3} />
@@ -2126,12 +2161,12 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'github-start': { track: 'foundation', num: '00', title: 'GitHub с нуля' },
   typing: { track: 'foundation', num: '01', title: 'Печать и клавиатура' },
   'it-english': { track: 'foundation', num: '02', title: 'IT-английский: стартовый словарь' },
-  '02b-english-practice': { track: 'foundation', num: '03', title: 'Английский на практике' },
-  'linux-terminal': { track: 'foundation', num: '04', title: 'Linux и терминал' },
-  'files-packages-ssh': { track: 'foundation', num: '05', title: 'Файлы, пакеты, SSH' },
-  'git-first-commit': { track: 'foundation', num: '06', title: 'Git: первый коммит' },
-  'git-branches': { track: 'foundation', num: '07', title: 'Git: ветки и merge' },
-  'git-remote': { track: 'foundation', num: '08', title: 'Git: push, PR и командная работа' },
+  '02b-english-practice': { track: 'foundation', num: '02', title: 'Английский на практике' },
+  'linux-terminal': { track: 'foundation', num: '03', title: 'Linux и терминал' },
+  'files-packages-ssh': { track: 'foundation', num: '04', title: 'Файлы, пакеты, SSH' },
+  'git-first-commit': { track: 'foundation', num: '05', title: 'Git: первый коммит' },
+  'git-branches': { track: 'foundation', num: '06', title: 'Git: ветки и merge' },
+  'git-remote': { track: 'foundation', num: '07', title: 'Git: push, PR и командная работа' },
   'foundation-final': { track: 'foundation', num: '08', title: 'Финал Фундамента: английский, git, SSH, система, клавиатура' },
   'android-studio': { track: 'mobile', num: '00', title: 'Android Studio: знакомство с IDE' },
   'kotlin-vars': { track: 'mobile', num: '01', title: 'Переменные и типы' },
@@ -2149,20 +2184,22 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'lazy-lists': { track: 'mobile', num: '13', title: 'Списки: LazyColumn и всё, что не нарисовать циклом' },
   'material-theme': { track: 'mobile', num: '14', title: 'Material 3: тема, которую вам уже сгенерировали' },
   'scaffold-bars': { track: 'mobile', num: '15', title: 'Scaffold: каркас экрана, шапка и нижняя панель' },
-  'kotlin-coroutines': { track: 'mobile', num: '16', title: 'Корутины: как приложение не зависает' },
-  'flow-streams': { track: 'mobile', num: '17', title: 'Flow: поток значений во времени' },
-  'viewmodel-state': { track: 'mobile', num: '18', title: 'ViewModel: состояние, которое переживает поворот' },
-  'app-layers': { track: 'mobile', num: '19', title: 'Слои приложения: data, domain и репозиторий' },
-  'network-retrofit': { track: 'mobile', num: '20', title: 'Сеть: тот же экран, но с настоящими данными' },
-  'network-errors': { track: 'mobile', num: '21', title: 'Когда сети нет: ошибки, повторы и что видит пользователь' },
-  'data-storage': { track: 'mobile', num: '22', title: 'Хранение на устройстве: DataStore и Room' },
-  'cache-offline': { track: 'mobile', num: '23', title: 'Кэш и офлайн: база как источник истины' },
-  'clean-code': { track: 'mobile', num: '24', title: 'Чистый код: комментарии и логирование, которые оценивают' },
-  'auth-session': { track: 'mobile', num: '25', title: 'Авторизация: вход, живая сессия и биометрия' },
-  'device-features': { track: 'mobile', num: '26', title: 'Возможности устройства: камера, уведомления, виджет' },
-  'testing-mobile': { track: 'mobile', num: '27', title: 'Тестирование: MockWebServer, фейки и TDD' },
-  'kotlin-vs-java': { track: 'mobile', num: '28', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '29', title: 'История Java, Android и Kotlin' },
+  'kit-buttons': { track: 'mobile', num: '16', title: 'Компонент библиотеки: кнопки, слоты и состояния' },
+  'kit-inputs': { track: 'mobile', num: '17', title: 'Поля ввода: подпись, ошибка и клавиатура' },
+  'kotlin-coroutines': { track: 'mobile', num: '18', title: 'Корутины: как приложение не зависает' },
+  'flow-streams': { track: 'mobile', num: '19', title: 'Flow: поток значений во времени' },
+  'viewmodel-state': { track: 'mobile', num: '20', title: 'ViewModel: состояние, которое переживает поворот' },
+  'app-layers': { track: 'mobile', num: '21', title: 'Слои приложения: data, domain и репозиторий' },
+  'network-retrofit': { track: 'mobile', num: '22', title: 'Сеть: тот же экран, но с настоящими данными' },
+  'network-errors': { track: 'mobile', num: '23', title: 'Когда сети нет: ошибки, повторы и что видит пользователь' },
+  'data-storage': { track: 'mobile', num: '24', title: 'Хранение на устройстве: DataStore и Room' },
+  'cache-offline': { track: 'mobile', num: '25', title: 'Кэш и офлайн: база как источник истины' },
+  'clean-code': { track: 'mobile', num: '26', title: 'Чистый код: комментарии и логирование, которые оценивают' },
+  'auth-session': { track: 'mobile', num: '27', title: 'Авторизация: вход, живая сессия и биометрия' },
+  'device-features': { track: 'mobile', num: '28', title: 'Возможности устройства: камера, уведомления, виджет' },
+  'testing-mobile': { track: 'mobile', num: '29', title: 'Тестирование: MockWebServer, фейки и TDD' },
+  'kotlin-vs-java': { track: 'mobile', num: '30', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '31', title: 'История Java, Android и Kotlin' },
   'what-is-blockchain': { track: 'blockchain', num: '01', title: 'Что такое блокчейн' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'solidity-hello': { track: 'blockchain', num: '03', title: 'Первый контракт: из чего состоит код' },
@@ -2171,7 +2208,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'solidity-flow': { track: 'blockchain', num: '06', title: 'Условия, циклы и время: как контракт принимает решения' },
   'solidity-functions': { track: 'blockchain', num: '07', title: 'Функции: видимость, view, payable и модификаторы' },
   'solidity-storage': { track: 'blockchain', num: '08', title: 'Хранение данных: mapping, struct, массивы и события' },
-  'sol-contracts-oop': { track: 'blockchain', num: '09', title: 'Контракт как объект: конструктор, enum и роли' },
+  'sol-contracts-oop': { track: 'blockchain', num: '26', title: 'Контракт как объект: конструктор, enum и роли' },
   'sol-inheritance': { track: 'blockchain', num: '10', title: 'Наследование: is, virtual, override и super' },
   'sol-interfaces': { track: 'blockchain', num: '11', title: 'Интерфейсы: договор между контрактами' },
   'sol-libraries': { track: 'blockchain', num: '12', title: 'Библиотеки, import и хеши: keccak256 и abi.encode' },

@@ -1,0 +1,455 @@
+---
+title: 'Поля ввода: подпись, ошибка и клавиатура'
+audience: 'мобилка'
+level: 'углубление'
+order: 17
+sidebar_position: 17
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="kit-inputs" />
+
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+import KotlinPlay from '@site/src/components/KotlinPlay';
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+
+# Поля ввода: подпись, ошибка и клавиатура
+
+<ChapterProgress chapterId="kit-inputs" totalSections={12} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="kit-inputs" />
+
+## Зачем это нужно
+
+«Создайте инпут» — один пункт критериев, а работы в нём больше, чем в кнопке: у поля ввода четыре состояния на макете, своя клавиатура под каждый тип данных и отдельный вопрос — **когда** показывать ошибку.
+
+Последнее оценивается вживую. Если приложение ругается «неверная почта» на первую же набранную букву, это видно эксперту сразу и выглядит именно тем, чем является, — недоделкой.
+
+Как и в прошлой главе, весь код собран настоящим компилятором, а сообщения об ошибках — его подлинный вывод.
+
+<SectionAnchor chapterId="kit-inputs" sectionId="zachem" />
+
+## Поле не хранит текст
+
+<Figure scheme="ki-controlled" caption="Текст живёт снаружи: поле получает его сверху и отдаёт изменения обратно" />
+
+Это первое, что ломает привычку тех, кто писал на вёрстке через XML. Поле ввода в Compose **ничего не помнит**. Оно получает строку в `value`, рисует её и сообщает о нажатиях через `onValueChange`. Хранить текст — обязанность вызывающего.
+
+```kotlin
+var email by remember { mutableStateOf("") }
+
+KitTextField(
+    value = email,
+    onValueChange = { email = it },
+    label = "Почта",
+)
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'var email by remember', label: 'состояние снаружи', note: 'текст хранится на экране, а не в поле; remember переживает перерисовку' },
+  { text: 'value = email', label: 'сверху вниз', note: 'поле рисует то, что ему дали, и ничего не решает само' },
+  { text: 'onValueChange = { email = it }', label: 'снизу вверх', note: 'поле сообщает о новом значении, а менять состояние — задача вызывающего' },
+  { text: 'it', label: 'новая строка целиком', note: 'не символ и не событие, а всё содержимое поля после ввода' },
+]} />
+
+А теперь то, ради чего эта схема тут:
+
+```kotlin
+@Composable
+fun P() {
+    OutlinedTextField(value = "текст", onValueChange = {})
+}
+```
+
+```text
+(сборка проходит, ошибок нет)
+```
+
+Компилятор доволен: типы сошлись. А поле **не печатается** — в него можно тыкать сколько угодно, текст не меняется, потому что `value` всегда одна и та же константа, а `onValueChange` ничего не делает.
+
+<Hint type="important">
+«Поле не печатается» — самая частая жалоба на первом дне работы, и причина всегда одна: кольцо разомкнуто. Либо `onValueChange` не меняет состояние, либо в `value` уходит не то состояние, которое он меняет. Компилятор здесь не помощник: код законный.
+</Hint>
+
+<SectionAnchor chapterId="kit-inputs" sectionId="pole-ne-hranit" />
+
+## Компонент библиотеки
+
+```kotlin
+@Composable
+fun KitTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    placeholder: String? = null,
+    error: String? = null,
+    enabled: Boolean = true,
+    singleLine: Boolean = true,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Next,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    trailing: (@Composable () -> Unit)? = null,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier,
+        enabled = enabled,
+        singleLine = singleLine,
+        isError = error != null,
+        label = { Text(label) },
+        placeholder = placeholder?.let { { Text(it) } },
+        supportingText = error?.let { { Text(it) } },
+        trailingIcon = trailing,
+        visualTransformation = visualTransformation,
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
+    )
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'error: String? = null', label: 'ошибка одним параметром', note: 'есть текст — поле в состоянии ошибки; нет — обычное. Отдельный флаг isError снаружи не нужен' },
+  { text: 'isError = error != null', label: 'флаг выводится сам', note: 'два параметра, которые можно рассогласовать, превращены в один' },
+  { text: 'label = { Text(label) }', label: 'подпись — это разметка', note: 'Material ждёт не строку, а функцию, которая рисует; строку он не примет' },
+  { text: 'placeholder?.let { { Text(it) } }', label: 'двойные скобки', note: 'внешние — тело let, внутренние — та самая функция-разметка; нет подсказки — нет и функции' },
+  { text: 'keyboardType', label: 'какая клавиатура', note: 'Text, Email, Number, Password, Phone — определяет раскладку, которую увидит человек' },
+  { text: 'imeAction = ImeAction.Next', label: 'кнопка на клавиатуре', note: 'Next переводит к следующему полю, Done закрывает клавиатуру' },
+]} />
+
+<Hint type="tip">
+Приём с `error: String?` вместо пары `isError: Boolean` и `errorText: String` стоит запомнить: он делает невозможным рассогласование. Нельзя случайно получить красную рамку без объяснения или объяснение без красной рамки.
+</Hint>
+
+<SectionAnchor chapterId="kit-inputs" sectionId="komponent" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-inputs" quizId="quiz-1" questions={[
+  { q: 'Поле не печатается, хотя код компилируется. В чём причина?', options: ['Нужен другой компонент', 'Кольцо разомкнуто: onValueChange не меняет то состояние, которое уходит в value', 'Не хватает remember', 'Клавиатура не та'], correct: 1, why: 'Поле ничего не хранит — текст живёт снаружи.' },
+  { q: 'Почему ошибку передают одним параметром error: String?, а не парой isError и errorText?', options: ['Так короче', 'Пару можно рассогласовать: красная рамка без объяснения или объяснение без рамки', 'isError устарел', 'Так требует Material'], correct: 1, why: 'Флаг isError выводится внутри компонента сам.' },
+  { q: 'Что означает it в onValueChange = { email = it }?', options: ['Набранный символ', 'Всё содержимое поля после ввода', 'Событие нажатия', 'Позицию курсора'], correct: 1, why: 'Поле отдаёт новую строку целиком, а не приращение.' },
+]} />
+
+</Block>
+
+## Четыре состояния с макета
+
+<Figure scheme="ki-states" caption="Все четыре — один компонент с разными параметрами" />
+
+На макете поле обычно нарисовано четыре раза, и это не четыре компонента:
+
+| Состояние | Что передаём |
+| --- | --- |
+| Пустое | `value = ""`, `placeholder = "ivan@mail.ru"` |
+| Заполненное | `value = "oleg@pgk63.ru"` |
+| С ошибкой | `error = "Неверный формат почты"` |
+| Отключённое | `enabled = false` |
+
+<Hint type="fact">
+Подпись (`label`) в Material 3 ведёт себя хитро: у пустого поля она стоит внутри как текст, а при вводе уезжает наверх и уменьшается. Подсказка (`placeholder`) видна **только** у пустого поля и только когда подпись уже уехала. Это частый источник вопроса «почему не видно placeholder» — он перекрыт подписью, пока в поле не встали курсором.
+</Hint>
+
+<SectionAnchor chapterId="kit-inputs" sectionId="chetyre-sostoyaniya" />
+
+## Пароль: то же поле, другие правила
+
+```kotlin
+@Composable
+fun KitPasswordField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    label: String = "Пароль",
+    error: String? = null,
+    visible: Boolean = false,
+    trailing: (@Composable () -> Unit)? = null,
+) {
+    KitTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = label,
+        modifier = modifier,
+        error = error,
+        keyboardType = KeyboardType.Password,
+        imeAction = ImeAction.Done,
+        visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
+        trailing = trailing,
+    )
+}
+```
+
+Поле пароля — не новый компонент, а настройка существующего. Три отличия: своя клавиатура, `Done` вместо `Next` (пароль обычно последний) и **преобразование показа** — текст остаётся в состоянии как есть, а на экран выводятся точки.
+
+<Hint type="important">
+`visualTransformation` меняет только вид. В `value` по-прежнему лежит настоящий пароль, и именно он уходит в проверку и в сеть. Путать эти две вещи опасно: попытка «взять то, что показано» даст строку из точек.
+</Hint>
+
+Кнопка «показать пароль» делается слотом — компонент про неё не знает:
+
+```kotlin
+KitPasswordField(
+    value = password,
+    onValueChange = { password = it },
+    visible = shown,
+    trailing = {
+        KitButtonGhost(text = if (shown) "Скрыть" else "Показать", onClick = { shown = !shown })
+    },
+)
+```
+
+<SectionAnchor chapterId="kit-inputs" sectionId="parol" />
+
+## Когда показывать ошибку
+
+<Figure scheme="ki-when-validate" caption="Первый раз — при уходе из поля, дальше — на каждое изменение" />
+
+Правило, которое решает большинство претензий на приёмке:
+
+- пока человек **ещё не уходил** из поля — молчим, что бы он ни набрал;
+- как только ушёл (нажал на другое поле, свернул клавиатуру) — проверяем и показываем;
+- дальше проверяем **на каждое изменение**, чтобы ошибка исчезла сразу после починки.
+
+Логику проверки удобно держать отдельно от разметки — её и протестировать проще:
+
+<KotlinPlay code={`fun pochtaOshibka(v: String): String? = when {
+    v.isBlank() -> "Укажите почту"
+    !v.contains("@") -> "В адресе нет знака @"
+    v.substringAfter("@").isBlank() -> "После @ ничего нет"
+    !v.substringAfter("@").contains(".") -> "В домене нет точки"
+    else -> null
+}
+
+fun main() {
+    for (v in listOf("", "oleg", "oleg@", "oleg@mail", "oleg@mail.ru")) {
+        println("\\"" + v + "\\" -> " + (pochtaOshibka(v) ?: "ок"))
+    }
+}`} />
+
+А в разметке — только момент показа:
+
+```kotlin
+var email by remember { mutableStateOf("") }
+var trogali by remember { mutableStateOf(false) }
+
+val oshibka = if (trogali) pochtaOshibka(email) else null
+
+KitTextField(
+    value = email,
+    onValueChange = { email = it },
+    label = "Почта",
+    error = oshibka,
+    modifier = Modifier.onFocusChanged { if (!it.isFocused) trogali = true },
+)
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'var trogali by remember', label: 'трогали ли поле', note: 'отдельное состояние: оно и решает, показывать ошибку или молчать' },
+  { text: 'if (trogali) pochtaOshibka(email) else null', label: 'момент показа', note: 'проверка считается всегда, но до первого ухода её результат не используют' },
+  { text: 'onFocusChanged', label: 'ушли из поля', note: 'срабатывает и при входе, и при выходе — отсюда проверка !it.isFocused' },
+]} />
+
+<SectionAnchor chapterId="kit-inputs" sectionId="kogda-oshibka" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-inputs" quizId="quiz-2" questions={[
+  { q: 'Когда показывать ошибку в поле первый раз?', options: ['С первого введённого символа', 'После того, как человек впервые ушёл из поля', 'Только при нажатии кнопки отправки', 'Никогда, достаточно подсказки'], correct: 1, why: 'Ругань на первую букву видна эксперту сразу и выглядит недоделкой.' },
+  { q: 'Что лежит в value у поля пароля с visualTransformation?', options: ['Строка из точек', 'Настоящий пароль: преобразование меняет только вид', 'Хеш пароля', 'Пустая строка'], correct: 1, why: 'Попытка взять «то, что показано» даст строку из точек.' },
+  { q: 'Зачем отдельное состояние «трогали ли поле»?', options: ['Для статистики', 'Оно решает, показывать ли ошибку: до первого ухода из поля молчим', 'Для оптимизации', 'Для клавиатуры'], correct: 1, why: 'Проверка считается всегда, но до первого ухода её результат не используют.' },
+]} />
+
+</Block>
+
+## Что ловит компилятор, а что нет
+
+**Подпись строкой вместо разметки:**
+
+```kotlin
+OutlinedTextField(value = "", onValueChange = {}, label = "Почта")
+```
+
+```text
+e: Probe.kt:4:23 None of the following candidates is applicable:
+```
+
+То же самое сообщение, что и в главе про макет при `fontSize = 16.dp`, и читается так же: ни одна перегрузка не подошла, ищите свой параметр в сигнатуре. Там будет `label: (@Composable () -> Unit)?` — то есть нужна разметка, а не строка. Ровно так же отказывает `supportingText = "ошибка"`.
+
+**Опечатка в перечислении:**
+
+```kotlin
+KeyboardOptions(keyboardType = KeyboardType.Emal)
+```
+
+```text
+e: Probe.kt:5:75 Unresolved reference 'Emal'.
+```
+
+**А это компилятор пропустит:**
+
+- `value` из константы — поле не печатается;
+- `KeyboardType.Text` там, где нужен `Number` — человек будет искать цифры на буквенной клавиатуре;
+- `imeAction = ImeAction.Next` на последнем поле формы — кнопка переведёт в никуда;
+- `singleLine = true` у поля адреса — длинный адрес не будет виден целиком.
+
+<Hint type="fact">
+Ни одна из четырёх последних ошибок не видна в коде — они видны только на устройстве. Поэтому каждое поле формы прокликивают руками: набрать, уйти, вернуться, отправить. Три минуты на форму.
+</Hint>
+
+<SectionAnchor chapterId="kit-inputs" sectionId="chto-lovit" />
+
+## Типичные ошибки
+
+**Ошибка 1. Состояние без `remember`.**
+
+Текст сбрасывается при каждой перерисовке: поле «печатает и стирает». Компилятор молчит.
+
+**Ошибка 2. Проверка прямо в разметке.**
+
+```kotlin
+error = if (!email.contains("@")) "Неверно" else null
+```
+
+Ругань на первую букву. Нужен признак «трогали».
+
+**Ошибка 3. Ошибка не исчезает после починки.**
+
+Обратная крайность: проверили один раз при уходе и запомнили результат. Человек исправил адрес, а красная рамка висит. После первого показа проверять надо на каждое изменение.
+
+**Ошибка 4. Клавиатура не под тип данных.**
+
+Телефон, почта и количество набираются на разных клавиатурах. Это один параметр, и он оценивается.
+
+**Ошибка 5. Пароль виден в отладочном выводе.**
+
+```kotlin
+Log.d("form", "пароль: $password")
+```
+
+Журнал показывают на демонстрации, а иногда прикладывают к сдаче.
+
+**Ошибка 6. `trailing` занят иконкой, а нужен для «показать пароль».**
+
+Слот один. Если туда уже положили иконку по макету, кнопку показа кладут в него же — вместе с иконкой в `Row`.
+
+<SectionAnchor chapterId="kit-inputs" sectionId="oshibki" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-inputs" quizId="quiz-3" questions={[
+  { q: 'Человек исправил адрес, а красная рамка не исчезла. Что не так?', options: ['Нужен другой компонент', 'После первого показа проверять надо на каждое изменение, а не один раз при уходе', 'Ошибка в самой проверке', 'Не хватает remember'], correct: 1, why: 'Обратная крайность к ругани на первую букву.' },
+  { q: 'label = "Почта" не компилируется. Как читать «None of the following candidates is applicable»?', options: ['Material сломан', 'Ни одна перегрузка не подошла по типам: в сигнатуре label — это разметка, а не строка', 'Не хватает импорта', 'Нужна другая версия'], correct: 1, why: 'То же сообщение, что и при fontSize = 16.dp в главе про макет.' },
+  { q: 'Какую из этих ошибок компилятор НЕ поймает?', options: ['Опечатку в KeyboardType', 'Подпись строкой вместо разметки', 'KeyboardType.Text там, где нужен Number', 'Неверный тип onValueChange'], correct: 2, why: 'Это видно только на устройстве — поэтому форму прокликивают руками.' },
+]} />
+
+</Block>
+
+## Шпаргалка по главе
+
+<Block kind="cheatsheet">
+
+| Что нужно | Как |
+| --- | --- |
+| Текст поля | хранить снаружи: `var v by remember { mutableStateOf("") }` |
+| Связать | `value = v`, `onValueChange = { v = it }` |
+| Подпись и подсказка | `label = { Text(...) }`, `placeholder = { Text(...) }` — разметка, не строка |
+| Ошибка | один параметр `error: String?`, `isError` вывести внутри |
+| Клавиатура | `KeyboardOptions(keyboardType = ..., imeAction = ...)` |
+| Скрыть пароль | `visualTransformation = PasswordVisualTransformation()` |
+| Момент проверки | признак «трогали» + `Modifier.onFocusChanged` |
+| Проверить руками | набрать, уйти, вернуться, исправить, отправить |
+
+</Block>
+
+<SectionAnchor chapterId="kit-inputs" sectionId="shpargalka" />
+
+## Слова главы
+
+<Block kind="vocab">
+
+| Термин | Что это |
+| --- | --- |
+| Управляемое поле | Поле, которое не хранит текст: получает `value`, отдаёт `onValueChange` |
+| `label` | Подпись; у пустого поля внутри, при вводе уезжает наверх |
+| `placeholder` | Подсказка; видна только у пустого поля |
+| `supportingText` | Текст под полем: пояснение или ошибка |
+| `visualTransformation` | Меняет только вид текста; в состоянии остаётся исходный |
+| `imeAction` | Что написано на кнопке клавиатуры: `Next` или `Done` |
+| Признак «трогали» | Состояние, по которому решают, показывать ли ошибку |
+
+</Block>
+
+<SectionAnchor chapterId="kit-inputs" sectionId="slovar" />
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="kit-inputs"
+  trainerId="trainer-kit-inputs"
+  targetCpm={95}
+  targetAccuracy={90}
+  pools={[
+    { label: 'Связка со состоянием', snippets: [
+      'var email by remember { mutableStateOf("") }',
+      'onValueChange = { email = it },',
+      'value = email,',
+    ] },
+    { label: 'Параметры поля', snippets: [
+      'isError = error != null,',
+      'label = { Text(label) },',
+      'supportingText = error?.let { { Text(it) } },',
+      'keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction)',
+    ] },
+    { label: 'Момент проверки', snippets: [
+      'Modifier.onFocusChanged { if (!it.isFocused) trogali = true }',
+      'val oshibka = if (trogali) pochtaOshibka(email) else null',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="kit-inputs" sectionId="trenazher" />
+
+## Что должен уметь после главы
+
+- объяснить, почему поле не хранит текст, и починить «поле не печатается»;
+- собрать компонент поля с подписью, подсказкой, ошибкой и клавиатурой;
+- передать ошибку одним параметром и объяснить, почему не парой;
+- показать четыре состояния поля одним компонентом;
+- сделать поле пароля и не перепутать показанное со значением;
+- выбрать момент показа ошибки и объяснить обе крайности;
+- назвать, что здесь компилятор не проверяет вовсе.
+
+<SectionAnchor chapterId="kit-inputs" sectionId="chto-umet" />
+
+## Проверка по главе
+
+<ChapterExam chapterId="kit-inputs" questions={[
+  { q: 'Где хранится текст поля ввода в Compose?', options: ['внутри поля', 'снаружи, в состоянии экрана; поле только показывает и сообщает', 'в системе', 'в модели'], correct: 1, why: 'Поле получает value и отдаёт onValueChange.' },
+  { q: 'Поле не печатается, код компилируется. Причина', options: ['нет remember', 'кольцо разомкнуто: onValueChange не меняет то, что уходит в value', 'не та клавиатура', 'нужен другой компонент'], correct: 1, why: 'Компилятор здесь не помощник: код законный.' },
+  { q: 'Почему ошибку передают как error: String?', options: ['короче', 'пару isError и errorText можно рассогласовать', 'isError устарел', 'требование Material'], correct: 1, why: 'Флаг выводится внутри: isError = error != null.' },
+  { q: 'label = "Почта" даёт «None of the following candidates is applicable». Почему?', options: ['нет импорта', 'label ждёт разметку, а не строку — это видно в сигнатуре', 'Material сломан', 'нужна другая версия'], correct: 1, why: 'То же сообщение, что и при fontSize = 16.dp.' },
+  { q: 'Что лежит в value поля пароля?', options: ['строка из точек', 'настоящий пароль: visualTransformation меняет только вид', 'хеш', 'пусто'], correct: 1, why: 'В проверку и в сеть уходит именно значение, а не показанное.' },
+  { q: 'Когда показывать ошибку первый раз?', options: ['с первого символа', 'после первого ухода из поля', 'только по кнопке отправки', 'никогда'], correct: 1, why: 'Иначе человека ругают, пока он ещё печатает.' },
+  { q: 'Ошибка не исчезает после исправления. Что не так?', options: ['проверка неверна', 'после первого показа проверять надо на каждое изменение', 'нужен remember', 'нужен другой компонент'], correct: 1, why: 'Обратная крайность к ругани на первую букву.' },
+  { q: 'ImeAction.Next на последнем поле формы', options: ['правильно', 'переведёт в никуда: на последнем поле ставят Done', 'закроет клавиатуру', 'не влияет'], correct: 1, why: 'Компилятор этого не поймает — видно только на устройстве.' },
+  { q: 'Какую ошибку компилятор НЕ поймает?', options: ['опечатку в KeyboardType', 'строку вместо разметки в label', 'Text вместо Number в keyboardType', 'неверный тип onValueChange'], correct: 2, why: 'Человек будет искать цифры на буквенной клавиатуре.' },
+  { q: 'Зачем прокликивать каждое поле формы руками?', options: ['для скорости', 'половина ошибок формы не видна в коде: клавиатура, кнопка перехода, однострочность', 'так требует критерий', 'для тестов'], correct: 1, why: 'Набрать, уйти, вернуться, исправить, отправить — три минуты на форму.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Text fields в Compose](https://developer.android.com/develop/ui/compose/text/user-input) — все параметры поля и их поведение.
+- [Настройка клавиатуры](https://developer.android.com/develop/ui/compose/text/user-input#keyboard-options) — `KeyboardOptions`, типы и действия.
+- [Состояние в Compose](https://developer.android.com/develop/ui/compose/state) — почему текст живёт снаружи поля.
+- [Обработка фокуса](https://developer.android.com/develop/ui/compose/touch-input/focus) — `onFocusChanged` и порядок перехода между полями.

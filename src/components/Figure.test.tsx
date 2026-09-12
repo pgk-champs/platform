@@ -105,6 +105,8 @@ import { sdachaRepoSchemes } from './figures/sdachaRepo';
 import { demoShowSchemes } from './figures/demoShow';
 import { layoutCardSchemes } from './figures/layoutCard';
 import { sprintFlowSchemes } from './figures/sprintFlow';
+import { kitButtonsSchemes } from './figures/kitButtons';
+import { kitInputsSchemes } from './figures/kitInputs';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -235,6 +237,8 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(demoShowSchemes),
     ...Object.keys(layoutCardSchemes),
     ...Object.keys(sprintFlowSchemes),
+    ...Object.keys(kitButtonsSchemes),
+    ...Object.keys(kitInputsSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

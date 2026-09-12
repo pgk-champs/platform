@@ -1,0 +1,421 @@
+---
+title: 'Компонент библиотеки: кнопки, слоты и состояния'
+audience: 'мобилка'
+level: 'углубление'
+order: 16
+sidebar_position: 16
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="kit-buttons" />
+
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+
+# Компонент библиотеки: кнопки, слоты и состояния
+
+<ChapterProgress chapterId="kit-buttons" totalSections={11} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="kit-buttons" />
+
+## Зачем это нужно
+
+В критериях чемпионата по мобильной разработке есть отдельный список пунктов, и звучат они так:
+
+```text
+Создайте компоненты кнопок
+Создайте инпут
+Создайте компонент селект
+Создайте компонент Поиск
+Создайте компонент BottomSheet
+Создайте компонент TabBar
+Создайте компонент карточки
+Создайте компонент «Хэдер»
+Все компоненты библиотеки адаптивны
+```
+
+Девять оцениваемых пунктов, и каждый — про **свой** компонент, а не про использование готового из Material. Разница принципиальная: `Button` из Material вы вызываете, а `KitButtonPrimary` вы **проектируете** — решаете, какие у него параметры, какие состояния, что можно подменить снаружи.
+
+Эта глава — про то, как устроен такой компонент, на примере кнопок. Дальше в блоке те же правила применяются к полям ввода, выбору, поиску и остальному списку.
+
+<Hint type="important">
+Весь Compose-код этой главы собран настоящим компилятором в библиотечном модуле Android: Kotlin 2.0.21, Compose BOM 2024.10.01, плагин сборки 8.7.3, compileSdk 34. Сообщения об ошибках ниже — его подлинный вывод, а не пересказ.
+</Hint>
+
+<SectionAnchor chapterId="kit-buttons" sectionId="zachem" />
+
+## Порядок параметров — это документация
+
+<Figure scheme="kb-api-shape" caption="Обязательные, потом modifier, потом состояния, слоты последними" />
+
+Порядок параметров в Compose — жёсткое соглашение, и следовать ему стоит не из вежливости: по нему чужой компонент читают, не открывая код.
+
+```kotlin
+@Composable
+fun KitButtonPrimary(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    leading: (@Composable () -> Unit)? = null,
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled && !loading,
+    ) {
+        KitButtonContent(text = text, loading = loading, leading = leading)
+    }
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'text: String, onClick: () -> Unit', label: 'обязательные — первыми', note: 'без умолчаний: кнопка без текста и без действия бессмысленна, и компилятор об этом напомнит' },
+  { text: 'modifier: Modifier = Modifier', label: 'первый необязательный', note: 'соглашение всего Compose; вызывающий всегда знает, где искать место для отступов и размеров' },
+  { text: 'enabled: Boolean = true', label: 'состояние с умолчанием', note: 'разумное значение по умолчанию: кнопка обычно доступна' },
+  { text: 'enabled = enabled && !loading', label: 'состояния не независимы', note: 'во время загрузки кнопка недоступна — иначе пользователь нажмёт второй раз' },
+  { text: 'leading: (@Composable () -> Unit)? = null', label: 'слот — последним', note: 'необязательный кусок разметки; ставят в конец, чтобы вызов мог закончиться лямбдой' },
+]} />
+
+<Hint type="tip">
+`modifier: Modifier = Modifier` выглядит как тавтология, но это не она: слева — имя параметра, справа — объект-пустышка `Modifier`, к которому вызывающий добавляет что хочет. Компонент обязан его принять и повесить на свой **корневой** элемент — иначе снаружи невозможно ни задать отступ, ни растянуть кнопку по ширине.
+</Hint>
+
+<SectionAnchor chapterId="kit-buttons" sectionId="poryadok-parametrov" />
+
+## Три варианта, а не три цвета
+
+<Figure scheme="kb-three-variants" caption="Вариант выбирают по важности действия, а не по красоте" />
+
+На макете обычно три кнопки, и отличаются они не оттенком, а **весом действия**:
+
+```kotlin
+@Composable
+fun KitButtonSecondary(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    leading: (@Composable () -> Unit)? = null,
+) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled && !loading,
+    ) {
+        KitButtonContent(text = text, loading = loading, leading = leading)
+    }
+}
+
+@Composable
+fun KitButtonGhost(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
+    TextButton(onClick = onClick, modifier = modifier, enabled = enabled) {
+        Text(text = text, style = MaterialTheme.typography.labelLarge)
+    }
+}
+```
+
+Обратите внимание: у призрачной кнопки **нет** `loading` и `leading`. Это не забывчивость — так проектируют. Третьестепенное действие («Отмена», «Пропустить») не бывает долгим и не носит иконку; лишние параметры только создали бы впечатление, что ими можно пользоваться.
+
+<Hint type="important">
+Три варианта — три отдельные публичные функции, а не одна с параметром `variant: ButtonVariant`. Так вызов читается без заглядывания в перечисление (`KitButtonGhost("Отмена")` понятно сразу), а каждый вариант может иметь свой набор параметров. Параметр-перечисление берут, когда вариантов много и они правда одинаковы по возможностям.
+</Hint>
+
+<SectionAnchor chapterId="kit-buttons" sectionId="tri-varianta" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-buttons" quizId="quiz-1" questions={[
+  { q: 'Почему modifier ставят первым среди необязательных параметров?', options: ['Так короче писать', 'Это соглашение всего Compose: вызывающий всегда знает, где место для отступов и размеров', 'Иначе не скомпилируется', 'Так требует Material'], correct: 1, why: 'Чужой компонент читают по сигнатуре, а не по коду.' },
+  { q: 'Зачем компонент обязан принять modifier и повесить его на корневой элемент?', options: ['Для красоты', 'Иначе снаружи невозможно задать отступ или растянуть компонент по ширине', 'Так быстрее отрисовка', 'Это требование компилятора'], correct: 1, why: 'Modifier — единственный способ повлиять на компонент снаружи, не меняя его код.' },
+  { q: 'У призрачной кнопки нет параметров loading и leading. Почему?', options: ['Забыли добавить', 'Третьестепенное действие не бывает долгим и не носит иконку — лишние параметры вводили бы в заблуждение', 'Они не поддерживаются TextButton', 'Их добавят позже'], correct: 1, why: 'Набор параметров — тоже проектное решение, а не список всего возможного.' },
+]} />
+
+</Block>
+
+## Слот вместо флагов
+
+<Figure scheme="kb-slot-vs-flag" caption="Флаги растут с каждым пожеланием, слот не растёт вовсе" />
+
+Дизайнер просит иконку слева от текста. Первое решение, которое приходит в голову:
+
+```kotlin
+showIcon: Boolean = false,
+iconRes: Int? = null,
+iconTint: Color? = null,
+```
+
+Через неделю просят бейдж с количеством — ещё три параметра. Потом индикатор загрузки вместо иконки — ещё два. Компонент превращается в свалку настроек, из которых в каждом конкретном вызове используются две.
+
+Слот решает это целиком:
+
+```kotlin
+leading: (@Composable () -> Unit)? = null,
+```
+
+Вызывающий кладёт туда что угодно: иконку, бейдж, картинку, вообще всё, что рисуется. Компонент про это ничего не знает — он просто ставит содержимое слева и отступ после него.
+
+```kotlin
+@Composable
+private fun KitButtonContent(
+    text: String,
+    loading: Boolean,
+    leading: (@Composable () -> Unit)?,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        if (loading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(16.dp),
+                strokeWidth = 2.dp,
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+        } else if (leading != null) {
+            leading()
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+        Text(text = text, style = MaterialTheme.typography.labelLarge)
+    }
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'private fun', label: 'не часть библиотеки', note: 'общая начинка трёх кнопок; наружу она не выходит и менять её можно свободно' },
+  { text: '(@Composable () -> Unit)?', label: 'тип слота', note: 'функция без аргументов, которая рисует; знак вопроса делает слот необязательным' },
+  { text: '@Composable внутри скобок', label: 'где ставить аннотацию', note: 'она относится к типу функции, а не к параметру — без неё вызов leading() не скомпилируется' },
+  { text: 'leading()', label: 'вызов слота', note: 'компонент вызывает переданную разметку в том месте, где она должна оказаться' },
+  { text: 'if (loading) … else if (leading != null)', label: 'приоритет', note: 'во время загрузки индикатор вытесняет иконку — иначе они наложились бы' },
+]} />
+
+<SectionAnchor chapterId="kit-buttons" sectionId="slot-vmesto-flagov" />
+
+## Три ошибки, которые ловит компилятор
+
+**Ошибка 1. Забыли `@Composable` у функции.**
+
+```kotlin
+fun Screen() { Text("привет") }
+```
+
+```text
+e: Probe.kt:3:5 Functions which invoke @Composable functions must be marked with the @Composable annotation
+e: Probe.kt:3:16 @Composable invocations can only happen from the context of a @Composable function
+```
+
+Две строки на одну ошибку: первая говорит, что делать, вторая — где именно сломалось.
+
+**Ошибка 2. Слот объявлен без `@Composable` в типе.**
+
+```kotlin
+@Composable fun Card(slot: () -> Unit) { slot() }
+@Composable fun Use() { Card(slot = { Text("внутри") }) }
+```
+
+```text
+e: Probe.kt:5:39 @Composable invocations can only happen from the context of a @Composable function
+```
+
+Смотрите на позицию: `5:39` — это **место вызова**, внутри лямбды с `Text`. Сам `Card` скомпилировался нормально: обычная функция без аргументов — законный тип. Сломалось там, где в неё попытались положить разметку. Отсюда правило: аннотацию пишут внутри скобок типа — `(@Composable () -> Unit)`.
+
+**Ошибка 3. Разметка в обработчике нажатия.**
+
+```kotlin
+@Composable fun P() { Button(onClick = { Text("нельзя") }) { Text("ок") } }
+```
+
+```text
+e: Probe.kt:5:42 @Composable invocations can only happen from the context of a @Composable function
+```
+
+`onClick` — обычная функция, она выполняется по нажатию, а не во время отрисовки. Рисовать из неё нечего и некуда. Если по нажатию должно что-то появиться — меняют состояние, а разметка реагирует на изменение сама.
+
+<Hint type="fact">
+Все три ошибки дают одно и то же сообщение `@Composable invocations can only happen from the context of a @Composable function`. Разными у них будут только строка и столбец. Поэтому первое, что делают с этой ошибкой, — смотрят не на текст, а на позицию.
+</Hint>
+
+<SectionAnchor chapterId="kit-buttons" sectionId="tri-oshibki" />
+
+## А эту компилятор не ловит
+
+```kotlin
+@Composable
+fun P() {
+    val s = mutableStateOf(0)
+    Text(s.value.toString())
+}
+```
+
+```text
+(сборка проходит, ошибок нет)
+```
+
+Состояние без `remember` создаётся заново при каждой перерисовке, и значение всегда сбрасывается. Компилятор молчит — это законный код, просто бесполезный. Предупреждение выдаст только проверка стиля в среде разработки, и то если она включена.
+
+<Hint type="important">
+Это разделение стоит запомнить на весь блок: компилятор проверяет **типы и контекст**, а не смысл. Всё, что связано с жизненным циклом состояния и с тем, перерисуется ли компонент, ловится только чтением кода и запуском.
+</Hint>
+
+<SectionAnchor chapterId="kit-buttons" sectionId="ne-lovit" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-buttons" quizId="quiz-2" questions={[
+  { q: 'Три разные ошибки дали одинаковый текст «@Composable invocations can only happen…». Что смотреть первым?', options: ['Текст сообщения', 'Строку и столбец: текст у них общий, а место разное', 'Версию Compose', 'Импорты'], correct: 1, why: 'Позиция указывает, какая именно из трёх ситуаций произошла.' },
+  { q: 'Где ставится @Composable у слота?', options: ['Перед именем параметра', 'Внутри скобок типа: (@Composable () -> Unit)', 'Над функцией компонента', 'Нигде, определяется автоматически'], correct: 1, why: 'Аннотация относится к типу функции; без неё ошибка вылезет в месте вызова, а не в объявлении.' },
+  { q: 'mutableStateOf без remember. Что скажет компилятор?', options: ['Ошибку типа', 'Ничего: это законный код, просто состояние сбрасывается при каждой перерисовке', 'Предупреждение о производительности', 'Ошибку контекста'], correct: 1, why: 'Компилятор проверяет типы и контекст, а не смысл.' },
+]} />
+
+</Block>
+
+## Типичные ошибки проектирования
+
+**Ошибка 1. Компонент не принимает `modifier`.**
+
+Снаружи такому компоненту ни отступ не задать, ни ширину. Лечится добавлением параметра и передачей его на корневой элемент — но обычно к этому моменту компонент уже вызван в двадцати местах с обёрткой `Box` вокруг.
+
+**Ошибка 2. `modifier` повешен не на корень.**
+
+```kotlin
+Button(onClick = onClick) {
+    Row(modifier = modifier) { … }   // отступ окажется ВНУТРИ кнопки
+}
+```
+
+Снаружи задали `padding(16.dp)`, ожидая отступ вокруг кнопки, а получили увеличенную кнопку.
+
+**Ошибка 3. Состояния не согласованы.**
+
+`loading = true` при `enabled = true` — кнопка показывает индикатор и продолжает нажиматься. Пользователь оформит заказ дважды.
+
+**Ошибка 4. Цвета и размеры вписаны числами внутри компонента.**
+
+Библиотека на то и библиотека, что берёт значения из темы: `MaterialTheme.typography.labelLarge`, а не `fontSize = 14.sp`. Иначе смена темы не дойдёт до компонента.
+
+**Ошибка 5. Слот сделан обязательным.**
+
+`leading: @Composable () -> Unit` без `?` и без умолчания заставляет каждый вызов писать пустую лямбду. Необязательное делают необязательным.
+
+<SectionAnchor chapterId="kit-buttons" sectionId="oshibki-proektirovaniya" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-buttons" quizId="quiz-3" questions={[
+  { q: 'Снаружи задали Modifier.padding(16.dp), а кнопка просто стала больше. Почему?', options: ['padding так и работает', 'modifier повешен не на корневой элемент, а на что-то внутри кнопки', 'Нужен Spacer', 'Ошибка Material'], correct: 1, why: 'Отступ оказался внутри кнопки, а не вокруг неё.' },
+  { q: 'Почему в компоненте библиотеки не пишут fontSize = 14.sp?', options: ['Это медленно', 'Библиотека берёт значения из темы, иначе смена темы до компонента не дойдёт', 'sp нельзя в библиотеке', 'Так требует критерий'], correct: 1, why: 'MaterialTheme.typography.labelLarge вместо числа.' },
+  { q: 'loading = true при enabled = true — чем это плохо?', options: ['Ничем', 'Кнопка показывает индикатор и продолжает нажиматься: заказ оформится дважды', 'Индикатор не видно', 'Ошибка компиляции'], correct: 1, why: 'Поэтому внутри пишут enabled = enabled && !loading.' },
+]} />
+
+</Block>
+
+## Шпаргалка по главе
+
+<Block kind="cheatsheet">
+
+| Что нужно | Как |
+| --- | --- |
+| Порядок параметров | обязательные → `modifier` → состояния → слоты |
+| Пустышка для модификатора | `modifier: Modifier = Modifier` |
+| Куда вешать modifier | на корневой элемент компонента |
+| Слот | `leading: (@Composable () -> Unit)? = null` |
+| Вызов слота | `leading()` внутри нужного места разметки |
+| Согласование состояний | `enabled = enabled && !loading` |
+| Размеры и цвета | из `MaterialTheme`, не числами |
+| Варианты | отдельные функции, а не параметр-перечисление |
+
+</Block>
+
+<SectionAnchor chapterId="kit-buttons" sectionId="shpargalka" />
+
+## Слова главы
+
+<Block kind="vocab">
+
+| Термин | Что это |
+| --- | --- |
+| Компонент библиотеки | Своя `@Composable`-функция с продуманной сигнатурой |
+| Слот | Параметр-разметка: `(@Composable () -> Unit)?` |
+| Вариант | Отдельная функция под свой вес действия: primary, secondary, ghost |
+| Состояние компонента | `enabled`, `loading` и подобные; должны быть согласованы |
+| Корневой элемент | Самый внешний элемент компонента; на него вешают `modifier` |
+| Пустышка `Modifier` | Объект без изменений, к которому вызывающий добавляет своё |
+
+</Block>
+
+<SectionAnchor chapterId="kit-buttons" sectionId="slovar" />
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="kit-buttons"
+  trainerId="trainer-kit-buttons"
+  targetCpm={95}
+  targetAccuracy={90}
+  pools={[
+    { label: 'Сигнатура компонента', snippets: [
+      'modifier: Modifier = Modifier,',
+      'leading: (@Composable () -> Unit)? = null,',
+      'enabled: Boolean = true,',
+    ] },
+    { label: 'Тело', snippets: [
+      'enabled = enabled && !loading,',
+      'Row(verticalAlignment = Alignment.CenterVertically) {',
+      'Text(text = text, style = MaterialTheme.typography.labelLarge)',
+    ] },
+    { label: 'Индикатор загрузки', snippets: [
+      'CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)',
+      'Spacer(modifier = Modifier.width(8.dp))',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="kit-buttons" sectionId="trenazher" />
+
+## Что должен уметь после главы
+
+- расставить параметры компонента в принятом порядке и объяснить, почему он такой;
+- принять `modifier` и повесить его на корневой элемент;
+- сделать три варианта кнопки и обосновать разный набор параметров у них;
+- заменить набор флагов слотом и объяснить выигрыш;
+- узнать по позиции в сообщении, какая из трёх ошибок контекста произошла;
+- назвать то, чего компилятор не проверяет, и почему это опаснее.
+
+<SectionAnchor chapterId="kit-buttons" sectionId="chto-umet" />
+
+## Проверка по главе
+
+<ChapterExam chapterId="kit-buttons" questions={[
+  { q: 'Порядок параметров компонента', options: ['алфавитный', 'обязательные → modifier → состояния → слоты', 'состояния → обязательные → слоты', 'любой'], correct: 1, why: 'По сигнатуре чужой компонент читают, не открывая код.' },
+  { q: 'Зачем компоненту параметр modifier?', options: ['для стиля', 'чтобы снаружи можно было задать отступ, размер и поведение, не меняя код компонента', 'для ускорения', 'этого требует компилятор'], correct: 1, why: 'И повесить его надо на корневой элемент, иначе отступ окажется внутри.' },
+  { q: 'modifier: Modifier = Modifier — это', options: ['тавтология', 'имя параметра и объект-пустышка, к которому вызывающий добавляет своё', 'ошибка', 'обязательный параметр'], correct: 1, why: 'Слева имя, справа — значение по умолчанию.' },
+  { q: 'Три варианта кнопки лучше сделать', options: ['одной функцией с параметром variant', 'тремя отдельными функциями: вызов читается сразу и наборы параметров могут отличаться', 'наследованием', 'через тему'], correct: 1, why: 'У призрачной кнопки, например, нет loading и leading — и это осознанно.' },
+  { q: 'Слот вместо флагов даёт', options: ['экономию памяти', 'закрывает и иконку, и бейдж, и то, чего ещё не придумали — компонент не меняется', 'ускорение отрисовки', 'меньше кода при вызове'], correct: 1, why: 'Плата за флаги — переписывать компонент на каждое пожелание.' },
+  { q: 'Где ставится @Composable у слота?', options: ['перед именем параметра', 'внутри скобок типа: (@Composable () -> Unit)', 'над функцией', 'нигде'], correct: 1, why: 'Иначе ошибка вылезет в месте вызова, а не в объявлении.' },
+  { q: 'Что означает «Functions which invoke @Composable functions must be marked with the @Composable annotation»?', options: ['нет импорта', 'обычная функция вызывает разметку — на неё нужна аннотация', 'неверная версия Compose', 'ошибка сборки'], correct: 1, why: 'Вторая строка того же отказа покажет, где именно сломалось.' },
+  { q: 'Почему нельзя вызвать Text в onClick?', options: ['можно', 'onClick выполняется по нажатию, а не во время отрисовки: рисовать из него некуда', 'нужен другой импорт', 'нужна корутина'], correct: 1, why: 'По нажатию меняют состояние, а разметка реагирует сама.' },
+  { q: 'mutableStateOf без remember компилятор', options: ['не пропустит', 'пропустит: код законный, но состояние сбрасывается при каждой перерисовке', 'заменит сам', 'выдаст предупреждение'], correct: 1, why: 'Компилятор проверяет типы и контекст, а не смысл.' },
+  { q: 'enabled = enabled && !loading внутри кнопки нужно, чтобы', options: ['ускорить отрисовку', 'кнопка не нажималась во время загрузки — иначе заказ оформится дважды', 'показать индикатор', 'соблюсти соглашение'], correct: 1, why: 'Состояния компонента не независимы.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Compose API guidelines](https://github.com/androidx/androidx/blob/androidx-main/compose/docs/compose-api-guidelines.md) — первоисточник соглашения про порядок параметров и слоты.
+- [Модификаторы](https://developer.android.com/develop/ui/compose/modifiers) — почему порядок в цепочке важен и куда вешать `modifier`.
+- [Кнопки в Material 3](https://developer.android.com/develop/ui/compose/components/button) — какие готовые варианты есть и чем отличаются.
+- [Слоты и переиспользуемые компоненты](https://developer.android.com/develop/ui/compose/layouts/basics#slot-based-layouts) — официальное объяснение приёма.

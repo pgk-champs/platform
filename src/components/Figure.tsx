@@ -105,6 +105,8 @@ import { sdachaRepoSchemes } from './figures/sdachaRepo';
 import { demoShowSchemes } from './figures/demoShow';
 import { layoutCardSchemes } from './figures/layoutCard';
 import { sprintFlowSchemes } from './figures/sprintFlow';
+import { kitButtonsSchemes } from './figures/kitButtons';
+import { kitInputsSchemes } from './figures/kitInputs';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -207,6 +209,8 @@ const SCHEMES = {
   ...demoShowSchemes,
   ...layoutCardSchemes,
   ...sprintFlowSchemes,
+  ...kitButtonsSchemes,
+  ...kitInputsSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

@@ -3220,5 +3220,59 @@
       "title": "IDEA+Git (ветки, пулл реквесты). ПОДРОБНО! Новый интерфейс, подводные камни. Установка с 0.",
       "channel": "Kotlin & Android с нуля – Иван Ветров"
     }
+  ],
+  "kit-buttons": [
+    {
+      "videoId": "7e8IeU1sK0s",
+      "title": "Слоты в Jetpack Compose | Slot API",
+      "channel": "byCompose"
+    },
+    {
+      "videoId": "4wTq3mbaYic",
+      "title": "Custom Design Systems In Jetpack Compose - THESE Are My Best Practices",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "ka_4Vi_7hoM",
+      "title": "Material 3 Buttons in Jetpack Compose | Filled, Elevated, Outlined & Text | Button Components #2",
+      "channel": "RAN MasterApps"
+    },
+    {
+      "videoId": "e-wlF3cmJms",
+      "title": "Build custom design systems with Jetpack Compose's new Styles API",
+      "channel": "Android Developers"
+    },
+    {
+      "videoId": "1prBjBys9js",
+      "title": "Композиция и Рекомпозиция в Jetpack Compose",
+      "channel": "byCompose"
+    }
+  ],
+  "kit-inputs": [
+    {
+      "videoId": "yJoD0v00uBQ",
+      "title": "Урок 9: TextField, OutlinedTextField, Валидация почты, ErrorState | Курс Android Jetpack Compose",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    },
+    {
+      "videoId": "RTAp8fW3yEo",
+      "title": "Form Validation in Jetpack Compose.  #JetpackCompose  #Kotlin #Android #MobileDevelopment #uiux",
+      "channel": "themobileXplorer - Saurabh"
+    },
+    {
+      "videoId": "6w4l-3jC21E",
+      "title": "Text Fields - Jetpack Compose",
+      "channel": "Stevdza-San"
+    },
+    {
+      "videoId": "4scYhAbPuuY",
+      "title": "Secure Login Form UI | TextField Components #2 | Jetpack Compose Material 3",
+      "channel": "RAN MasterApps"
+    },
+    {
+      "videoId": "Nz7akf80SkI",
+      "title": "Styling TextField in Jetpack Compose",
+      "channel": "Mawuli Azameti"
+    }
   ]
 }
