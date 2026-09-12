@@ -74,6 +74,7 @@ import { webDomSchemes } from './figures/webDom';
 import { webReactSchemes } from './figures/webReact';
 import { webStateSchemes } from './figures/webState';
 import { webViteSchemes } from './figures/webVite';
+import { webFetchSchemes } from './figures/webFetch';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -173,6 +174,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(webReactSchemes),
     ...Object.keys(webStateSchemes),
     ...Object.keys(webViteSchemes),
+    ...Object.keys(webFetchSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

@@ -460,6 +460,28 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="182" textAnchor="middle" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>222 кБ → 69 кБ</text>
     </g>
   ),
+  /* Данные из сети: загрузка, отказ, гонка ответов */
+  'web-fetch': () => (
+    <g strokeLinecap="round">
+      <rect x="22" y="48" width="60" height="30" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="52" y="68" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>loading</text>
+
+      <rect x="118" y="48" width="60" height="30" rx="8" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="148" y="68" textAnchor="middle" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>ok</text>
+
+      <rect x="70" y="100" width="60" height="30" rx="8" fill="rgba(255,140,140,0.16)" stroke="rgba(255,140,140,0.8)" strokeWidth={3} />
+      <text x="100" y="120" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,170,170,0.95)" fontFamily={MONO}>error</text>
+
+      <path d="M86 63h26" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M112 63l-6-4M112 63l-6 4" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M62 82l26 14" stroke="rgba(255,140,140,0.8)" strokeWidth={3} fill="none" />
+      <path d="M88 96l-7 0M88 96l-2-6" stroke="rgba(255,140,140,0.8)" strokeWidth={3} fill="none" />
+
+      <path d="M150 100q26 18 0 34" stroke="rgba(255,140,140,0.8)" strokeWidth={3} fill="none" />
+      <text x="100" y="158" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,170,170,0.95)" fontFamily={MONO}>опоздавший ответ</text>
+      <text x="100" y="180" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>cancelled = true</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1450,7 +1472,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'web-react': { track: 'blockchain', num: '42', title: 'React: компоненты вместо ручного DOM' },
   'web-state': { track: 'blockchain', num: '43', title: 'Состояние и эффекты: интерфейс с памятью' },
   'web-vite': { track: 'blockchain', num: '44', title: 'Проект на Vite: от исходников к готовым файлам' },
-  'waves-first-network': { track: 'blockchain', num: '45', title: 'Первая сеть на Waves Enterprise' },
+  'web-fetch': { track: 'blockchain', num: '45', title: 'Данные из сети: загрузка, отказ, гонка ответов' },
+  'waves-first-network': { track: 'blockchain', num: '46', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },

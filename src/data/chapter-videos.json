@@ -2361,5 +2361,32 @@
       "title": "Как происходит сборка фронтенда | proxy, bundler, vite",
       "channel": "Даниил Лаптев | ДЕВ РОЙ"
     }
+  ],
+  "web-fetch": [
+    {
+      "videoId": "sKb3VoX9vF4",
+      "title": "Работа с API в React. Подключение к json-server и fetch-запросы: GET, POST, DELETE, PATCH",
+      "channel": "Александр Ламков — Friendly Frontend"
+    },
+    {
+      "videoId": "BJHZbCXzVIY",
+      "title": "React #40 | Загрузка данных из API в React: fetch и useEffect.",
+      "channel": "DevHotSpot"
+    },
+    {
+      "videoId": "M77Badiq5qU",
+      "title": "🔥 Ошибка CORS в браузере — как починить за 5 минут (и почему она возникает)",
+      "channel": "Makhabat Abdisattarova"
+    },
+    {
+      "videoId": "PNtFSVU-YTI",
+      "title": "Learn CORS In 6 Minutes",
+      "channel": "Web Dev Simplified"
+    },
+    {
+      "videoId": "TtqsvB-wR2A",
+      "title": "React Урок 8: Как делать запросы к API? useEffect + Fetch шаг за шагом!",
+      "channel": "DevHotSpot"
+    }
   ]
 }

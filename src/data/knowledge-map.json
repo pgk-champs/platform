@@ -704,11 +704,19 @@
     "path": "blockchain/web-vite.mdx"
   },
   {
+    "id": "web-fetch",
+    "title": "Данные из сети: загрузка, отказ, гонка ответов",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 45,
+    "path": "blockchain/web-fetch.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 45,
+    "order": 46,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]
