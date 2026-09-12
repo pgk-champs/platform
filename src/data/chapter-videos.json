@@ -2577,5 +2577,32 @@
       "title": "Verify Signature | Solidity 0.8",
       "channel": "Smart Contract Programmer"
     }
+  ],
+  "dapp-full": [
+    {
+      "videoId": "ZzK15vkO38c",
+      "title": "Solidity и смарт-контракты Ethereum, урок #7 | События, модификаторы, require/revert и тесты",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "bzzf0ANyq70",
+      "title": "Solidity и смарт-контракты Ethereum, урок #43 | Ethers.js v6 - апдейты, BigInt, перегрузка, импорты",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "K608okBC3L0",
+      "title": "Работа со смарт-контрактами Ethereum с помощью Ethers.js",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "pSieJcRha_I",
+      "title": "Что такое dApps? Обзор и примеры с анимацией",
+      "channel": "Whiteboard Crypto на русском"
+    },
+    {
+      "videoId": "VnAbxlV1qU8",
+      "title": "How to Speed Up or Cancel a Pending Transaction in MetaMask",
+      "channel": "Data Slayer"
+    }
   ]
 }

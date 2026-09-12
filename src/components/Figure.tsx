@@ -82,6 +82,7 @@ import { webRtkSchemes } from './figures/webRtk';
 import { webRtkAsyncSchemes } from './figures/webRtkAsync';
 import { walletConnectSchemes } from './figures/walletConnect';
 import { walletSignSchemes } from './figures/walletSign';
+import { dappFullSchemes } from './figures/dappFull';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -161,6 +162,7 @@ const SCHEMES = {
   ...webRtkAsyncSchemes,
   ...walletConnectSchemes,
   ...walletSignSchemes,
+  ...dappFullSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

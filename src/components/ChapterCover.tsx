@@ -642,6 +642,29 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="180" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>без транзакции</text>
     </g>
   ),
+  /* dApp целиком: чтение, транзакция, события */
+  'dapp-full': () => (
+    <g strokeLinecap="round">
+      <rect x="20" y="44" width="70" height="34" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="55" y="65" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>staticCall</text>
+
+      <rect x="20" y="88" width="70" height="34" rx="8" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="55" y="109" textAnchor="middle" fontSize="5.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>send</text>
+
+      <rect x="20" y="132" width="70" height="34" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="55" y="153" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>wait(2)</text>
+
+      <path d="M94 61h22M94 105h22M94 149h22" stroke={INK} strokeWidth={2.5} fill="none" />
+
+      <rect x="120" y="44" width="62" height="122" rx="10" fill="rgba(0,0,0,0.28)" stroke={ACCENT} strokeWidth={3} />
+      <text x="151" y="70" textAnchor="middle" fontSize="5.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>узел</text>
+      {[86, 100, 114, 128, 142].map((y, i) => (
+        <rect key={y} x="130" y={y} width="42" height="8" rx="2" fill={i === 2 ? SOFT : 'rgba(255,255,255,0.12)'} stroke={i === 2 ? ACCENT : 'transparent'} strokeWidth={1.5} />
+      ))}
+
+      <text x="100" y="186" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>блок 7 · статус 1</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1640,7 +1663,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'web-rtk-async': { track: 'blockchain', num: '50', title: 'Асинхронность в Redux: запросы и состояние' },
   'wallet-connect': { track: 'blockchain', num: '51', title: 'Кошелёк в браузере: подключение и сеть' },
   'wallet-sign': { track: 'blockchain', num: '52', title: 'Подписи: доказать, не отправляя транзакцию' },
-  'waves-first-network': { track: 'blockchain', num: '53', title: 'Первая сеть на Waves Enterprise' },
+  'dapp-full': { track: 'blockchain', num: '53', title: 'dApp целиком: чтение, транзакция, события' },
+  'waves-first-network': { track: 'blockchain', num: '54', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },

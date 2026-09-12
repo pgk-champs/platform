@@ -768,11 +768,19 @@
     "path": "blockchain/wallet-sign.mdx"
   },
   {
+    "id": "dapp-full",
+    "title": "dApp целиком: чтение, транзакция, события",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 53,
+    "path": "blockchain/dapp-full.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 53,
+    "order": 54,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]
