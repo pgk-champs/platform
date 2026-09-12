@@ -2604,5 +2604,32 @@
       "title": "How to Speed Up or Cancel a Pending Transaction in MetaMask",
       "channel": "Data Slayer"
     }
+  ],
+  "audit-vulns": [
+    {
+      "videoId": "xOvO_09f2_g",
+      "title": "Уязвимости смарт-контрактов. Reentrancy. Взлом DAO. Хардфорк ETH #solidity #аудитсмартконтрактов",
+      "channel": "Dima HideCrypto - Web3 | Solidity"
+    },
+    {
+      "videoId": "cBG5c_apQys",
+      "title": "Уязвимости смарт-контрактов. Delegatecall. Взлом кошелька Parity. #solidity #аудитсмартконтрактов",
+      "channel": "Dima HideCrypto - Web3 | Solidity"
+    },
+    {
+      "videoId": "IRk-CEc-dGY",
+      "title": "Уязвимости смарт-контрактов. Denial of service. DOS. #solidity #уязвимостисмартконтрактов",
+      "channel": "Dima HideCrypto - Web3 | Solidity"
+    },
+    {
+      "videoId": "db1Yfr0BokE",
+      "title": "Атаки на смарт-контракты и как их избежать. Безопасность в Ethereum.",
+      "channel": "Future Markt"
+    },
+    {
+      "videoId": "5-yywz0e2E8",
+      "title": "Ворую эфир со смарт-контракта Solidity в рамках тестового на аудитора безопасности смарт-контрактов",
+      "channel": "Блокчейн-разработка с Юлией Бедросовой"
+    }
   ]
 }

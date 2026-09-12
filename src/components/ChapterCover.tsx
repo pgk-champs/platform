@@ -665,6 +665,30 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="186" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>блок 7 · статус 1</text>
     </g>
   ),
+  /* Уязвимости: как из контрактов уходят деньги */
+  'audit-vulns': () => (
+    <g strokeLinecap="round">
+      <rect x="24" y="52" width="72" height="60" rx="10" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="60" y="76" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>банк</text>
+      <text x="60" y="96" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,170,170,0.95)" fontFamily={MONO}>10 → 6</text>
+
+      <rect x="128" y="52" width="52" height="60" rx="10" fill="rgba(255,140,140,0.16)" stroke="rgba(255,140,140,0.8)" strokeWidth={3} />
+      <text x="154" y="76" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,170,170,0.95)" fontFamily={MONO}>атака</text>
+      <text x="154" y="96" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,170,170,0.95)" fontFamily={MONO}>1 → 5</text>
+
+      <path d="M100 68h22" stroke="rgba(255,140,140,0.8)" strokeWidth={3} fill="none" />
+      <path d="M122 68l-6-4M122 68l-6 4" stroke="rgba(255,140,140,0.8)" strokeWidth={3} fill="none" />
+      <path d="M122 96h-22" stroke="rgba(255,140,140,0.8)" strokeWidth={3} fill="none" />
+      <path d="M100 96l6-4M100 96l6 4" stroke="rgba(255,140,140,0.8)" strokeWidth={3} fill="none" />
+      <path d="M154 112q34 22 0 30 -34 -8 0 -30" stroke="rgba(255,140,140,0.8)" strokeWidth={3} fill="none" />
+      <text x="154" y="158" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,170,170,0.95)" fontFamily={MONO}>×4</text>
+
+      <rect x="24" y="126" width="72" height="26" rx="7" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="60" y="143" textAnchor="middle" fontSize="5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>записал → отдал</text>
+
+      <text x="100" y="184" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>checks · effects · interactions</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1664,7 +1688,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'wallet-connect': { track: 'blockchain', num: '51', title: 'Кошелёк в браузере: подключение и сеть' },
   'wallet-sign': { track: 'blockchain', num: '52', title: 'Подписи: доказать, не отправляя транзакцию' },
   'dapp-full': { track: 'blockchain', num: '53', title: 'dApp целиком: чтение, транзакция, события' },
-  'waves-first-network': { track: 'blockchain', num: '54', title: 'Первая сеть на Waves Enterprise' },
+  'audit-vulns': { track: 'blockchain', num: '54', title: 'Уязвимости: как из контрактов уходят деньги' },
+  'waves-first-network': { track: 'blockchain', num: '55', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },

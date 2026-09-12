@@ -776,11 +776,19 @@
     "path": "blockchain/dapp-full.mdx"
   },
   {
+    "id": "audit-vulns",
+    "title": "Уязвимости: как из контрактов уходят деньги",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 54,
+    "path": "blockchain/audit-vulns.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 54,
+    "order": 55,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]
