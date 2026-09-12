@@ -305,11 +305,6 @@
       "channel": "Kotlin & Android с нуля – Иван Ветров"
     },
     {
-      "videoId": "oYA2InjQ4WQ",
-      "title": "Урок 9: Коллекции: списки (List). Функции для работы с коллекциями",
-      "channel": "Kotlin & Android с нуля – Иван Ветров"
-    },
-    {
       "videoId": "R8f-LCu2BWs",
       "title": "Урок 22: Data class (дата классы) copy, toString, equals, hashCode",
       "channel": "Kotlin & Android с нуля – Иван Ветров"
@@ -2684,6 +2679,33 @@
       "videoId": "v0WOjg8WWgA",
       "title": "Smart contract auditor: from zero to hero 👾 Сергей Прилуцкий",
       "channel": "Cyber Academy"
+    }
+  ],
+  "kotlin-collections": [
+    {
+      "videoId": "oYA2InjQ4WQ",
+      "title": "Урок 9: Коллекции: списки (List). Функции для работы с коллекциями – Котлин курс с нуля",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    },
+    {
+      "videoId": "LgCUCIgkEDw",
+      "title": "Учим Kotlin с нуля | №24 Коллекции. list.",
+      "channel": "SyntaxSugarDaddy"
+    },
+    {
+      "videoId": "MJS-MLExpRk",
+      "title": "Учим Kotlin с нуля | №26 Коллекции. Map.",
+      "channel": "SyntaxSugarDaddy"
+    },
+    {
+      "videoId": "oub5QFjh0Qw",
+      "title": "Учим Kotlin с нуля | №27 Коллекции. Set.",
+      "channel": "SyntaxSugarDaddy"
+    },
+    {
+      "videoId": "ldnJAcWx3Mk",
+      "title": "Множества (Set) и словари (Map) в Kotlin",
+      "channel": "Kotlin.forEach"
     }
   ]
 }

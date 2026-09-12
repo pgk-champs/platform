@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import ChapterCover, { CHAPTER_IDS, TrackBanner, coverFontSize } from './ChapterCover';
 
 test('покрыты все 43 главы', () => {
-  expect(CHAPTER_IDS).toHaveLength(101);
+  expect(CHAPTER_IDS).toHaveLength(102);
 });
 
 test('заголовок обложки умещается в ширину 800', () => {
@@ -24,13 +24,13 @@ test('новые главы стоят в своих треках', () => {
     ['code-editor', 'БЛОКЧЕЙН', '02'],
     ['android-studio', 'МОБИЛКА', '00'],
     ['kotlin-flow', 'МОБИЛКА', '03'],
-    ['kotlin-oop', 'МОБИЛКА', '06'],
-    ['kotlin-vs-java', 'МОБИЛКА', '26'],
-    ['kotlin-history', 'МОБИЛКА', '27'],
-    ['kotlin-coroutines', 'МОБИЛКА', '14'],
+    ['kotlin-oop', 'МОБИЛКА', '07'],
+    ['kotlin-vs-java', 'МОБИЛКА', '27'],
+    ['kotlin-history', 'МОБИЛКА', '28'],
+    ['kotlin-coroutines', 'МОБИЛКА', '15'],
     ['kotlin-null', 'МОБИЛКА', '02'],
-    ['first-compose-screen', 'МОБИЛКА', '07'],
-    ['ui-kit', 'МОБИЛКА', '10'],
+    ['first-compose-screen', 'МОБИЛКА', '08'],
+    ['ui-kit', 'МОБИЛКА', '11'],
     ['ts-vs-js', 'БЛОКЧЕЙН', '18'],
     ['ts-values', 'БЛОКЧЕЙН', '20'],
     ['ts-flow', 'БЛОКЧЕЙН', '22'],
