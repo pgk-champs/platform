@@ -2707,5 +2707,59 @@
       "title": "Множества (Set) и словари (Map) в Kotlin",
       "channel": "Kotlin.forEach"
     }
+  ],
+  "fabric-intro": [
+    {
+      "videoId": "UvgeQBztKx4",
+      "title": "Николай Ерёмин - Архитектура приватного блокчейн на Hyperledger Fabric. Стачка 18",
+      "channel": "Стачка IT конференция"
+    },
+    {
+      "videoId": "l7cDRqsU61U",
+      "title": "BlockchainUA. Николай Ревич: Как использовать Hyperledger Fabric",
+      "channel": "Distributed Lab"
+    },
+    {
+      "videoId": "iTV89Tqfmgk",
+      "title": "What is Hyperledger Fabric? | Blockchain",
+      "channel": "Telusko"
+    },
+    {
+      "videoId": "acHiHRJ-dVM",
+      "title": "Getting Started with Hyperledger Fabric and Installation | Blockchain",
+      "channel": "Telusko"
+    },
+    {
+      "videoId": "SOG7lQonLrQ",
+      "title": "Уязвимости платформы Hyperledger Fabric  / Илья Дружинин (Positive Technologies)",
+      "channel": "HighLoad Channel"
+    }
+  ],
+  "fabric-network": [
+    {
+      "videoId": "E0GEdeEfgYg",
+      "title": "Membership Service Provider | MSP in Hyperledger Fabric | Cryptogen | Fabric CA | Cryptography",
+      "channel": "Learning Blockchain"
+    },
+    {
+      "videoId": "QVAdbHaCFiM",
+      "title": "Manage Blockchain with Hyperledger : Session 4.7 - Fabric Policies & Fabric Endorsement Policy",
+      "channel": "Coding Bootcamps"
+    },
+    {
+      "videoId": "GN_6dEcDsAQ",
+      "title": "Hyperledger Ordering Service: Deep Dive into the Raft Consensus Algorithm",
+      "channel": "LF Decentralized Trust"
+    },
+    {
+      "videoId": "uW_uJlz5xZ4",
+      "title": "Manage Blockchain with Hyperledger: Project 2 - Adding an Organization to Fabric channel",
+      "channel": "Coding Bootcamps"
+    },
+    {
+      "videoId": "HFbjdfu2R1Q",
+      "title": "Introduction to RAFT on Hyperledger Fabric",
+      "channel": "A Cloudfan"
+    }
   ]
 }

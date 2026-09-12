@@ -86,6 +86,8 @@ import { dappFullSchemes } from './figures/dappFull';
 import { auditVulnsSchemes } from './figures/auditVulns';
 import { auditToolsSchemes } from './figures/auditTools';
 import { auditReportSchemes } from './figures/auditReport';
+import { fabricIntroSchemes } from './figures/fabricIntro';
+import { fabricNetworkSchemes } from './figures/fabricNetwork';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -169,6 +171,8 @@ const SCHEMES = {
   ...auditVulnsSchemes,
   ...auditToolsSchemes,
   ...auditReportSchemes,
+  ...fabricIntroSchemes,
+  ...fabricNetworkSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

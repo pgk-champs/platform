@@ -86,6 +86,8 @@ import { dappFullSchemes } from './figures/dappFull';
 import { auditVulnsSchemes } from './figures/auditVulns';
 import { auditToolsSchemes } from './figures/auditTools';
 import { auditReportSchemes } from './figures/auditReport';
+import { fabricIntroSchemes } from './figures/fabricIntro';
+import { fabricNetworkSchemes } from './figures/fabricNetwork';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -197,6 +199,8 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(auditVulnsSchemes),
     ...Object.keys(auditToolsSchemes),
     ...Object.keys(auditReportSchemes),
+    ...Object.keys(fabricIntroSchemes),
+    ...Object.keys(fabricNetworkSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

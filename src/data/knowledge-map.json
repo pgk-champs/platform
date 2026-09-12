@@ -808,11 +808,27 @@
     "path": "blockchain/audit-report.mdx"
   },
   {
+    "id": "fabric-intro",
+    "title": "Приватный блокчейн: сеть, куда пускают по пропуску",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 57,
+    "path": "blockchain/fabric-intro.mdx"
+  },
+  {
+    "id": "fabric-network",
+    "title": "Устройство сети: организации, политики, блоки",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 58,
+    "path": "blockchain/fabric-network.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 57,
+    "order": 59,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]

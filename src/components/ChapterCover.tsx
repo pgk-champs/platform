@@ -723,6 +723,58 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="186" textAnchor="middle" fontSize="7.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>5 → 1 находка</text>
     </g>
   ),
+  /* Приватный блокчейн: сеть по пропуску */
+  'fabric-intro': () => (
+    <g strokeLinecap="round">
+      <rect x="26" y="40" width="148" height="52" rx="10" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="100" y="62" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>OU=admin</text>
+      <text x="100" y="80" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>Org1MSP</text>
+
+      <path d="M100 92 L100 112" stroke={ACCENT} strokeWidth={3} />
+      <path d="M100 112 L56 112 M100 112 L144 112" stroke={ACCENT} strokeWidth={3} />
+
+      {[
+        { x: 34, y: 118, t: 'peer' },
+        { x: 78, y: 118, t: 'peer' },
+        { x: 122, y: 118, t: 'ord' },
+      ].map((n) => (
+        <g key={n.x}>
+          <rect x={n.x} y={n.y} width="44" height="34" rx="8" fill={SOFT} stroke={ACCENT} strokeWidth={2.5} />
+          <text x={n.x + 22} y={n.y + 22} textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>{n.t}</text>
+        </g>
+      ))}
+
+      {[0, 1, 2, 3].map((i) => (
+        <rect key={i} x={30 + i * 38} y="168" width="30" height="20" rx="5" fill="rgba(0,0,0,0.32)" stroke={INK} strokeWidth={2.5} />
+      ))}
+      <text x="100" y="204" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>КАНАЛ</text>
+    </g>
+  ),
+  /* Устройство сети: организации и политики */
+  'fabric-network': () => (
+    <g strokeLinecap="round">
+      <rect x="24" y="38" width="152" height="42" rx="9" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="56" textAnchor="middle" fontSize="6.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>MAJORITY</text>
+      <text x="100" y="71" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>уровень канала</text>
+
+      <path d="M100 80 L100 96 M60 96 L140 96 M60 96 L60 108 M140 96 L140 108" stroke={ACCENT} strokeWidth={2.5} fill="none" />
+
+      {[
+        { x: 26, t: 'Org1MSP' },
+        { x: 106, t: 'Org2MSP' },
+      ].map((o) => (
+        <g key={o.x}>
+          <rect x={o.x} y="108" width="68" height="58" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+          <text x={o.x + 34} y="128" textAnchor="middle" fontSize="6" fontWeight={800} fill="#fff" fontFamily={MONO}>{o.t}</text>
+          <text x={o.x + 34} y="144" textAnchor="middle" fontSize="5.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>PEER</text>
+          <text x={o.x + 34} y="157" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.45)" fontFamily={MONO}>ADMIN</text>
+        </g>
+      ))}
+
+      <rect x="26" y="178" width="148" height="26" rx="6" fill="rgba(0,0,0,0.32)" stroke={INK} strokeWidth={2.5} />
+      <text x="100" y="195" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>BatchTimeout 2s</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1750,7 +1802,9 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'audit-vulns': { track: 'blockchain', num: '54', title: 'Уязвимости: как из контрактов уходят деньги' },
   'audit-tools': { track: 'blockchain', num: '55', title: 'Инструменты аудита: что находит машина' },
   'audit-report': { track: 'blockchain', num: '56', title: 'Чек-лист и отчёт: как сдавать безопасность' },
-  'waves-first-network': { track: 'blockchain', num: '57', title: 'Первая сеть на Waves Enterprise' },
+  'fabric-intro': { track: 'blockchain', num: '57', title: 'Приватный блокчейн: сеть, куда пускают по пропуску' },
+  'fabric-network': { track: 'blockchain', num: '58', title: 'Устройство сети: организации, политики, блоки' },
+  'waves-first-network': { track: 'blockchain', num: '59', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '27', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '28', title: 'История Java, Android и Kotlin' },
