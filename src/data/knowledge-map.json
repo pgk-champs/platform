@@ -112,12 +112,28 @@
     "path": "foundation/git-branches.mdx"
   },
   {
+    "id": "sdacha-repo",
+    "title": "Сдача работы: чистый клон и семь проверок",
+    "audience": "все",
+    "level": "углубление",
+    "order": 7,
+    "path": "advanced/sdacha-repo.mdx"
+  },
+  {
     "id": "git-remote",
     "title": "Git: push, PR и командная работа",
     "audience": "все",
     "level": "база",
     "order": 7,
     "path": "foundation/git-remote.mdx"
+  },
+  {
+    "id": "demo-show",
+    "title": "Демонстрация: показать решение за пять минут",
+    "audience": "все",
+    "level": "углубление",
+    "order": 8,
+    "path": "advanced/demo-show.mdx"
   },
   {
     "id": "foundation-final",

@@ -3112,5 +3112,59 @@
       "title": "Crash Course to Blockchain Tech with Waves (Part I)",
       "channel": "Openhack 2020 Australia"
     }
+  ],
+  "sdacha-repo": [
+    {
+      "videoId": "2klGolerhB0",
+      "title": "Наводим порядок в git-репозитории. Работа с файлом .gitignore. \"Git - это просто!\" - Урок 10",
+      "channel": "JavaClass"
+    },
+    {
+      "videoId": "Neh9b9eOzqc",
+      "title": "Git - файл .gitignore на практике",
+      "channel": "Тимофей Коваленко"
+    },
+    {
+      "videoId": "PH4OssUt6Ro",
+      "title": "Почему я хочу убивать когда README нет в проекте",
+      "channel": "Свят в АйТи: Разработка это Просто"
+    },
+    {
+      "videoId": "ko7NVbNLPPM",
+      "title": "Наводим порядок в git-репозитории. Readme и язык разметки Markdown. \"Git - это просто!\" - Урок 11",
+      "channel": "JavaClass"
+    },
+    {
+      "videoId": "NXNf9aYTCZ0",
+      "title": "Как Оформить README-Файл На GitHub | Основы Markdown",
+      "channel": "PyLounge - программирование на Python и всё о Айти"
+    }
+  ],
+  "demo-show": [
+    {
+      "videoId": "FWNy0dA3dJY",
+      "title": "Как проводить демо в IT — сценарий, показ и обратная связь от стейкхолдеров | Урок 15",
+      "channel": "Славный Проджект | в ИТ с нуля"
+    },
+    {
+      "videoId": "_qYnWJ3T8II",
+      "title": "Защита проектов — Промышленное программирование — Школа программистов МШП",
+      "channel": "Московская школа программистов (МШП)"
+    },
+    {
+      "videoId": "7cJVi087Y5I",
+      "title": "Диплом программиста: типичные ошибки и правильный подход",
+      "channel": "Александр Викторович"
+    },
+    {
+      "videoId": "QQZ9Dl2b89c",
+      "title": "Как провести убойную презентацию без запинки",
+      "channel": "Искусство харизмы"
+    },
+    {
+      "videoId": "rXX8NxgAyYA",
+      "title": "Презентация и защита результатов исследовательской работы",
+      "channel": "МАГУ Апатиты"
+    }
   ]
 }

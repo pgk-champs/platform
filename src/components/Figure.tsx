@@ -101,6 +101,8 @@ import { wavesSmartAccountSchemes } from './figures/wavesSmartAccount';
 import { wavesDappSchemes } from './figures/wavesDapp';
 import { wavesPaymentsSchemes } from './figures/wavesPayments';
 import { wavesClientSchemes } from './figures/wavesClient';
+import { sdachaRepoSchemes } from './figures/sdachaRepo';
+import { demoShowSchemes } from './figures/demoShow';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -199,6 +201,8 @@ const SCHEMES = {
   ...wavesDappSchemes,
   ...wavesPaymentsSchemes,
   ...wavesClientSchemes,
+  ...sdachaRepoSchemes,
+  ...demoShowSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

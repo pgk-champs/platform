@@ -1,0 +1,422 @@
+---
+title: 'Сдача работы: чистый клон и семь проверок'
+audience: 'все'
+level: 'углубление'
+order: 7
+sidebar_position: 7
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="sdacha-repo" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+
+# Сдача работы: чистый клон и семь проверок
+
+<ChapterProgress chapterId="sdacha-repo" totalSections={12} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="sdacha-repo" />
+
+## Зачем это нужно
+
+Модуль сделан, всё работает, осталось сдать. И вот здесь теряются баллы, которые уже были заработаны.
+
+Эксперт не смотрит на вашу папку. Он берёт то, что лежит **в репозитории**, разворачивает у себя и пробует запустить. Если проект не собирается — неважно, что у вас он собирался. Если в истории лежит сид-фраза — это снятые баллы за безопасность, даже если файл потом удалили.
+
+Эта глава — про семь проверок, каждая на минуту, которые закрывают почти все потери такого рода. Всё ниже проделано вживую на учебном проекте: сначала с типичными ошибками, потом исправленном.
+
+<SectionAnchor chapterId="sdacha-repo" sectionId="zachem" />
+
+## «У меня работает» — не аргумент
+
+<Figure scheme="sd-clean-clone" caption="У вас на диске и в чистом клоне — разные проекты" />
+
+Соберём проект так, как его обычно собирает уставший человек за пять минут до конца времени:
+
+```bash
+git init
+git add -A
+git commit -m "первый коммит"
+```
+
+Смотрим, что реально попало:
+
+```bash
+git ls-files
+```
+
+```text
+.env
+node_modules/junk/a.js
+package.json
+src/index.ts
+```
+
+Четыре строки, и в них две беды сразу: в репозиторий уехал `.env` с сид-фразой и папка зависимостей. А `tsconfig.json`, `README.md` и файл блокировки версий — не уехали, потому что их просто нет.
+
+<Hint type="important">
+Команда `git ls-files` — самая недооценённая в этом списке. Она показывает ровно то, что увидит эксперт. Не `ls`, не «я вроде всё добавил», а именно она.
+</Hint>
+
+<SectionAnchor chapterId="sdacha-repo" sectionId="ne-argument" />
+
+## Проверка первая: собрать из чистого клона
+
+```bash
+cd ..
+git clone proekt proverka
+cd proverka
+ls -a
+```
+
+```text
+. .. .git .gitignore package.json src
+```
+
+Ставим и собираем:
+
+```bash
+npm ci
+npm run build
+```
+
+```text
+Version 5.9.3
+tsc: The TypeScript Compiler - Version 5.9.3
+
+COMMON COMMANDS
+```
+
+Компилятор напечатал **справку**. Это не ошибка сборки — это `tsc`, запущенный без настроек: файла `tsconfig.json` в репозитории нет, компилировать нечего, и он показал, как им пользоваться.
+
+<SyntaxBreakdown parts={[
+  { text: 'git clone proekt proverka', label: 'клон в новую папку', note: 'локальный путь тоже годится: проверять надо содержимое репозитория, а не сервер' },
+  { text: 'npm ci', label: 'установка по блокировке', note: 'в отличие от install, ставит ровно те версии, что записаны — и падает, если файла блокировки нет' },
+  { text: 'npm run build', label: 'сборка', note: 'то, что сделает эксперт первым делом после клонирования' },
+]} />
+
+<Hint type="tip">
+Клонировать можно локально, без всякого сервера: `git clone ./proekt ./proverka`. Это занимает секунду и ловит больше половины проблем сдачи.
+</Hint>
+
+<SectionAnchor chapterId="sdacha-repo" sectionId="chistyy-klon" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="sdacha-repo" quizId="quiz-1" questions={[
+  { q: 'Какая команда показывает, что реально попало в репозиторий?', options: ['ls -a', 'git ls-files', 'git status', 'du -sh'], correct: 1, why: 'Она показывает ровно то, что увидит эксперт после клонирования.' },
+  { q: 'Чем npm ci отличается от npm install?', options: ['Ничем', 'Ставит ровно те версии из файла блокировки и падает, если его нет', 'Работает быстрее', 'Ставит только продакшен-зависимости'], correct: 1, why: 'Поэтому он и годится как проверка: нет блокировки — сразу видно.' },
+  { q: 'tsc напечатал справку вместо сборки. Что это значит?', options: ['Ошибка установки', 'Нет tsconfig.json: компилятору нечего собирать', 'Устаревшая версия', 'Нет прав на запись'], correct: 1, why: 'Файл настроек не попал в репозиторий, хотя на диске он мог быть.' },
+]} />
+
+</Block>
+
+## Проверка вторая: чего в репозитории быть не должно
+
+```bash
+printf 'node_modules/\ndist/\n.env\n' > .gitignore
+git rm -r --cached node_modules .env
+git add -A && git commit -m "убрал лишнее из репозитория"
+git ls-files
+```
+
+```text
+.gitignore
+package.json
+src/index.ts
+```
+
+<SyntaxBreakdown parts={[
+  { text: '.gitignore', label: 'список игнорируемого', note: 'действует только на новые файлы: уже отслеживаемые он не выкинет' },
+  { text: 'git rm -r --cached', label: 'убрать из индекса', note: 'ключевое слово --cached: файл остаётся на диске, но перестаёт отслеживаться' },
+  { text: 'node_modules/', label: 'зависимости', note: 'сотни мегабайт, которые восстанавливаются одной командой — в репозитории им нечего делать' },
+  { text: 'dist/', label: 'результат сборки', note: 'то же самое: собирается из исходников, хранить не нужно' },
+]} />
+
+<Hint type="important">
+Добавить `.gitignore` **после** первого коммита недостаточно. Он не действует на файлы, которые уже отслеживаются, — их надо убирать руками через `git rm --cached`. Это ловушка, на которую попадаются почти все.
+</Hint>
+
+<SectionAnchor chapterId="sdacha-repo" sectionId="chego-ne-dolzhno" />
+
+## Проверка третья: секрет остаётся в истории
+
+Рабочая копия чистая. Проверим историю:
+
+```bash
+git show HEAD~1:.env
+```
+
+```text
+SEED=olegs test seed for pgk champs course 2026
+NODE_URL=http://127.0.0.1:6869
+```
+
+<Figure scheme="sd-secret-history" caption="Файл удалён, секрет достаётся одной командой" />
+
+Сид-фраза на месте. Она в первом коммите, и там останется навсегда: история git неизменяема по устройству. Любой, у кого есть доступ к репозиторию — включая эксперта, — достанет её за одну команду.
+
+Грепаем весь код и историю:
+
+```bash
+git grep -nEi "(api[_-]?key|secret|passw|seed *=)" -- .
+```
+
+```text
+.env:1:SEED=olegs test seed for pgk champs course 2026
+src/index.ts:1:const SEED = 'olegs test seed for pgk champs course 2026';
+```
+
+Второе попадание не менее важно: сид **вписан прямо в код**, и удаление `.env` его не трогает.
+
+<Hint type="important">
+Единственное настоящее лечение — **сменить ключ**. Переписывать историю можно, но ключ всё равно считается скомпрометированным: репозиторий мог быть склонирован, показан, попасть в резервную копию. На чемпионате это ещё и снятые баллы независимо от того, что вы сделали потом.
+</Hint>
+
+<SectionAnchor chapterId="sdacha-repo" sectionId="sekret-v-istorii" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="sdacha-repo" quizId="quiz-2" questions={[
+  { q: 'Добавили .gitignore после первого коммита. Что произойдёт с node_modules?', options: ['Исчезнет из репозитория', 'Останется: .gitignore не действует на уже отслеживаемые файлы', 'Удалится с диска', 'Git спросит подтверждение'], correct: 1, why: 'Убирать надо руками: git rm -r --cached node_modules.' },
+  { q: 'Удалили .env следующим коммитом. Секрет в безопасности?', options: ['Да', 'Нет: он достаётся из истории одной командой git show', 'Да, после сборки', 'Зависит от настроек репозитория'], correct: 1, why: 'История git неизменяема по устройству.' },
+  { q: 'Что делать, если ключ попал в историю?', options: ['Переписать историю и забыть', 'Сменить ключ: он считается скомпрометированным', 'Сделать репозиторий приватным', 'Ничего, если никто не видел'], correct: 1, why: 'Репозиторий мог быть склонирован, показан или попасть в резервную копию.' },
+]} />
+
+</Block>
+
+## Проверки с четвёртой по седьмую
+
+<Figure scheme="sd-checklist" caption="Семь проверок, каждая на минуту" />
+
+**Файл блокировки версий.** `package-lock.json` (или `yarn.lock`, `Gemfile.lock`, `poetry.lock`) должен быть в репозитории. Без него `npm ci` не работает вовсе, а `npm install` поставит новые версии — и проект, собиравшийся вчера, сегодня сломается.
+
+**README с командами запуска.** Три команды подряд, которые можно скопировать:
+
+```markdown
+## Запуск
+
+npm ci
+npm run build
+npm start
+```
+
+**Пример настроек.** Файл `.env.example` с перечнем переменных и **без значений**:
+
+```text
+SEED=
+NODE_URL=http://127.0.0.1:6869
+```
+
+**Понятное падение без настроек.** Вот как выглядит плохо и хорошо:
+
+```ts
+const seed = process.env.SEED;
+if (!seed) {
+  throw new Error('Не задана переменная SEED — скопируйте .env.example в .env');
+}
+```
+
+```text
+Error: Не задана переменная SEED — скопируйте .env.example в .env
+```
+
+Вместо стека на сорок строк — одна строка, объясняющая, что делать.
+
+<SectionAnchor chapterId="sdacha-repo" sectionId="chetvertaya-sedmaya" />
+
+## Как выглядит починенный проект
+
+```bash
+git ls-files
+```
+
+```text
+.env.example
+.gitignore
+README.md
+package-lock.json
+package.json
+src/index.ts
+tsconfig.json
+```
+
+Чистый клон:
+
+```bash
+git clone proekt proverka3 && cd proverka3
+npm ci && npm run build
+```
+
+```text
+> tsc
+код возврата: 0
+```
+
+Запуск без настроек:
+
+```text
+Error: Не задана переменная SEED — скопируйте .env.example в .env
+```
+
+Запуск с настройками:
+
+```text
+запуск с аккаунтом длиной 15
+```
+
+<Hint type="fact">
+По дороге вылез ещё один реальный отказ: `error TS2580: Cannot find name 'process'. Do you need to install type definitions for node?` Типы Node не были записаны в зависимости. Заметить это можно было только на чистом клоне — на рабочей машине они лежали в папке зависимостей от соседнего проекта.
+</Hint>
+
+<SectionAnchor chapterId="sdacha-repo" sectionId="pochinennyy" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="sdacha-repo" quizId="quiz-3" questions={[
+  { q: 'Зачем коммитить файл блокировки версий?', options: ['Он ускоряет установку', 'Без него npm ci не работает, а npm install поставит другие версии', 'Так требует GitHub', 'Он нужен для тестов'], correct: 1, why: 'Проект, собиравшийся вчера, завтра сломается на новых версиях зависимости.' },
+  { q: 'Что должно быть в .env.example?', options: ['Рабочие значения', 'Перечень переменных без значений', 'Только комментарии', 'Копия .env'], correct: 1, why: 'Значения — это и есть секрет; список переменных секретом не является.' },
+  { q: 'Ошибка TS2580 «Cannot find name process» на чистом клоне означает', options: ['битый клон', 'типы Node не записаны в зависимости, а на рабочей машине лежали от соседнего проекта', 'старую версию tsc', 'нет прав'], correct: 1, why: 'Ровно тот класс проблем, который ловится только чистым клоном.' },
+]} />
+
+</Block>
+
+## Типичные ошибки
+
+**Ошибка 1. Проверять на своей папке.**
+
+Там лежит всё нужное, даже то, чего нет в репозитории. Проверка — только на чистом клоне.
+
+**Ошибка 2. Считать `.gitignore` задним числом работающим.**
+
+Не работает. Нужен `git rm --cached`.
+
+**Ошибка 3. Коммитить `.env` «временно».**
+
+Временного в истории git не бывает.
+
+**Ошибка 4. README из одной строки «дипломный проект».**
+
+README нужен эксперту, а не вам: три команды запуска и список переменных.
+
+**Ошибка 5. Оставлять отладочный вывод с ключами.**
+
+```js
+console.log('сид:', seed);       // уедет в журнал, а журнал покажут
+```
+
+**Ошибка 6. Сдавать, не запустив.**
+
+Последняя правка «на всякий случай» ломает сборку чаще, чем кажется. Между последним коммитом и поднятой рукой должен быть чистый клон.
+
+<SectionAnchor chapterId="sdacha-repo" sectionId="oshibki" />
+
+## Шпаргалка по главе
+
+<Block kind="cheatsheet">
+
+| Проверка | Команда |
+| --- | --- |
+| Что в репозитории | `git ls-files` |
+| Чистый клон | `git clone ./proekt ./proverka && cd proverka` |
+| Установка по блокировке | `npm ci` |
+| Сборка | `npm run build` |
+| Убрать из индекса | `git rm -r --cached node_modules .env` |
+| Секреты в коде | `git grep -nEi "(api[_-]?key\|secret\|passw\|seed *=)" -- .` |
+| Секрет в истории | `git show <коммит>:<файл>` |
+| Что изменилось за коммит | `git show --stat <коммит>` |
+
+</Block>
+
+<SectionAnchor chapterId="sdacha-repo" sectionId="shpargalka" />
+
+## Словарь главы
+
+<Block kind="vocab">
+
+| Термин | Что это |
+| --- | --- |
+| Чистый клон | Копия репозитория в новой папке; единственная честная проверка |
+| Файл блокировки | `package-lock.json` и аналоги: точные версии зависимостей |
+| `npm ci` | Установка строго по блокировке; падает без неё |
+| `git rm --cached` | Убрать файл из отслеживания, оставив на диске |
+| `.env.example` | Перечень переменных без значений |
+| Скомпрометированный ключ | Попавший в историю; лечится только заменой |
+| Понятное падение | Одна строка с тем, что делать, вместо стека |
+
+</Block>
+
+<SectionAnchor chapterId="sdacha-repo" sectionId="slovar" />
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="sdacha-repo"
+  trainerId="trainer-sdacha-repo"
+  targetCpm={95}
+  targetAccuracy={90}
+  pools={[
+    { label: 'Осмотр репозитория', snippets: [
+      'git ls-files',
+      'git show HEAD~1:.env',
+      'git show --stat HEAD~1',
+    ] },
+    { label: 'Чистка', snippets: [
+      "printf 'node_modules/\\ndist/\\n.env\\n' > .gitignore",
+      'git rm -r --cached node_modules .env',
+      'git grep -nEi "(api[_-]?key|secret|passw)" -- .',
+    ] },
+    { label: 'Чистый клон', snippets: [
+      'git clone ./proekt ./proverka',
+      'npm ci && npm run build',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="sdacha-repo" sectionId="trenazher" />
+
+## Что должен уметь после главы
+
+- посмотреть, что реально лежит в репозитории, а не на диске;
+- собрать проект из чистого клона и понять, чего не хватает;
+- убрать лишнее из отслеживания и объяснить, почему `.gitignore` задним числом не работает;
+- достать секрет из истории и объяснить, почему лечение — смена ключа;
+- написать README и `.env.example`, которыми можно пользоваться;
+- сделать так, чтобы программа без настроек падала понятно;
+- пройти семь проверок за семь минут.
+
+<SectionAnchor chapterId="sdacha-repo" sectionId="chto-umet" />
+
+## Проверка по главе
+
+<ChapterExam chapterId="sdacha-repo" questions={[
+  { q: 'Что смотрит эксперт при приёмке?', options: ['вашу папку на компьютере', 'то, что лежит в репозитории, развёрнутое у себя', 'экран во время демонстрации', 'только README'], correct: 1, why: '«У меня работает» ничего не доказывает.' },
+  { q: 'Какая команда показывает содержимое репозитория?', options: ['ls -a', 'git ls-files', 'git status', 'find .'], correct: 1, why: 'Она показывает ровно то, что увидит другой человек после клонирования.' },
+  { q: 'Чем npm ci отличается от npm install?', options: ['ничем', 'ставит строго версии из файла блокировки и падает без него', 'быстрее', 'только продакшен-зависимости'], correct: 1, why: 'Поэтому он и годится как проверка сдачи.' },
+  { q: 'Добавили .gitignore после первого коммита. node_modules', options: ['исчезнет из репозитория', 'останется: игнорирование не действует на отслеживаемые файлы', 'удалится с диска', 'вызовет ошибку'], correct: 1, why: 'Нужен git rm -r --cached.' },
+  { q: 'Удалили .env следующим коммитом. Секрет', options: ['удалён', 'достаётся из истории одной командой', 'удалён после сборки', 'зависит от настроек'], correct: 1, why: 'История git неизменяема по устройству.' },
+  { q: 'Ключ попал в историю. Что делать?', options: ['переписать историю и забыть', 'сменить ключ', 'сделать репозиторий приватным', 'ничего'], correct: 1, why: 'Репозиторий мог быть склонирован или попасть в резервную копию.' },
+  { q: 'Зачем коммитить файл блокировки версий?', options: ['ускоряет установку', 'без него npm ci не работает, а install поставит другие версии', 'требует GitHub', 'нужен для тестов'], correct: 1, why: 'Собиравшийся вчера проект завтра сломается на новой версии зависимости.' },
+  { q: 'Что должно быть в .env.example?', options: ['рабочие значения', 'перечень переменных без значений', 'только комментарии', 'копия .env'], correct: 1, why: 'Секрет — это значения, а не имена переменных.' },
+  { q: 'tsc напечатал справку вместо сборки', options: ['битая установка', 'нет tsconfig.json: собирать нечего', 'старая версия', 'нет прав'], correct: 1, why: 'Файл настроек не попал в репозиторий, хотя на диске он был.' },
+  { q: 'Программа без настроек должна', options: ['падать со стеком', 'падать одной понятной строкой с тем, что делать', 'молча работать', 'использовать значения по умолчанию'], correct: 1, why: 'Эксперт увидит именно это сообщение первым.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Документация git: gitignore](https://git-scm.com/docs/gitignore) — правила и порядок применения.
+- [npm ci](https://docs.npmjs.com/cli/v10/commands/npm-ci) — чем отличается от install и когда падает.
+- [gitleaks](https://github.com/gitleaks/gitleaks) — автоматический поиск секретов в истории.
+- [Make a README](https://www.makeareadme.com/) — что должно быть в README и в каком порядке.

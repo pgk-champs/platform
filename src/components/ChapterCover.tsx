@@ -1049,6 +1049,53 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="206" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>сида на странице нет</text>
     </g>
   ),
+  /* Сдача работы: чистый клон */
+  'sdacha-repo': () => (
+    <g strokeLinecap="round">
+      <rect x="22" y="36" width="72" height="92" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      <text x="58" y="54" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.45)" fontFamily={MONO}>у вас</text>
+      {['node_modules', 'dist', '.env', 'tsconfig', 'src'].map((t, i) => (
+        <text key={t} x="30" y={70 + i * 13} fontSize="5" fontWeight={800} fill="rgba(255,255,255,0.4)" fontFamily={MONO}>{t}</text>
+      ))}
+
+      <path d="M98 80 L112 80" stroke={ACCENT} strokeWidth={3} />
+      <path d="M112 80 L106 76 M112 80 L106 84" stroke={ACCENT} strokeWidth={3} />
+
+      <rect x="116" y="36" width="62" height="92" rx="8" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="147" y="54" textAnchor="middle" fontSize="5.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>клон</text>
+      <text x="124" y="70" fontSize="5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>package.json</text>
+      <text x="124" y="83" fontSize="5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>src</text>
+      <text x="124" y="100" fontSize="5" fontWeight={800} fill="rgba(255,170,170,0.9)" fontFamily={MONO}>tsconfig — нет</text>
+      <text x="124" y="113" fontSize="5" fontWeight={800} fill="rgba(255,170,170,0.9)" fontFamily={MONO}>README — нет</text>
+
+      <rect x="30" y="146" width="140" height="28" rx="7" fill="rgba(255,140,140,0.16)" stroke="rgba(255,140,140,0.85)" strokeWidth={2.5} />
+      <text x="100" y="164" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,170,170,0.95)" fontFamily={MONO}>git show HEAD~1:.env</text>
+
+      <text x="100" y="196" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>проверяют репозиторий</text>
+    </g>
+  ),
+  /* Демонстрация решения за пять минут */
+  'demo-show': () => (
+    <g strokeLinecap="round">
+      {[
+        { y: 36, m: '0:30', t: 'задача' },
+        { y: 72, m: '1:30', t: 'путь' },
+        { y: 108, m: '1:00', t: 'защита' },
+        { y: 144, m: '1:00', t: 'устройство' },
+        { y: 180, m: '1:00', t: 'вопросы' },
+      ].map((r, i) => (
+        <g key={r.t}>
+          <rect x="22" y={r.y} width="46" height="26" rx="6" fill={SOFT} stroke={ACCENT} strokeWidth={2.5} />
+          <text x="45" y={r.y + 17} textAnchor="middle" fontSize="6.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>{r.m}</text>
+          <rect x="76" y={r.y} width="102" height="26" rx="6"
+            fill={i === 2 ? SOFT : 'rgba(0,0,0,0.3)'} stroke={i === 2 ? ACCENT : INK} strokeWidth={2.5} />
+          <text x="127" y={r.y + 17} textAnchor="middle" fontSize="6.5" fontWeight={800}
+            fill={i === 2 ? ACCENT : 'rgba(255,255,255,0.6)'} fontFamily={MONO}>{r.t}</text>
+        </g>
+      ))}
+      <text x="100" y="216" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>сначала работает, потом как</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -2091,6 +2138,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'waves-dapp': { track: 'blockchain', num: '70', title: 'dApp на RIDE: зачётка, которая живёт в сети' },
   'waves-payments': { track: 'blockchain', num: '71', title: 'Платежи в dApp: банк вкладов на RIDE' },
   'waves-client': { track: 'blockchain', num: '72', title: 'Клиент к Waves: приложение поверх сети' },
+  'sdacha-repo': { track: 'advanced', num: '07', title: 'Сдача работы: чистый клон и семь проверок' },
+  'demo-show': { track: 'advanced', num: '08', title: 'Демонстрация: показать решение за пять минут' },
   'waves-first-network': { track: 'blockchain', num: '63', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '27', title: 'Kotlin и Java: в чём разница' },
