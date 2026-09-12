@@ -81,6 +81,7 @@ import { webReduxSchemes } from './figures/webRedux';
 import { webRtkSchemes } from './figures/webRtk';
 import { webRtkAsyncSchemes } from './figures/webRtkAsync';
 import { walletConnectSchemes } from './figures/walletConnect';
+import { walletSignSchemes } from './figures/walletSign';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -159,6 +160,7 @@ const SCHEMES = {
   ...webRtkSchemes,
   ...webRtkAsyncSchemes,
   ...walletConnectSchemes,
+  ...walletSignSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

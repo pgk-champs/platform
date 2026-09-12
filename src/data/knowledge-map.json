@@ -760,11 +760,19 @@
     "path": "blockchain/wallet-connect.mdx"
   },
   {
+    "id": "wallet-sign",
+    "title": "Подписи: доказать, не отправляя транзакцию",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 52,
+    "path": "blockchain/wallet-sign.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 52,
+    "order": 53,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]

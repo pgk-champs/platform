@@ -81,6 +81,7 @@ import { webReduxSchemes } from './figures/webRedux';
 import { webRtkSchemes } from './figures/webRtk';
 import { webRtkAsyncSchemes } from './figures/webRtkAsync';
 import { walletConnectSchemes } from './figures/walletConnect';
+import { walletSignSchemes } from './figures/walletSign';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -187,6 +188,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(webRtkSchemes),
     ...Object.keys(webRtkAsyncSchemes),
     ...Object.keys(walletConnectSchemes),
+    ...Object.keys(walletSignSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

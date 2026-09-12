@@ -620,6 +620,28 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="182" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>chainId 0x539</text>
     </g>
   ),
+  /* Подписи: доказать, не отправляя транзакцию */
+  'wallet-sign': () => (
+    <g strokeLinecap="round">
+      <rect x="20" y="46" width="76" height="52" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="58" y="66" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>owner</text>
+      <text x="58" y="80" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>amount</text>
+      <text x="58" y="93" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>deadline</text>
+
+      <path d="M100 72h22" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M122 72l-6-4M122 72l-6 4" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <rect x="126" y="46" width="56" height="52" rx="9" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="154" y="68" textAnchor="middle" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>sign</text>
+      <text x="154" y="86" textAnchor="middle" fontSize="5.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>65 байт</text>
+
+      <path d="M154 98v18M58 98v18" stroke={INK} strokeWidth={2.5} fill="none" />
+      <rect x="34" y="120" width="132" height="34" rx="9" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="142" textAnchor="middle" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>ecrecover → owner</text>
+
+      <text x="100" y="180" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>без транзакции</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1617,7 +1639,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'web-rtk': { track: 'blockchain', num: '49', title: 'Redux Toolkit: срезы, селекторы и связь с React' },
   'web-rtk-async': { track: 'blockchain', num: '50', title: 'Асинхронность в Redux: запросы и состояние' },
   'wallet-connect': { track: 'blockchain', num: '51', title: 'Кошелёк в браузере: подключение и сеть' },
-  'waves-first-network': { track: 'blockchain', num: '52', title: 'Первая сеть на Waves Enterprise' },
+  'wallet-sign': { track: 'blockchain', num: '52', title: 'Подписи: доказать, не отправляя транзакцию' },
+  'waves-first-network': { track: 'blockchain', num: '53', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },

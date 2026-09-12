@@ -2550,5 +2550,32 @@
       "title": "Connect a Crypto Wallet with JavaScript - MetaMask - UI/UX & Code",
       "channel": "DesignCourse"
     }
+  ],
+  "wallet-sign": [
+    {
+      "videoId": "QODPMaUlrLw",
+      "title": "Solidity и Ethereum, урок #40 | ecrecover, подпись оффчейн/проверка подписи, платежи без газа",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "8vDJjpJOM_8",
+      "title": "Solidity и смарт-контракты Ethereum, урок #48 | ERC2612, ERC20Permit, аппрув без газа, EIP712",
+      "channel": "Ilya Krukowski"
+    },
+    {
+      "videoId": "0RqgAlz7Fp8",
+      "title": "Решаем тестовую задачу. Разбираемся с оффчейн подписями r, v ,s и ecrecover. #solidity #уязвимиости",
+      "channel": "Dima HideCrypto - Web3 | Solidity"
+    },
+    {
+      "videoId": "MLLEYHqCfF0",
+      "title": "1011 Цифровая подпись и верификация",
+      "channel": "Programming Innopolis STEM"
+    },
+    {
+      "videoId": "vYwYe-Gv_XI",
+      "title": "Verify Signature | Solidity 0.8",
+      "channel": "Smart Contract Programmer"
+    }
   ]
 }
