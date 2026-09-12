@@ -1,0 +1,408 @@
+---
+title: 'Жизненный цикл чейнкода: пять шагов до первого вызова'
+audience: 'блокчейн'
+level: 'углубление'
+order: 60
+sidebar_position: 60
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="fabric-lifecycle" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+
+# Жизненный цикл чейнкода: пять шагов до первого вызова
+
+<ChapterProgress chapterId="fabric-lifecycle" totalSections={13} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="fabric-lifecycle" />
+
+## Зачем это нужно
+
+В Ethereum установка контракта — одна транзакция. Отправил байт-код, получил адрес, работай.
+
+В Fabric это **пять шагов**, и такая громоздкость не случайна. Контракт здесь исполняют несколько независимых организаций. Прежде чем код начнёт менять общий реестр, каждая из них должна посмотреть на него и **письменно согласиться**. Пять шагов — это и есть процедура такого согласования.
+
+В прошлой главе учебный скрипт `network.sh deployCC` делал всё сам. Эта глава — про то, что он делал, потому что на чемпионате скрипта не будет, а будут отказы вида «chaincode definition not agreed to by this org».
+
+<SectionAnchor chapterId="fabric-lifecycle" sectionId="zachem" />
+
+## Пять шагов целиком
+
+<Figure scheme="fl-five-steps" caption="Первые два шага локальные, остальные три — транзакции в канале" />
+
+Первые два шага никто, кроме вас, не видит: собрать архив и положить его на пиры. Последние три — настоящие транзакции: они попадают в цепочку, и по ним потом можно посмотреть, кто и когда согласился.
+
+<SectionAnchor chapterId="fabric-lifecycle" sectionId="pyat-shagov" />
+
+## Шаг 1: упаковать
+
+```bash
+peer lifecycle chaincode package zachetka.tar.gz \
+  --path ./zachetka --lang node --label zachetka_1.0
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'lifecycle chaincode package', label: 'собрать архив', note: 'ни с какой сетью команда не разговаривает — работает только с файлами' },
+  { text: 'zachetka.tar.gz', label: 'что получится', note: 'обычный архив: внутри metadata.json и code.tar.gz с исходниками' },
+  { text: '--path ./zachetka', label: 'откуда', note: 'папка проекта; для TypeScript она должна быть уже собрана — внутри нужен dist' },
+  { text: '--lang node', label: 'на чём написано', note: 'node для JavaScript и TypeScript, golang для Go, java для Java' },
+  { text: '--label zachetka_1.0', label: 'человеческая метка', note: 'попадёт в идентификатор пакета; по ней потом узнают, что установлено' },
+]} />
+
+Что внутри архива:
+
+```text
+metadata.json
+code.tar.gz
+```
+
+<SectionAnchor chapterId="fabric-lifecycle" sectionId="shag-upakovat" />
+
+## Шаг 2: установить на каждый пир
+
+```bash
+. ./env.sh 1
+peer lifecycle chaincode install zachetka.tar.gz
+. ./env.sh 2
+peer lifecycle chaincode install zachetka.tar.gz
+```
+
+```text
+INFO [cli.lifecycle.chaincode] submitInstallProposal -> Chaincode code package identifier:
+zachetka_1.0:8853d6701bcad0b97bbb6ef75778304e38684d8f23c4dc4dff06006d54f4148b
+```
+
+Обратите внимание: **идентификатор одинаковый на обоих пирах**.
+
+<Figure scheme="fl-package-id" caption="Идентификатор пакета — метка плюс хеш содержимого; одинаковый код даёт одинаковый идентификатор" />
+
+Это ключевая проверка всей процедуры. Организации одобряют не «чейнкод по имени», а конкретный отпечаток кода. Если бы вторая организация установила чуть изменённый архив, идентификатор бы отличался — и согласия не сложились бы.
+
+<Hint type="important">
+Пересобрали проект и упаковали заново — идентификатор сменился, даже если код не менялся ни на строчку (метки времени в архиве). Одобрение со старым идентификатором станет недействительным. Поэтому упаковывают **один раз**, и один и тот же файл раздают всем организациям.
+</Hint>
+
+Посмотреть, что установлено:
+
+```bash
+peer lifecycle chaincode queryinstalled
+```
+
+```text
+Installed chaincodes on peer:
+Package ID: basic_1.0:42c5880fedf163ab14f7328cb9c10a7b341cc1008926620749512c3fc5dd48db, Label: basic_1.0
+Package ID: zachetka_1.0:8853d6701bcad0b97bbb6ef75778304e38684d8f23c4dc4dff06006d54f4148b, Label: zachetka_1.0
+```
+
+<SectionAnchor chapterId="fabric-lifecycle" sectionId="shag-ustanovit" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="fabric-lifecycle" quizId="quiz-1" questions={[
+  { q: 'Почему установка чейнкода — пять шагов, а не один?', options: ['Историческое наследие', 'Код исполняют несколько независимых организаций, и каждая должна письменно согласиться до того, как он начнёт менять реестр', 'Так быстрее', 'Из-за размера архива'], correct: 1, why: 'Три из пяти шагов — это транзакции согласования, они попадают в цепочку.' },
+  { q: 'Что такое идентификатор пакета?', options: ['Случайный номер', 'Метка плюс хеш содержимого архива', 'Имя файла', 'Номер версии'], correct: 1, why: 'Одинаковый архив даёт одинаковый идентификатор на всех пирах — это и есть проверка, что одобряют один код.' },
+  { q: 'Пересобрали и упаковали заново. Что произойдёт с прежним одобрением?', options: ['Ничего', 'Оно станет недействительным: идентификатор сменился', 'Оно применится к новому пакету', 'Сеть спросит подтверждение'], correct: 1, why: 'Поэтому упаковывают один раз и раздают всем организациям один и тот же файл.' },
+]} />
+
+</Block>
+
+## Шаг 3: одобрить от своей организации
+
+```bash
+peer lifecycle chaincode approveformyorg \
+  -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com \
+  --tls --cafile "$ORDERER_CA" \
+  -C pgk -n zachetka --version 1.0 \
+  --package-id zachetka_1.0:8853d6701bcad0b97bbb6ef757783... \
+  --sequence 1
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'approveformyorg', label: 'согласие организации', note: 'транзакция: она попадает в канал и видна остальным' },
+  { text: '-n zachetka', label: 'имя на канале', note: 'под этим именем контракт будут вызывать; с именем папки не связано' },
+  { text: '--version 1.0', label: 'версия для людей', note: 'произвольная строка; сеть по ней ничего не решает' },
+  { text: '--package-id', label: 'какой именно код', note: 'тот самый отпечаток; здесь и происходит привязка согласия к содержимому' },
+  { text: '--sequence 1', label: 'номер правки', note: 'целое число; при каждом следующем изменении определения растёт на единицу' },
+]} />
+
+```text
+INFO [chaincodeCmd] ClientWait -> txid [efb833de4e2e…] committed with status (VALID) at localhost:7051
+```
+
+<Hint type="fact">
+`approveformyorg` — это согласие **организации**, а не пира. Даже если у организации десять пиров, одобрение делается один раз и от её имени. А вот `install` нужен на каждом пире, который будет исполнять код.
+</Hint>
+
+<SectionAnchor chapterId="fabric-lifecycle" sectionId="shag-odobrit" />
+
+## Шаг 4: посмотреть, кто согласился
+
+```bash
+peer lifecycle chaincode checkcommitreadiness -C pgk -n zachetka \
+  --version 1.0 --sequence 1 --output json
+```
+
+После одобрения только первой организации:
+
+```json
+{
+	"approvals": {
+		"Org1MSP": true,
+		"Org2MSP": false
+	}
+}
+```
+
+Попробуем зафиксировать, не дожидаясь второй:
+
+```text
+Error: failed to create signed transaction: proposal response was not successful,
+error code 500, msg failed to invoke backing implementation of 'CommitChaincodeDefinition':
+chaincode definition not agreed to by this org (Org2MSP)
+```
+
+Сообщение прямо называет виновника: `not agreed to by this org (Org2MSP)`. Одобряем вторую и смотрим снова:
+
+```json
+{
+	"approvals": {
+		"Org1MSP": true,
+		"Org2MSP": true
+	}
+}
+```
+
+<Hint type="tip">
+`checkcommitreadiness` — первое, что нужно запускать при любом отказе на этом шаге. Он не меняет ничего и сразу показывает, чьего согласия не хватает.
+</Hint>
+
+<SectionAnchor chapterId="fabric-lifecycle" sectionId="shag-gotovnost" />
+
+## Шаг 5: зафиксировать на канале
+
+```bash
+peer lifecycle chaincode commit \
+  -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com \
+  --tls --cafile "$ORDERER_CA" -C pgk -n zachetka \
+  --version 1.0 --sequence 1 \
+  --peerAddresses localhost:7051 --tlsRootCertFiles "$PEER0_ORG1_CA" \
+  --peerAddresses localhost:9051 --tlsRootCertFiles "$PEER0_ORG2_CA"
+```
+
+```text
+INFO [chaincodeCmd] ClientWait -> txid [a0e1992a8cc5…] committed with status (VALID) at localhost:9051
+INFO [chaincodeCmd] ClientWait -> txid [a0e1992a8cc5…] committed with status (VALID) at localhost:7051
+```
+
+Проверяем, что вступило в силу:
+
+```bash
+peer lifecycle chaincode querycommitted -C pgk -n zachetka
+```
+
+```text
+Committed chaincode definition for chaincode 'zachetka' on channel 'pgk':
+Version: 1.0, Sequence: 1, Endorsement Plugin: escc, Validation Plugin: vscc,
+Approvals: [Org1MSP: true, Org2MSP: true]
+```
+
+Теперь контракт можно вызывать. Первый вызов идёт заметно дольше остальных: пир поднимает для него контейнер.
+
+<SectionAnchor chapterId="fabric-lifecycle" sectionId="shag-zafiksirovat" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="fabric-lifecycle" quizId="quiz-2" questions={[
+  { q: 'Отказ «chaincode definition not agreed to by this org (Org2MSP)» означает', options: ['ошибку в коде контракта', 'вторая организация ещё не выполнила approveformyorg', 'неверный пароль', 'канал не создан'], correct: 1, why: 'Проверяется командой checkcommitreadiness — она сразу показывает, чьего согласия нет.' },
+  { q: 'Сколько раз делается approveformyorg, если у организации десять пиров?', options: ['Десять', 'Один: это согласие организации, а не пира', 'По одному на канал каждого пира', 'Ни одного'], correct: 1, why: 'А вот install нужен на каждом пире, который будет исполнять код.' },
+  { q: 'Почему первый вызов контракта идёт дольше остальных?', options: ['Прогревается кеш', 'Пир поднимает для контракта контейнер', 'Сеть проверяет подписи', 'Идёт синхронизация'], correct: 1, why: 'Дальше контейнер уже запущен, и вызовы идут в обычном темпе.' },
+]} />
+
+</Block>
+
+## Обновление: версия и номер правки
+
+Допустим, в контракт добавили функции. Обновление — это те же пять шагов, но с **номером правки на единицу больше**.
+
+<Figure scheme="fl-sequence" caption="Версия ни на что не влияет, номер правки — влияет на всё" />
+
+```bash
+peer lifecycle chaincode package zachetka2.tar.gz --path ./zachetka --lang node --label zachetka_2.0
+peer lifecycle chaincode install zachetka2.tar.gz        # на обоих пирах
+peer lifecycle chaincode approveformyorg ... --version 2.0 --package-id <новый> --sequence 2
+peer lifecycle chaincode commit ... --version 2.0 --sequence 2
+```
+
+```text
+Committed chaincode definition for chaincode 'zachetka' on channel 'pgk':
+Version: 2.0, Sequence: 2, Endorsement Plugin: escc, Validation Plugin: vscc,
+Approvals: [Org1MSP: true, Org2MSP: true]
+```
+
+Разница между двумя числами важна:
+
+- **`--version`** — произвольная строка для людей. Сеть её не проверяет и никаких решений по ней не принимает. Можно написать `2.0`, можно `после-аудита`.
+- **`--sequence`** — целое число, по которому сеть отличает одно определение от другого. Растёт строго на единицу, повторить прежнее нельзя.
+
+<Hint type="important">
+Состояние при обновлении **не трогается**. Ключи, записанные старой версией, остаются как были, и новый код работает поверх них. Отсюда обычная забота при обновлении: если формат хранения поменялся, старые записи придётся уметь читать — или переписать их отдельной функцией.
+</Hint>
+
+Через номер правки меняют не только код. Тем же способом меняют политику подтверждения конкретного контракта — например, «эту сделку должны подписывать все три организации, а не большинство».
+
+<SectionAnchor chapterId="fabric-lifecycle" sectionId="obnovlenie" />
+
+## Типичные ошибки
+
+**Ошибка 1. Повторили прежний номер правки.**
+
+```text
+Error: ... requested sequence is 1, but new definition must be sequence 2
+```
+
+Номер растёт строго на единицу. Если предыдущая попытка зафиксировалась, следующая должна быть на единицу больше — даже если она исправляет ошибку.
+
+**Ошибка 2. Одобрили с чужим идентификатором пакета.**
+
+Опечатка в длинной шестнадцатеричной строке не вызовет ошибки на шаге одобрения. Она проявится на `checkcommitreadiness`: организация будет числиться не согласившейся, хотя команду вы выполняли.
+
+**Ошибка 3. Забыли установить пакет на второй пир.**
+
+Одобрение пройдёт, фиксация пройдёт. Упадёт первый вызов, потому что один из пиров не сможет исполнить код.
+
+**Ошибка 4. Собрали архив из несобранного проекта.**
+
+```text
+Error: endorsement failure during invoke. response: status:500
+message:"error in simulation: failed to execute transaction: could not launch chaincode"
+```
+
+Для TypeScript упаковывают папку, где уже есть `dist`.
+
+**Ошибка 5. Перепутали имя на канале и имя папки.**
+
+`-n zachetka` — это имя, под которым контракт вызывают. С названием папки и меткой пакета оно никак не связано, и их расхождение — нормальная ситуация, а не ошибка.
+
+<SectionAnchor chapterId="fabric-lifecycle" sectionId="oshibki" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="fabric-lifecycle" quizId="quiz-3" questions={[
+  { q: 'Чем --version отличается от --sequence?', options: ['Ничем', 'Версия — произвольная строка для людей, номер правки — целое число, по которому сеть отличает определения', 'Версия обязательна, номер нет', 'Версия для пиров, номер для упорядочивателя'], correct: 1, why: 'Сеть не принимает решений по строке версии вообще.' },
+  { q: 'Что происходит с состоянием при обновлении чейнкода?', options: ['Стирается', 'Не трогается: ключи остаются, меняется только код над ними', 'Переносится вручную', 'Копируется в новый контракт'], correct: 1, why: 'Отсюда забота о совместимости формата: старые записи новый код должен уметь читать.' },
+  { q: 'Забыли install на втором пире. Когда это проявится?', options: ['Сразу при одобрении', 'На первом вызове: один из пиров не сможет исполнить код', 'При фиксации', 'Никогда'], correct: 1, why: 'Одобрение — согласие организации, оно не проверяет наличие пакета на всех её пирах.' },
+]} />
+
+</Block>
+
+## Шпаргалка по главе
+
+<Block kind="cheatsheet">
+
+| Шаг | Команда |
+| --- | --- |
+| Упаковать | `peer lifecycle chaincode package cc.tar.gz --path ./cc --lang node --label cc_1.0` |
+| Установить | `peer lifecycle chaincode install cc.tar.gz` |
+| Узнать идентификатор | `peer lifecycle chaincode queryinstalled` |
+| Одобрить | `peer lifecycle chaincode approveformyorg -C pgk -n cc --version 1.0 --package-id … --sequence 1` |
+| Кто согласился | `peer lifecycle chaincode checkcommitreadiness -C pgk -n cc --version 1.0 --sequence 1 --output json` |
+| Зафиксировать | `peer lifecycle chaincode commit -C pgk -n cc --version 1.0 --sequence 1 --peerAddresses …` |
+| Что на канале | `peer lifecycle chaincode querycommitted -C pgk -n cc` |
+| Обновить | те же шаги с `--sequence` на единицу больше |
+
+</Block>
+
+<SectionAnchor chapterId="fabric-lifecycle" sectionId="shpargalka" />
+
+## Словарь главы
+
+<Block kind="vocab">
+
+| Термин | Что это |
+| --- | --- |
+| Пакет чейнкода | Архив `.tar.gz` с исходниками и меткой |
+| Идентификатор пакета | Метка плюс хеш содержимого; одинаковый код — одинаковый идентификатор |
+| Определение чейнкода | Что зафиксировано на канале: имя, версия, номер правки, политика |
+| `approveformyorg` | Согласие организации на конкретное определение |
+| `checkcommitreadiness` | Проверка «кто уже согласился»; ничего не меняет |
+| `commit` | Фиксация определения на канале; выполняется один раз |
+| `--sequence` | Номер правки определения: целое, растёт на единицу |
+| `--version` | Строка версии для людей; сеть её не проверяет |
+
+</Block>
+
+<SectionAnchor chapterId="fabric-lifecycle" sectionId="slovar" />
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="fabric-lifecycle"
+  trainerId="trainer-fabric-lifecycle"
+  targetCpm={90}
+  targetAccuracy={88}
+  pools={[
+    { label: 'Упаковка и установка', snippets: [
+      'peer lifecycle chaincode package cc.tar.gz --path ./cc --lang node --label cc_1.0',
+      'peer lifecycle chaincode install cc.tar.gz',
+      'peer lifecycle chaincode queryinstalled',
+    ] },
+    { label: 'Согласование', snippets: [
+      'peer lifecycle chaincode approveformyorg -C pgk -n cc --sequence 1',
+      'peer lifecycle chaincode checkcommitreadiness -C pgk -n cc --output json',
+      'peer lifecycle chaincode commit -C pgk -n cc --sequence 1',
+    ] },
+    { label: 'Проверка', snippets: [
+      'peer lifecycle chaincode querycommitted -C pgk -n cc',
+      '--version 2.0 --sequence 2',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="fabric-lifecycle" sectionId="trenazher" />
+
+## Что должен уметь после главы
+
+- назвать пять шагов и сказать, какие из них локальные, а какие попадают в цепочку;
+- упаковать чейнкод и установить его на оба пира;
+- объяснить, зачем нужен идентификатор пакета и почему он одинаков у всех;
+- одобрить определение от каждой организации и проверить готовность;
+- зафиксировать определение и посмотреть, что вступило в силу;
+- обновить контракт с правильным номером правки;
+- по тексту отказа понять, чьего согласия не хватает.
+
+<SectionAnchor chapterId="fabric-lifecycle" sectionId="chto-umet" />
+
+## Проверка по главе
+
+<ChapterExam chapterId="fabric-lifecycle" questions={[
+  { q: 'Сколько шагов в установке чейнкода и почему?', options: ['Один, как в Ethereum', 'Пять: код исполняют независимые организации, и каждая должна согласиться до того, как он начнёт менять реестр', 'Три, по числу узлов', 'Два: собрать и запустить'], correct: 1, why: 'Три из пяти шагов — транзакции согласования, попадающие в цепочку.' },
+  { q: 'Какие шаги никто, кроме вас, не видит?', options: ['Все пять', 'Упаковка и установка', 'Одобрение и фиксация', 'Только фиксация'], correct: 1, why: 'Они работают с файлами и пирами, а не с каналом.' },
+  { q: 'Идентификатор пакета — это', options: ['случайный номер', 'метка плюс хеш содержимого архива', 'имя файла', 'адрес контракта'], correct: 1, why: 'По нему организации одобряют именно тот код, который установлен, а не похожий.' },
+  { q: 'approveformyorg делается', options: ['на каждом пире', 'один раз от имени организации', 'один раз на всю сеть', 'при каждом вызове'], correct: 1, why: 'install, наоборот, нужен на каждом исполняющем пире.' },
+  { q: 'Что делает checkcommitreadiness?', options: ['фиксирует определение', 'показывает, кто из организаций уже согласился, ничего не меняя', 'устанавливает пакет', 'проверяет код'], correct: 1, why: 'Это первое, что запускают при отказе на шаге фиксации.' },
+  { q: 'Отказ «not agreed to by this org (Org2MSP)» означает', options: ['ошибку в коде', 'вторая организация ещё не одобрила определение', 'неверный канал', 'нет прав администратора'], correct: 1, why: 'Сообщение прямо называет организацию, чьего согласия не хватает.' },
+  { q: 'Чем --sequence отличается от --version?', options: ['Ничем', 'Номер правки — целое, по которому сеть различает определения; версия — строка для людей', 'Версия важнее', 'Номер нужен только при обновлении'], correct: 1, why: 'По строке версии сеть не принимает никаких решений.' },
+  { q: 'Что происходит с состоянием при обновлении чейнкода?', options: ['Стирается', 'Остаётся: меняется только код над теми же ключами', 'Копируется', 'Требует ручного переноса'], correct: 1, why: 'Если формат хранения поменялся, старые записи нужно уметь читать — или переписать отдельной функцией.' },
+  { q: 'Пересобрали проект и упаковали заново. Что с прежним одобрением?', options: ['Действует', 'Стало недействительным: идентификатор пакета сменился', 'Обновится само', 'Требует подтверждения'], correct: 1, why: 'Поэтому один и тот же файл раздают всем организациям.' },
+  { q: 'Почему первый вызов после фиксации идёт дольше?', options: ['Проверяются подписи', 'Пир поднимает контейнер для контракта', 'Синхронизируется состояние', 'Так работает шифрование'], correct: 1, why: 'Дальше контейнер уже запущен и вызовы идут в обычном темпе.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Жизненный цикл чейнкода](https://hyperledger-fabric.readthedocs.io/en/release-2.5/chaincode_lifecycle.html) — все пять шагов и их настройки.
+- [Развёртывание чейнкода в учебной сети](https://hyperledger-fabric.readthedocs.io/en/release-2.5/deploy_chaincode.html) — те же команды пошагово.
+- [Справочник команд peer](https://hyperledger-fabric.readthedocs.io/en/release-2.5/commands/peerlifecycle.html) — все флаги `peer lifecycle chaincode`.
+- [Политика подтверждения на уровне контракта](https://hyperledger-fabric.readthedocs.io/en/release-2.5/endorsement-policies.html) — как поменять её через номер правки.

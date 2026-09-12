@@ -1,0 +1,469 @@
+---
+title: 'Смарт-контракт для Fabric: зачётка на TypeScript'
+audience: 'блокчейн'
+level: 'углубление'
+order: 59
+sidebar_position: 59
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="fabric-chaincode" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+
+# Смарт-контракт для Fabric: зачётка на TypeScript
+
+<ChapterProgress chapterId="fabric-chaincode" totalSections={12} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="fabric-chaincode" />
+
+## Зачем это нужно
+
+Смарт-контракт в Fabric называется **чейнкодом**. Отличие от Solidity начинается с языка: здесь это обычный TypeScript, Go или Java — не специальный язык, а тот же, на котором пишут остальную часть системы.
+
+Второе отличие важнее. В Ethereum контракт живёт в виртуальной машине, у него есть свои переменные, и эти переменные — часть цепочки. В Fabric контракт — это **программа рядом с реестром**. У неё нет «своих полей»: она читает и пишет в общее хранилище пар «ключ — значение» через переданный объект.
+
+Эта глава — про то, как устроен такой контракт, и про главную ловушку, которой в Solidity не бывает вовсе: код исполняется **несколькими пирами независимо**, и результаты обязаны совпасть до последнего байта.
+
+<SectionAnchor chapterId="fabric-chaincode" sectionId="zachem" />
+
+## Устройство контракта
+
+<Figure scheme="fc-contract-shape" caption="Класс с публичными методами — снаружи это функции контракта; хранилище — через ctx.stub" />
+
+Заготовка проекта — четыре файла: `package.json`, `tsconfig.json`, `src/index.ts` и сам контракт. Начнём с описания зачётки:
+
+```ts
+import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
+
+interface Zapis {
+  id: string;
+  fio: string;
+  gruppa: string;
+  ocenki: { predmet: string; ball: number }[];
+}
+
+@Info({ title: 'Zachetka', description: 'Зачётные книжки студентов' })
+export class ZachetkaContract extends Contract {
+  @Transaction()
+  async Zavesti(ctx: Context, id: string, fio: string, gruppa: string): Promise<void> {
+    const est = await ctx.stub.getState(id);
+    if (est && est.length > 0) {
+      throw new Error(`Зачётка ${id} уже заведена`);
+    }
+    const zapis: Zapis = { id, fio, gruppa, ocenki: [] };
+    await ctx.stub.putState(id, Buffer.from(JSON.stringify(zapis)));
+  }
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'extends Contract', label: 'наследование', note: 'базовый класс из fabric-contract-api; он превращает публичные методы в вызываемые функции' },
+  { text: '@Info({...})', label: 'подпись контракта', note: 'название и описание; попадают в метаданные, которые сеть отдаёт клиентам' },
+  { text: '@Transaction()', label: 'меняет состояние', note: 'пометка «этот вызов пишет»; без скобок с false считается изменяющим' },
+  { text: 'ctx: Context', label: 'первый аргумент всегда', note: 'контекст вызова: внутри него stub — единственный вход в реестр' },
+  { text: 'id: string, fio: string', label: 'аргументы — строки', note: 'из сети всё приходит строками; числа разбирают вручную' },
+  { text: 'ctx.stub.getState(id)', label: 'чтение', note: 'возвращает набор байт; для несуществующего ключа — пустой, а не null' },
+  { text: 'Buffer.from(JSON.stringify(...))', label: 'запись', note: 'хранилище хранит байты, поэтому объект сериализуют руками' },
+]} />
+
+<Hint type="important">
+`getState` для несуществующего ключа возвращает **пустой буфер**, а не `null` и не ошибку. Проверка «если существует» пишется как `est && est.length > 0`. Забыть про длину — самая частая ошибка новичка: пустой буфер истинный.
+</Hint>
+
+<SectionAnchor chapterId="fabric-chaincode" sectionId="ustroystvo" />
+
+## Проверки — внутри, всегда
+
+В Solidity проверки пишут через `require`. Здесь — обычным `throw`. Всё, что вылетело из функции, становится отказом в подтверждении:
+
+```ts
+  @Transaction()
+  async PostavitOcenku(ctx: Context, id: string, predmet: string, ball: string): Promise<void> {
+    const zapis = await this.prochitat(ctx, id);
+    const n = Number(ball);
+    if (!Number.isInteger(n) || n < 2 || n > 5) {
+      throw new Error(`Балл ${ball} вне диапазона 2..5`);
+    }
+    zapis.ocenki.push({ predmet, ball: n });
+    await ctx.stub.putState(id, Buffer.from(JSON.stringify(zapis)));
+  }
+
+  private async prochitat(ctx: Context, id: string): Promise<Zapis> {
+    const bytes = await ctx.stub.getState(id);
+    if (!bytes || bytes.length === 0) {
+      throw new Error(`Зачётки ${id} не существует`);
+    }
+    return JSON.parse(bytes.toString()) as Zapis;
+  }
+```
+
+Приватный метод `prochitat` не помечен декоратором — значит, снаружи он не виден и функцией контракта не является. Это удобный способ вынести общий код.
+
+Проверим на живой сети:
+
+```bash
+peer chaincode invoke ... -c '{"function":"PostavitOcenku","Args":["z-1","Физкультура","7"]}'
+```
+
+```text
+Error: endorsement failure during invoke. response: status:500
+message:"\320\221\320\260\320\273\320\273 7 \320\262\320\275\320\265 \320\264\320\270\320\260\320\277\320\260\320\267\320\276\320\275\320\260 2..5"
+```
+
+<Hint type="tip">
+Кириллицу утилита `peer` печатает восьмеричными последовательностями — это не порча текста, а способ показать не-ASCII в терминале. Сообщение целое, просто закодировано. Если такие тексты будут читать глазами через CLI, пишите их латиницей.
+</Hint>
+
+<SectionAnchor chapterId="fabric-chaincode" sectionId="proverki" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="fabric-chaincode" quizId="quiz-1" questions={[
+  { q: 'Что возвращает getState для несуществующего ключа?', options: ['null', 'Пустой набор байт — поэтому проверяют длину, а не истинность', 'Ошибку', 'Строку «undefined»'], correct: 1, why: 'Пустой буфер сам по себе истинный, и проверка «если есть» без длины пропускает несуществующий ключ.' },
+  { q: 'Как в чейнкоде отказывают в операции?', options: ['Возвращают false', 'Бросают исключение: всё вылетевшее из функции становится отказом в подтверждении', 'Пишут в лог', 'Вызывают revert'], correct: 1, why: 'Текст исключения доезжает до клиента как сообщение об отказе.' },
+  { q: 'Почему аргументы функций — строки?', options: ['Так удобнее', 'Из сети всё приходит строками; числа разбирают и проверяют внутри', 'Ограничение TypeScript', 'Чтобы экономить место'], correct: 1, why: 'Отсюда обязательная проверка Number.isInteger и диапазона внутри функции.' },
+]} />
+
+</Block>
+
+## Главная ловушка: код считают несколько пиров
+
+Вот место, где Fabric отличается от всего, что было раньше в треке.
+
+Когда клиент отправляет вызов, он отправляет его **каждому пиру, чья подпись нужна по политике**. Каждый пир выполняет функцию у себя, получает набор изменений и подписывает его. Клиент собирает подписи и сверяет: результаты обязаны совпасть побайтово.
+
+<Figure scheme="fc-nondeterminism" caption="Два пира посчитали разное — сделка не собралась и до упорядочивателя не доехала" />
+
+Добавим в контракт функцию со случайным баллом — так, как её написал бы человек, не знающий про это правило:
+
+```ts
+  @Transaction()
+  async PostavitSluchaino(ctx: Context, id: string, predmet: string): Promise<void> {
+    const zapis = await this.prochitat(ctx, id);
+    const ball = 3 + Math.floor(Math.random() * 3);
+    zapis.ocenki.push({ predmet, ball });
+    await ctx.stub.putState(id, Buffer.from(JSON.stringify(zapis)));
+  }
+```
+
+Вызов:
+
+```text
+Error: could not assemble transaction: ProposalResponsePayloads do not match (base64):
+'...eyJwcmVkbWV0Ijoi0KTQuNC70L7RgdC+0YTQuNGPIiwiYmFsbCI6NH1dfQ...'
+vs
+'...eyJwcmVkbWV0Ijoi0KTQuNC70L7RgdC+0YTQuNGPIiwiYmFsbCI6M31dfQ...'
+```
+
+В конце обеих длинных строк видно расхождение: у одного пира `"ball":4`, у другого `"ball":3`. Сделка **не собралась** — она даже не дошла до упорядочивателя и в цепочку не попала.
+
+<Hint type="important">
+Сообщение `ProposalResponsePayloads do not match` означает ровно одно: ваш код недетерминирован. Не ищите ошибку в сети — ищите в функции всё, что может дать разный ответ на разных машинах.
+</Hint>
+
+<SectionAnchor chapterId="fabric-chaincode" sectionId="lovushka" />
+
+## Почему `Date.now()` хуже, чем `Math.random()`
+
+Со случайным числом всё честно: ломается сразу и всегда. А теперь вторая функция — отметка времени:
+
+```ts
+  @Transaction()
+  async OtmetitVremya(ctx: Context, id: string): Promise<void> {
+    const zapis = await this.prochitat(ctx, id);
+    zapis.gruppa = `${zapis.gruppa} @ ${Date.now()}`;
+    await ctx.stub.putState(id, Buffer.from(JSON.stringify(zapis)));
+  }
+```
+
+Три вызова подряд на живой сети:
+
+```text
+1) INFO [chaincodeCmd] chaincodeInvokeOrQuery -> Chaincode invoke successful. result: status:200
+2) Error: could not assemble transaction: ProposalResponsePayloads do not match ...
+3) Error: could not assemble transaction: ProposalResponsePayloads do not match ...
+```
+
+Первый вызов **прошёл**. Два пира успели попасть в одну и ту же миллисекунду, строки совпали, сделка собралась и записалась. Следующие два не успели.
+
+Это хуже случайного числа, потому что такая ошибка проходит тестирование. На ненагруженной машине пиры часто попадают в одну миллисекунду, и разработчик делает вывод «работает». Ломаться начнёт под нагрузкой и у заказчика.
+
+Правильный способ взять время — из самой сделки:
+
+```ts
+const ts = ctx.stub.getTxTimestamp();
+```
+
+Эта отметка проставлена **клиентом один раз** и приезжает всем пирам одинаковой. То же правило касается любых других источников расхождения.
+
+<Block kind="fact">
+
+Чего не должно быть в чейнкоде:
+
+- `Math.random()` и любой другой источник случайности;
+- `Date.now()`, `new Date()` — только `ctx.stub.getTxTimestamp()`;
+- обращений к внешним службам по сети: два пира получат разные ответы;
+- чтения файлов, переменных окружения, имени машины;
+- перебора ключей объекта там, где порядок не гарантирован, если от порядка зависит результат.
+
+</Block>
+
+<SectionAnchor chapterId="fabric-chaincode" sectionId="date-now" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="fabric-chaincode" quizId="quiz-2" questions={[
+  { q: 'Что означает «ProposalResponsePayloads do not match»?', options: ['Сеть недоступна', 'Пиры посчитали разный результат — код недетерминирован', 'Кончилось место', 'Не хватает подписей'], correct: 1, why: 'Клиент сверяет ответы пиров побайтово и отказывается собирать сделку при расхождении.' },
+  { q: 'Почему Date.now() в чейнкоде опаснее Math.random()?', options: ['Он медленнее', 'Он ломается через раз: на ненагруженной машине пиры попадают в одну миллисекунду и ошибка проходит тестирование', 'Он не поддерживается', 'Он даёт неверное время'], correct: 1, why: 'В живом прогоне один вызов из трёх прошёл — и именно это делает ошибку незаметной до продакшена.' },
+  { q: 'Как правильно взять время в чейнкоде?', options: ['Date.now()', 'ctx.stub.getTxTimestamp() — отметка проставлена клиентом и одинакова у всех пиров', 'new Date().getTime()', 'Никак, время недоступно'], correct: 1, why: 'Отметка приезжает вместе со сделкой, поэтому расхождения не возникает.' },
+]} />
+
+</Block>
+
+## История ключа: то, чего нет в открытых сетях
+
+Хранилище состояния держит **одно** значение на ключ. Но сама цепочка помнит все записи, и Fabric даёт к ним прямой доступ:
+
+```ts
+  @Transaction(false)
+  @Returns('string')
+  async Istoriya(ctx: Context, id: string): Promise<string> {
+    const it = await ctx.stub.getHistoryForKey(id);
+    const versii: unknown[] = [];
+    for (let r = await it.next(); !r.done; r = await it.next()) {
+      const v = r.value;
+      versii.push({
+        txId: v.txId,
+        udalena: v.isDelete,
+        znachenie: v.value.length ? JSON.parse(v.value.toString()) : null,
+      });
+    }
+    await it.close();
+    return JSON.stringify(versii);
+  }
+```
+
+<SyntaxBreakdown parts={[
+  { text: '@Transaction(false)', label: 'только чтение', note: 'вызов не меняет состояние: его можно выполнить на одном пире и не отправлять упорядочивателю' },
+  { text: 'getHistoryForKey(id)', label: 'все версии', note: 'возвращает перебор от новых к старым; каждая запись помнит свою сделку' },
+  { text: 'it.next()', label: 'шаг перебора', note: 'перебор асинхронный: сведения подтягиваются по мере чтения' },
+  { text: 'v.isDelete', label: 'пометка удаления', note: 'удалённая запись остаётся в истории с этим признаком и пустым значением' },
+  { text: 'it.close()', label: 'закрыть перебор', note: 'обязательно: незакрытый перебор держит ресурсы пира' },
+]} />
+
+Вызов после четырёх записей выдаёт всю историю:
+
+```text
+[{"txId":"a23931d6…","udalena":false,"znachenie":{…"ocenki":[три оценки]}},
+ {"txId":"4b9288b1…","udalena":false,"znachenie":{…"ocenki":[две оценки]}},
+ {"txId":"be7d7a83…","udalena":false,"znachenie":{…"ocenki":[одна оценка]}},
+ {"txId":"8d102bdb…","udalena":false,"znachenie":{…"ocenki":[]}}]
+```
+
+<Figure scheme="fc-state-vs-history" caption="Состояние отвечает «как сейчас», история — «как было и кто менял»" />
+
+<Hint type="fact">
+В Ethereum такого вызова нет. Там, чтобы узнать историю поля, пишут события и потом собирают их снаружи. Здесь история ключа — встроенная возможность, и именно она делает Fabric естественным выбором для журналов: дипломов, поставок, медицинских карт.
+</Hint>
+
+<SectionAnchor chapterId="fabric-chaincode" sectionId="istoriya" />
+
+## Сборка
+
+Fabric запускает чейкод в контейнере и вызывает `npm start`. Для TypeScript это значит: собрать проект заранее, а в `package.json` указать собранный файл.
+
+```json
+{
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "fabric-chaincode-node start"
+  },
+  "dependencies": {
+    "fabric-contract-api": "^2.5.4",
+    "fabric-shim": "^2.5.4"
+  }
+}
+```
+
+И точка входа, которая перечисляет контракты:
+
+```ts
+import { ZachetkaContract } from './zachetka';
+export { ZachetkaContract } from './zachetka';
+export const contracts = [ZachetkaContract];
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'main: dist/index.js', label: 'что запускать', note: 'собранный файл, а не исходник: контейнер про TypeScript ничего не знает' },
+  { text: 'export const contracts', label: 'список контрактов', note: 'по нему среда исполнения находит классы; забыть его — «контракт не найден» при вызове' },
+  { text: 'fabric-chaincode-node start', label: 'команда запуска', note: 'поднимает связь с пиром и ждёт вызовов' },
+  { text: 'experimentalDecorators', label: 'в tsconfig', note: 'без этой настройки декораторы @Transaction не соберутся' },
+]} />
+
+Проверка перед упаковкой — обычная:
+
+```bash
+npm run build
+npx tsc --noEmit
+```
+
+<SectionAnchor chapterId="fabric-chaincode" sectionId="sborka" />
+
+## Типичные ошибки
+
+**Ошибка 1. Проверка существования без длины.**
+
+```ts
+if (est) { throw new Error('уже есть'); }     // сработает ВСЕГДА
+```
+
+Пустой буфер истинный. Нужно `est && est.length > 0`.
+
+**Ошибка 2. Забыли `await`.**
+
+`getState` и `putState` асинхронные. Без `await` функция завершится раньше записи, и в набор изменений ничего не попадёт — молча, без ошибки.
+
+**Ошибка 3. Число пришло строкой.**
+
+```ts
+zapis.ocenki.push({ predmet, ball });    // ball === "5", а не 5
+```
+
+Из сети всё приходит строками. Забыли `Number(...)` — в реестр уедет строка, и первое же сравнение `ball > 4` начнёт врать.
+
+**Ошибка 4. Не собрали проект перед упаковкой.**
+
+Пакет соберётся, установится и даже одобрится. Упадёт только на первом вызове — потому что `dist/index.js` в нём нет.
+
+**Ошибка 5. Забыли `export const contracts`.**
+
+```text
+Error: endorsement failure during invoke. response: status:500
+message:"Contract name is not known"
+```
+
+<SectionAnchor chapterId="fabric-chaincode" sectionId="oshibki" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="fabric-chaincode" quizId="quiz-3" questions={[
+  { q: 'Чем @Transaction(false) отличается от @Transaction()?', options: ['Ничем', 'Помечает вызов как читающий: его выполняет один пир и упорядочивателю не отправляют', 'Отключает проверки', 'Делает метод приватным'], correct: 1, why: 'Чтение не меняет состояние, поэтому блока для него не нужно.' },
+  { q: 'Что даёт getHistoryForKey?', options: ['Текущее значение', 'Все версии ключа с номерами сделок и пометкой об удалении', 'Список ключей', 'Размер хранилища'], correct: 1, why: 'В открытых сетях такого вызова нет — там историю собирают из событий снаружи.' },
+  { q: 'Функция без await у putState завершилась без ошибки, но запись не появилась. Почему?', options: ['Нет прав', 'Функция закончилась раньше записи, и изменение не попало в набор', 'Ключ занят', 'Пир был занят'], correct: 1, why: 'Молчаливая потеря записи — самая неприятная из ошибок этого списка.' },
+]} />
+
+</Block>
+
+## Шпаргалка по главе
+
+<Block kind="cheatsheet">
+
+| Что нужно | Как |
+| --- | --- |
+| Прочитать значение | `await ctx.stub.getState(id)` → байты, пустые если нет |
+| Записать значение | `await ctx.stub.putState(id, Buffer.from(JSON.stringify(v)))` |
+| Удалить | `await ctx.stub.deleteState(id)` — из состояния, не из истории |
+| Все версии ключа | `await ctx.stub.getHistoryForKey(id)` |
+| Время сделки | `ctx.stub.getTxTimestamp()` |
+| Кто вызвал | `ctx.clientIdentity.getMSPID()` |
+| Пометить чтение | `@Transaction(false)` над методом |
+| Собрать проект | `npm run build` → `dist/index.js` |
+
+</Block>
+
+<SectionAnchor chapterId="fabric-chaincode" sectionId="shpargalka" />
+
+## Словарь главы
+
+<Block kind="vocab">
+
+| Термин | Что это |
+| --- | --- |
+| Чейнкод | Смарт-контракт Fabric: обычная программа на TypeScript, Go или Java |
+| Контекст (`ctx`) | Первый аргумент любой функции контракта; внутри него `stub` |
+| `stub` | Единственный вход в реестр: чтение, запись, история, время сделки |
+| Состояние | Быстрая база «ключ → значение»: одно текущее значение на ключ |
+| История ключа | Все версии значения с номерами сделок; хранится в самой цепочке |
+| Детерминизм | Требование: одинаковый вызов даёт одинаковый результат на всех пирах |
+| Набор изменений | То, что пир подписывает: какие ключи прочитаны и какие записаны |
+| `@Transaction(false)` | Пометка «только чтение»: блок для такого вызова не нужен |
+
+</Block>
+
+<SectionAnchor chapterId="fabric-chaincode" sectionId="slovar" />
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="fabric-chaincode"
+  trainerId="trainer-fabric-chaincode"
+  targetCpm={95}
+  targetAccuracy={88}
+  pools={[
+    { label: 'Каркас контракта', snippets: [
+      'export class ZachetkaContract extends Contract {',
+      'async Zavesti(ctx: Context, id: string, fio: string)',
+      "import { Context, Contract, Transaction } from 'fabric-contract-api';",
+    ] },
+    { label: 'Работа с реестром', snippets: [
+      'const bytes = await ctx.stub.getState(id);',
+      'await ctx.stub.putState(id, Buffer.from(JSON.stringify(zapis)));',
+      'const it = await ctx.stub.getHistoryForKey(id);',
+    ] },
+    { label: 'Проверки', snippets: [
+      'if (!bytes || bytes.length === 0) throw new Error(`net ${id}`);',
+      'if (!Number.isInteger(n) || n < 2 || n > 5)',
+      'const ts = ctx.stub.getTxTimestamp();',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="fabric-chaincode" sectionId="trenazher" />
+
+## Что должен уметь после главы
+
+- написать контракт-класс с функциями чтения и записи;
+- правильно проверить существование ключа и разобрать числовой аргумент;
+- объяснить, почему код исполняется несколькими пирами и что такое детерминизм;
+- узнать недетерминизм по сообщению `ProposalResponsePayloads do not match`;
+- взять время сделки правильным способом;
+- достать историю ключа и объяснить, чем она отличается от состояния;
+- собрать проект так, чтобы среда исполнения нашла точку входа.
+
+<SectionAnchor chapterId="fabric-chaincode" sectionId="chto-umet" />
+
+## Проверка по главе
+
+<ChapterExam chapterId="fabric-chaincode" questions={[
+  { q: 'Что такое чейнкод?', options: ['Специальный язык Fabric', 'Смарт-контракт, написанный на обычном языке — TypeScript, Go или Java', 'Формат блока', 'Утилита командной строки'], correct: 1, why: 'Отдельного языка, как Solidity в Ethereum, здесь нет.' },
+  { q: 'Где живут данные контракта?', options: ['В полях класса', 'В общем хранилище «ключ — значение», доступном через ctx.stub', 'В файле на диске', 'В памяти процесса'], correct: 1, why: 'У контракта нет собственных полей: он читает и пишет в реестр.' },
+  { q: 'getState для несуществующего ключа возвращает', options: ['null', 'пустой набор байт — проверять надо длину', 'ошибку', 'undefined'], correct: 1, why: 'Пустой буфер истинный, поэтому проверка без длины ничего не поймает.' },
+  { q: 'Почему нельзя вызывать Math.random() в чейнкоде?', options: ['Медленно', 'Пиры посчитают разное, и сделка не соберётся: ProposalResponsePayloads do not match', 'Запрещено линтером', 'Нет такой функции'], correct: 1, why: 'Клиент сверяет ответы пиров побайтово.' },
+  { q: 'Чем Date.now() опаснее Math.random()?', options: ['Ничем', 'Ломается через раз: иногда пиры попадают в одну миллисекунду, и ошибка проходит тестирование', 'Работает медленнее', 'Возвращает неверное время'], correct: 1, why: 'В живом прогоне один вызов из трёх прошёл — именно так такая ошибка и доезжает до продакшена.' },
+  { q: 'Правильный способ взять время сделки', options: ['Date.now()', 'ctx.stub.getTxTimestamp()', 'new Date()', 'время недоступно'], correct: 1, why: 'Отметку проставляет клиент один раз, и она приезжает всем пирам одинаковой.' },
+  { q: 'Что даёт getHistoryForKey?', options: ['Текущее значение', 'Все версии ключа с номерами сделок и признаком удаления', 'Список всех ключей', 'Размер базы'], correct: 1, why: 'Удалённый ключ остаётся в истории с пометкой isDelete.' },
+  { q: 'Зачем @Transaction(false)?', options: ['Отключить проверки', 'Пометить вызов читающим: он выполняется на одном пире и не идёт в блок', 'Сделать метод приватным', 'Ускорить запись'], correct: 1, why: 'Чтение не меняет состояние, значит блок для него не нужен.' },
+  { q: 'Метод без декоратора @Transaction', options: ['вызывается снаружи как обычно', 'функцией контракта не является — это внутренний помощник', 'вызывает ошибку сборки', 'считается читающим'], correct: 1, why: 'Так выносят общий код: например, чтение с проверкой существования.' },
+  { q: 'Забыли await у putState. Что произойдёт?', options: ['Ошибка компиляции', 'Функция завершится раньше записи, изменение не попадёт в набор — молча', 'Запись задвоится', 'Ничего'], correct: 1, why: 'Отсутствие ошибки и делает эту ошибку самой неприятной.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Чейнкод для разработчика](https://hyperledger-fabric.readthedocs.io/en/release-2.5/chaincode4ade.html) — интерфейс `stub` целиком.
+- [fabric-contract-api для Node](https://hyperledger.github.io/fabric-chaincode-node/release-2.5/api/) — справочник по декораторам и контексту.
+- [asset-transfer-basic на TypeScript](https://github.com/hyperledger/fabric-samples/tree/main/asset-transfer-basic/chaincode-typescript) — эталонный пример из поставки.
+- [Приватные данные](https://hyperledger-fabric.readthedocs.io/en/release-2.5/private-data/private-data.html) — что делать, когда часть данных не должна видеть даже своя организация.

@@ -88,6 +88,10 @@ import { auditToolsSchemes } from './figures/auditTools';
 import { auditReportSchemes } from './figures/auditReport';
 import { fabricIntroSchemes } from './figures/fabricIntro';
 import { fabricNetworkSchemes } from './figures/fabricNetwork';
+import { fabricChaincodeSchemes } from './figures/fabricChaincode';
+import { fabricLifecycleSchemes } from './figures/fabricLifecycle';
+import { fabricTxSchemes } from './figures/fabricTx';
+import { fabricVsEthSchemes } from './figures/fabricVsEth';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -201,6 +205,10 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(auditReportSchemes),
     ...Object.keys(fabricIntroSchemes),
     ...Object.keys(fabricNetworkSchemes),
+    ...Object.keys(fabricChaincodeSchemes),
+    ...Object.keys(fabricLifecycleSchemes),
+    ...Object.keys(fabricTxSchemes),
+    ...Object.keys(fabricVsEthSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

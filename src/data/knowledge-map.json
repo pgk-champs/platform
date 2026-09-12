@@ -824,11 +824,43 @@
     "path": "blockchain/fabric-network.mdx"
   },
   {
+    "id": "fabric-chaincode",
+    "title": "Смарт-контракт для Fabric: зачётка на TypeScript",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 59,
+    "path": "blockchain/fabric-chaincode.mdx"
+  },
+  {
+    "id": "fabric-lifecycle",
+    "title": "Жизненный цикл чейнкода: пять шагов до первого вызова",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 60,
+    "path": "blockchain/fabric-lifecycle.mdx"
+  },
+  {
+    "id": "fabric-tx",
+    "title": "Путь транзакции: почему «успешно» не значит «записано»",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 61,
+    "path": "blockchain/fabric-tx.mdx"
+  },
+  {
+    "id": "fabric-vs-eth",
+    "title": "Fabric и Ethereum: одна задача, два решения",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 62,
+    "path": "blockchain/fabric-vs-eth.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 59,
+    "order": 63,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]

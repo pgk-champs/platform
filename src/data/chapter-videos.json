@@ -2761,5 +2761,113 @@
       "title": "Introduction to RAFT on Hyperledger Fabric",
       "channel": "A Cloudfan"
     }
+  ],
+  "fabric-chaincode": [
+    {
+      "videoId": "c26Ub_tYHmI",
+      "title": "JavaScript Smart Contracts for Hyperledger Fabric - Part 2 | Convector",
+      "channel": "Covalent"
+    },
+    {
+      "videoId": "wMgWgd-LpVI",
+      "title": "Hyperledger Fabric: Coding the Fabric with Node",
+      "channel": "Blockchain Technology Conference"
+    },
+    {
+      "videoId": "80w8yiud4Vc",
+      "title": "Tech Tuesday: How to Write and Deploy Chaincode for Hyperledger Fabric",
+      "channel": "Kaleido"
+    },
+    {
+      "videoId": "Jb-CvGp_Bmo",
+      "title": "Intro to Smart Contract Development in Hyperledger Fabric with CC-Tools",
+      "channel": "GoLedger"
+    },
+    {
+      "videoId": "DH8x72FkbNY",
+      "title": "Blockchain Tutorials | Hyperledger Fabric | ChainCodeStubInterface Introduction",
+      "channel": "Upskilltym"
+    }
+  ],
+  "fabric-lifecycle": [
+    {
+      "videoId": "p_L56LFLgi8",
+      "title": "Blockchain Tutorials| Hyperledger Fabric Chaincode Lifecycle| Package Chaincode",
+      "channel": "Upskilltym"
+    },
+    {
+      "videoId": "0CUJhesGqr4",
+      "title": "Hyperledger Fabric 2.0 Chaincode Updates",
+      "channel": "A Cloudfan"
+    },
+    {
+      "videoId": "M-caS8_HGJw",
+      "title": "Hyperledger Fabric Tutorial: Using Test Network & Deploying Sample Chaincode",
+      "channel": "tuyenngduc"
+    },
+    {
+      "videoId": "SXTAVFM2liU",
+      "title": "Hyperledger fabric install & instantiate chaincode",
+      "channel": "Hyperledger Fabric"
+    },
+    {
+      "videoId": "uFwkLlZQEGY",
+      "title": "Deploy your smart contract on Hyperledger | Hyperledger Course | Code Eater - Blockchain| Hindi",
+      "channel": "Code Eater"
+    }
+  ],
+  "fabric-tx": [
+    {
+      "videoId": "nBXr7dLXAbE",
+      "title": "Hyperledger Fabric – Transaction Flow",
+      "channel": "NPTEL-NOC IITM"
+    },
+    {
+      "videoId": "dH6E0D-01lc",
+      "title": "7 Steps of a HyperLedger Fabric Blockchain Transaction",
+      "channel": "Ernesto"
+    },
+    {
+      "videoId": "i8SGcy569Uc",
+      "title": "Hyperledger Fabric Consensus: Transaction Lifecycle Explained | Module 1.4",
+      "channel": "KryptoMindz Technologies"
+    },
+    {
+      "videoId": "iM71d2krbS4",
+      "title": "Multiversion Concurrency Control (MVCC) Explained in Simple Terms",
+      "channel": "Cameron McKenzie"
+    },
+    {
+      "videoId": "s-J7G61_m3M",
+      "title": "Failure and Recovery | Hyperledger Fabric Blockchain  | Endorsement | VSCC | MVCC | Ledger File",
+      "channel": "Learning Blockchain"
+    }
+  ],
+  "fabric-vs-eth": [
+    {
+      "videoId": "tjrvWvX4diA",
+      "title": "Ethereum vs Hyperledger | Which Blockchain Technology to Choose | Blockchain Training |  Edureka",
+      "channel": "edureka!"
+    },
+    {
+      "videoId": "nxP-H3IE-Bg",
+      "title": "Hyperledger vs Ethereum | Difference between Hyperledger and Ethereum | 101 Blockchains",
+      "channel": "101Blockchains"
+    },
+    {
+      "videoId": "UvgeQBztKx4",
+      "title": "Николай Ерёмин - Архитектура приватного блокчейн на Hyperledger Fabric. Стачка 18",
+      "channel": "Стачка IT конференция"
+    },
+    {
+      "videoId": "RuTW-Rqz-F0",
+      "title": "Public Blockchain vs Private: Which Is Better?",
+      "channel": "On The Block (by Espeo Software)"
+    },
+    {
+      "videoId": "ecY2U5kTBJ8",
+      "title": "Blockchain Simplified: Public, Private, Consortium & Hybrid Explained | Key Differences",
+      "channel": "Neeraj"
+    }
   ]
 }

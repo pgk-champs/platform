@@ -88,6 +88,10 @@ import { auditToolsSchemes } from './figures/auditTools';
 import { auditReportSchemes } from './figures/auditReport';
 import { fabricIntroSchemes } from './figures/fabricIntro';
 import { fabricNetworkSchemes } from './figures/fabricNetwork';
+import { fabricChaincodeSchemes } from './figures/fabricChaincode';
+import { fabricLifecycleSchemes } from './figures/fabricLifecycle';
+import { fabricTxSchemes } from './figures/fabricTx';
+import { fabricVsEthSchemes } from './figures/fabricVsEth';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -173,6 +177,10 @@ const SCHEMES = {
   ...auditReportSchemes,
   ...fabricIntroSchemes,
   ...fabricNetworkSchemes,
+  ...fabricChaincodeSchemes,
+  ...fabricLifecycleSchemes,
+  ...fabricTxSchemes,
+  ...fabricVsEthSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

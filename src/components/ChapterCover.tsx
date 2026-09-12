@@ -775,6 +775,89 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="195" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>BatchTimeout 2s</text>
     </g>
   ),
+  /* Смарт-контракт для Fabric: зачётка */
+  'fabric-chaincode': () => (
+    <g strokeLinecap="round">
+      <rect x="24" y="36" width="152" height="74" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="38" y="56" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>@Transaction()</text>
+      <text x="38" y="72" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>Zavesti(ctx, id)</text>
+      <text x="38" y="92" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>putState(id, ...)</text>
+
+      <path d="M100 110 L100 126 M62 126 L138 126 M62 126 L62 138 M138 126 L138 138" stroke={ACCENT} strokeWidth={2.5} fill="none" />
+
+      <rect x="28" y="138" width="68" height="32" rx="7" fill={SOFT} stroke={ACCENT} strokeWidth={2.5} />
+      <text x="62" y="158" textAnchor="middle" fontSize="6.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>ball: 5</text>
+
+      <rect x="104" y="138" width="68" height="32" rx="7" fill="rgba(255,140,140,0.16)" stroke="rgba(255,140,140,0.85)" strokeWidth={2.5} />
+      <text x="138" y="158" textAnchor="middle" fontSize="6.5" fontWeight={800} fill="rgba(255,170,170,0.95)" fontFamily={MONO}>ball: 3</text>
+
+      <text x="100" y="192" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>payloads do not match</text>
+    </g>
+  ),
+  /* Жизненный цикл чейнкода: пять шагов */
+  'fabric-lifecycle': () => (
+    <g strokeLinecap="round">
+      {[
+        { y: 36, n: '1', t: 'package' },
+        { y: 70, n: '2', t: 'install' },
+        { y: 104, n: '3', t: 'approve' },
+        { y: 138, n: '4', t: 'ready?' },
+        { y: 172, n: '5', t: 'commit' },
+      ].map((s, i) => (
+        <g key={s.n}>
+          <circle cx="44" cy={s.y + 14} r="12" fill={i > 1 ? SOFT : 'rgba(0,0,0,0.3)'} stroke={i > 1 ? ACCENT : INK} strokeWidth={2.5} />
+          <text x="44" y={s.y + 18} textAnchor="middle" fontSize="8" fontWeight={800} fill="#fff" fontFamily={MONO}>{s.n}</text>
+          <rect x="66" y={s.y} width="108" height="28" rx="7" fill={i > 1 ? SOFT : 'rgba(0,0,0,0.3)'} stroke={i > 1 ? ACCENT : INK} strokeWidth={2.5} />
+          <text x="120" y={s.y + 18} textAnchor="middle" fontSize="7" fontWeight={800} fill={i > 1 ? ACCENT : 'rgba(255,255,255,0.6)'} fontFamily={MONO}>{s.t}</text>
+          {i < 4 && <path d={`M44 ${s.y + 26} L44 ${s.y + 36}`} stroke={ACCENT} strokeWidth={2.5} />}
+        </g>
+      ))}
+      <text x="100" y="212" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>sequence 1 → 2 → 3</text>
+    </g>
+  ),
+  /* Путь транзакции в Fabric */
+  'fabric-tx': () => (
+    <g strokeLinecap="round">
+      {[
+        { y: 34, t: 'proposal', ok: true },
+        { y: 74, t: 'endorse', ok: true },
+        { y: 114, t: 'order', ok: true },
+        { y: 154, t: 'validate', ok: false },
+      ].map((s, i) => (
+        <g key={s.t}>
+          <rect x="30" y={s.y} width="140" height="30" rx="7"
+            fill={s.ok ? SOFT : 'rgba(255,140,140,0.16)'}
+            stroke={s.ok ? ACCENT : 'rgba(255,140,140,0.85)'} strokeWidth={2.5} />
+          <text x="100" y={s.y + 19} textAnchor="middle" fontSize="7" fontWeight={800}
+            fill={s.ok ? ACCENT : 'rgba(255,170,170,0.95)'} fontFamily={MONO}>{s.t}</text>
+          {i < 3 && <path d={`M100 ${s.y + 30} L100 ${s.y + 40}`} stroke={ACCENT} strokeWidth={2.5} />}
+        </g>
+      ))}
+      <text x="100" y="200" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,170,170,0.9)" fontFamily={MONO}>status 200 ≠ записано</text>
+    </g>
+  ),
+  /* Fabric и Ethereum: одна задача, два решения */
+  'fabric-vs-eth': () => (
+    <g strokeLinecap="round">
+      <rect x="20" y="40" width="78" height="150" rx="10" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="59" y="62" textAnchor="middle" fontSize="6.5" fontWeight={800} fill="#fff" fontFamily={MONO}>ETH</text>
+      <text x="59" y="86" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>газ</text>
+      <text x="59" y="104" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>публично</text>
+      <text x="59" y="122" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>Solidity</text>
+      <text x="59" y="146" textAnchor="middle" fontSize="9" fontWeight={800} fill="#fff" fontFamily={MONO}>96830</text>
+      <text x="59" y="162" textAnchor="middle" fontSize="5" fontWeight={800} fill="rgba(255,255,255,0.4)" fontFamily={MONO}>газа</text>
+
+      <rect x="102" y="40" width="78" height="150" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="141" y="62" textAnchor="middle" fontSize="6.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>FABRIC</text>
+      <text x="141" y="86" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>без платы</text>
+      <text x="141" y="104" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>по пропуску</text>
+      <text x="141" y="122" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>TypeScript</text>
+      <text x="141" y="146" textAnchor="middle" fontSize="9" fontWeight={800} fill={ACCENT} fontFamily={MONO}>2,1 с</text>
+      <text x="141" y="162" textAnchor="middle" fontSize="5" fontWeight={800} fill="rgba(255,255,255,0.4)" fontFamily={MONO}>на запись</text>
+
+      <text x="100" y="210" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>одна зачётка, два пути</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1804,7 +1887,11 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'audit-report': { track: 'blockchain', num: '56', title: 'Чек-лист и отчёт: как сдавать безопасность' },
   'fabric-intro': { track: 'blockchain', num: '57', title: 'Приватный блокчейн: сеть, куда пускают по пропуску' },
   'fabric-network': { track: 'blockchain', num: '58', title: 'Устройство сети: организации, политики, блоки' },
-  'waves-first-network': { track: 'blockchain', num: '59', title: 'Первая сеть на Waves Enterprise' },
+  'fabric-chaincode': { track: 'blockchain', num: '59', title: 'Смарт-контракт для Fabric: зачётка на TypeScript' },
+  'fabric-lifecycle': { track: 'blockchain', num: '60', title: 'Жизненный цикл чейнкода: пять шагов' },
+  'fabric-tx': { track: 'blockchain', num: '61', title: 'Путь транзакции: почему «успешно» не значит «записано»' },
+  'fabric-vs-eth': { track: 'blockchain', num: '62', title: 'Fabric и Ethereum: одна задача, два решения' },
+  'waves-first-network': { track: 'blockchain', num: '63', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '27', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '28', title: 'История Java, Android и Kotlin' },
