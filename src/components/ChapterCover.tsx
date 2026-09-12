@@ -2124,6 +2124,54 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="208" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>текст живёт снаружи</text>
     </g>
   ),
+  /* Селект и нижняя шторка */
+  'kit-select': () => (
+    <g strokeLinecap="round">
+      <rect x="30" y="34" width="140" height="180" rx="12" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+
+      <rect x="42" y="48" width="116" height="26" rx="6" fill="rgba(255,255,255,0.1)" stroke={ACCENT} strokeWidth={2} />
+      <text x="52" y="65" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>Самара</text>
+      <text x="146" y="65" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>⌄</text>
+
+      <rect x="30" y="112" width="140" height="102" rx="12" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <rect x="86" y="122" width="28" height="4" rx="2" fill={ACCENT} />
+      {['Самара', 'Тольятти', 'Сызрань'].map((t, i) => (
+        <text key={t} x="100" y={148 + i * 20} textAnchor="middle" fontSize="6.5" fontWeight={800}
+          fill={i === 0 ? ACCENT : 'rgba(255,255,255,0.55)'} fontFamily={MONO}>{t}</text>
+      ))}
+
+      <text x="100" y="236" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>шторка вместо списка</text>
+    </g>
+  ),
+  /* Поиск: пауза и состояния выдачи */
+  'kit-search': () => (
+    <g strokeLinecap="round">
+      <rect x="28" y="38" width="144" height="28" rx="8" fill="rgba(0,0,0,0.3)" stroke={ACCENT} strokeWidth={2.5} />
+      <circle cx="44" cy="52" r="5" fill="none" stroke={ACCENT} strokeWidth={2} />
+      <path d="M48 56 L53 61" stroke={ACCENT} strokeWidth={2} />
+      <text x="60" y="56" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>ноутбук</text>
+      <text x="160" y="56" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.4)" fontFamily={MONO}>×</text>
+
+      <text x="100" y="84" textAnchor="middle" fontSize="5.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>пауза 400 мс</text>
+
+      {[
+        { y: 94, t: 'Idle', on: false },
+        { y: 118, t: 'Loading', on: false },
+        { y: 142, t: 'Found', on: true },
+        { y: 166, t: 'Empty', on: false },
+        { y: 190, t: 'Failed', on: false },
+      ].map((r) => (
+        <g key={r.t}>
+          <rect x="40" y={r.y} width="120" height="18" rx="5"
+            fill={r.on ? SOFT : 'rgba(0,0,0,0.25)'} stroke={r.on ? ACCENT : INK} strokeWidth={r.on ? 2.5 : 1.6} />
+          <text x="100" y={r.y + 12} textAnchor="middle" fontSize="5.5" fontWeight={800}
+            fill={r.on ? ACCENT : 'rgba(255,255,255,0.4)'} fontFamily={MONO}>{r.t}</text>
+        </g>
+      ))}
+
+      <text x="100" y="226" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>один запрос вместо семи</text>
+    </g>
+  ),
   'kotlin-coroutines': () => (
     <g strokeLinecap="round">
       <rect x="14" y="44" width="172" height="30" rx="9" fill={SOFT} stroke={INK} strokeWidth={3} />
@@ -2186,20 +2234,22 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'scaffold-bars': { track: 'mobile', num: '15', title: 'Scaffold: каркас экрана, шапка и нижняя панель' },
   'kit-buttons': { track: 'mobile', num: '16', title: 'Компонент библиотеки: кнопки, слоты и состояния' },
   'kit-inputs': { track: 'mobile', num: '17', title: 'Поля ввода: подпись, ошибка и клавиатура' },
-  'kotlin-coroutines': { track: 'mobile', num: '18', title: 'Корутины: как приложение не зависает' },
-  'flow-streams': { track: 'mobile', num: '19', title: 'Flow: поток значений во времени' },
-  'viewmodel-state': { track: 'mobile', num: '20', title: 'ViewModel: состояние, которое переживает поворот' },
-  'app-layers': { track: 'mobile', num: '21', title: 'Слои приложения: data, domain и репозиторий' },
-  'network-retrofit': { track: 'mobile', num: '22', title: 'Сеть: тот же экран, но с настоящими данными' },
-  'network-errors': { track: 'mobile', num: '23', title: 'Когда сети нет: ошибки, повторы и что видит пользователь' },
-  'data-storage': { track: 'mobile', num: '24', title: 'Хранение на устройстве: DataStore и Room' },
-  'cache-offline': { track: 'mobile', num: '25', title: 'Кэш и офлайн: база как источник истины' },
-  'clean-code': { track: 'mobile', num: '26', title: 'Чистый код: комментарии и логирование, которые оценивают' },
-  'auth-session': { track: 'mobile', num: '27', title: 'Авторизация: вход, живая сессия и биометрия' },
-  'device-features': { track: 'mobile', num: '28', title: 'Возможности устройства: камера, уведомления, виджет' },
-  'testing-mobile': { track: 'mobile', num: '29', title: 'Тестирование: MockWebServer, фейки и TDD' },
-  'kotlin-vs-java': { track: 'mobile', num: '30', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '31', title: 'История Java, Android и Kotlin' },
+  'kit-select': { track: 'mobile', num: '18', title: 'Селект и нижняя шторка: выбор одного из списка' },
+  'kit-search': { track: 'mobile', num: '19', title: 'Поиск: пауза в наборе и пять состояний выдачи' },
+  'kotlin-coroutines': { track: 'mobile', num: '20', title: 'Корутины: как приложение не зависает' },
+  'flow-streams': { track: 'mobile', num: '21', title: 'Flow: поток значений во времени' },
+  'viewmodel-state': { track: 'mobile', num: '22', title: 'ViewModel: состояние, которое переживает поворот' },
+  'app-layers': { track: 'mobile', num: '23', title: 'Слои приложения: data, domain и репозиторий' },
+  'network-retrofit': { track: 'mobile', num: '24', title: 'Сеть: тот же экран, но с настоящими данными' },
+  'network-errors': { track: 'mobile', num: '25', title: 'Когда сети нет: ошибки, повторы и что видит пользователь' },
+  'data-storage': { track: 'mobile', num: '26', title: 'Хранение на устройстве: DataStore и Room' },
+  'cache-offline': { track: 'mobile', num: '27', title: 'Кэш и офлайн: база как источник истины' },
+  'clean-code': { track: 'mobile', num: '28', title: 'Чистый код: комментарии и логирование, которые оценивают' },
+  'auth-session': { track: 'mobile', num: '29', title: 'Авторизация: вход, живая сессия и биометрия' },
+  'device-features': { track: 'mobile', num: '30', title: 'Возможности устройства: камера, уведомления, виджет' },
+  'testing-mobile': { track: 'mobile', num: '31', title: 'Тестирование: MockWebServer, фейки и TDD' },
+  'kotlin-vs-java': { track: 'mobile', num: '32', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '33', title: 'История Java, Android и Kotlin' },
   'what-is-blockchain': { track: 'blockchain', num: '01', title: 'Что такое блокчейн' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'solidity-hello': { track: 'blockchain', num: '03', title: 'Первый контракт: из чего состоит код' },

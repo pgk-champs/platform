@@ -107,6 +107,8 @@ import { layoutCardSchemes } from './figures/layoutCard';
 import { sprintFlowSchemes } from './figures/sprintFlow';
 import { kitButtonsSchemes } from './figures/kitButtons';
 import { kitInputsSchemes } from './figures/kitInputs';
+import { kitSelectSchemes } from './figures/kitSelect';
+import { kitSearchSchemes } from './figures/kitSearch';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -211,6 +213,8 @@ const SCHEMES = {
   ...sprintFlowSchemes,
   ...kitButtonsSchemes,
   ...kitInputsSchemes,
+  ...kitSelectSchemes,
+  ...kitSearchSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

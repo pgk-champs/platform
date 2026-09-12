@@ -1,0 +1,397 @@
+---
+title: 'Поиск: пауза в наборе и пять состояний выдачи'
+audience: 'мобилка'
+level: 'углубление'
+order: 19
+sidebar_position: 19
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="kit-search" />
+
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+import KotlinPlay from '@site/src/components/KotlinPlay';
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+
+# Поиск: пауза в наборе и пять состояний выдачи
+
+<ChapterProgress chapterId="kit-search" totalSections={11} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="kit-search" />
+
+## Зачем это нужно
+
+«Создайте компонент Поиск» — и рядом, в списке запросов к серверу, отдельной строкой: «Сделан запрос Поиск». Это один пункт критериев с двух сторон: компонент и то, что он вызывает.
+
+Поиск выглядит как поле ввода с иконкой, а внутри — три вещи, которых в обычном поле нет: **пауза перед отправкой**, **пять состояний выдачи** вместо одного списка и **гонка ответов**, из-за которой на экране оказывается выдача по устаревшему запросу.
+
+Весь код собран настоящим компилятором; сообщения об ошибках — его вывод.
+
+<SectionAnchor chapterId="kit-search" sectionId="zachem" />
+
+## Не на каждый символ
+
+<Figure scheme="kse-debounce" caption="Семь запросов на одно слово против одного" />
+
+Прямое решение — отправлять запрос из `onValueChange` — даёт семь запросов на слово «ноутбук». Это не только трафик: выдача под пальцами мигает и перестраивается на каждую букву, и попасть по нужной строке невозможно.
+
+Правильное поведение: подождать, пока человек **перестанет печатать**.
+
+```kotlin
+LaunchedEffect(query) {
+    if (query.length < minLength) return@LaunchedEffect
+    delay(debounceMillis)
+    onSearch(query)
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'LaunchedEffect(query)', label: 'работа, привязанная к значению', note: 'при смене query прошлая корутина ОТМЕНЯЕТСЯ и запускается новая — в этом весь приём' },
+  { text: 'delay(debounceMillis)', label: 'пауза', note: 'если за 400 мс человек набрал ещё букву, корутина не доживёт до следующей строки' },
+  { text: 'onSearch(query)', label: 'отправка', note: 'до неё дело дойдёт только у той корутины, чей запрос оказался последним' },
+  { text: 'query.length < minLength', label: 'порог длины', note: 'по одной букве искать нечего: сервер вернёт полкаталога, а человек всё равно ещё печатает' },
+  { text: 'return@LaunchedEffect', label: 'выход из лямбды', note: 'обычный return вышел бы из внешней функции — здесь нужна метка' },
+]} />
+
+<Hint type="important">
+Пауза здесь бесплатная — не нужно ни таймеров, ни отмены руками. Всю работу делает **ключ** у `LaunchedEffect`: сменился `query` — прошлая корутина отменена вместе со своим `delay`. Именно поэтому приём в Compose выглядит проще, чем в любой другой среде.
+</Hint>
+
+Проверим саму отмену на исполняемом примере — без Compose, на чистом Kotlin:
+
+<KotlinPlay code={`import kotlinx.coroutines.*
+
+fun main() = runBlocking {
+    var otpravleno = 0
+    var rabota: Job? = null
+
+    for (q in listOf("н", "но", "ноу", "ноут", "ноутб", "ноутбу", "ноутбук")) {
+        rabota?.cancel()                       // так делает LaunchedEffect при смене ключа
+        rabota = launch {
+            delay(400)
+            otpravleno++
+            println("запрос: " + q)
+        }
+        delay(80)                              // человек печатает быстрее паузы
+    }
+
+    rabota?.join()
+    println("всего запросов: " + otpravleno)
+}`} />
+
+<SectionAnchor chapterId="kit-search" sectionId="ne-na-kazhdyy" />
+
+## Ключ обязателен
+
+```kotlin
+@Composable fun P(q: String) { LaunchedEffect { println(q) } }
+```
+
+```text
+e: Probe.kt:4:32 'fun LaunchedEffect(block: suspend CoroutineScope.() -> Unit): Unit' is deprecated.
+LaunchedEffect must provide one or more 'key' parameters that define the identity of the
+LaunchedEffect and determine when its previous effect coroutine should be cancelled and a new
+effect launched for the new key.
+```
+
+Редкий случай, когда сообщение объясняет замысел целиком: ключ определяет, **когда прошлую корутину отменить и запустить новую**. Без ключа неясно, когда работу перезапускать, — поэтому вариант без ключей помечен устаревшим.
+
+А вот попытка подождать прямо в разметке:
+
+```kotlin
+@Composable fun P() { delay(400); Text("готово") }
+```
+
+```text
+e: Probe.kt:5:23 Suspend function 'suspend fun delay(timeMillis: Long): Unit' should be called only from a coroutine or another suspend function.
+```
+
+То же сообщение, что в прошлой главе про `hide()`. Разметка не ждёт — ждут корутины.
+
+<SectionAnchor chapterId="kit-search" sectionId="klyuch-obyazatelen" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-search" quizId="quiz-1" questions={[
+  { q: 'Почему нельзя отправлять запрос прямо из onValueChange?', options: ['Медленно работает', 'Получится по запросу на каждый символ: трафик, нагрузка и мигающая под пальцами выдача', 'Так нельзя технически', 'Сервер запретит'], correct: 1, why: 'На слово «ноутбук» уйдёт семь запросов вместо одного.' },
+  { q: 'Что делает ключ у LaunchedEffect?', options: ['Кеширует результат', 'Определяет, когда прошлую корутину отменить и запустить новую', 'Задаёт приоритет', 'Ограничивает время'], correct: 1, why: 'Это дословно сказано в сообщении об устаревании варианта без ключей.' },
+  { q: 'Зачем порог минимальной длины запроса?', options: ['Для скорости', 'По одной-двум буквам искать нечего: сервер вернёт полкаталога, а человек ещё печатает', 'Требование сервера', 'Для валидации'], correct: 1, why: 'Отсекает заведомо бессмысленные запросы до всякой паузы.' },
+]} />
+
+</Block>
+
+## Пять состояний, а не список
+
+<Figure scheme="kse-four-states" caption="Под полем поиска пять разных экранов" />
+
+Вторая половина компонента — то, что под полем. Подставить туда просто список значит потерять четыре состояния из пяти:
+
+```kotlin
+sealed interface SearchState<out T> {
+    data object Idle : SearchState<Nothing>
+    data object Loading : SearchState<Nothing>
+    data object Empty : SearchState<Nothing>
+    data class Found<T>(val items: List<T>) : SearchState<T>
+    data class Failed(val message: String) : SearchState<Nothing>
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'sealed interface', label: 'закрытый набор', note: 'наследников ровно пять и все известны компилятору — отсюда проверка полноты в when' },
+  { text: 'data object', label: 'состояние без данных', note: 'Idle, Loading и Empty ничего не несут: экземпляр нужен один на всю программу' },
+  { text: 'data class Found<T>', label: 'состояние с данными', note: 'единственное, где есть список; в остальных его нет — значит и обратиться к нему нельзя' },
+  { text: '<out T>', label: 'ковариантность', note: 'позволяет состоянию без данных объявить тип Nothing и подойти под любой T' },
+  { text: 'Failed(val message: String)', label: 'отказ с объяснением', note: 'в критериях это отдельный пункт: ошибку сети и ошибку сервера надо показать, а не проглотить' },
+]} />
+
+Компилятор следит, чтобы ни одно состояние не забыли:
+
+```kotlin
+sealed interface S { data object A : S; data object B : S }
+fun f(s: S): String = when (s) { is S.A -> "a" }
+```
+
+```text
+e: Probe.kt:3:23 'when' expression must be exhaustive. Add the 'B' branch or an 'else' branch.
+```
+
+<Hint type="important">
+Здесь стоит **не** писать `else`. Добавили шестое состояние — и компилятор пройдёт по всем местам, где его забыли обработать. С веткой `else` он промолчит, а пользователь увидит пустой экран. Это и есть главная причина брать закрытый набор, а не строку со статусом.
+</Hint>
+
+Разметка получается прямым перечислением:
+
+```kotlin
+when (state) {
+    is SearchState.Idle -> Text("Начните вводить название")
+    is SearchState.Loading -> Text("Ищем…")
+    is SearchState.Empty -> Text("Ничего не нашлось. Попробуйте другое слово")
+    is SearchState.Failed -> Text(state.message)
+    is SearchState.Found -> Column { state.items.forEach { item(it) } }
+}
+```
+
+<Hint type="fact">
+Различать «нашлось пусто» и «не смогли спросить» обязательно. Первое — нормальный результат, и человеку надо предложить изменить запрос. Второе — отказ, и там нужна кнопка «Повторить». Экран «ничего не нашлось» при выключенном интернете — классическая претензия на приёмке.
+</Hint>
+
+<SectionAnchor chapterId="kit-search" sectionId="pyat-sostoyaniy" />
+
+## Гонка ответов
+
+<Figure scheme="kse-race" caption="Ответ на «ноут» приехал позже и затёр выдачу по «ноутбук»" />
+
+Даже с паузой запросов может уйти несколько: человек набрал «ноут», задумался на полсекунды, дописал «бук». Ушло два запроса. Ответы вернутся в произвольном порядке — короткий может обогнать длинный, потому что по нему меньше данных.
+
+Результат: в поле «ноутбук», а на экране выдача по «ноут».
+
+Лечение в Compose встроено и уже написано: `LaunchedEffect(query)` при смене запроса **отменяет** прошлую корутину. Отменённая до `onSearch` не дойдёт — устаревшему ответу просто неоткуда взяться.
+
+<Hint type="tip">
+Это одно из мест, где Compose заметно проще предшественников. В обычном коде от гонки защищаются номером запроса: запомнили последний, при ответе сверили и выбросили чужой. Здесь достаточно указать ключ — остальное делает отмена.
+</Hint>
+
+<SectionAnchor chapterId="kit-search" sectionId="gonka-otvetov" />
+
+## Компонент целиком
+
+```kotlin
+@Composable
+fun KitSearchField(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onSearch: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    label: String = "Поиск",
+    placeholder: String = "Название товара",
+    minLength: Int = 3,
+    debounceMillis: Long = 400,
+) {
+    LaunchedEffect(query) {
+        if (query.length < minLength) return@LaunchedEffect
+        delay(debounceMillis)
+        onSearch(query)
+    }
+
+    KitTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        label = label,
+        modifier = modifier,
+        placeholder = placeholder,
+        imeAction = ImeAction.Search,
+        trailing = if (query.isNotEmpty()) {
+            { KitButtonGhost(text = "Очистить", onClick = { onQueryChange("") }) }
+        } else {
+            null
+        },
+    )
+}
+```
+
+Три мелочи, которые оценивают:
+
+- **`ImeAction.Search`** — на клавиатуре появляется лупа вместо «Далее»;
+- **кнопка очистки** показывается только когда есть что очищать;
+- **`onQueryChange` и `onSearch` — разные** параметры: первый срабатывает на каждый символ (поле должно печататься), второй — после паузы.
+
+<Hint type="important">
+Разделение этих двух обработчиков — главное в сигнатуре. Попытка обойтись одним приводит либо к запросу на каждый символ, либо к полю, которое не печатается, пока идёт пауза.
+</Hint>
+
+<SectionAnchor chapterId="kit-search" sectionId="komponent-tselikom" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-search" quizId="quiz-2" questions={[
+  { q: 'Почему в закрытом наборе состояний не стоит писать else?', options: ['else медленнее', 'С else компилятор промолчит при добавлении нового состояния, и пользователь увидит пустой экран', 'else запрещён в Kotlin', 'else ломает типы'], correct: 1, why: 'Без него компилятор пройдёт по всем местам, где новое состояние забыли обработать.' },
+  { q: 'Чем отличается Empty от Failed?', options: ['Ничем', 'Empty — нормальный результат, надо предложить изменить запрос; Failed — отказ, нужна кнопка «Повторить»', 'Empty для списков, Failed для строк', 'Failed это исключение'], correct: 1, why: 'Экран «ничего не нашлось» при выключенном интернете — классическая претензия на приёмке.' },
+  { q: 'Зачем onQueryChange и onSearch — разные параметры?', options: ['Для удобства', 'Первый срабатывает на каждый символ, чтобы поле печаталось; второй — после паузы', 'Так требует Material', 'Для тестирования'], correct: 1, why: 'Одним обработчиком получится либо запрос на символ, либо поле, которое не печатается.' },
+]} />
+
+</Block>
+
+## Типичные ошибки
+
+**Ошибка 1. Запрос прямо из `onValueChange`.**
+
+Разобрано: семь запросов на слово.
+
+**Ошибка 2. Пауза руками, через таймер.**
+
+Заводят `Handler`, `Timer` или свою корутину и отменяют её вручную. Работает, но `LaunchedEffect` с ключом делает это надёжнее и без утечек: корутина отменится и при уходе с экрана.
+
+**Ошибка 3. Слишком длинная пауза.**
+
+Секунда и больше воспринимается как «приложение задумалось». Рабочий диапазон — 300–500 мс.
+
+**Ошибка 4. Нет состояния «ищем».**
+
+Между вводом и ответом экран остаётся прежним, и человек набирает снова, решив, что не сработало.
+
+**Ошибка 5. Кнопка очистки всегда видна.**
+
+У пустого поля очищать нечего — крестик на пустом поле выглядит недоделкой.
+
+**Ошибка 6. Поиск по нажатию кнопки и по паузе одновременно.**
+
+Оба пути вызывают `onSearch`, запросы дублируются. Если по макету есть кнопка — либо она, либо пауза.
+
+<SectionAnchor chapterId="kit-search" sectionId="oshibki" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-search" quizId="quiz-3" questions={[
+  { q: 'Какая пауза перед отправкой разумна?', options: ['50 мс', '300–500 мс', '1–2 секунды', 'без паузы'], correct: 1, why: 'Секунда и больше воспринимается как «приложение задумалось».' },
+  { q: 'Чем LaunchedEffect лучше своего таймера?', options: ['Быстрее', 'Отменяет работу и при смене запроса, и при уходе с экрана — без утечек и ручной отмены', 'Проще писать', 'Так принято'], correct: 1, why: 'Ручная отмена обычно забывается именно на уходе с экрана.' },
+  { q: 'Между вводом и ответом экран не меняется. Чем это плохо?', options: ['Ничем', 'Человек решит, что не сработало, и наберёт снова', 'Замедляет отрисовку', 'Ломает состояние'], correct: 1, why: 'Поэтому состояние Loading — отдельное и обязательное.' },
+]} />
+
+</Block>
+
+## Шпаргалка по главе
+
+<Block kind="cheatsheet">
+
+| Что нужно | Как |
+| --- | --- |
+| Пауза перед запросом | `LaunchedEffect(query) { delay(400); onSearch(query) }` |
+| Порог длины | `if (query.length < 3) return@LaunchedEffect` |
+| Защита от гонки | она же: смена ключа отменяет прошлую корутину |
+| Лупа на клавиатуре | `imeAction = ImeAction.Search` |
+| Кнопка очистки | показывать только при `query.isNotEmpty()` |
+| Состояния выдачи | `sealed interface` с пятью наследниками |
+| Полнота разбора | `when` без `else` — компилятор проверит |
+| Два обработчика | `onQueryChange` на символ, `onSearch` после паузы |
+
+</Block>
+
+<SectionAnchor chapterId="kit-search" sectionId="shpargalka" />
+
+## Слова главы
+
+<Block kind="vocab">
+
+| Термин | Что это |
+| --- | --- |
+| Пауза в наборе | Задержка перед отправкой; ждём, пока человек перестанет печатать |
+| Ключ эффекта | Значение, при смене которого прошлая корутина отменяется |
+| Гонка ответов | Ответы приходят не в том порядке, в каком уходили запросы |
+| Закрытый набор | `sealed interface`: все наследники известны компилятору |
+| `data object` | Состояние без данных; экземпляр один на всю программу |
+| Полнота разбора | Требование обработать все ветки `when` без `else` |
+
+</Block>
+
+<SectionAnchor chapterId="kit-search" sectionId="slovar" />
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="kit-search"
+  trainerId="trainer-kit-search"
+  targetCpm={95}
+  targetAccuracy={90}
+  pools={[
+    { label: 'Пауза', snippets: [
+      'LaunchedEffect(query) {',
+      'if (query.length < minLength) return@LaunchedEffect',
+      'delay(debounceMillis)',
+    ] },
+    { label: 'Состояния', snippets: [
+      'sealed interface SearchState<out T>',
+      'data object Loading : SearchState<Nothing>',
+      'data class Found<T>(val items: List<T>) : SearchState<T>',
+    ] },
+    { label: 'Поле', snippets: [
+      'imeAction = ImeAction.Search,',
+      'trailing = if (query.isNotEmpty()) { … } else null,',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="kit-search" sectionId="trenazher" />
+
+## Что должен уметь после главы
+
+- объяснить, почему запрос не отправляют из `onValueChange`;
+- сделать паузу через `LaunchedEffect` с ключом и объяснить, что делает ключ;
+- объяснить гонку ответов и почему отмена решает её сама;
+- перечислить пять состояний выдачи и различить `Empty` и `Failed`;
+- обосновать отказ от `else` в разборе закрытого набора;
+- назвать три мелочи поля поиска, которые оценивают на приёмке.
+
+<SectionAnchor chapterId="kit-search" sectionId="chto-umet" />
+
+## Проверка по главе
+
+<ChapterExam chapterId="kit-search" questions={[
+  { q: 'Сколько запросов уйдёт при отправке из onValueChange на слове «ноутбук»?', options: ['один', 'семь — по одному на символ', 'два', 'ни одного'], correct: 1, why: 'Плюс мигающая под пальцами выдача.' },
+  { q: 'Что делает ключ у LaunchedEffect?', options: ['кеширует', 'определяет, когда прошлую корутину отменить и запустить новую', 'задаёт приоритет', 'ограничивает время'], correct: 1, why: 'Это сказано дословно в сообщении об устаревании варианта без ключей.' },
+  { q: 'delay прямо в разметке даёт', options: ['предупреждение', '«Suspend function … should be called only from a coroutine»', 'ошибку типа', 'ничего'], correct: 1, why: 'То же сообщение, что и при hide() у шторки.' },
+  { q: 'Разумная пауза перед запросом', options: ['50 мс', '300–500 мс', '1–2 с', 'без паузы'], correct: 1, why: 'Секунда и больше воспринимается как «приложение задумалось».' },
+  { q: 'Гонка ответов — это когда', options: ['сервер отвечает медленно', 'ответ на более ранний запрос приходит позже и затирает свежую выдачу', 'два человека ищут одновременно', 'кончился трафик'], correct: 1, why: 'По короткому запросу данных меньше, и он может обогнать длинный.' },
+  { q: 'Как Compose решает гонку?', options: ['номером запроса', 'отменой: смена ключа LaunchedEffect убивает прошлую корутину до onSearch', 'очередью', 'блокировкой'], correct: 1, why: 'Устаревшему ответу неоткуда взяться.' },
+  { q: 'Сколько состояний у выдачи поиска?', options: ['одно — список', 'пять: ещё не искали, ищем, нашли, пусто, отказ', 'два', 'три'], correct: 1, why: 'Подставить просто список значит потерять четыре из пяти.' },
+  { q: 'Чем Empty отличается от Failed?', options: ['ничем', 'Empty — нормальный результат, Failed — отказ, и там нужна кнопка «Повторить»', 'Empty для списков', 'Failed это исключение'], correct: 1, why: '«Ничего не нашлось» при выключенном интернете — претензия на приёмке.' },
+  { q: 'Почему в when по закрытому набору не пишут else?', options: ['else медленнее', 'с else компилятор промолчит при добавлении состояния, и экран окажется пустым', 'else запрещён', 'ломает типы'], correct: 1, why: 'Без него компилятор сам укажет все места, где новое состояние забыли.' },
+  { q: 'Зачем onQueryChange и onSearch раздельно?', options: ['для удобства', 'первый на каждый символ, чтобы поле печаталось; второй после паузы', 'требование Material', 'для тестов'], correct: 1, why: 'Одним обработчиком получится либо запрос на символ, либо поле, которое не печатается.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Побочные эффекты в Compose](https://developer.android.com/develop/ui/compose/side-effects) — `LaunchedEffect`, ключи и отмена.
+- [Отмена корутин](https://kotlinlang.org/docs/cancellation-and-timeouts.html) — что происходит с `delay` при отмене.
+- [Закрытые классы и интерфейсы](https://kotlinlang.org/docs/sealed-classes.html) — почему `when` по ним проверяется на полноту.
+- [Search в Material 3](https://developer.android.com/develop/ui/compose/components/search-bar) — готовая строка поиска и её состояния.

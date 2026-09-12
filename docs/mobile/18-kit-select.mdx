@@ -1,0 +1,398 @@
+---
+title: 'Селект и нижняя шторка: выбор одного из списка'
+audience: 'мобилка'
+level: 'углубление'
+order: 18
+sidebar_position: 18
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="kit-select" />
+
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+
+# Селект и нижняя шторка: выбор одного из списка
+
+<ChapterProgress chapterId="kit-select" totalSections={11} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="kit-select" />
+
+## Зачем это нужно
+
+В критериях два соседних пункта: «Создайте компонент селект» и «Создайте компонент BottomSheet». Это не совпадение — на телефоне они почти всегда одно и то же: селект открывает нижнюю шторку, а шторка показывает варианты.
+
+Заодно здесь впервые в блоке появляются две вещи, которых не было у кнопки и поля: **экспериментальный интерфейс**, который надо разрешить явно, и **асинхронное закрытие** — потому что закрыть шторку значит доиграть анимацию.
+
+Весь код главы собран настоящим компилятором; сообщения об ошибках — его вывод.
+
+<SectionAnchor chapterId="kit-select" sectionId="zachem" />
+
+## Почему не выпадающий список
+
+<Figure scheme="ks-dropdown-vs-sheet" caption="Выпадающий список оказывается под пальцем, шторка — у большого пальца" />
+
+Привычный по вебу выпадающий список на телефоне работает плохо, и причины механические:
+
+- он раскрывается **вниз от поля**, то есть ровно туда, где сейчас находится рука;
+- строки в нём мелкие — попасть пальцем сложнее, чем курсором;
+- длинный вариант обрезается: ширина ограничена шириной поля;
+- закрыть его можно только нажатием мимо, а «мимо» на телефоне мало.
+
+Нижняя шторка решает всё это разом: она приезжает снизу, к большому пальцу, занимает всю ширину, строки в ней крупные, а закрывается смахиванием вниз.
+
+<Hint type="tip">
+Выпадающий список в Compose существует — `DropdownMenu`, и он уместен: в панели инструментов, в меню «ещё» из трёх точек, на планшете. Правило простое: меню действий — выпадающее, выбор значения для формы — шторка.
+</Hint>
+
+<SectionAnchor chapterId="kit-select" sectionId="pochemu-ne-dropdown" />
+
+## Экспериментальный интерфейс
+
+Первое, что произойдёт при попытке использовать шторку:
+
+```kotlin
+@Composable fun P() { ModalBottomSheet(onDismissRequest = {}) { Text("шторка") } }
+```
+
+```text
+e: Probe.kt:5:23 This material API is experimental and is likely to change or to be removed in the future.
+```
+
+Это не поломка и не запрет, а предупреждение, поднятое до уровня ошибки: авторы Material 3 оставляют за собой право изменить этот интерфейс. Разрешение даётся явно:
+
+```kotlin
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun KitBottomSheet(…) { … }
+```
+
+<SyntaxBreakdown parts={[
+  { text: '@OptIn(...)', label: 'беру на себя', note: 'подпись под тем, что при обновлении библиотеки этот код может потребовать правки' },
+  { text: 'ExperimentalMaterial3Api::class', label: 'какая именно метка', note: 'у каждой экспериментальной области своя; чужую метку компилятор не примет' },
+  { text: 'над функцией', label: 'где ставить', note: 'ставят как можно ближе к месту использования — на функцию, а не на весь файл' },
+]} />
+
+<Hint type="important">
+Соблазн велик: поставить `@OptIn` один раз на весь файл или, ещё хуже, отключить проверку в настройках сборки. Так делать не стоит именно потому, что предупреждение полезное. Когда библиотека обновится и интерфейс изменится, точечная аннотация покажет ровно те три функции, которые надо посмотреть, а глобальная — ничего.
+</Hint>
+
+<SectionAnchor chapterId="kit-select" sectionId="eksperimentalnyy" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-select" quizId="quiz-1" questions={[
+  { q: 'Почему для выбора значения на телефоне берут шторку, а не выпадающий список?', options: ['Так красивее', 'Список раскрывается под руку, строки мелкие, длинный текст обрезается; шторка приезжает к большому пальцу и занимает всю ширину', 'Выпадающих списков нет в Compose', 'Шторка работает быстрее'], correct: 1, why: 'Выпадающий список уместен для меню действий, а не для выбора значения в форму.' },
+  { q: 'Что означает «This material API is experimental»?', options: ['Библиотека сломана', 'Предупреждение, поднятое до ошибки: интерфейс может измениться, и согласие нужно дать явно через @OptIn', 'Нужна платная версия', 'Не та версия Compose'], correct: 1, why: 'Это не запрет, а подпись под будущей правкой.' },
+  { q: 'Куда ставить @OptIn?', options: ['На весь файл', 'На конкретную функцию, как можно ближе к месту использования', 'В настройки сборки', 'Никуда, достаточно импорта'], correct: 1, why: 'При обновлении библиотеки точечная аннотация покажет ровно те функции, которые надо посмотреть.' },
+]} />
+
+</Block>
+
+## Закрыть шторку — это ожидание
+
+Вторая особенность: у шторки есть состояние с анимацией, и закрытие — не мгновенная операция.
+
+```kotlin
+val st = rememberModalBottomSheetState()
+ModalBottomSheet(onDismissRequest = {}, sheetState = st) { Text("шторка"); st.hide() }
+```
+
+```text
+e: Probe.kt:10:81 Suspend function 'suspend fun hide(): Unit' should be called only from a coroutine or another suspend function.
+```
+
+<Figure scheme="ks-hide-async" caption="Убрать из разметки можно мгновенно; доиграть съезд вниз — нет" />
+
+`hide()` помечена как приостанавливаемая, потому что внутри она ждёт окончания анимации. Вызвать её прямо в разметке нельзя — разметка не умеет ждать. Нужна область корутин:
+
+```kotlin
+val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+val scope = rememberCoroutineScope()
+
+val hide: () -> Unit = {
+    scope.launch { state.hide() }.invokeOnCompletion {
+        if (!state.isVisible) onDismiss()
+    }
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'rememberCoroutineScope()', label: 'откуда запускать', note: 'область, живущая столько же, сколько эта часть разметки; при исчезновении компонента запущенное отменяется' },
+  { text: 'scope.launch { state.hide() }', label: 'запустили анимацию', note: 'launch возвращает управление сразу, а анимация играет своим чередом' },
+  { text: '.invokeOnCompletion { … }', label: 'после анимации', note: 'здесь и только здесь убираем шторку из разметки — иначе она исчезнет, не доиграв' },
+  { text: 'if (!state.isVisible)', label: 'проверка', note: 'анимацию могли прервать: например, человек потянул шторку обратно вверх' },
+  { text: 'skipPartiallyExpanded = true', label: 'без промежуточной высоты', note: 'для списка вариантов промежуточное состояние «наполовину» только мешает' },
+]} />
+
+<Hint type="fact">
+Разница между «убрать» и «закрыть» видна на устройстве сразу. `open = false` заставляет шторку **исчезнуть**, как будто её выключили; правильный путь показывает, как она съезжает вниз. Это ровно тот класс мелочей, из которых складывается впечатление «сделано аккуратно».
+</Hint>
+
+<SectionAnchor chapterId="kit-select" sectionId="zakryt-ozhidanie" />
+
+## Компонент шторки
+
+```kotlin
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun KitBottomSheet(
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    title: String? = null,
+    content: @Composable (hide: () -> Unit) -> Unit,
+) {
+    val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
+
+    val hide: () -> Unit = {
+        scope.launch { state.hide() }.invokeOnCompletion {
+            if (!state.isVisible) onDismiss()
+        }
+    }
+
+    ModalBottomSheet(onDismissRequest = onDismiss, modifier = modifier, sheetState = state) {
+        Column(modifier = Modifier.padding(bottom = 24.dp)) {
+            if (title != null) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                )
+            }
+            content(hide)
+        }
+    }
+}
+```
+
+Обратите внимание на тип слота: `@Composable (hide: () -> Unit) -> Unit`. Это слот **с аргументом** — шторка передаёт внутрь способ закрыть себя. Иначе содержимое не смогло бы закрыть шторку после выбора: состояние анимации живёт внутри компонента.
+
+<Hint type="tip">
+Приём «слот получает то, что есть только внутри» встречается постоянно. Так же устроен `Scaffold`, отдающий `innerPadding`, и списки, отдающие индекс элемента. Если содержимому нужно что-то из внутренностей компонента — это передают в слот, а не выносят наружу.
+</Hint>
+
+<SectionAnchor chapterId="kit-select" sectionId="komponent-shtorki" />
+
+## Сам селект
+
+<Figure scheme="ks-who-owns" caption="Открыта ли шторка — дело компонента; выбранное значение — дело экрана" />
+
+```kotlin
+@Composable
+fun <T> KitSelect(
+    value: T?,
+    options: List<T>,
+    onSelect: (T) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    error: String? = null,
+    enabled: Boolean = true,
+    placeholder: String = "Не выбрано",
+    optionText: (T) -> String = { it.toString() },
+) {
+    var open by remember { mutableStateOf(false) }
+
+    KitTextField(
+        value = value?.let(optionText) ?: "",
+        onValueChange = {},
+        label = label,
+        modifier = modifier.clickable(enabled = enabled) { open = true },
+        placeholder = placeholder,
+        error = error,
+        enabled = false,
+    )
+
+    if (open) {
+        KitBottomSheet(onDismiss = { open = false }, title = label) { hide ->
+            options.forEach { option ->
+                Text(
+                    text = optionText(option),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onSelect(option); hide() }
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                )
+            }
+        }
+    }
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'fun <T> KitSelect', label: 'обобщённый', note: 'селект не знает, что выбирают: город, размер, категорию — работает с любым типом' },
+  { text: 'optionText: (T) -> String', label: 'как показать вариант', note: 'значение по умолчанию toString() годится для строк, для своих типов передают своё' },
+  { text: 'value: T?', label: 'может быть не выбрано', note: 'знак вопроса — это состояние «пока ничего», и его надо показать подсказкой' },
+  { text: 'enabled = false у поля', label: 'поле только показывает', note: 'вводить руками в селект нельзя; нажатие ловит modifier снаружи' },
+  { text: 'modifier.clickable { open = true }', label: 'нажатие на всё поле', note: 'вешается на modifier компонента, а не внутрь: тогда нажимается вся его площадь' },
+  { text: 'onSelect(option); hide()', label: 'порядок важен', note: 'сначала сообщаем о выборе, потом закрываем — иначе анимация задержит обновление' },
+]} />
+
+<Hint type="important">
+Приём с `enabled = false` у поля — обходной, и стоит понимать его цену: отключённое поле выглядит приглушённым. На макете селект обычно нарисован как обычное поле, поэтому цвета для него задают отдельно, через параметры цветов поля, а не полагаются на отключённый вид.
+</Hint>
+
+<SectionAnchor chapterId="kit-select" sectionId="sam-selekt" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-select" quizId="quiz-2" questions={[
+  { q: 'Почему hide() нельзя вызвать прямо в разметке?', options: ['Она приватная', 'Она приостанавливаемая: внутри ждёт окончания анимации, а разметка ждать не умеет', 'Нужен другой импорт', 'Нужны права'], correct: 1, why: 'Компилятор говорит: «should be called only from a coroutine or another suspend function».' },
+  { q: 'Зачем invokeOnCompletion после scope.launch?', options: ['Для логов', 'Чтобы убрать шторку из разметки только после того, как анимация доиграла', 'Для обработки ошибок', 'Чтобы отменить корутину'], correct: 1, why: 'Иначе шторка исчезнет мгновенно, как будто её выключили.' },
+  { q: 'Состояние «открыта ли шторка» держат внутри селекта. Почему не выносят наружу?', options: ['Так проще писать', 'Экрану это не нужно: наружу выносят то, что экран отправляет, проверяет и сохраняет', 'Compose не позволяет', 'Из-за производительности'], correct: 1, why: 'Иначе каждый экран обязан был бы держать лишнее состояние ни за чем.' },
+]} />
+
+</Block>
+
+## Типичные ошибки
+
+**Ошибка 1. `@OptIn` на весь файл или отключение проверки в сборке.**
+
+Разобрано выше: при обновлении библиотеки вы потеряете единственную подсказку о том, что именно надо посмотреть.
+
+**Ошибка 2. Закрытие рывком.**
+
+```kotlin
+.clickable { onSelect(option); open = false }
+```
+
+Работает, но шторка исчезает без анимации. На демонстрации это заметно.
+
+**Ошибка 3. Нажатие повешено на текст внутри поля.**
+
+Тогда нажимается только площадь букв, а не всё поле. `clickable` вешают на `modifier` компонента.
+
+**Ошибка 4. Селект без состояния «не выбрано».**
+
+Если `value` не может быть пустым, при открытии формы там окажется первый вариант — и человек отправит его, не заметив, что ничего не выбирал.
+
+**Ошибка 5. Шторка со списком на сотню строк без прокрутки.**
+
+`Column` не прокручивается. Для длинных списков внутри шторки берут `LazyColumn`, иначе нижние варианты недостижимы.
+
+**Ошибка 6. Обобщённый селект, который печатает объект.**
+
+```kotlin
+optionText = { it.toString() }   // Gorod(id=3, name=Самара)
+```
+
+Значение по умолчанию годится для строк. Для своих типов передают своё — иначе в шторке окажется отладочный вывод.
+
+<SectionAnchor chapterId="kit-select" sectionId="oshibki" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-select" quizId="quiz-3" questions={[
+  { q: 'В шторке сто вариантов, нижние недостижимы. Что не так?', options: ['Ограничение Material', 'Внутри Column, который не прокручивается — нужен LazyColumn', 'Не хватает высоты экрана', 'Нужен skipPartiallyExpanded'], correct: 1, why: 'Прокрутка у шторки не появляется сама.' },
+  { q: 'В шторке видно «Gorod(id=3, name=Самара)». Причина', options: ['ошибка сериализации', 'обобщённому селекту не передали optionText: сработало значение по умолчанию toString()', 'неверный тип', 'нужен data class'], correct: 1, why: 'Умолчание годится для строк, для своих типов передают своё.' },
+  { q: 'Зачем селекту состояние «не выбрано»?', options: ['для красоты', 'иначе при открытии формы там окажется первый вариант, и его отправят не глядя', 'требование Material', 'для валидации'], correct: 1, why: 'Поэтому value имеет тип T? и есть placeholder.' },
+]} />
+
+</Block>
+
+## Шпаргалка по главе
+
+<Block kind="cheatsheet">
+
+| Что нужно | Как |
+| --- | --- |
+| Разрешить шторку | `@OptIn(ExperimentalMaterial3Api::class)` над функцией |
+| Состояние шторки | `rememberModalBottomSheetState(skipPartiallyExpanded = true)` |
+| Откуда запускать анимацию | `rememberCoroutineScope()` |
+| Закрыть по-настоящему | `scope.launch { state.hide() }.invokeOnCompletion { … }` |
+| Слот с аргументом | `content: @Composable (hide: () -> Unit) -> Unit` |
+| Нажатие на всё поле | `modifier.clickable { open = true }` |
+| Как показать вариант | `optionText: (T) -> String` |
+| Длинный список в шторке | `LazyColumn`, а не `Column` |
+
+</Block>
+
+<SectionAnchor chapterId="kit-select" sectionId="shpargalka" />
+
+## Слова главы
+
+<Block kind="vocab">
+
+| Термин | Что это |
+| --- | --- |
+| Нижняя шторка | Панель, приезжающая снизу; на телефоне заменяет выпадающий список |
+| Экспериментальный интерфейс | Часть библиотеки, которая может измениться; требует `@OptIn` |
+| Приостанавливаемая функция | Та, что умеет ждать; вызывается только из корутины |
+| Область корутин | `rememberCoroutineScope()` — место, откуда запускают ожидание из разметки |
+| Слот с аргументом | Слот, которому компонент передаёт что-то из своих внутренностей |
+| Обобщённый компонент | Работает с любым типом значения: `fun <T> KitSelect` |
+
+</Block>
+
+<SectionAnchor chapterId="kit-select" sectionId="slovar" />
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="kit-select"
+  trainerId="trainer-kit-select"
+  targetCpm={95}
+  targetAccuracy={90}
+  pools={[
+    { label: 'Разрешение и состояние', snippets: [
+      '@OptIn(ExperimentalMaterial3Api::class)',
+      'val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)',
+      'val scope = rememberCoroutineScope()',
+    ] },
+    { label: 'Закрытие с анимацией', snippets: [
+      'scope.launch { state.hide() }.invokeOnCompletion {',
+      'if (!state.isVisible) onDismiss()',
+    ] },
+    { label: 'Селект', snippets: [
+      'content: @Composable (hide: () -> Unit) -> Unit,',
+      'modifier.clickable(enabled = enabled) { open = true }',
+      'optionText: (T) -> String = { it.toString() },',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="kit-select" sectionId="trenazher" />
+
+## Что должен уметь после главы
+
+- объяснить, почему выбор значения на телефоне делают шторкой, а не выпадающим списком;
+- разрешить экспериментальный интерфейс точечно и объяснить, почему не на весь файл;
+- узнать по сообщению приостанавливаемую функцию и вызвать её правильно;
+- закрыть шторку с анимацией, а не рывком;
+- сделать слот, который передаёт содержимому что-то из внутренностей компонента;
+- решить, какое состояние компонент держит у себя, а какое отдаёт наружу.
+
+<SectionAnchor chapterId="kit-select" sectionId="chto-umet" />
+
+## Проверка по главе
+
+<ChapterExam chapterId="kit-select" questions={[
+  { q: 'Почему на телефоне выбор значения делают шторкой?', options: ['так красивее', 'выпадающий список раскрывается под руку, строки мелкие, длинный текст обрезается', 'списков нет в Compose', 'шторка быстрее'], correct: 1, why: 'Выпадающий список уместен для меню действий.' },
+  { q: '«This material API is experimental» — это', options: ['поломка библиотеки', 'предупреждение, поднятое до ошибки: нужен явный @OptIn', 'платная функция', 'неверная версия'], correct: 1, why: 'Подпись под тем, что при обновлении код может потребовать правки.' },
+  { q: 'Куда ставить @OptIn?', options: ['на весь файл', 'на конкретную функцию, ближе к месту использования', 'в настройки сборки', 'никуда'], correct: 1, why: 'Иначе при обновлении библиотеки не останется подсказки, что смотреть.' },
+  { q: 'Почему hide() нельзя вызвать в разметке?', options: ['она приватная', 'она приостанавливаемая: ждёт окончания анимации, а разметка ждать не умеет', 'нет импорта', 'нужны права'], correct: 1, why: '«should be called only from a coroutine or another suspend function».' },
+  { q: 'Зачем invokeOnCompletion?', options: ['для логов', 'убрать шторку из разметки только после того, как анимация доиграла', 'для ошибок', 'отменить корутину'], correct: 1, why: 'Иначе шторка исчезнет мгновенно, как будто её выключили.' },
+  { q: 'content: @Composable (hide: () -> Unit) -> Unit — это', options: ['ошибка в типе', 'слот с аргументом: шторка передаёт внутрь способ закрыть себя', 'два слота', 'функция высшего порядка без разметки'], correct: 1, why: 'Состояние анимации живёт внутри компонента, иначе содержимое не смогло бы закрыть шторку.' },
+  { q: 'Состояние «открыта ли шторка» держат', options: ['снаружи, на экране', 'внутри селекта: экрану оно не нужно', 'в модели', 'в системе'], correct: 1, why: 'Наружу выносят то, что экран отправляет, проверяет и сохраняет.' },
+  { q: 'Нажатие вешают на', options: ['текст внутри поля', 'modifier компонента — тогда нажимается вся его площадь', 'иконку справа', 'весь экран'], correct: 1, why: 'Иначе нажимается только площадь букв.' },
+  { q: 'В шторке сто вариантов, нижние недостижимы', options: ['ограничение Material', 'внутри Column, который не прокручивается — нужен LazyColumn', 'мало высоты', 'нужен skipPartiallyExpanded'], correct: 1, why: 'Прокрутка у шторки не появляется сама.' },
+  { q: 'В списке вариантов видно Gorod(id=3, name=Самара). Причина', options: ['ошибка сериализации', 'не передали optionText, сработало умолчание toString()', 'неверный тип', 'нужен data class'], correct: 1, why: 'Умолчание годится только для строк.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Bottom sheets в Material 3](https://developer.android.com/develop/ui/compose/components/bottom-sheets) — виды шторок и их состояния.
+- [Корутины в Compose](https://developer.android.com/develop/ui/compose/kotlin#coroutines) — `rememberCoroutineScope` и когда он нужен.
+- [Экспериментальные интерфейсы Kotlin](https://kotlinlang.org/docs/opt-in-requirements.html) — как устроен `@OptIn` и зачем он.
+- [Меню в Compose](https://developer.android.com/develop/ui/compose/components/menu) — когда всё-таки уместен выпадающий список.

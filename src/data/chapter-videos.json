@@ -3274,5 +3274,59 @@
       "title": "Styling TextField in Jetpack Compose",
       "channel": "Mawuli Azameti"
     }
+  ],
+  "kit-select": [
+    {
+      "videoId": "Q6zDTAWT1lw",
+      "title": "Modal Bottom Sheet Jetpack Compose Material 3 | Kotlin | @BashPSK",
+      "channel": "Bash PSK"
+    },
+    {
+      "videoId": "Y8uUO_4ITzM",
+      "title": "Create Jetpack Compose Bottomsheet with Material 3",
+      "channel": "Busy Programmer"
+    },
+    {
+      "videoId": "DoRbQC7w6BU",
+      "title": "Modal Bottom Sheet Example in Jetpack Compose",
+      "channel": "Tresor Builds"
+    },
+    {
+      "videoId": "LxMelcwV0Js",
+      "title": "Jetpack Compose: BottomSheet",
+      "channel": "YOGESH SHINDE"
+    },
+    {
+      "videoId": "HQOkakxzoY0",
+      "title": "Урок 8: MutableState, remember. Состояние и Рекомпозиция | Курс Android Jetpack Compose",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    }
+  ],
+  "kit-search": [
+    {
+      "videoId": "CfL6Dl2_dAE",
+      "title": "The BEST Way to Implement a Search In Jetpack Compose - Android Studio Tutorial",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "gxWcfz3V2QE",
+      "title": "Full Guide to Jetpack Compose Effect Handlers",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "-v4BprIi7iI",
+      "title": "#9 - Kotlin Flow debounce: Stop Firing 5 Requests for One Search | Flow & State",
+      "channel": "Android Atlas"
+    },
+    {
+      "videoId": "rHYlUGC109I",
+      "title": "Kotlin Flows: Buffer, Conflate, and Debounce",
+      "channel": "Dave Leeds"
+    },
+    {
+      "videoId": "aFXVJAOOZGY",
+      "title": "LaunchedEffect in Composable | Side Effects - Android SideEffects | Jetpack Compose [Kotlin]- 43",
+      "channel": "Codetutor"
+    }
   ]
 }

@@ -107,6 +107,8 @@ import { layoutCardSchemes } from './figures/layoutCard';
 import { sprintFlowSchemes } from './figures/sprintFlow';
 import { kitButtonsSchemes } from './figures/kitButtons';
 import { kitInputsSchemes } from './figures/kitInputs';
+import { kitSelectSchemes } from './figures/kitSelect';
+import { kitSearchSchemes } from './figures/kitSearch';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -239,6 +241,8 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(sprintFlowSchemes),
     ...Object.keys(kitButtonsSchemes),
     ...Object.keys(kitInputsSchemes),
+    ...Object.keys(kitSelectSchemes),
+    ...Object.keys(kitSearchSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),
