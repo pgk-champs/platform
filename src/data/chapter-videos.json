@@ -3166,5 +3166,32 @@
       "title": "Презентация и защита результатов исследовательской работы",
       "channel": "МАГУ Апатиты"
     }
+  ],
+  "layout-card": [
+    {
+      "videoId": "DzUrk9hEoGw",
+      "title": "Курс по Jetpack Compose Android  | Card, Box, Image | #3 | Android Studio",
+      "channel": "Neco Ru"
+    },
+    {
+      "videoId": "ACKz8_uoF6A",
+      "title": "Верстка экрана в Jetpack Compose Beta. Часть 1. [Ru, Android] / Мобильный разработчик",
+      "channel": "Алексей Гладков"
+    },
+    {
+      "videoId": "BbrLgWsLZyU",
+      "title": "Верстка экрана в Jetpack Compose Beta. Часть 2. [Ru, Android] / Мобильный разработчик",
+      "channel": "Алексей Гладков"
+    },
+    {
+      "videoId": "Nw-gwP5TiCw",
+      "title": "Android. Вёрстка Jetpack Compose",
+      "channel": "Илья Селетков"
+    },
+    {
+      "videoId": "OQjYwTCEFus",
+      "title": "Layouts in Jetpack Compose | Row, Column, Box, LazyColumn Explained (EP 2)",
+      "channel": "ComposeNCode"
+    }
   ]
 }

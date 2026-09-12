@@ -186,6 +186,27 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <rect x="82" y="76" width="44" height="36" rx="5" fill={SOFT} />
     </g>
   ),
+  /* Карточка по макету */
+  'layout-card': () => (
+    <g strokeLinecap="round">
+      <rect x="34" y="34" width="132" height="154" rx="10" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+
+      <rect x="44" y="44" width="112" height="52" rx="7" fill={SOFT} stroke={ACCENT} strokeWidth={2.5} />
+      <rect x="124" y="48" width="28" height="16" rx="4" fill="rgba(255,140,140,0.25)" stroke="rgba(255,140,140,0.85)" strokeWidth={2} />
+      <text x="138" y="60" textAnchor="middle" fontSize="5" fontWeight={800} fill="rgba(255,170,170,0.95)" fontFamily={MONO}>-30%</text>
+
+      <rect x="44" y="104" width="80" height="10" rx="3" fill="rgba(255,255,255,0.28)" />
+      <rect x="44" y="120" width="56" height="8" rx="3" fill="rgba(255,255,255,0.18)" />
+
+      <text x="44" y="152" fontSize="9" fontWeight={800} fill={ACCENT} fontFamily={MONO}>1 990 ₽</text>
+      <rect x="108" y="140" width="48" height="20" rx="6" fill={SOFT} stroke={ACCENT} strokeWidth={2.5} />
+      <text x="132" y="154" textAnchor="middle" fontSize="5.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>В корзину</text>
+
+      <text x="44" y="180" fontSize="5" fontWeight={800} fill="rgba(255,255,255,0.4)" fontFamily={MONO}>Dimens.CardPadding</text>
+
+      <text x="100" y="208" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>снаружи внутрь</text>
+    </g>
+  ),
   'ui-kit': () => (
     <g strokeLinecap="round">
       <rect x="30" y="96" width="46" height="46" rx="10" fill={SOFT} stroke={INK} strokeWidth={3} />
@@ -2097,7 +2118,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'first-compose-screen': { track: 'mobile', num: '08', title: 'Первый экран Compose' },
   'state-events': { track: 'mobile', num: '09', title: 'Состояние и события' },
   'layout-by-mockup': { track: 'mobile', num: '10', title: 'Вёрстка по макету' },
-  'ui-kit': { track: 'mobile', num: '11', title: 'Многомодульность и UI Kit' },
+  'layout-card': { track: 'mobile', num: '11', title: 'Карточка по макету: от картинки к коду' },
+  'ui-kit': { track: 'mobile', num: '12', title: 'Многомодульность и UI Kit' },
   'what-is-blockchain': { track: 'blockchain', num: '01', title: 'Что такое блокчейн' },
   'geth-network': { track: 'blockchain', num: '33', title: 'Свой узел: приватная сеть на geth' },
   'hh-start': { track: 'blockchain', num: '34', title: 'Hardhat: пакет, npx и структура проекта' },
@@ -2142,23 +2164,23 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'demo-show': { track: 'advanced', num: '08', title: 'Демонстрация: показать решение за пять минут' },
   'waves-first-network': { track: 'blockchain', num: '63', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
-  'kotlin-vs-java': { track: 'mobile', num: '27', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '28', title: 'История Java, Android и Kotlin' },
-  'testing-mobile': { track: 'mobile', num: '26', title: 'Тестирование: MockWebServer, фейки и TDD' },
-  'device-features': { track: 'mobile', num: '25', title: 'Возможности устройства: камера, уведомления, виджет' },
-  'auth-session': { track: 'mobile', num: '24', title: 'Авторизация: вход, живая сессия и биометрия' },
-  'cache-offline': { track: 'mobile', num: '22', title: 'Кэш и офлайн: база как источник истины' },
-  'clean-code': { track: 'mobile', num: '23', title: 'Чистый код: комментарии и логирование, которые оценивают' },
-  'data-storage': { track: 'mobile', num: '21', title: 'Хранение на устройстве: DataStore и Room' },
-  'network-errors': { track: 'mobile', num: '20', title: 'Когда сети нет: ошибки, повторы и что видит пользователь' },
-  'network-retrofit': { track: 'mobile', num: '19', title: 'Сеть: тот же экран, но с настоящими данными' },
-  'app-layers': { track: 'mobile', num: '18', title: 'Слои приложения: data, domain и репозиторий' },
-  'viewmodel-state': { track: 'mobile', num: '17', title: 'ViewModel: состояние, которое переживает поворот' },
-  'scaffold-bars': { track: 'mobile', num: '14', title: 'Scaffold: каркас экрана, шапка и нижняя панель' },
-  'material-theme': { track: 'mobile', num: '13', title: 'Material 3: тема, которую вам уже сгенерировали' },
-  'lazy-lists': { track: 'mobile', num: '12', title: 'Списки: LazyColumn и всё, что не нарисовать циклом' },
-  'flow-streams': { track: 'mobile', num: '16', title: 'Flow: поток значений во времени' },
-  'kotlin-coroutines': { track: 'mobile', num: '15', title: 'Корутины: как приложение не зависает' },
+  'kotlin-vs-java': { track: 'mobile', num: '28', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '29', title: 'История Java, Android и Kotlin' },
+  'testing-mobile': { track: 'mobile', num: '27', title: 'Тестирование: MockWebServer, фейки и TDD' },
+  'device-features': { track: 'mobile', num: '26', title: 'Возможности устройства: камера, уведомления, виджет' },
+  'auth-session': { track: 'mobile', num: '25', title: 'Авторизация: вход, живая сессия и биометрия' },
+  'cache-offline': { track: 'mobile', num: '23', title: 'Кэш и офлайн: база как источник истины' },
+  'clean-code': { track: 'mobile', num: '24', title: 'Чистый код: комментарии и логирование, которые оценивают' },
+  'data-storage': { track: 'mobile', num: '22', title: 'Хранение на устройстве: DataStore и Room' },
+  'network-errors': { track: 'mobile', num: '21', title: 'Когда сети нет: ошибки, повторы и что видит пользователь' },
+  'network-retrofit': { track: 'mobile', num: '20', title: 'Сеть: тот же экран, но с настоящими данными' },
+  'app-layers': { track: 'mobile', num: '19', title: 'Слои приложения: data, domain и репозиторий' },
+  'viewmodel-state': { track: 'mobile', num: '18', title: 'ViewModel: состояние, которое переживает поворот' },
+  'scaffold-bars': { track: 'mobile', num: '15', title: 'Scaffold: каркас экрана, шапка и нижняя панель' },
+  'material-theme': { track: 'mobile', num: '14', title: 'Material 3: тема, которую вам уже сгенерировали' },
+  'lazy-lists': { track: 'mobile', num: '13', title: 'Списки: LazyColumn и всё, что не нарисовать циклом' },
+  'flow-streams': { track: 'mobile', num: '17', title: 'Flow: поток значений во времени' },
+  'kotlin-coroutines': { track: 'mobile', num: '16', title: 'Корутины: как приложение не зависает' },
   'kotlin-null': { track: 'mobile', num: '02', title: 'Null-безопасность: ошибка на миллиард долларов' },
   'solidity-hello': { track: 'blockchain', num: '03', title: 'Первый контракт: из чего состоит код' },
   'solidity-types': { track: 'blockchain', num: '04', title: 'Типы данных: uint, address, bool, string и деньги' },

@@ -1,8 +1,9 @@
 ---
-title: Вёрстка по макету
+title: 'Читаем макет: dp, sp и три контейнера'
 audience: мобилка
 level: база
 order: 10
+sidebar_position: 10
 ---
 
 import ChapterCover from '@site/src/components/ChapterCover';
@@ -14,7 +15,6 @@ import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
 import CodeTyping from '@site/src/components/CodeTyping';
 import Flashcards from '@site/src/components/Flashcards';
 import KotlinPlay from '@site/src/components/KotlinPlay';
-import ComposePreview from '@site/src/components/ComposePreview';
 import SelfCheck from '@site/src/components/SelfCheck';
 import ChapterExam from '@site/src/components/ChapterExam';
 import Block from '@site/src/components/Block';
@@ -23,26 +23,24 @@ import CollapsibleToc from '@site/src/components/CollapsibleToc';
 import ChapterProgress from '@site/src/components/ChapterProgress';
 import SectionAnchor from '@site/src/components/SectionAnchor';
 import EyeDp from '@site/src/components/EyeDp';
-import CardAssembler from '@site/src/components/CardAssembler';
 
-# Вёрстка по макету
+# Читаем макет: dp, sp и три контейнера
 
-<ChapterProgress chapterId="layout-by-mockup" totalSections={14} totalQuizzes={8} totalTrainers={5} />
+<ChapterProgress chapterId="layout-by-mockup" totalSections={11} totalQuizzes={6} totalTrainers={3} />
 
 ## Зачем это нужно
 
-На чемпионате «Профессионалы» задание почти никогда не звучит как «сделай красивый экран, на своё усмотрение». Вместо этого судьи выдают макет (mockup) — картинку или ссылку на Figma с уже готовым дизайном — и критерии оценки, которые сверяют твой экран с этим макетом буквально попиксельно: не тот отступ, не тот размер шрифта, не тот цвет — минус баллы, даже если экран выглядит красиво на глаз. Умение прочитать макет и перенести его в код так же важно, как умение писать сам код.
+На чемпионате «Профессионалы» задание почти никогда не звучит как «сделай красивый экран, на своё усмотрение». Судьи выдают макет — картинку или ссылку на Figma с готовым дизайном — и критерии, по которым экран сверяют с макетом буквально попиксельно: не тот отступ, не тот размер шрифта, не тот цвет — минус баллы, даже если на глаз всё красиво.
 
-Прошлые главы уже дали строительные блоки — `Column`, `Row`, `Modifier`, `Text`, `Button`, `.dp` — но использовали их для простых, придуманных с нуля экранов. Эта глава переворачивает задачу: не «придумай экран», а «вот готовый макет с конкретными числами — воспроизведи его точно». Разберём макет карточки товара (product card) — один из самых частых элементов на экранах интернет-магазинов и один из самых частых элементов в заданиях по мобильной разработке на чемпионате — по шагам: как читать числа и цвета на макете, как выбрать между `Column`, `Row` и новым для этого курса контейнером `Box`, как понять, какое именно свойство `Arrangement` или `Alignment` нужно, и как не оставить в коде россыпь голых чисел, а вынести их в константы.
+Прошлые главы дали строительные блоки — `Column`, `Row`, `Modifier`, `Text`, `Button`, `.dp` — но использовали их для простых, придуманных с нуля экранов. Эта глава переворачивает задачу: не «придумай экран», а «вот готовый макет с конкретными числами — прочитай его правильно».
 
-Готового набора цветов, отступов и текстовых стилей на все случаи (design system, ui-kit) в этой главе ещё нет — так, как проект обычно и начинается: с одной карточки и конкретных чисел из макета. Собрать из таких чисел переиспользуемую систему — тема следующей главы.
+Здесь разберём первую половину работы: как читать числа и цвета на макете, чем `dp` отличается от `sp`, как выбрать между `Box`, `Column` и `Row` и как понять, какое именно свойство `Arrangement` или `Alignment` нужно. Вторая половина — сборка настоящей карточки по шагам — в следующей главе.
 
-Как и в двух прошлых главах, сам Jetpack Compose (`Box`, `Column`, `Row`, `Text`, `Button`) в браузере не запускается — нужен настоящий Android-проект. Compose-код здесь снова даётся статичными блоками с построчным разбором. А там, где под капотом скрывается обычный Kotlin — числа, строки, функции, объекты, — глава, как и раньше, даёт исполняемые примеры, которые можно запустить прямо здесь.
+Как и в двух прошлых главах, сам Jetpack Compose в браузере не запускается — нужен настоящий Android-проект. Compose-код здесь даётся статичными блоками с построчным разбором. А там, где под капотом обычный Kotlin — числа, строки, функции, объекты, — глава даёт исполняемые примеры, которые можно запустить прямо здесь.
 
 <CollapsibleToc toc={toc} chapterId="layout-by-mockup" />
 
 <SectionAnchor chapterId="layout-by-mockup" sectionId="why" />
-
 ## Как читать макет: отступы, размеры, цвета
 
 Независимо от инструмента, которым пользовался дизайнер (Figma, Sketch, Zeplin, Avocode — на разных чемпионатах встречаются разные), готовый макет почти всегда сопровождают одни и те же три вида пометок поверх картинки:
@@ -389,341 +387,64 @@ fun main() {
 
 <SectionAnchor chapterId="layout-by-mockup" sectionId="arrangement-alignment" />
 
-## Перенос макета в код: карточка товара шаг за шагом
 
-Спецификация из первого раздела уже собрана. Дальше — тот же порядок, в котором обычно и собирают карточку на практике: сначала внешняя рамка, потом слой с изображением и бейджем, потом текст, потом ряд с ценой.
+## Типичные ошибки чтения макета
 
-### Шаг 1. Внешняя рамка карточки
-
-Карточка целиком — вертикальный список из трёх блоков (изображение, заголовок, цена), значит внешний контейнер — `Column`. Из первой строки таблицы спецификации («Карточка целиком»): фон белый (`#FFFFFF`), внутренний отступ — 12dp со всех сторон, ширина — на весь доступный экран.
+**Ошибка 1. `dp` вместо `sp` для текста.**
 
 ```kotlin
-@Composable
-fun ProductCard(title: String, price: String, discountPercent: Int) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFFFFFFFF))
-            .padding(12.dp)
-    ) {
-        // содержимое — дальше, шаг за шагом
-    }
-}
+Text(text = "Цена", fontSize = 16.dp)
 ```
-
-`Modifier.background(...)` — ещё один модификатор из той же цепочки, что и `.fillMaxSize()`/`.padding()` из прошлой главы: принимает `Color` и красит фон элемента этим цветом, ничего больше не меняя в остальной цепочке.
-
-### Шаг 2. Изображение и бейдж скидки — слой на Box
-
-Внутри карточки первым идёт изображение — но по спецификации на него ещё накладывается бейдж скидки. Это тот самый случай «два элемента в одном месте», под который заведён `Box`.
-
-```kotlin
-Box {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(120.dp)
-            .background(Color(0xFFEEEEEE))
-    )
-    Text(
-        text = "-$discountPercent%",
-        fontSize = 12.sp,
-        modifier = Modifier
-            .align(Alignment.TopEnd)
-            .background(Color(0xFFE53935))
-            .padding(4.dp)
-    )
-}
-```
-
-Обрати внимание: здесь ДВА вложенных `Box` — внешний просто группирует «слой с изображением», а внутренний, поменьше, служит серой заглушкой самого изображения (в настоящем проекте на его месте была бы функция `AsyncImage` для загрузки настоящей картинки по `imageUrl`, но она не входит в тему этой главы). `Modifier.align(Alignment.TopEnd)` у `Text` — то самое переопределение позиции для ОДНОГО ребёнка, разобранное в прошлом разделе: заглушка изображения растянута на весь `Box` без выравнивания, а вот бейдж явно прижат в правый верхний угол.
-
-### Шаг 3. Заголовок и цена с кнопкой
-
-Заголовок — обычный `Text` с `fontSize` из спецификации. Цена и кнопка — `Row` с `Arrangement.SpaceBetween`, как и определено в таблице выше.
-
-```kotlin
-Text(text = title, fontSize = 16.sp)
-Row(
-    modifier = Modifier.fillMaxWidth(),
-    horizontalArrangement = Arrangement.SpaceBetween,
-    verticalAlignment = Alignment.CenterVertically
-) {
-    Text(text = price, fontSize = 18.sp)
-    Button(onClick = { }) {
-        Text(text = "В корзину")
-    }
-}
-```
-
-<Hint id="layout-by-mockup-h3" type="tip">
-`verticalAlignment = Alignment.CenterVertically` здесь не из таблицы спецификации напрямую, а логическое следствие того, что цена и кнопка — разной высоты (текст ниже кнопки), и без выравнивания по центру они бы «прилипли» к верху ряда неровно.
-</Hint>
-
-### Собираем всё вместе
-
-```kotlin
-@Composable
-fun ProductCard(title: String, price: String, discountPercent: Int) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFFFFFFFF))
-            .padding(12.dp)
-    ) {
-        Box {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-                    .background(Color(0xFFEEEEEE))
-            )
-            Text(
-                text = "-$discountPercent%",
-                fontSize = 12.sp,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .background(Color(0xFFE53935))
-                    .padding(4.dp)
-            )
-        }
-        Text(text = title, fontSize = 16.sp)
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = price, fontSize = 18.sp)
-            Button(onClick = { }) {
-                Text(text = "В корзину")
-            }
-        }
-    }
-}
-```
-
-### Разбор по строкам
-
-- **Строка 2: `fun ProductCard(title: String, price: String, discountPercent: Int)`** — три параметра снаружи, ровно столько, сколько реально меняется от товара к товару; всё остальное (отступы, цвета, размеры шрифта) — фиксированные числа из макета, а не параметры.
-- **Строки 3–8: внешний `Column`** — из шага 1, без изменений: фон, ширина на весь экран, отступ 12dp со всех сторон.
-- **Строки 9–24: внешний `Box` с двумя детьми** — из шага 2: серая заглушка изображения растянута на весь `Box` (`.fillMaxWidth().height(120.dp)`), а `Text` с бейджем прижат в угол через `.align(Alignment.TopEnd)`, покрашен красным и получил свой собственный маленький отступ в 4dp — ВНУТРИ бейджа, а не относительно всей карточки.
-- **Строка 25: `Text(text = title, fontSize = 16.sp)`** — заголовок, второй по счёту ребёнок внешнего `Column`, значит встанет НИЖЕ блока с изображением.
-- **Строки 26–35: `Row` с ценой и кнопкой** — третий и последний ребёнок `Column`; `SpaceBetween` разводит цену и кнопку по краям строки. Всего у внешнего `Column` три ребёнка: `Box` со слоями, `Text` заголовка и этот `Row`.
-
-**Что должно появиться на экране:** белая карточка на всю ширину, сверху — серый прямоугольник изображения с красным бейджем `-N%` в правом верхнем углу, ниже — заголовок товара, ещё ниже — строка, где слева цена, а справа кнопка «В корзину».
-
-Собранную карточку можно покрутить вживую прямо здесь: слева — упрощённый мокап экрана, справа — Compose-псевдокод, сгенерированный из того же самого дерева вёрстки. Подвигай padding, arrangement и fontSize и смотри, как едет вёрстка — и как синхронно переписывается код. Одно упрощение: `Modifier.align(Alignment.TopEnd)` эта песочница не умеет, поэтому бейдж скидки здесь прижат к углу по умолчанию — `TopStart`.
-
-<Block kind="trainer" title="Живой мокап: покрути карточку товара" chapterId="layout-by-mockup" blockId="trainer-card-preview">
-<ComposePreview
-  editable
-  tree={{
-    type: 'Column',
-    fillMaxWidth: true,
-    background: '#FFFFFF',
-    padding: 12,
-    children: [
-      {
-        type: 'Box',
-        children: [
-          { type: 'Box', fillMaxWidth: true, height: 120, background: '#EEEEEE' },
-          { type: 'Text', text: '-20%', fontSize: 12, background: '#E53935', padding: 4 },
-        ],
-      },
-      { type: 'Text', text: 'Заголовок товара', fontSize: 16 },
-      {
-        type: 'Row',
-        fillMaxWidth: true,
-        arrangement: 'spaceBetween',
-        alignment: 'center',
-        children: [
-          { type: 'Text', text: '1 990 ₽', fontSize: 18 },
-          { type: 'Button', text: 'В корзину' },
-        ],
-      },
-    ],
-  }}
-  chapterId="layout-by-mockup"
-  trainerId="trainer-card-preview"
-/>
-</Block>
-
-А чтобы структура «внешний контейнер → изображение → заголовок → ряд с ценой» уложилась в голове, собери её ещё раз сам — из перемешанных строк вёрстки.
-
-<Block kind="trainer" title="Собери структуру карточки" chapterId="layout-by-mockup" blockId="trainer-card-assembler">
-<CardAssembler chapterId="layout-by-mockup" trainerId="trainer-card-assembler" />
-</Block>
-
-<Block kind="quiz" title="Карточка товара" chapterId="layout-by-mockup" blockId="quiz-product-card">
-<SelfCheck chapterId="layout-by-mockup" quizId="quiz-product-card" questions={[
-  { q: 'Почему в собранном ProductCard изображение и бейдж лежат внутри Box, а не внутри ещё одного Column?', options: ['Просто для разнообразия кода', 'Потому что бейдж должен оказаться ПОВЕРХ изображения, в одном и том же месте экрана, а не под ним — а это именно то, для чего существует Box', 'Column не поддерживает Text внутри Text', 'Box работает быстрее, чем Column, для двух элементов'], correct: 1, why: 'Column раскладывает элементы в отдельные места одно под другим; для наложения (изображение + бейдж в одном месте) годится только Box.' },
-  { q: 'В коде .padding(4.dp) стоит на самом Text с бейджем, ПОСЛЕ .background(Color(0xFFE53935)). Что произойдёт, если поменять их местами — сначала .padding(4.dp), потом .background(...)?', options: ['Ничего не изменится, порядок модификаторов здесь не важен', 'Отступ окажется СНАРУЖИ красной заливки — фон станет меньше текста с бейджем, а не будет включать отступ вокруг него', 'Программа перестанет компилироваться', 'Текст бейджа исчезнет с экрана'], correct: 1, why: 'Как и в прошлой главе с .clickable/.padding, порядок модификаторов задаёт порядок "слоёв": .background().padding() красит сначала всю доступную область, потом добавляет отступ поверх покрашенного; в обратном порядке заливка охватила бы только сам текст, без отступа вокруг.' },
-  { q: 'Строка Text(text = "-$discountPercent%", ...) — что здесь делает символ $ перед discountPercent?', options: ['Обозначает денежную сумму', 'Строковый шаблон — подставляет значение параметра discountPercent прямо в текст строки', 'Это опечатка, символ лишний', 'Указывает тип параметра'], correct: 1, why: 'Тот же строковый шаблон $переменная из самой первой главы курса — здесь он подставляет число скидки в надпись бейджа, например discountPercent = 20 даст текст "-20%".' },
-  { q: 'Что было бы, если у Row с ценой и кнопкой убрать verticalAlignment = Alignment.CenterVertically?', options: ['Row вообще перестанет компилироваться без этого параметра', 'Цена и кнопка встанут по умолчанию вверх ряда (Alignment.Top), и из-за разной высоты текста и кнопки они окажутся визуально не выровнены по центру друг друга', 'Кнопка станет невидимой', 'horizontalArrangement перестанет работать без verticalAlignment'], correct: 1, why: 'verticalAlignment — необязательный параметр со значением по умолчанию (Alignment.Top для Row); без явного CenterVertically кнопка и текст цены просто прижались бы к верхнему краю строки, а не выровнялись по центру.' },
-]} />
-</Block>
-
-<SectionAnchor chapterId="layout-by-mockup" sectionId="product-card" />
-
-## Вынос размеров в константы
-
-В собранном `ProductCard` числа — `12.dp`, `120.dp`, `4.dp`, `16.sp`, `18.sp`, `12.sp` и два цвета — разбросаны по всему телу функции. Пока карточка одна, это терпимо. Но макет обычно содержит МНОГО похожих элементов — карточки в списке, другие экраны с теми же отступами, — и голое число `12.dp`, повторённое в десяти местах, называют магическим числом (magic number): непонятно без контекста, что оно значит, и любое его изменение требует искать и править каждое повторение по отдельности.
-
-Решение — вынести числа в именованные константы один раз и обращаться к ним по имени. В Compose для этого чаще всего заводят отдельный объект (object — уже знакомый механизм из примера с `Arrangement` выше, только теперь свой собственный):
-
-```kotlin
-object Dimens {
-    val CardPadding = 12.dp
-    val ImageHeight = 120.dp
-    val BadgePadding = 4.dp
-    val TitleFontSize = 16.sp
-    val PriceFontSize = 18.sp
-    val BadgeFontSize = 12.sp
-}
-```
-
-<Block kind="breakdown" title="Разбор по частям: val CardPadding = 12.dp" chapterId="layout-by-mockup" blockId="breakdown-val-dimens">
-<SyntaxBreakdown parts={[
-  { text: 'val', label: 'неизменяемое хранилище — но НЕ const val', note: 'здесь важно именно val, а не const val: Dp и Sp создаются вызовом функции (.dp/.sp — свойства-расширения), а const val в Kotlin разрешён только для примитивных типов и String, вычисляемых уже на этапе компиляции. Что случится при попытке const val — отдельная типичная ошибка ниже' },
-  { text: ' CardPadding', label: 'имя константы', note: 'по соглашению Kotlin — с большой буквы, как и другие val внутри object, которые фактически играют роль констант' },
-  { text: ' = 12.dp', label: 'значение', note: 'то же самое число из макета, что и раньше — просто теперь оно существует в единственном месте' },
-]} />
-</Block>
-
-Правило `val`, а не `const val`, специфично именно для `Dp`/`Sp`/`Color` и подобных типов Compose. Там, где значение — обычный примитив (`Int`, `String`, `Boolean`), `const val` работает и даже предпочтительнее: он вычисляется на этапе компиляции, а не при первом обращении. Разница видна на простом примере — рефакторинг магических чисел «до и после», где сами числа — обычные `Int`, без единиц измерения:
-
-<KotlinPlay code={`fun describeCardBefore() {
-    println("ДО: отступ=12, высота изображения=120, мин. высота карточки=\${120 + 12 * 2}")
-}
-
-object Dimens {
-    const val CardPadding = 12
-    const val ImageHeight = 120
-}
-
-fun describeCardAfter() {
-    println("ПОСЛЕ: отступ=\${Dimens.CardPadding}, высота изображения=\${Dimens.ImageHeight}, мин. высота карточки=\${Dimens.ImageHeight + Dimens.CardPadding * 2}")
-}
-
-fun main() {
-    describeCardBefore()
-    describeCardAfter()
-}`} />
-
-**Что выведет:** одинаковые числа в обеих строках — `144` для минимальной высоты что «до», что «после». Рефакторинг НЕ меняет результат — и не должен: цель не в новом поведении, а в том, что теперь `12` и `120` существуют в коде ровно один раз, под понятным именем, а не разбросаны по функциям. Если на макете отступ карточки завтра станет `16` вместо `12`, в версии «после» достаточно поменять одну строку — `const val CardPadding = 12` на `16` — и значение обновится сразу везде, где встречается `Dimens.CardPadding`. В версии «до» пришлось бы искать каждое отдельное вхождение числа `12` по всему файлу и гадать, какое из них — тот самый отступ, а какое — случайное совпадение с другим смыслом.
-
-<Block kind="quiz" title="Вынос в константы" chapterId="layout-by-mockup" blockId="quiz-dimens">
-<SelfCheck chapterId="layout-by-mockup" quizId="quiz-dimens" questions={[
-  { q: 'Почему магическое число называют именно "магическим", а не просто "числом"?', options: ['Потому что такие числа выбирают случайным образом', 'Потому что без контекста непонятно, ЧТО оно значит и откуда взялось — как будто появилось "по волшебству"', 'Это официальный термин Kotlin для чисел больше 100', 'Магические числа существуют только в Compose'], correct: 1, why: 'Магическое число — это буквально то, что видно в коде без объяснения смысла: 12.dp где-то в середине функции ничего не говорит о том, что это именно отступ карточки, а не что-то другое.' },
-  { q: 'Почему для object Dimens с Dp-значениями нужно писать val, а не const val, хотя для Int-значений const val работает нормально?', options: ['const val вообще запрещён в Kotlin', 'const val разрешён только для примитивных типов (Int, Boolean и т.п.) и String — значений, известных уже на этапе компиляции; Dp создаётся вызовом функции .dp во время выполнения, а не является таким значением', 'val быстрее работает, чем const val, для любых типов', 'Dimens вообще нельзя объявлять через object'], correct: 1, why: '.dp — это вызов свойства-расширения, а не литерал; компилятор не может заранее, на этапе компиляции, вычислить такое значение, а именно это и требуется для const val.' },
-  { q: 'В рефакторинге describeCardBefore/After — что изменилось в РЕЗУЛЬТАТЕ работы программы?', options: ['Результат стал другим — числа увеличились', 'Ничего не изменилось: обе версии печатают одинаковые числа, разница только в том, откуда код их берёт', 'Программа стала работать быстрее в несколько раз', 'До рефакторинга программа не компилировалась'], correct: 1, why: 'Вынос в константы — это рефакторинг: изменение структуры кода без изменения его поведения. Числа на экране одинаковые что до, что после — меняется только то, насколько легко их найти и обновить в будущем.' },
-  { q: 'Если Dimens.CardPadding используется в пяти разных местах файла ProductCard.kt, сколько строк нужно изменить, чтобы поменять отступ карточки на новое значение?', options: ['Пять — по одной на каждое место использования', 'Одну — саму строку val CardPadding = ... внутри object Dimens', 'Ни одной, значение меняется автоматически', 'Все пять и ещё дополнительно саму декларацию'], correct: 1, why: 'В этом и есть выигрыш: единственный источник истины (тот же принцип single source of truth, что и у состояния в прошлой главе) — значение хранится в одном месте, а используется в пяти, но правка нужна только там, где оно объявлено.' },
-]} />
-</Block>
-
-<SectionAnchor chapterId="layout-by-mockup" sectionId="dimens-constants" />
-
-## Типичные ошибки
-
-Все пять ошибок этой главы воспроизведены и проверены вживую в этой же песочнице — тем же компилятором Kotlin, что стоит за встроенным KotlinPlay, — на минимальных классах, повторяющих структуру настоящих Compose-типов (`Dp`, `Sp`, `Modifier`, `Alignment`, `RowScope`) ровно настолько, насколько нужно, чтобы получить ту же самую диагностику компилятора.
-
-### 1. sp передан туда, где ожидается Dp (и наоборот)
-
-<KotlinPlay code={`@JvmInline
-value class Dp(val value: Float)
-@JvmInline
-value class Sp(val value: Float)
-val Int.dp: Dp get() = Dp(this.toFloat())
-val Int.sp: Sp get() = Sp(this.toFloat())
-
-fun setFontSize(fontSize: Sp) {}
-
-fun main() {
-    setFontSize(16.dp)
-}`} />
 
 ```text
-Argument type mismatch: actual type is 'Dp', but 'Sp' was expected.
+Argument type mismatch: actual type is 'Dp', but 'TextUnit' was expected.
 ```
 
-**Перевод:** «несовпадение типа аргумента: фактический тип Dp, а ожидался Sp». В настоящем Compose параметр `fontSize` ждёт значение типа `TextUnit` (тип, в который превращает число `.sp`), а `16.dp` — это `Dp`, совсем другой тип: числа выглядят одинаково («шестнадцать»), но единицы измерения, а значит и типы Kotlin, разные.
+Компилятор ловит это сразу: `fontSize` принимает `TextUnit`, а `.dp` даёт `Dp`. Хуже другой случай — когда размер задан через `TextStyle` с `fontSize` в `sp`, а отступы вокруг текста посчитаны «на глаз» в тех же числах. Тогда при увеличенном системном шрифте текст вырастет, а отступы — нет, и строка вылезет за карточку.
 
-**Как починить:** заменить суффикс на правильный по смыслу — `.sp` для размера текста, `.dp` для всего остального: `setFontSize(16.sp)`.
-
-### 2. Позиционный аргумент Box перепутан местами
+**Ошибка 2. Позиционный аргумент `Box`.**
 
 ```kotlin
-Box(Alignment.TopEnd) {
-    Text(text = "Бейдж")
-}
+Box(Alignment.Center) { Text("Привет") }
 ```
 
 ```text
 Argument type mismatch: actual type is 'Alignment', but 'Modifier' was expected.
 ```
 
-**Перевод:** «несовпадение типа аргумента: фактический тип Alignment, а ожидался Modifier». У `Box` первый ПОЗИЦИОННЫЙ параметр (без явного имени) — `modifier`, а `contentAlignment` — только второй; если написать `Box(Alignment.TopEnd)` без имени `contentAlignment =`, компилятор пытается подставить `Alignment.TopEnd` на место `modifier` и обнаруживает несовпадение типов. Формулировка проверена на минимальном аналоге с той же сигнатурой параметров, что и у настоящего `Box`.
+Первый безымянный параметр `Box` — это `modifier`, а не `contentAlignment`. Писать надо с именем: `Box(contentAlignment = Alignment.Center)`.
 
-**Как починить:** указать имя параметра явно — `Box(contentAlignment = Alignment.TopEnd) { ... }`. Именованные аргументы для необязательных параметров, идущих не первыми, — не стиль, а необходимость: без имени компилятор ориентируется строго по порядку.
+**Ошибка 3. `weight` вне `Row` и `Column`.**
 
-### 3. weight() вызван вне Row или Column
-
-<KotlinPlay code={`interface RowScope
-fun RowScope.weight(value: Float): Unit {}
-
-fun main() {
-    weight(1f)
-}`} />
-
-```text
-Unresolved reference 'weight'.
+```kotlin
+Box {
+    Text("Слева", modifier = Modifier.weight(1f))
+}
 ```
 
-**Перевод:** «неразрешённая ссылка weight». В настоящем Compose `weight(...)` (задаёт, какую долю свободного места в `Row`/`Column` займёт элемент) — не отдельная свободная функция, а функция-расширение, объявленная специально для `RowScope`/`ColumnScope`. Такую функцию можно вызвать ТОЛЬКО у объекта с подходящим типом-получателем (receiver) — то есть только внутри трейлинг-лямбды `Row { ... }` или `Column { ... }`, где Compose сам подставляет нужный scope. Внутри `Box` или вообще вне какого-либо контейнера тот же вызов `weight(...)` не находит подходящей функции — ровно то же самое случилось бы с `Modifier.align(...)` вне `Box`, разобранным чуть раньше в этой главе.
-
-**Как починить:** использовать `weight` только внутри `Row { ... }` или `Column { ... }`, а не внутри `Box` или отдельно; если нужно занять долю свободного места ИМЕННО внутри `Box`, `weight` не подходит вообще — там за размер отвечают `fillMaxWidth(fraction = ...)` и подобные модификаторы без ограничения по scope.
-
-### 4. const val с типом Dp — не примитив и не String
-
-<KotlinPlay code={`@JvmInline
-value class Dp(val value: Float)
-val Int.dp: Dp get() = Dp(this.toFloat())
-const val CardPadding = 12.dp
-
-fun main() {
-    println(CardPadding)
-}`} />
-
 ```text
-Const 'val' has type 'Dp'. Only primitive types and 'String' are allowed.
+Unresolved reference: weight
 ```
 
-**Перевод:** «const val имеет тип Dp. Разрешены только примитивные типы и String». `const val` требует значения, которое компилятор может вычислить ЦЕЛИКОМ на этапе компиляции, без запуска программы, — а `16.dp` фактически вызывает функцию (`.dp` — свойство-расширение), результат которой известен только во время выполнения. Именно поэтому в разделе про константы `object Dimens` использует обычный `val`, а не `const val`, для всех `Dp`/`Sp`-значений.
+`weight` — функция-расширение для `RowScope` и `ColumnScope`. Внутри `Box` такого получателя нет, и имя просто не находится. То же правило работает в обратную сторону: `Modifier.align(Alignment.TopEnd)` с двумя координатами существует только внутри `Box`.
 
-**Как починить:** заменить `const val` на обычный `val`: `val CardPadding = 12.dp`. `const val` оставить только для настоящих компайл-тайм значений — `Int`, `String`, `Boolean` и подобных примитивов, как в демо с `Dimens.CardPadding: Int` в разделе про рефакторинг.
+**Ошибка 4. Опечатка в имени именованного аргумента.**
 
-### 5. Опечатка в имени именованного аргумента
-
-<KotlinPlay code={`fun myRow(horizontalArrangement: String = "start", content: () -> Unit) {}
-
-fun main() {
-    myRow(arrangement = "center") { }
-}`} />
-
-```text
-No parameter with name 'arrangement' found.
+```kotlin
+Row(horizontalArrangment = Arrangement.SpaceBetween) { }
 ```
 
-**Перевод:** «параметр с именем arrangement не найден». Настоящий параметр `Row` называется `horizontalArrangement`, а не просто `arrangement` — сокращённое имя, которое иногда кажется логичным по аналогии с `contentAlignment` у `Box`, компилятор не подставляет автоматически: имя именованного аргумента должно совпадать буквально.
+```text
+Cannot find a parameter with this name: horizontalArrangment
+```
 
-**Как починить:** использовать точное имя параметра — `horizontalArrangement` у `Row`, `verticalArrangement` у `Column`. Автодополнение Android Studio почти всегда подсказывает правильное имя раньше, чем успеваешь ошибиться, но при написании кода руками (или на бумаге на чемпионате) эта ошибка встречается часто.
+Сообщение точное, но взгляд по нему скользит: `Arrangment` без `e` выглядит почти как правильное слово. Если параметр «не находится», а имя выглядит верным — читайте его по буквам.
 
-<Block kind="quiz" title="Типичные ошибки" chapterId="layout-by-mockup" blockId="quiz-typical-errors">
-<SelfCheck chapterId="layout-by-mockup" quizId="quiz-typical-errors" questions={[
-  { q: 'Какая из пяти ошибок этой главы возникает из-за того, что первый позиционный (безымянный) параметр Box — именно modifier, а не contentAlignment?', options: ['Unresolved reference weight (ошибка 3)', "Argument type mismatch: actual type is 'Alignment', but 'Modifier' was expected. (ошибка 2)", "Const 'val' has type 'Dp' (ошибка 4)", 'No parameter with name arrangement (ошибка 5)'], correct: 1, why: 'Box(Alignment.TopEnd) без имени параметра пытается подставить Alignment на место первого параметра — modifier, а не второго — contentAlignment.' },
-  { q: 'Чем ошибка 3 (weight вне Row/Column) объясняется на уровне механизма Kotlin, а не просто "так работает Compose"?', options: ['Это специальная магия компилятора Compose, недоступная обычному Kotlin', 'weight — функция-расширение с типом-получателем RowScope; вызвать её можно только там, где есть подходящий receiver — то есть внутри Row/Column, а не в произвольном месте', 'weight вообще не является функцией', 'Ошибка возникает только на старых версиях Kotlin'], correct: 1, why: 'Функции-расширения со scope-получателем — обычный механизм языка Kotlin (как getValue/setValue у делегатов из прошлой главы), а не что-то специфичное только для Compose; Compose просто активно использует этот механизм для weight и align.' },
-  { q: 'Почему val CardPadding = 12.dp работает без ошибок, а const val CardPadding = 12.dp — нет?', options: ['val и const val — это одно и то же в Kotlin', 'const val требует значения, вычислимого на этапе компиляции (примитив или String); 12.dp — результат вызова функции-расширения, известный только во время выполнения, поэтому не подходит', 'const val работает только внутри функций, а не внутри object', 'Числа с плавающей точкой вообще нельзя использовать с const val'], correct: 1, why: 'Именно эта проверка — "вычислимо ли значение ДО запуска программы" — отличает const val от обычного val, и Dp, создаваемый вызовом .dp, эту проверку не проходит.' },
-  { q: 'myRow(arrangement = "center") при объявлении fun myRow(horizontalArrangement: String = "start", ...) — почему это не сработает даже с правильным типом значения (String)?', options: ['Тип значения тоже не совпадает', 'Имя именованного аргумента должно буквально совпадать с именем параметра в объявлении функции — "arrangement" и "horizontalArrangement" для компилятора два разных имени, даже если оба выглядят логично', 'В Kotlin вообще нельзя передавать String в параметр по умолчанию', 'Ошибка появляется только при отсутствии content-лямбды'], correct: 1, why: 'Именованные аргументы ищутся строго по точному имени параметра из сигнатуры функции — компилятор не подбирает "похожие по смыслу" имена, даже если тип значения подходит идеально.' },
+<Block kind="quiz" title="Ошибки чтения макета" chapterId="layout-by-mockup" blockId="quiz-reading-errors">
+<SelfCheck chapterId="layout-by-mockup" quizId="quiz-reading-errors" questions={[
+  { q: 'Компилятор говорит «actual type is Dp, but TextUnit was expected». Где ошибка?', options: ['В имени переменной', 'Размер текста задан через .dp вместо .sp', 'Не хватает Modifier', 'Text вызван вне Composable'], correct: 1, why: 'fontSize принимает TextUnit, а .dp даёт Dp — это ловится сразу при компиляции.' },
+  { q: 'Box(Alignment.Center) { … } не компилируется. Почему?', options: ['Box не принимает Alignment', 'Первый безымянный параметр Box — modifier, а не contentAlignment', 'Alignment.Center не существует', 'Нужен Modifier.align'], correct: 1, why: 'Писать надо с именем: Box(contentAlignment = Alignment.Center).' },
+  { q: 'Modifier.weight(1f) внутри Box даёт «Unresolved reference». Почему?', options: ['Опечатка в имени', 'weight — расширение для RowScope и ColumnScope, внутри Box такого получателя нет', 'weight принимает Int', 'Нужен импорт'], correct: 1, why: 'То же правило в обратную сторону: align с двумя координатами существует только внутри Box.' },
 ]} />
 </Block>
 
@@ -739,8 +460,8 @@ No parameter with name 'arrangement' found.
   { term: 'Arrangement', translation: 'расположение (Arrangement)', note: 'параметр Row/Column, отвечающий за распределение элементов вдоль главной оси контейнера' },
   { term: 'Alignment', translation: 'выравнивание (Alignment)', note: 'параметр, отвечающий за положение элементов вдоль поперечной оси у Row/Column или сразу по обеим осям у Box' },
   { term: 'stack', translation: 'наложение / стек (stack)', note: 'то, как Box располагает своих детей — друг на друге, в порядке вызова, а не рядом' },
-  { term: 'magic number', translation: 'магическое число (magic number)', note: 'голое числовое значение в коде без объяснения смысла, обычно кандидат на вынос в именованную константу' },
   { term: 'hex color', translation: 'HEX-цвет (hex color)', note: 'запись цвета в шестнадцатеричной системе счисления, обычно по каналам ARGB/RGB' },
+  { term: 'scope', translation: 'область видимости (scope)', note: 'то, что делает weight доступным внутри Row и Column, а align с двумя координатами — внутри Box' },
 ]} />
 </Block>
 
@@ -748,22 +469,19 @@ No parameter with name 'arrangement' found.
 
 ## Потренируйся печатать
 
-Объявление Box с выравниванием содержимого — то, что придётся набирать при каждом наложении элементов:
-
 <Block kind="trainer" title="Строки вёрстки этой главы" chapterId="layout-by-mockup" blockId="trainer-layout-lines">
-<CodeTyping pools={[{ label: 'Вёрстка по макету', snippets: [
+<CodeTyping pools={[{ label: 'Чтение макета', snippets: [
   'Box(contentAlignment = Alignment.TopEnd) {',
   'Modifier.align(Alignment.TopEnd)',
   '.background(Color(0xFFE53935))',
   'Modifier.fillMaxWidth().height(120.dp)',
   'Text(text = title, fontSize = 16.sp)',
   'verticalAlignment = Alignment.CenterVertically',
-  'val CardPadding = 12.dp',
   'Arrangement.spacedBy(8.dp)',
 ] }]} keyboard chapterId="layout-by-mockup" trainerId="trainer-layout-lines" targetCpm={110} targetAccuracy={90} />
 </Block>
 
-Строка позиционирования Row из спецификации карточки товара:
+Строка позиционирования `Row` — то, что придётся набирать при каждом разведении элементов по краям:
 
 <Block kind="trainer" title="Строка позиционирования Row" chapterId="layout-by-mockup" blockId="trainer-row-arrangement">
 <CodeTyping snippet={'horizontalArrangement = Arrangement.SpaceBetween'} chapterId="layout-by-mockup" trainerId="trainer-row-arrangement" targetCpm={120} targetAccuracy={90} />
@@ -785,7 +503,6 @@ No parameter with name 'arrangement' found.
     ['16.dp', 'единица размера/отступа', 'density-independent pixels — для всего, кроме размера текста', 'Modifier.padding(12.dp)'],
     ['16.sp', 'единица размера текста', 'scale-independent pixels — учитывает системную настройку размера шрифта', 'Text(fontSize = 16.sp)'],
     ['Color(0xAARRGGBB)', 'конструктор цвета из числа', 'четыре пары hex-цифр: прозрачность, красный, зелёный, синий каналы', 'Color(0xFFE53935)'],
-    ['object Dimens { val X = ... }', 'объект-хранилище констант', 'выносит повторяющиеся числа макета в единственное именованное место', 'Dimens.CardPadding'],
   ],
 }}>
 
@@ -799,20 +516,19 @@ No parameter with name 'arrangement' found.
 | `16.dp` | единица размера/отступа | density-independent pixels — для всего, кроме размера текста | `Modifier.padding(12.dp)` |
 | `16.sp` | единица размера текста | scale-independent pixels — учитывает системную настройку размера шрифта | `Text(fontSize = 16.sp)` |
 | `Color(0xAARRGGBB)` | конструктор цвета из числа | четыре пары hex-цифр: прозрачность, красный, зелёный, синий каналы | `Color(0xFFE53935)` |
-| `object Dimens { val X = ... }` | объект-хранилище констант | выносит повторяющиеся числа макета в единственное именованное место | `Dimens.CardPadding` |
 
 </Block>
 
 <details>
 <summary>Углубиться</summary>
 
-**Как Compose на самом деле решает размер Box, Column и Row.** Всё, что описано в этой главе, — снаружи: КАК элементы позиционируются друг относительно друга, если их размер уже известен. Но откуда сам `Box` или `Column` вообще узнаёт, какого размера ему быть? Ответ — трёхшаговый процесс измерения: контейнер сначала измеряет каждого ребёнка (спрашивает, каким тот хочет быть при доступных ограничениях по ширине/высоте — constraints), затем решает собственный размер на основе размеров детей и родительских ограничений, и только потом расставляет детей по вычисленным позициям. `Row` и `Column` — это, по сути, готовые, уже написанные за тебя реализации этого процесса под конкретную стратегию (в ряд или в столбец); когда готовых `Row`/`Column`/`Box` не хватает — например, нужен ряд, сам переносящий лишние элементы на новую строку, — Compose позволяет написать этот процесс измерения вручную через низкоуровневый `Layout` composable и `MeasurePolicy`.
+**Как Compose на самом деле решает размер Box, Column и Row.** Всё, что описано в этой главе, — снаружи: КАК элементы позиционируются друг относительно друга, если их размер уже известен. Но откуда сам `Box` или `Column` вообще узнаёт, какого размера ему быть? Ответ — трёхшаговый процесс измерения: контейнер сначала измеряет каждого ребёнка (спрашивает, каким тот хочет быть при доступных ограничениях по ширине и высоте), затем решает собственный размер на основе размеров детей и родительских ограничений, и только потом расставляет детей по вычисленным позициям. `Row` и `Column` — это готовые, уже написанные за тебя реализации этого процесса под конкретную стратегию; когда их не хватает — например, нужен ряд, сам переносящий лишние элементы на новую строку, — Compose позволяет написать процесс измерения вручную через низкоуровневый `Layout` и `MeasurePolicy`.
 
-**Почему на макете чемпионата важна каждая единица измерения.** Критерии оценки на реальных чемпионатах часто автоматизированы: скрипт сравнивает скриншот собранного экрана с эталонным макетом попиксельно, с небольшим допуском. Отступ в `16.dp` вместо `12.dp` или текст в `dp` вместо `sp` (который выглядит иначе при изменённых настройках доступности на тестовом устройстве) — это не стилистическая мелочь, а формальное несовпадение, которое такой скрипт обнаружит и оценит как ошибку, даже если экран визуально выглядит «почти так же».
+**Почему на макете чемпионата важна каждая единица измерения.** Критерии оценки часто автоматизированы: скрипт сравнивает скриншот собранного экрана с эталонным макетом попиксельно, с небольшим допуском. Отступ в `16.dp` вместо `12.dp` или текст в `dp` вместо `sp` — это не стилистическая мелочь, а формальное несовпадение, которое такой скрипт обнаружит и оценит как ошибку, даже если экран визуально выглядит «почти так же».
 
 Дальше по теме:
-- [Jetpack Compose Layouts](https://habr.com/ru/articles/691954/) — открой, чтобы увидеть, что происходит, когда готовых Row/Column/Box не хватает: разбор своего Row, который сам переносит элементы на новую строку.
-- [Custom layouts in Compose](https://developer.android.com/develop/ui/compose/layouts/custom) — официальное объяснение трёхшагового процесса измерения и `Layout`/`MeasurePolicy` из первого абзаца выше.
+- [Jetpack Compose Layouts](https://habr.com/ru/articles/691954/) — разбор своего `Row`, который сам переносит элементы на новую строку.
+- [Custom layouts in Compose](https://developer.android.com/develop/ui/compose/layouts/custom) — официальное объяснение трёхшагового процесса измерения.
 
 </details>
 
@@ -825,7 +541,6 @@ No parameter with name 'arrangement' found.
 <Block kind="cheatsheet" title="Русские материалы" chapterId="layout-by-mockup" blockId="cheatsheet-resources-ru">
 
 - [Единицы измерения. Чем отличается dp (dip) от px. Screen Density](https://startandroid.ru/ru/11-pamjatka/40-edinitsy-izmerenija-chem-otlichaetsja-dp-dip-ot-px-screen-density.html) — открой за более подробным объяснением плотности экрана и того, как именно Android пересчитывает dp в реальные пиксели на разных устройствах.
-- [Замена магического числа символьной константой — Refactoring.Guru](https://refactoring.guru/ru/replace-magic-number-with-symbolic-constant) — открой за классическим объяснением рефакторинга «магическое число → константа» вне контекста Android, тем же приёмом, что применён к `Dimens` в этой главе.
 
 </Block>
 
@@ -834,67 +549,25 @@ No parameter with name 'arrangement' found.
 <Block kind="cheatsheet" title="Официальная документация" chapterId="layout-by-mockup" blockId="cheatsheet-resources-en">
 
 - [Compose layout basics](https://developer.android.com/develop/ui/compose/layouts/basics) — открой за первоисточником примеров про Row, Column, Box, Arrangement и Alignment из этой главы.
-- [Support different pixel densities](https://developer.android.com/training/multiscreen/screendensities) — открой за официальным определением dp, sp и таблицей плотностей экрана (`ldpi`…`xxxhdpi`).
-- [Guide to Dev Mode — Figma Help Center](https://help.figma.com/hc/en-us/articles/15023124644247-Guide-to-Dev-Mode) — открой, чтобы увидеть, как на практике выглядит инструмент, которым дизайнеры готовят те самые макеты с отступами, размерами и hex-цветами, разобранные в начале главы.
-- [Basic Layouts in Compose (codelab)](https://developer.android.com/codelabs/jetpack-compose-layouts) — открой для пошагового практикума на 15 шагов: собрать целое приложение-экран с поиском, карточками и адаптивной навигацией, используя Modifier, Arrangement, Alignment, Box, LazyRow и Scaffold.
-
-- [Видео и материалы сообщества — ниже](#community-sources) — ролики по теме и ссылки от студентов и преподавателей смотри в самом низу страницы.
+- [Support different pixel densities](https://developer.android.com/training/multiscreen/screendensities) — открой за официальным определением dp, sp и таблицей плотностей экрана.
+- [Guide to Dev Mode — Figma Help Center](https://help.figma.com/hc/en-us/articles/15023124644247-Guide-to-Dev-Mode) — открой, чтобы увидеть, как выглядит инструмент, которым дизайнеры готовят те самые макеты.
+- [Basic Layouts in Compose (codelab)](https://developer.android.com/codelabs/jetpack-compose-layouts) — пошаговый практикум на 15 шагов.
 
 </Block>
 
 <SectionAnchor chapterId="layout-by-mockup" sectionId="resources" />
 
-## Челлендж ⭐
-
-`ProductCard` из раздела «Собираем всё вместе» уже готов. Дальше — без эмулятора, только чтением и написанием кода: реши обе ступени сам, а потом сверься с решением.
-
-**Ступень 1.** На макете под ценой и кнопкой добавлена ещё одна строка — рейтинг товара: слева текст `"★ 4.8"`, справа — `"132 отзыва"`, разведённые по краям строки точно так же, как цена и кнопка выше. Допиши `ProductCard` вторым по счёту `Row` — последним, четвёртым ребёнком внешнего `Column`, — используя то же значение `Arrangement`, что и в ряду с ценой.
-
-**Ступень 2 ⭐.** Представь, что кто-то в команде решил «сделать константы понадёжнее» и переписал `object Dimens` из раздела про вынос размеров так:
-
-```kotlin
-object Dimens {
-    const val CardPadding = 12.dp
-    const val ImageHeight = 120.dp
-}
-```
-
-Объясни своими словами (без запуска кода — просто зная материал этой главы), какую именно ошибку это вызовет и почему `val` здесь работал, а `const val` — нет.
-
-<details>
-<summary>Решение (сначала попробуй сам)</summary>
-
-Ступень 1:
-
-```kotlin
-Row(
-    modifier = Modifier.fillMaxWidth(),
-    horizontalArrangement = Arrangement.SpaceBetween
-) {
-    Text(text = "★ 4.8")
-    Text(text = "132 отзыва")
-}
-```
-
-Этот `Row` — четвёртый и последний ребёнок внешнего `Column` (после `Box`, заголовка и ряда с ценой), значит встанет ниже ряда с ценой и кнопкой; `Arrangement.SpaceBetween` разводит два текста по краям строки той же стратегией, что и раньше.
-
-Ступень 2 ⭐:
-
-Ошибка будет той же самой, что разобрана в пункте 4 раздела «Типичные ошибки»: `Const 'val' has type 'Dp'. Only primitive types and 'String' are allowed.` — «const val имеет тип Dp. Разрешены только примитивные типы и String». `12.dp` — не число, известное компилятору заранее, а результат вызова свойства-расширения `.dp`, который вычисляется во время выполнения программы; `const val` же требует значения, полностью готового ещё ДО того, как программа вообще запустится. `Int`, `String`, `Boolean` компилятор может вычислить сам на этапе компиляции — а вызов функции, даже такой маленькой, как `.dp`, для него уже не «просто число», а код, который нужно выполнить. Починка — вернуть обычный `val`, как в оригинальном `Dimens`.
-
-</details>
-
-<SectionAnchor chapterId="layout-by-mockup" sectionId="challenge" />
+## Проверка по главе
 
 <Block kind="quiz" title="Экзамен главы" chapterId="layout-by-mockup" blockId="exam">
 <ChapterExam chapterId="layout-by-mockup" questions={[
-  { q: 'Для Color(0xFF4CAF50) в схеме ARGB, разобранной в главе, — какая пара чисел (в десятичной записи) верна для каналов alpha и green?', options: ['alpha=255, green=175', 'alpha=76, green=175', 'alpha=255, green=80', 'alpha=255, green=76'], correct: 0, why: 'Порядок каналов — alpha, red, green, blue: FF=255 (alpha), 4C=76 (red), AF=175 (green), 50=80 (blue) — та же арифметика shr/and, что и в демо с 0xFFE53935.' },
-  { q: 'В коде написано Box(Alignment.Center) { Text("Привет") } вместо именованного аргумента. Что скажет компилятор?', options: ['Ничего, Alignment.Center — верный первый аргумент Box', 'Argument type mismatch: actual type is Alignment, but Modifier was expected', 'Box вообще не принимает Alignment ни в каком виде', 'Text должен быть первым аргументом, а не Alignment'], correct: 1, why: 'У Box первый позиционный (безымянный) параметр — modifier, а не contentAlignment. Без явного имени компилятор пытается подставить Alignment.Center на место Modifier — вторая типичная ошибка главы.' },
-  { q: 'Почему у fontSize используют .sp, а не .dp, хотя оба по умолчанию дают одно и то же число?', options: ['.dp работает только с целыми числами, а .sp — с дробными', 'sp дополнительно учитывает системную настройку размера шрифта пользователя; если использовать dp, эта настройка перестанет работать именно для этого текста', 'Это просто соглашение об именовании без разницы в поведении', '.sp работает быстрее, чем .dp, при отрисовке текста'], correct: 1, why: 'sp равен dp один в один по умолчанию, но масштабируется вместе с системной настройкой размера шрифта (например, для людей с плохим зрением) — dp эту настройку игнорирует.' },
-  { q: 'Ряд шириной 200 с двумя элементами по 40 (свободного места — 120). Какой зазор получится МЕЖДУ элементами при Arrangement.SpaceBetween?', options: ['60', '120', '40', '30'], correct: 1, why: 'SpaceBetween делит свободное место на itemCount - 1 = 1 промежуток между элементами и ничего не оставляет по краям: весь зазор 120 достаётся единственному промежутку.' },
-  { q: 'Внутри Box { Image(...); Badge(...) } порядок вызова — сначала Image, потом Badge. Как они расположатся на экране?', options: ['Рядом друг с другом по горизонтали', 'Друг под другом, Image сверху', 'Друг на друге, Badge поверх Image', 'Порядок вызова не имеет значения для Box'], correct: 2, why: 'Box кладёт детей друг на друга по порядку вызова: первый вызванный элемент рисуется первым, а каждый следующий — поверх уже нарисованных.' },
-  { q: 'В object Dimens кто-то написал const val CardPadding = 12.dp вместо val CardPadding = 12.dp. Что скажет компилятор?', options: ['Ничего, const val работает одинаково с val для любых типов', "Const 'val' has type 'Dp'. Only primitive types and 'String' are allowed.", "'val' cannot be reassigned.", 'Unresolved reference: dp'], correct: 1, why: 'const val требует значения, вычислимого на этапе компиляции, — только примитивы и String. 12.dp — результат вызова свойства-расширения, вычисляемый во время выполнения, поэтому не подходит под const val.' },
-  { q: 'Почему Modifier.align(Alignment.TopEnd) можно написать внутри Box { ... }, но нельзя вызвать в произвольном месте кода, например прямо в main()?', options: ['align — обычная функция, просто не импортированная по умолчанию', 'align объявлена как функция-расширение специально для BoxScope, а BoxScope существует только внутри трейлинг-лямбды Box { ... }, куда его подставляет сам Compose', 'align работает только с значением Alignment.TopEnd, но не с другими', 'Это ограничение IDE, а не компилятора Kotlin'], correct: 1, why: 'align — функция-расширение с типом-получателем BoxScope; вызвать её можно только там, где есть подходящий receiver-объект, то есть внутри Box { ... }, ровно как показано на самодельном аналоге BoxScope/place в этой главе.' },
+  { q: 'Для Color(0xFF4CAF50) в схеме ARGB — какая пара чисел (в десятичной записи) верна для каналов alpha и green?', options: ['alpha=255, green=175', 'alpha=76, green=175', 'alpha=255, green=80', 'alpha=255, green=76'], correct: 0, why: 'Порядок каналов — alpha, red, green, blue: FF=255 (alpha), 4C=76 (red), AF=175 (green), 50=80 (blue).' },
+  { q: 'В коде написано Box(Alignment.Center) { Text("Привет") }. Что скажет компилятор?', options: ['Ничего, Alignment.Center — верный первый аргумент Box', 'Argument type mismatch: actual type is Alignment, but Modifier was expected', 'Box вообще не принимает Alignment ни в каком виде', 'Text должен быть первым аргументом'], correct: 1, why: 'У Box первый позиционный параметр — modifier, а не contentAlignment.' },
+  { q: 'Почему у fontSize используют .sp, а не .dp, хотя оба по умолчанию дают одно и то же число?', options: ['.dp работает только с целыми числами', 'sp учитывает системную настройку размера шрифта; с dp эта настройка перестанет работать для этого текста', 'Это соглашение об именовании без разницы в поведении', '.sp работает быстрее при отрисовке'], correct: 1, why: 'sp равен dp один в один по умолчанию, но масштабируется вместе с системной настройкой размера шрифта.' },
+  { q: 'Ряд шириной 200 с двумя элементами по 40 (свободного места — 120). Какой зазор получится МЕЖДУ элементами при Arrangement.SpaceBetween?', options: ['60', '120', '40', '30'], correct: 1, why: 'SpaceBetween делит свободное место на itemCount - 1 = 1 промежуток и ничего не оставляет по краям.' },
+  { q: 'Внутри Box { Image(...); Badge(...) } порядок вызова — сначала Image, потом Badge. Как они расположатся?', options: ['Рядом по горизонтали', 'Друг под другом, Image сверху', 'Друг на друге, Badge поверх Image', 'Порядок вызова не важен для Box'], correct: 2, why: 'Box кладёт детей друг на друга по порядку вызова.' },
+  { q: 'Почему Modifier.align(Alignment.TopEnd) можно написать внутри Box, но нельзя в произвольном месте кода?', options: ['align не импортирована по умолчанию', 'align — расширение для BoxScope, а BoxScope существует только внутри лямбды Box { ... }', 'align работает только со значением TopEnd', 'Это ограничение IDE, а не компилятора'], correct: 1, why: 'Вызвать функцию-расширение можно только там, где есть подходящий получатель.' },
+  { q: 'Modifier.weight(1f) внутри Box даёт Unresolved reference. Причина', options: ['опечатка в имени', 'weight — расширение для RowScope и ColumnScope, внутри Box такого получателя нет', 'weight принимает Int', 'не хватает импорта'], correct: 1, why: 'То же правило в обратную сторону работает для align внутри Box.' },
 ]} />
 </Block>
 
@@ -902,11 +575,9 @@ Row(
 
 - Читать в макете отступы и размеры (числа в dp) и текстовые размеры (числа в sp), не путая единицы между собой.
 - Раскладывать hex-цвет вроде `#E53935` на каналы ARGB и объяснять, что означает каждая пара цифр.
-- Выбирать между `Box` (наложение элементов друг на друга), `Column` (сверху вниз) и `Row` (слева направо) по тому, что именно требует макет.
-- Использовать `contentAlignment` у `Box` для общей позиции содержимого и `Modifier.align(...)` — для позиции одного конкретного элемента.
-- По памяти сопоставлять `Row`/`Column` с их параметрами главной и поперечной оси: `horizontalArrangement`/`verticalAlignment` у `Row`, `verticalArrangement`/`horizontalAlignment` у `Column`.
-- Переносить макет карточки в код пошагово: внешний контейнер → слои с наложением → текст → ряды с распределением, — и читать получившийся код построчно.
-- Выносить повторяющиеся числа макета в `object` с именованными константами, объясняя, почему для `Dp`/`Sp`-значений нужен `val`, а не `const val`.
-- Узнавать по сообщению компилятора пять типичных ошибок этой темы — путаницу `dp`/`sp`, перепутанный позиционный аргумент `Box`, `weight` вне `Row`/`Column`, `const val` с типом `Dp`, опечатку в имени именованного аргумента — и чинить каждую.
+- Выбирать между `Box` (наложение), `Column` (сверху вниз) и `Row` (слева направо) по тому, что требует макет.
+- Использовать `contentAlignment` у `Box` для общей позиции содержимого и `Modifier.align(...)` — для позиции одного элемента.
+- По памяти сопоставлять `Row`/`Column` с параметрами главной и поперечной оси.
+- Узнавать по сообщению компилятора четыре типичных ошибки этой темы и чинить каждую.
 
 <SectionAnchor chapterId="layout-by-mockup" sectionId="what-you-should-know" />
