@@ -918,5 +918,21 @@
     "level": "углубление",
     "order": 70,
     "path": "blockchain/waves-dapp.mdx"
+  },
+  {
+    "id": "waves-payments",
+    "title": "Платежи в dApp: банк вкладов на RIDE",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 71,
+    "path": "blockchain/waves-payments.mdx"
+  },
+  {
+    "id": "waves-client",
+    "title": "Клиент к Waves: приложение поверх сети",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 72,
+    "path": "blockchain/waves-client.mdx"
   }
 ]

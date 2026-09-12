@@ -99,6 +99,8 @@ import { wavesAssetsSchemes } from './figures/wavesAssets';
 import { wavesRideSchemes } from './figures/wavesRide';
 import { wavesSmartAccountSchemes } from './figures/wavesSmartAccount';
 import { wavesDappSchemes } from './figures/wavesDapp';
+import { wavesPaymentsSchemes } from './figures/wavesPayments';
+import { wavesClientSchemes } from './figures/wavesClient';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -223,6 +225,8 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(wavesRideSchemes),
     ...Object.keys(wavesSmartAccountSchemes),
     ...Object.keys(wavesDappSchemes),
+    ...Object.keys(wavesPaymentsSchemes),
+    ...Object.keys(wavesClientSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

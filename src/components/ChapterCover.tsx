@@ -1004,6 +1004,51 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="196" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>возвращает список действий</text>
     </g>
   ),
+  /* Платежи в dApp: банк вкладов */
+  'waves-payments': () => (
+    <g strokeLinecap="round">
+      <rect x="22" y="38" width="70" height="38" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      <text x="57" y="62" textAnchor="middle" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>вкладчик</text>
+
+      <path d="M94 50 L136 50" stroke={ACCENT} strokeWidth={3} />
+      <path d="M136 50 L130 46 M136 50 L130 54" stroke={ACCENT} strokeWidth={3} />
+      <text x="115" y="42" textAnchor="middle" fontSize="5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>3 WAVES</text>
+
+      <path d="M136 66 L94 66" stroke="rgba(255,255,255,0.4)" strokeWidth={3} />
+      <path d="M94 66 L100 62 M94 66 L100 70" stroke="rgba(255,255,255,0.4)" strokeWidth={3} />
+      <text x="115" y="80" textAnchor="middle" fontSize="5" fontWeight={800} fill="rgba(255,255,255,0.4)" fontFamily={MONO}>1 WAVES</text>
+
+      <rect x="140" y="38" width="42" height="38" rx="8" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="161" y="62" textAnchor="middle" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>банк</text>
+
+      <rect x="24" y="106" width="152" height="66" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      <text x="38" y="126" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>vklad_3M57BFmz…</text>
+      <text x="38" y="148" fontSize="9" fontWeight={800} fill={ACCENT} fontFamily={MONO}>200000000</text>
+      <text x="38" y="164" fontSize="5" fontWeight={800} fill="rgba(255,255,255,0.35)" fontFamily={MONO}>учёт в состоянии</text>
+
+      <text x="100" y="196" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>деньги едут с вызовом</text>
+    </g>
+  ),
+  /* Клиент к Waves */
+  'waves-client': () => (
+    <g strokeLinecap="round">
+      {[
+        { y: 38, t: 'читать', ok: true },
+        { y: 78, t: 'собрать', ok: true },
+        { y: 118, t: 'отправить', ok: false },
+        { y: 158, t: 'дождаться', ok: false },
+      ].map((s, i) => (
+        <g key={s.t}>
+          <rect x="34" y={s.y} width="132" height="30" rx="8"
+            fill={s.ok ? SOFT : 'rgba(0,0,0,0.3)'} stroke={s.ok ? ACCENT : INK} strokeWidth={2.5} />
+          <text x="100" y={s.y + 19} textAnchor="middle" fontSize="7" fontWeight={800}
+            fill={s.ok ? ACCENT : 'rgba(255,255,255,0.6)'} fontFamily={MONO}>{s.t}</text>
+          {i < 3 && <path d={`M100 ${s.y + 30} L100 ${s.y + 40}`} stroke={ACCENT} strokeWidth={2.5} />}
+        </g>
+      ))}
+      <text x="100" y="206" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>сида на странице нет</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -2044,6 +2089,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'waves-ride': { track: 'blockchain', num: '68', title: 'Язык RIDE: выражение, которое отвечает да или нет' },
   'waves-smart-account': { track: 'blockchain', num: '69', title: 'Смарт-аккаунт: скрипт вместо одной подписи' },
   'waves-dapp': { track: 'blockchain', num: '70', title: 'dApp на RIDE: зачётка, которая живёт в сети' },
+  'waves-payments': { track: 'blockchain', num: '71', title: 'Платежи в dApp: банк вкладов на RIDE' },
+  'waves-client': { track: 'blockchain', num: '72', title: 'Клиент к Waves: приложение поверх сети' },
   'waves-first-network': { track: 'blockchain', num: '63', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '27', title: 'Kotlin и Java: в чём разница' },

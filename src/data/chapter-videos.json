@@ -3058,5 +3058,59 @@
       "title": "Инал Карданов, Waves Platform DevOps практики в Blockchain разработке",
       "channel": "Логрокон"
     }
+  ],
+  "waves-payments": [
+    {
+      "videoId": "31dwYcgb65M",
+      "title": "Waves Smart Contracts: Escrow Example",
+      "channel": "Waves Tech"
+    },
+    {
+      "videoId": "npMhg9yczNw",
+      "title": "Waves Platform - Ride, Smart Assets and NFT | Odyssey Connect",
+      "channel": "Odyssey"
+    },
+    {
+      "videoId": "wF0hgOe-loA",
+      "title": "How to create a smart contract on Waves Platform - Part 1: Creating a smart asset",
+      "channel": "Cryptin.eu"
+    },
+    {
+      "videoId": "MAcUBzFdHDw",
+      "title": "How to create a smart contract on Waves Platform - Part 2: Setting a smart account",
+      "channel": "Cryptin.eu"
+    },
+    {
+      "videoId": "ZZfW0LGZwfo",
+      "title": "CODE SPRINT: Creating the smart contract on Waves",
+      "channel": "Vladimir Zhuravlev"
+    }
+  ],
+  "waves-client": [
+    {
+      "videoId": "ZUV5VEWkptA",
+      "title": "Waves SDK,  connecting blockchain to blockchain. (multilingual subtitles)",
+      "channel": "Crypto Crave Dude"
+    },
+    {
+      "videoId": "o_o1QzQ4SYY",
+      "title": "Waves Protocol 101 architecture: Setting up a node and executing API calls",
+      "channel": "DoraHacks"
+    },
+    {
+      "videoId": "YW9SLnOGaqk",
+      "title": "Waves Explorer: user guide",
+      "channel": "Waves Tech"
+    },
+    {
+      "videoId": "7LGlrzm9PZ0",
+      "title": "Waves Platform воркшоп для веб-разработчиков | Kyiv BlockchainHub",
+      "channel": "CRYPTODEALERS"
+    },
+    {
+      "videoId": "W_S9CKx7qCI",
+      "title": "Crash Course to Blockchain Tech with Waves (Part I)",
+      "channel": "Openhack 2020 Australia"
+    }
   ]
 }

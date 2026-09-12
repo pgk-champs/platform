@@ -1,0 +1,364 @@
+---
+title: 'Платежи в dApp: банк вкладов на RIDE'
+audience: 'блокчейн'
+level: 'углубление'
+order: 71
+sidebar_position: 71
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="waves-payments" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+
+# Платежи в dApp: банк вкладов на RIDE
+
+<ChapterProgress chapterId="waves-payments" totalSections={11} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="waves-payments" />
+
+## Зачем это нужно
+
+Зачётка из прошлой главы данными и ограничилась. Настоящее приложение обычно работает с деньгами: принимает, хранит, возвращает. И вот тут появляется вопрос, который в Solidity решается словом `payable`, а здесь — иначе и удобнее.
+
+В Waves деньги **прикладывают к вызову**. Не переводят отдельной транзакцией, не разрешают списание заранее — кладут прямо в ту же транзакцию, которая зовёт функцию. К моменту, когда функция начала считать, деньги уже на счёте приложения.
+
+Эта глава — про этот механизм и про четыре проверки, без которых приложение теряет деньги. Написан и прогнан настоящий банк вкладов на локальном узле Waves 1.6.4.
+
+<SectionAnchor chapterId="waves-payments" sectionId="zachem" />
+
+## Что приложено к вызову
+
+<Figure scheme="wpm-payments" caption="Платёж едет в той же транзакции, что и вызов" />
+
+Со стороны клиента:
+
+```js
+const tx = invokeScript({
+  dApp: bank,
+  call: { function: 'polozhit', args: [] },
+  payment: [{ amount: 300000000, assetId: null }],
+  chainId: 'R',
+}, seed);
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'payment: [...]', label: 'что прикладываем', note: 'список: в одном вызове можно приложить до двух платежей' },
+  { text: 'amount: 300000000', label: 'сумма в «копейках»', note: 'это 3 WAVES' },
+  { text: 'assetId: null', label: 'какая монета', note: 'null означает WAVES; для токена ставят его идентификатор' },
+]} />
+
+Со стороны скрипта:
+
+```ride
+@Callable(i)
+func polozhit() = {
+  let pay = i.payments[0]
+  if (pay.assetId != unit) then throw("Prinimayu tolko WAVES")
+  else {
+    let k = kluch(i.caller)
+    let bylo = match getInteger(this, k) { case n: Int => n case _ => 0 }
+    [ IntegerEntry(k, bylo + pay.amount) ]
+  }
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'i.payments[0]', label: 'первый платёж', note: 'список может быть и пустым — обращение к [0] тогда уронит скрипт' },
+  { text: 'pay.assetId != unit', label: 'проверка монеты', note: 'в RIDE «ничего» называется unit; у платежа в WAVES assetId именно такой' },
+  { text: 'pay.amount', label: 'сумма', note: 'целое в «копейках», ровно то, что приложил вызвавший' },
+  { text: 'kluch(i.caller)', label: 'составной ключ', note: 'вклад каждого лежит под своим ключом: "vklad_" + адрес' },
+  { text: 'bylo + pay.amount', label: 'прибавляем к прежнему', note: 'состояние приложения ведёт учёт; сами деньги уже на его счёте' },
+]} />
+
+<Hint type="important">
+Деньги приходят на счёт приложения **до** выполнения функции. Если функция упадёт, транзакция целиком не применится, и платёж тоже не состоится. Но пока она работает, на счёте уже лежит и старое, и новое — это важно помнить при расчётах баланса.
+</Hint>
+
+<SectionAnchor chapterId="waves-payments" sectionId="chto-prilozheno" />
+
+## Выдача: `ScriptTransfer`
+
+```ride
+@Callable(i)
+func zabrat(skolko: Int) = {
+  let k = kluch(i.caller)
+  let est = match getInteger(this, k) { case n: Int => n case _ => 0 }
+  if (skolko > est) then throw("Na schete tolko " + est.toString())
+  else [ IntegerEntry(k, est - skolko), ScriptTransfer(i.caller, skolko, unit) ]
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'ScriptTransfer(i.caller, skolko, unit)', label: 'перевод со счёта dApp', note: 'три аргумента: кому, сколько, в какой монете; unit — это WAVES' },
+  { text: 'IntegerEntry(k, est - skolko)', label: 'уменьшить учёт', note: 'вместе с переводом, одним списком: либо оба, либо ни одного' },
+  { text: 'est.toString()', label: 'число в строку', note: 'в сообщении об ошибке видно, сколько на самом деле есть' },
+]} />
+
+<Figure scheme="wpm-bank-flow" caption="Живой прогон: положили три, забрали один" />
+
+Живой прогон:
+
+```text
+### кладём 3 WAVES
+изменения: [{"key":"vklad_3M57BFmz…","type":"integer","value":300000000}]
+баланс банка: 2299900000
+
+### забираем 1 WAVES
+изменения: [{"key":"vklad_3M57BFmz…","type":"integer","value":200000000}]
+переводы:  [{"address":"3M57BFmz…","asset":null,"amount":100000000}]
+```
+
+Запись и перевод пришли одним списком и применились вместе.
+
+<Hint type="fact">
+Обратите внимание: в `stateChanges` ответа узла есть отдельное поле `transfers`. Там видно всё, что приложение отправило со своего счёта, — удобно при разборе «куда делись деньги».
+</Hint>
+
+<SectionAnchor chapterId="waves-payments" sectionId="vydacha" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="waves-payments" quizId="quiz-1" questions={[
+  { q: 'Как деньги попадают в dApp?', options: ['Отдельным переводом до вызова', 'Прикладываются к той же транзакции вызова, в поле payment', 'Через разрешение на списание', 'dApp сам их забирает'], correct: 1, why: 'К моменту начала работы функции деньги уже на счёте приложения.' },
+  { q: 'Что означает assetId равный unit?', options: ['Ошибку', 'Платёж в WAVES: «ничего» вместо идентификатора токена', 'Нулевую сумму', 'Неизвестный токен'], correct: 1, why: 'Для токена в этом поле стоит его идентификатор.' },
+  { q: 'Что делает ScriptTransfer?', options: ['Принимает платёж', 'Отправляет деньги со счёта dApp: кому, сколько, в какой монете', 'Переводит между пользователями', 'Списывает комиссию'], correct: 1, why: 'Оно кладётся в тот же список действий, что и записи в состояние.' },
+]} />
+
+</Block>
+
+## Четыре обязательные проверки
+
+<Figure scheme="wpm-checks" caption="Сеть проверяет только балансы; смысл операции проверяет ваш код" />
+
+**Платёж вообще есть?**
+
+```ride
+if (i.payments.size() == 0) then throw("Nuzhen platezh") else …
+```
+
+Без этого обращение к `i.payments[0]` уронит скрипт — не с вашим сообщением, а с невнятным сбоем.
+
+**Та ли монета?** Самая частая пропущенная проверка. Прикладываем токен вместо WAVES:
+
+```text
+код: 400
+{"error":112,"message":"State check failed. Reason: Attempt to transfer unavailable funds:
+Transaction application leads to negative asset '3fyDK2Da…' balance …"}
+```
+
+В этом прогоне отказала сама сеть — токенов на счёте не было. Но если бы они были, платёж прошёл бы, и приложение записало бы вклад в WAVES за приложенный токен. Проверка `pay.assetId != unit` стоит одну строку и спасает от этого.
+
+**Сумма разумна?** Ноль и отрицательные значения отсекает сеть, но логика может требовать минимума — тогда проверять надо самому.
+
+**Хватает ли на счёте?**
+
+```text
+код: 400
+{"error":306,"message":"Error while executing dApp: Na schete tolko 200000000"}
+```
+
+Без этой проверки приложение выдало бы чужие деньги: на его счёте лежат вклады всех.
+
+<Hint type="important">
+Учёт в состоянии и деньги на счёте — **разные вещи**. Сеть следит только за вторым. Если в коде ошибка, сумма вкладов перестанет сходиться с балансом, и узнаете вы об этом в тот момент, когда кому-то не хватит на выдачу.
+</Hint>
+
+<SectionAnchor chapterId="waves-payments" sectionId="chetyre-proverki" />
+
+## Возврат значения из функции
+
+Вызываемая функция может вернуть не только список действий, но и значение:
+
+```ride
+@Callable(i)
+func skolko() = {
+  let k = kluch(i.caller)
+  let est = match getInteger(this, k) { case n: Int => n case _ => 0 }
+  ([], est)
+}
+```
+
+Пара: пустой список действий и число. Такой вызов ничего не меняет, но всё равно остаётся транзакцией — за него платят комиссию и он попадает в блок.
+
+<Hint type="tip">
+Для чтения это плохой способ: платить 0,005 WAVES за то, что можно бесплатно прочитать запросом `/addresses/data/<адрес>/<ключ>`, незачем. Возврат значения нужен для другого — чтобы **один dApp мог позвать другой** и получить ответ.
+</Hint>
+
+<SectionAnchor chapterId="waves-payments" sectionId="vozvrat" />
+
+## Сложность по функциям
+
+Узел показывает стоимость каждой функции отдельно:
+
+```bash
+curl .../addresses/scriptInfo/<адрес банка>
+```
+
+```text
+"callableComplexities":{"polozhit":20,"zabrat":22,"skolko":14}
+```
+
+Двадцать с небольшим — очень мало. Для сравнения, один `sigVerify` стоит 182. Работа с состоянием и деньгами почти ничего не стоит; дорого обходится криптография.
+
+<SectionAnchor chapterId="waves-payments" sectionId="slozhnost-funktsiy" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="waves-payments" quizId="quiz-2" questions={[
+  { q: 'Почему обязательно проверять i.payments.size()?', options: ['Для скорости', 'Обращение к [0] при пустом списке уронит скрипт невнятным сбоем', 'Так требует компилятор', 'Иначе не пройдёт комиссия'], correct: 1, why: 'Со своей проверкой пользователь хотя бы увидит осмысленное сообщение.' },
+  { q: 'Чем опасна пропущенная проверка монеты?', options: ['Ничем', 'Приложат токен, а вклад запишется в WAVES', 'Скрипт упадёт', 'Сеть откажет'], correct: 1, why: 'Сеть следит только за балансами, а смысл операции проверяет ваш код.' },
+  { q: 'Функция вернула ([], est). Что это значит?', options: ['Ошибку', 'Пустой список действий и возвращаемое значение', 'Пустое состояние', 'Возврат платежа'], correct: 1, why: 'Такой вызов ничего не меняет, но остаётся платной транзакцией.' },
+]} />
+
+</Block>
+
+## Типичные ошибки
+
+**Ошибка 1. Не проверить монету.**
+
+Разобрана выше. Одна строка кода, а без неё приложение принимает что угодно.
+
+**Ошибка 2. Считать баланс приложения вместо учёта.**
+
+```ride
+let est = wavesBalance(this).available     // это ВСЕ вклады, а не вклад вызвавшего
+```
+
+На счёте приложения лежат деньги всех. Учёт ведут в состоянии, под ключом на каждого.
+
+**Ошибка 3. Уменьшить учёт, но забыть перевод.**
+
+Или наоборот. Оба действия — в одном списке, иначе состояние и деньги разойдутся.
+
+**Ошибка 4. Переводить `i.caller` вместо `i.originCaller`, не понимая разницы.**
+
+Когда один dApp зовёт другой, `i.caller` — это позвавший dApp, а `i.originCaller` — человек, начавший всю цепочку. Для банка вкладов правильный вариант — `i.caller`: деньги вернутся туда, откуда пришли.
+
+**Ошибка 5. Читать состояние платным вызовом.**
+
+Комиссия 0,005 WAVES за то, что читается бесплатно обычным запросом к узлу.
+
+<SectionAnchor chapterId="waves-payments" sectionId="oshibki" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="waves-payments" quizId="quiz-3" questions={[
+  { q: 'Почему нельзя считать вклад по балансу приложения?', options: ['Баланс недоступен', 'На счёте приложения лежат вклады всех: свой учёт ведут в состоянии', 'Баланс обновляется с задержкой', 'Это дорого'], correct: 1, why: 'Ключ на каждого вкладчика — единственный способ их различить.' },
+  { q: 'Один dApp позвал другой. Кто такой i.caller во втором?', options: ['Человек, начавший цепочку', 'Позвавший dApp; человек — это i.originCaller', 'Узел', 'Сам dApp'], correct: 1, why: 'Для банка вкладов правильный вариант — i.caller: деньги вернутся туда, откуда пришли.' },
+  { q: 'Сколько стоит функция polozhit в живом прогоне?', options: ['182', '20', '500', '0'], correct: 1, why: 'Работа с состоянием и деньгами почти бесплатна; дорого стоит криптография.' },
+]} />
+
+</Block>
+
+## Шпаргалка по главе
+
+<Block kind="cheatsheet">
+
+| Что нужно | Как |
+| --- | --- |
+| Приложить деньги к вызову | `payment: [{ amount, assetId: null }]` |
+| Прочитать платёж | `let pay = i.payments[0]` |
+| Проверить, что платёж есть | `i.payments.size() > 0` |
+| Проверить, что это WAVES | `pay.assetId == unit` |
+| Отправить деньги | `ScriptTransfer(i.caller, summa, unit)` |
+| Отправить токен | `ScriptTransfer(i.caller, summa, assetId)` |
+| Вернуть значение | `([], znachenie)` |
+| Кто начал цепочку | `i.originCaller` |
+| Стоимость функций | поле `callableComplexities` в `scriptInfo` |
+
+</Block>
+
+<SectionAnchor chapterId="waves-payments" sectionId="shpargalka" />
+
+## Словарь главы
+
+<Block kind="vocab">
+
+| Термин | Что это |
+| --- | --- |
+| Платёж вызова | Деньги, приложенные к транзакции типа 16; до двух штук |
+| `i.payments` | Список платежей внутри функции |
+| `unit` | «Ничего» в RIDE; у платежа в WAVES `assetId` именно такой |
+| `ScriptTransfer` | Действие «отправить со счёта dApp» |
+| `i.caller` | Непосредственно вызвавший: человек или другой dApp |
+| `i.originCaller` | Тот, кто начал всю цепочку вызовов |
+| Учёт | Записи в состоянии, по которым приложение различает вкладчиков |
+| `transfers` | Поле `stateChanges`, где видны все выплаты вызова |
+
+</Block>
+
+<SectionAnchor chapterId="waves-payments" sectionId="slovar" />
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="waves-payments"
+  trainerId="trainer-waves-payments"
+  targetCpm={90}
+  targetAccuracy={88}
+  pools={[
+    { label: 'Приём денег', snippets: [
+      'let pay = i.payments[0]',
+      'if (pay.assetId != unit) then throw("Prinimayu tolko WAVES") else',
+      'func kluch(a: Address) = "vklad_" + a.toString()',
+    ] },
+    { label: 'Выдача', snippets: [
+      'ScriptTransfer(i.caller, skolko, unit)',
+      'if (skolko > est) then throw("Na schete tolko " + est.toString())',
+      '[ IntegerEntry(k, est - skolko), ScriptTransfer(i.caller, skolko, unit) ]',
+    ] },
+    { label: 'Вызов с платежом', snippets: [
+      "payment: [{ amount: 300000000, assetId: null }]",
+      'curl http://127.0.0.1:6869/addresses/scriptInfo/3MPa7P5SDzhd',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="waves-payments" sectionId="trenazher" />
+
+## Что должен уметь после главы
+
+- приложить деньги к вызову и прочитать платёж внутри функции;
+- отличить платёж в WAVES от платежа токеном;
+- выдать деньги действием `ScriptTransfer` вместе с изменением учёта;
+- назвать четыре обязательные проверки и объяснить, чем грозит каждая пропущенная;
+- объяснить разницу между учётом в состоянии и балансом счёта;
+- отличить `i.caller` от `i.originCaller`;
+- посмотреть стоимость каждой функции приложения.
+
+<SectionAnchor chapterId="waves-payments" sectionId="chto-umet" />
+
+## Проверка по главе
+
+<ChapterExam chapterId="waves-payments" questions={[
+  { q: 'Как деньги попадают в dApp?', options: ['отдельным переводом заранее', 'прикладываются к транзакции вызова в поле payment', 'через разрешение на списание', 'dApp списывает сам'], correct: 1, why: 'К началу работы функции деньги уже на счёте приложения.' },
+  { q: 'Сколько платежей можно приложить к одному вызову?', options: ['один', 'до двух', 'до восьми', 'сколько угодно'], correct: 1, why: 'Поэтому i.payments — список, а не одно поле.' },
+  { q: 'assetId равен unit — это', options: ['ошибка', 'платёж в WAVES', 'нулевая сумма', 'неизвестный токен'], correct: 1, why: 'Для токена там стоит его идентификатор.' },
+  { q: 'Что делает ScriptTransfer?', options: ['принимает платёж', 'отправляет деньги со счёта dApp', 'переводит между пользователями', 'списывает комиссию'], correct: 1, why: 'Кладётся в тот же список действий, что и записи в состояние.' },
+  { q: 'Зачем проверять i.payments.size()?', options: ['для скорости', 'обращение к [0] при пустом списке уронит скрипт', 'требует компилятор', 'иначе не спишется комиссия'], correct: 1, why: 'Со своей проверкой пользователь увидит осмысленное сообщение.' },
+  { q: 'Чем грозит пропущенная проверка монеты?', options: ['ничем', 'приложат токен, а вклад запишется в WAVES', 'скрипт упадёт', 'сеть откажет сама'], correct: 1, why: 'Смысл операции проверяет ваш код и больше никто.' },
+  { q: 'Почему вклад нельзя считать по балансу приложения?', options: ['баланс недоступен', 'на счёте лежат вклады всех: свой учёт ведут в состоянии', 'баланс с задержкой', 'это дорого'], correct: 1, why: 'Ключ на каждого вкладчика — единственный способ их различить.' },
+  { q: 'Уменьшили учёт, но забыли ScriptTransfer. Что произойдёт?', options: ['ничего', 'состояние и деньги разойдутся: у вкладчика спишется, а выплаты не будет', 'транзакция не пройдёт', 'сеть исправит сама'], correct: 1, why: 'Оба действия кладут в один список.' },
+  { q: 'Один dApp позвал другой. i.caller во втором — это', options: ['человек, начавший цепочку', 'позвавший dApp', 'узел', 'сам dApp'], correct: 1, why: 'Человек — это i.originCaller.' },
+  { q: 'Функция вернула ([], est). Это', options: ['ошибка', 'пустой список действий и возвращаемое значение', 'пустое состояние', 'возврат платежа'], correct: 1, why: 'Нужно, чтобы один dApp мог позвать другой и получить ответ.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Платежи в dApp](https://docs.waves.tech/ru/ride/structures/common-structures/attached-payment) — структура платежа и ограничения.
+- [Действия скрипта](https://docs.waves.tech/ru/ride/structures/script-actions/script-transfer) — `ScriptTransfer` и его поля.
+- [Вызов dApp из dApp](https://docs.waves.tech/ru/ride/functions/built-in-functions/dapp-to-dapp) — зачем нужен возврат значения.
+- [Waves IDE](https://waves-ide.com/) — отладка вызовов с платежами.

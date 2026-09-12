@@ -99,6 +99,8 @@ import { wavesAssetsSchemes } from './figures/wavesAssets';
 import { wavesRideSchemes } from './figures/wavesRide';
 import { wavesSmartAccountSchemes } from './figures/wavesSmartAccount';
 import { wavesDappSchemes } from './figures/wavesDapp';
+import { wavesPaymentsSchemes } from './figures/wavesPayments';
+import { wavesClientSchemes } from './figures/wavesClient';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -195,6 +197,8 @@ const SCHEMES = {
   ...wavesRideSchemes,
   ...wavesSmartAccountSchemes,
   ...wavesDappSchemes,
+  ...wavesPaymentsSchemes,
+  ...wavesClientSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,
