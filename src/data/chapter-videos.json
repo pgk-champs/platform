@@ -3004,5 +3004,59 @@
       "title": "Waves Smart Contracts: Console Example",
       "channel": "Waves Tech"
     }
+  ],
+  "waves-smart-account": [
+    {
+      "videoId": "o2msjSo0y0o",
+      "title": "Waves Smart Contracts: Multisignature Example",
+      "channel": "Waves Tech"
+    },
+    {
+      "videoId": "8DKRGnwsBjk",
+      "title": "Waves Smart Contracts: Create Multi Sig Account via Waves IDE tools",
+      "channel": "Waves Tech"
+    },
+    {
+      "videoId": "31dwYcgb65M",
+      "title": "Waves Smart Contracts: Escrow Example",
+      "channel": "Waves Tech"
+    },
+    {
+      "videoId": "OIQoheOYJw8",
+      "title": "Waves Smart Contracts: Create MultiSig Account via Waves Client",
+      "channel": "Waves Tech"
+    },
+    {
+      "videoId": "1XJfO5tNc8g",
+      "title": "Waves smart-contract - RIDE",
+      "channel": "Anonymous Man"
+    }
+  ],
+  "waves-dapp": [
+    {
+      "videoId": "Q3CX-n9cHlU",
+      "title": "Как создать децентрализованное приложение? Воркшоп от  Waves Platform в Киеве",
+      "channel": "CRYPTODEALERS"
+    },
+    {
+      "videoId": "7LGlrzm9PZ0",
+      "title": "Waves Platform воркшоп для веб-разработчиков | Kyiv BlockchainHub",
+      "channel": "CRYPTODEALERS"
+    },
+    {
+      "videoId": "sOZuE9Ebfko",
+      "title": "Waves Smart Contracts: Console Example",
+      "channel": "Waves Tech"
+    },
+    {
+      "videoId": "pSieJcRha_I",
+      "title": "Что такое dApps? Обзор и примеры с анимацией",
+      "channel": "Whiteboard Crypto на русском"
+    },
+    {
+      "videoId": "bMp6iPweH0A",
+      "title": "Инал Карданов, Waves Platform DevOps практики в Blockchain разработке",
+      "channel": "Логрокон"
+    }
   ]
 }

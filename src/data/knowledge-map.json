@@ -902,5 +902,21 @@
     "level": "углубление",
     "order": 68,
     "path": "blockchain/waves-ride.mdx"
+  },
+  {
+    "id": "waves-smart-account",
+    "title": "Смарт-аккаунт: скрипт вместо одной подписи",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 69,
+    "path": "blockchain/waves-smart-account.mdx"
+  },
+  {
+    "id": "waves-dapp",
+    "title": "dApp на RIDE: зачётка, которая живёт в сети",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 70,
+    "path": "blockchain/waves-dapp.mdx"
   }
 ]

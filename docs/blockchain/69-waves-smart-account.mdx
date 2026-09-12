@@ -1,0 +1,391 @@
+---
+title: 'Смарт-аккаунт: скрипт вместо одной подписи'
+audience: 'блокчейн'
+level: 'углубление'
+order: 69
+sidebar_position: 69
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="waves-smart-account" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+
+# Смарт-аккаунт: скрипт вместо одной подписи
+
+<ChapterProgress chapterId="waves-smart-account" totalSections={11} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="waves-smart-account" />
+
+## Зачем это нужно
+
+Обычный аккаунт работает по одному правилу: «подпись верна — пропускаем». В предыдущей главе мы написали это правило на RIDE и увидели, что оно стоит 182 единицы сложности.
+
+А теперь главное: это правило можно **заменить**. Навесить на обычный аккаунт скрипт — и он начнёт пропускать транзакции по своему собственному условию. Две подписи из трёх. Никаких переводов до определённой даты. Только записи данных, но не деньги. Что угодно, что выражается в RIDE.
+
+Такой аккаунт называется **смарт-аккаунтом**, и это самая недооценённая возможность Waves: в Ethereum ровно то же самое требует отдельного контракта-кошелька и куда больше кода.
+
+Эта глава — про то, как это делается, сколько стоит и где подводные камни. Все ответы узла сняты на локальном узле Waves 1.6.4.
+
+<SectionAnchor chapterId="waves-smart-account" sectionId="zachem" />
+
+## Скрипт-турникет
+
+<Figure scheme="wsa-turnstile" caption="Скрипт решает про исходящие транзакции: true пропускает, false отказывает" />
+
+Начнём с очевидного правила — «переводы запрещены»:
+
+```ride
+{-# STDLIB_VERSION 6 #-}
+{-# CONTENT_TYPE EXPRESSION #-}
+{-# SCRIPT_TYPE ACCOUNT #-}
+match tx {
+  case t: TransferTransaction => false
+  case _ => sigVerify(tx.bodyBytes, tx.proofs[0], tx.senderPublicKey)
+}
+```
+
+```text
+сложность: 183
+```
+
+Ставим:
+
+```js
+const { setScript } = require('@waves/waves-transactions');
+const ss = setScript({ script: compiled.base64, chainId: 'R' }, seed);
+```
+
+```text
+в блоке: 30
+```
+
+Проверим, что было до и что стало после. **До установки** тот же перевод проходил:
+
+```text
+ответ: 200
+```
+
+**После:**
+
+```text
+код: 400
+{"error":307,"message":"Transaction is not allowed by account-script"}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'error: 307', label: 'код отказа скрипта', note: 'отличается от 112: там проверка состояния, здесь именно скрипт сказал «нет»' },
+  { text: 'not allowed by account-script', label: 'формулировка', note: 'одна на все случаи: скрипт не объясняет, что именно ему не понравилось' },
+]} />
+
+А запись данных по-прежнему проходит — её пропускает ветка `case _`:
+
+```text
+код: 200 | в блоке: 30
+```
+
+<Hint type="important">
+Скрипт решает только про **исходящие** транзакции. Входящий перевод он остановить не может: транзакция подписана отправителем, а не вами, и ваш скрипт в ней не участвует. Задача «не принимать деньги» на смарт-аккаунте не решается — её решают смарт-активом.
+</Hint>
+
+<SectionAnchor chapterId="waves-smart-account" sectionId="turniket" />
+
+## Что видит скрипт
+
+Внутри скрипта доступно одно значение — `tx`, сама транзакция. Что в нём есть, зависит от типа, поэтому почти каждый скрипт начинается с `match`.
+
+| Поле | Что в нём |
+| --- | --- |
+| `tx.bodyBytes` | тело транзакции в байтах — то, что подписано |
+| `tx.proofs` | массив подписей, до восьми мест |
+| `tx.senderPublicKey` | публичный ключ отправителя |
+| `tx.fee` | комиссия |
+| `t.amount`, `t.recipient` | у перевода — сумма и получатель |
+| `d.data` | у транзакции данных — список записей |
+
+<Hint type="tip">
+`sigVerify(tx.bodyBytes, tx.proofs[0], tx.senderPublicKey)` — это ровно поведение обычного аккаунта, записанное вручную. Полезно держать эту строку в голове как «ничего не изменилось»: любой скрипт-проверяющий отличается от неё только добавленными условиями.
+</Hint>
+
+<SectionAnchor chapterId="waves-smart-account" sectionId="chto-vidit" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="waves-smart-account" quizId="quiz-1" questions={[
+  { q: 'Что делает скрипт на аккаунте?', options: ['Хранит данные', 'Решает, выпускать ли исходящую транзакцию: true пропускает, false отказывает', 'Принимает переводы', 'Выпускает токены'], correct: 1, why: 'Это замена правилу «подпись верна — пропускаем».' },
+  { q: 'Можно ли скриптом запретить приём переводов?', options: ['Да, веткой case t: TransferTransaction', 'Нет: скрипт решает только про исходящие транзакции', 'Да, через SetScript', 'Да, если указать sender'], correct: 1, why: 'Входящая транзакция подписана отправителем, и ваш скрипт в ней не участвует.' },
+  { q: 'Чем error 307 отличается от 112?', options: ['Ничем', '307 — отказал скрипт аккаунта, 112 — не прошла проверка состояния', '307 про комиссию', '112 про подпись'], correct: 1, why: 'Формулировка «Transaction is not allowed by account-script» одна на все случаи отказа скрипта.' },
+]} />
+
+</Block>
+
+## Две подписи из трёх
+
+Вот ради чего всё затевалось. Счёт, которым распоряжаются трое, и любые двое из них могут отправить транзакцию:
+
+```ride
+{-# STDLIB_VERSION 6 #-}
+{-# CONTENT_TYPE EXPRESSION #-}
+{-# SCRIPT_TYPE ACCOUNT #-}
+
+let alice = base58'FmEEYNK6ZxyC…'
+let boris = base58'8cbuFR33cJ9x…'
+let sonya = base58'6ZwCUSYEc5CA…'
+
+let a = if sigVerify(tx.bodyBytes, tx.proofs[0], alice) then 1 else 0
+let b = if sigVerify(tx.bodyBytes, tx.proofs[1], boris) then 1 else 0
+let s = if sigVerify(tx.bodyBytes, tx.proofs[2], sonya) then 1 else 0
+
+a + b + s >= 2
+```
+
+```text
+сложность: 549
+```
+
+<SyntaxBreakdown parts={[
+  { text: "base58'FmEEYNK6ZxyC…'", label: 'публичный ключ прямо в коде', note: 'запись base58\'…\' превращает строку в байты на этапе компиляции' },
+  { text: 'tx.proofs[0]', label: 'место закреплено', note: 'нулевое место — за Алисой; подпись Бориса там не засчитается' },
+  { text: 'if … then 1 else 0', label: 'счёт подписей', note: 'булево значение в число превращают вручную: приведения типов в языке нет' },
+  { text: 'a + b + s >= 2', label: 'условие', note: 'последнее выражение и есть ответ скрипта' },
+]} />
+
+<Figure scheme="wsa-proofs" caption="Каждое место в массиве закреплено за своим ключом" />
+
+**Одна подпись из трёх:**
+
+```text
+код: 400 | Transaction is not allowed by account-script
+```
+
+**Две подписи:**
+
+```text
+код: 200 | принято | в блоке: 149
+```
+
+**Две подписи, но в перепутанных местах** — подпись Бориса положили в нулевое место, Алисы в первое:
+
+```text
+код: 400 | Transaction is not allowed by account-script
+```
+
+<Hint type="important">
+Порядок в `proofs` — не формальность. Скрипт проверяет конкретное место конкретным ключом. Если подписант не участвует, на его место кладут **пустую строку** — это законное значение, означающее «этот не подписывал».
+</Hint>
+
+<SectionAnchor chapterId="waves-smart-account" sectionId="dve-iz-tryoh" />
+
+## Доплата за сложность
+
+При первой же попытке отправить транзакцию с такого счёта узел сказал неожиданное:
+
+```text
+State check failed. Reason: Transaction sent from smart account. Requires 400000 extra fee.
+Fee for TransferTransaction (100000 in WAVES) does not exceed minimal value of 500000 WAVES.
+```
+
+<Figure scheme="wsa-extra-fee" caption="Граница — сложность 200: до неё смарт-аккаунт платит как обычный" />
+
+Правило такое: если сложность проверяющего **больше 200**, к комиссии каждой исходящей транзакции добавляется 0,004 WAVES. Проверяется это одним запросом:
+
+```bash
+curl .../addresses/scriptInfo/<адрес>
+```
+
+```text
+сложность проверяющего: 183 | доплата: 0
+сложность проверяющего: 549 | доплата: 400000
+```
+
+Первый скрипт — «переводы запрещены», сложность 183, доплаты нет. Второй — две подписи из трёх, сложность 549, доплата есть.
+
+<Hint type="fact">
+Отсюда практический приём: если проверяющий слегка не укладывается в 200, его стоит подсократить — уложиться выгоднее, чем платить впятеро за каждую транзакцию. Например, `valueOrElse` стоит дороже, чем `getIntegerValue`, а лишний `sigVerify` — 182 единицы сам по себе.
+</Hint>
+
+<SectionAnchor chapterId="waves-smart-account" sectionId="doplata" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="waves-smart-account" quizId="quiz-2" questions={[
+  { q: 'Положили подпись Алисы в proofs[1]. Что будет?', options: ['Засчитается', 'Не засчитается: на первом месте скрипт ждёт подпись Бориса', 'Скрипт упадёт', 'Зависит от порядка ключей'], correct: 1, why: 'Место в массиве закреплено за конкретным ключом.' },
+  { q: 'Как отметить, что подписант не участвует?', options: ['Не передавать proofs вовсе', 'Положить на его место пустую строку', 'Передать null', 'Сдвинуть остальные подписи'], correct: 1, why: 'Сдвиг сломает соответствие мест и ключей.' },
+  { q: 'Когда появляется доплата 0,004 WAVES?', options: ['Всегда у смарт-аккаунта', 'Когда сложность проверяющего больше 200', 'При переводе токенов', 'При установке скрипта'], correct: 1, why: 'Скрипт сложностью 183 доплаты не требует, 549 — требует.' },
+]} />
+
+</Block>
+
+## Снять скрипт
+
+Скрипт можно убрать — если он сам это разрешает:
+
+```js
+const off = setScript({ script: null, chainId: 'R' }, seed);
+```
+
+```text
+код: 200
+скрипт после снятия: {"script":null,"complexity":0,"extraFee":0,"publicKey":null}
+```
+
+Аккаунт снова стал обычным.
+
+<Hint type="important">
+Скрипт может **запретить сам себя снимать** — достаточно ветки `case s: SetScriptTransaction => false`. Такой аккаунт останется со своим правилом навсегда. Это мощный приём и одновременно способ заблокировать счёт насмерть: проверяйте, что при отладке такая ветка не попала в код случайно.
+</Hint>
+
+<SectionAnchor chapterId="waves-smart-account" sectionId="snyat" />
+
+## Типичные ошибки
+
+**Ошибка 1. Забыть про доплату.**
+
+```text
+Transaction sent from smart account. Requires 400000 extra fee.
+```
+
+Библиотека считает комиссию по типу транзакции и про скрипт на счёте не знает. Ставить надо вручную.
+
+**Ошибка 2. Сдвигать подписи вместо пустых мест.**
+
+Подписант не участвует — на его месте пустая строка, а не отсутствие элемента. Сдвиг ломает соответствие.
+
+**Ошибка 3. Запретить всё, включая снятие скрипта.**
+
+```ride
+match tx {
+  case _ => false      // счёт заблокирован навсегда
+}
+```
+
+Потерять так учебный счёт не страшно, рабочий — очень.
+
+**Ошибка 4. Ожидать, что скрипт остановит входящие.**
+
+Не остановит. Скрипт — про исходящие.
+
+**Ошибка 5. Думать, что отказ объяснится.**
+
+`Transaction is not allowed by account-script` — это всё, что будет сказано. Какое именно условие не сошлось, узел не сообщает: отлаживать приходится, упрощая скрипт по частям.
+
+<SectionAnchor chapterId="waves-smart-account" sectionId="oshibki" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="waves-smart-account" quizId="quiz-3" questions={[
+  { q: 'Скрипт вернул false. Что скажет узел?', options: ['Назовёт условие, которое не сошлось', 'Только «Transaction is not allowed by account-script»', 'Покажет номер строки', 'Вернёт сложность'], correct: 1, why: 'Отлаживают, упрощая скрипт по частям.' },
+  { q: 'Можно ли запретить снятие скрипта?', options: ['Нет', 'Да, веткой case s: SetScriptTransaction => false — и тогда навсегда', 'Только администратору сети', 'Только на время'], correct: 1, why: 'Мощный приём и одновременно способ заблокировать счёт насмерть.' },
+  { q: 'Библиотека посчитала комиссию 0,001, а узел требует 0,005. Почему?', options: ['Ошибка библиотеки', 'Она не знает про скрипт на счёте: доплату ставят вручную', 'Сеть перегружена', 'Неверный тип транзакции'], correct: 1, why: 'Доплату узел называет в поле extraFee ответа scriptInfo.' },
+]} />
+
+</Block>
+
+## Шпаргалка по главе
+
+<Block kind="cheatsheet">
+
+| Что нужно | Как |
+| --- | --- |
+| Поставить скрипт | `setScript({ script: base64, chainId }, seed)` |
+| Снять скрипт | `setScript({ script: null, chainId }, seed)` |
+| Узнать сложность и доплату | `GET /addresses/scriptInfo/<адрес>` |
+| Поведение обычного аккаунта | `sigVerify(tx.bodyBytes, tx.proofs[0], tx.senderPublicKey)` |
+| Запретить вид транзакции | `case t: TransferTransaction => false` |
+| Подписать несколькими ключами | `signTx(tx, [{privateKey: a}, {privateKey: b}, null])` |
+| Отметить «не подписывал» | пустая строка на своём месте в `proofs` |
+| Доплата | 0,004 WAVES, если сложность проверяющего больше 200 |
+
+</Block>
+
+<SectionAnchor chapterId="waves-smart-account" sectionId="shpargalka" />
+
+## Словарь главы
+
+<Block kind="vocab">
+
+| Термин | Что это |
+| --- | --- |
+| Смарт-аккаунт | Обычный аккаунт со скриптом-проверяющим |
+| Проверяющий | Скрипт-выражение, решающий про исходящие транзакции |
+| `error: 307` | Скрипт аккаунта не разрешил транзакцию |
+| `extraFee` | Доплата за сложный проверяющий: 0,004 WAVES |
+| `proofs[n]` | Место в массиве подписей, закреплённое за конкретным ключом |
+| Многоподписный счёт | Смарт-аккаунт, требующий N подписей из M |
+| `SetScriptTransaction` | Тип 13; им ставят и снимают скрипт |
+
+</Block>
+
+<SectionAnchor chapterId="waves-smart-account" sectionId="slovar" />
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="waves-smart-account"
+  trainerId="trainer-waves-smart-account"
+  targetCpm={90}
+  targetAccuracy={88}
+  pools={[
+    { label: 'Проверяющий', snippets: [
+      'sigVerify(tx.bodyBytes, tx.proofs[0], tx.senderPublicKey)',
+      'match tx { case t: TransferTransaction => false case _ => true }',
+      "let alice = base58'FmEEYNK6ZxyC'",
+    ] },
+    { label: 'Много подписей', snippets: [
+      'let a = if sigVerify(tx.bodyBytes, tx.proofs[0], alice) then 1 else 0',
+      'a + b + s >= 2',
+    ] },
+    { label: 'Управление', snippets: [
+      "setScript({ script: compiled.base64, chainId: 'R' }, seed)",
+      "setScript({ script: null, chainId: 'R' }, seed)",
+      'curl http://127.0.0.1:6869/addresses/scriptInfo/3M4wYdShHFG2',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="waves-smart-account" sectionId="trenazher" />
+
+## Что должен уметь после главы
+
+- поставить скрипт на аккаунт и снять его;
+- объяснить, что скрипт решает только про исходящие транзакции;
+- написать проверяющего, запрещающего определённый вид транзакций;
+- собрать счёт с двумя подписями из трёх и объяснить роль мест в `proofs`;
+- посчитать доплату по сложности и узнать её через `scriptInfo`;
+- назвать способ заблокировать счёт навсегда — и не сделать этого случайно.
+
+<SectionAnchor chapterId="waves-smart-account" sectionId="chto-umet" />
+
+## Проверка по главе
+
+<ChapterExam chapterId="waves-smart-account" questions={[
+  { q: 'Что такое смарт-аккаунт?', options: ['Отдельный вид аккаунта', 'Обычный аккаунт, на который навесили скрипт-проверяющий', 'Аккаунт биржи', 'Аккаунт с токенами'], correct: 1, why: 'Скрипт заменяет правило «подпись верна — пропускаем».' },
+  { q: 'Про какие транзакции решает скрипт?', options: ['про все', 'только про исходящие', 'только про входящие', 'только про переводы'], correct: 1, why: 'Входящая подписана отправителем, и ваш скрипт в ней не участвует.' },
+  { q: 'Код 307 означает', options: ['нет связи', 'скрипт аккаунта не разрешил транзакцию', 'мало комиссии', 'неверная подпись'], correct: 1, why: '112 — это проверка состояния, а не скрипт.' },
+  { q: 'Строка sigVerify(tx.bodyBytes, tx.proofs[0], tx.senderPublicKey) — это', options: ['проверка баланса', 'поведение обычного аккаунта, записанное вручную', 'подпись транзакции', 'чтение состояния'], correct: 1, why: 'Любой проверяющий отличается от неё только добавленными условиями.' },
+  { q: 'Подпись Алисы положили в proofs[1]. Результат?', options: ['засчитается', 'не засчитается: там ждут ключ Бориса', 'скрипт упадёт', 'зависит от версии'], correct: 1, why: 'Место в массиве закреплено за конкретным ключом.' },
+  { q: 'Как отметить неучаствующего подписанта?', options: ['убрать элемент', 'пустая строка на его месте', 'null', 'сдвинуть остальных'], correct: 1, why: 'Сдвиг ломает соответствие мест и ключей.' },
+  { q: 'Когда появляется доплата 0,004 WAVES?', options: ['всегда у смарт-аккаунта', 'если сложность проверяющего больше 200', 'при установке скрипта', 'при переводе токена'], correct: 1, why: 'Скрипт сложностью 183 доплаты не требует, 549 — требует.' },
+  { q: 'Где узел называет доплату?', options: ['в ответе broadcast', 'в поле extraFee ответа scriptInfo', 'в блоке', 'нигде'], correct: 1, why: 'Ещё он назовёт её в тексте отказа, когда комиссии не хватит.' },
+  { q: 'Что сообщит узел о причине отказа скрипта?', options: ['номер строки', 'ничего, кроме «Transaction is not allowed by account-script»', 'название условия', 'сложность'], correct: 1, why: 'Отлаживают, упрощая скрипт по частям.' },
+  { q: 'Можно ли заблокировать счёт навсегда?', options: ['нет', 'да: скрипт, запрещающий SetScriptTransaction, снять уже нельзя', 'только администратору', 'только на время'], correct: 1, why: 'Проверяйте, что такая ветка не попала в код случайно.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Смарт-аккаунты](https://docs.waves.tech/ru/blockchain/account/smart-account) — что можно и чего нельзя.
+- [Скрипт аккаунта](https://docs.waves.tech/ru/ride/script/script-type/account-script) — правила и ограничения проверяющего.
+- [Комиссия за скрипт](https://docs.waves.tech/ru/blockchain/transaction/transaction-fee) — когда появляется доплата.
+- [Waves IDE](https://waves-ide.com/) — редактор, в котором такие скрипты удобно отлаживать.

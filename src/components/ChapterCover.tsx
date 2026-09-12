@@ -960,6 +960,50 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="208" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>цена известна заранее</text>
     </g>
   ),
+  /* Смарт-аккаунт: скрипт вместо подписи */
+  'waves-smart-account': () => (
+    <g strokeLinecap="round">
+      {[
+        { y: 40, t: 'proofs[0]', n: 'Алиса', ok: true },
+        { y: 80, t: 'proofs[1]', n: 'Борис', ok: true },
+        { y: 120, t: 'proofs[2]', n: 'Соня', ok: false },
+      ].map((r) => (
+        <g key={r.t}>
+          <rect x="24" y={r.y} width="72" height="30" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+          <text x="60" y={r.y + 19} textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>{r.t}</text>
+          <rect x="104" y={r.y} width="72" height="30" rx="7"
+            fill={r.ok ? SOFT : 'rgba(0,0,0,0.2)'} stroke={r.ok ? ACCENT : INK} strokeWidth={2.5} />
+          <text x="140" y={r.y + 19} textAnchor="middle" fontSize="6" fontWeight={800}
+            fill={r.ok ? ACCENT : 'rgba(255,255,255,0.3)'} fontFamily={MONO}>{r.n}</text>
+        </g>
+      ))}
+      <rect x="44" y="162" width="112" height="30" rx="7" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="181" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>a + b + s &gt;= 2</text>
+      <text x="100" y="210" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>две подписи из трёх</text>
+    </g>
+  ),
+  /* dApp на RIDE */
+  'waves-dapp': () => (
+    <g strokeLinecap="round">
+      <rect x="20" y="36" width="72" height="44" rx="8" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      <text x="56" y="54" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>i.caller</text>
+      <text x="56" y="68" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.35)" fontFamily={MONO}>3MGu…</text>
+
+      <path d="M92 58 L112 58" stroke={ACCENT} strokeWidth={3} />
+      <path d="M112 58 L106 54 M112 58 L106 62" stroke={ACCENT} strokeWidth={3} />
+
+      <rect x="116" y="36" width="64" height="44" rx="8" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="148" y="54" textAnchor="middle" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>this</text>
+      <text x="148" y="68" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.4)" fontFamily={MONO}>dApp</text>
+
+      <rect x="24" y="98" width="152" height="76" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      <text x="38" y="116" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>@Callable(i)</text>
+      <text x="38" y="134" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>func zavesti(id)</text>
+      <text x="38" y="156" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>[ StringEntry(…) ]</text>
+
+      <text x="100" y="196" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>возвращает список действий</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1998,6 +2042,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'waves-data': { track: 'blockchain', num: '66', title: 'Состояние аккаунта: словарь вместо переменных' },
   'waves-assets': { track: 'blockchain', num: '67', title: 'Свои токены: выпуск, перевод, сжигание' },
   'waves-ride': { track: 'blockchain', num: '68', title: 'Язык RIDE: выражение, которое отвечает да или нет' },
+  'waves-smart-account': { track: 'blockchain', num: '69', title: 'Смарт-аккаунт: скрипт вместо одной подписи' },
+  'waves-dapp': { track: 'blockchain', num: '70', title: 'dApp на RIDE: зачётка, которая живёт в сети' },
   'waves-first-network': { track: 'blockchain', num: '63', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '27', title: 'Kotlin и Java: в чём разница' },

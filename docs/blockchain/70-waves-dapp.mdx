@@ -1,0 +1,396 @@
+---
+title: 'dApp на RIDE: зачётка, которая живёт в сети'
+audience: 'блокчейн'
+level: 'углубление'
+order: 70
+sidebar_position: 70
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="waves-dapp" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+
+# dApp на RIDE: зачётка, которая живёт в сети
+
+<ChapterProgress chapterId="waves-dapp" totalSections={12} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="waves-dapp" />
+
+## Зачем это нужно
+
+Смарт-аккаунт из прошлой главы умеет только одно: сказать «да» или «нет» на свою же исходящую транзакцию. Этого хватает для многоподписного счёта, но не хватает для приложения.
+
+Чтобы появилось приложение, скрипт должен уметь две вещи: **принимать вызовы снаружи** и **менять состояние**. Именно это и добавляет второй вид скрипта — `DAPP`.
+
+Мы напишем на нём ту же зачётку, что уже писали на Solidity и чейнкодом Fabric. Сравнение получится честным: одна задача, третья платформа. Всё ниже — прогон на локальном узле Waves 1.6.4.
+
+<SectionAnchor chapterId="waves-dapp" sectionId="zachem" />
+
+## Устройство вызываемой функции
+
+```ride
+{-# STDLIB_VERSION 6 #-}
+{-# CONTENT_TYPE DAPP #-}
+{-# SCRIPT_TYPE ACCOUNT #-}
+
+@Callable(i)
+func zavesti(id: String, fio: String) = {
+  let kluch = "z_" + id
+  match getString(this, kluch) {
+    case s: String => throw("Zachetka " + id + " uzhe zavedena")
+    case _ => [ StringEntry(kluch, fio), IntegerEntry(kluch + "_ball", 0) ]
+  }
+}
+```
+
+<Figure scheme="wdp-callable" caption="Функция не пишет сама — она возвращает список того, что сеть должна сделать" />
+
+<SyntaxBreakdown parts={[
+  { text: 'CONTENT_TYPE DAPP', label: 'вид скрипта', note: 'вместо EXPRESSION: теперь у скрипта есть вызываемые функции' },
+  { text: '@Callable(i)', label: 'пометка «вызывается снаружи»', note: 'в скобках — имя, под которым внутри будет доступен вызвавший' },
+  { text: 'func zavesti(id: String, fio: String)', label: 'функция и её аргументы', note: 'типы обязательны; допустимы Int, String, Boolean, ByteVector и списки' },
+  { text: 'this', label: 'сам dApp', note: 'адрес аккаунта, на котором стоит скрипт; читаем и пишем его состояние' },
+  { text: 'throw("…")', label: 'отказ', note: 'текст доедет до клиента как сообщение об ошибке' },
+  { text: '[ StringEntry(…), IntegerEntry(…) ]', label: 'список действий', note: 'то, что функция возвращает; сеть применит это, если ничего не упало' },
+]} />
+
+Попробуем вернуть одно действие вместо списка:
+
+```ride
+@Callable(i)
+func f() = { IntegerEntry("x", 1) }
+```
+
+```text
+Compilation failed: [CallableFunction needs to return
+(List[BinaryEntry|BooleanEntry|Burn|DeleteEntry|IntegerEntry|Issue|Lease|LeaseCancel|
+Reissue|ScriptTransfer|SponsorFee|StringEntry], Any) | List[…]
+```
+
+Компилятор заодно перечислил **все** допустимые действия. Удобно: список можно не запоминать.
+
+<SectionAnchor chapterId="waves-dapp" sectionId="ustroystvo" />
+
+## Что можно положить в список
+
+<Figure scheme="wdp-actions" caption="Всё, что делает dApp, — в этом списке; другого способа менять мир у него нет" />
+
+| Действие | Что делает |
+| --- | --- |
+| `IntegerEntry`, `StringEntry` | записать число или строку в своё состояние |
+| `BooleanEntry`, `BinaryEntry` | записать да-нет или байты |
+| `DeleteEntry` | удалить ключ |
+| `ScriptTransfer` | отправить деньги со счёта dApp |
+| `Issue`, `Reissue`, `Burn` | выпустить, допечатать, сжечь токен |
+| `Lease`, `LeaseCancel`, `SponsorFee` | аренда и спонсирование комиссий |
+
+<Hint type="important">
+Функция ничего не делает сама — она **возвращает список**. Пока функция считает, ничего не записано; если где-то по дороге сработает `throw`, не запишется вообще ничего. Это и есть встроенная «всё или ничего», которую в Solidity обеспечивает `revert`.
+</Hint>
+
+<SectionAnchor chapterId="waves-dapp" sectionId="chto-v-spisok" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="waves-dapp" quizId="quiz-1" questions={[
+  { q: 'Что возвращает вызываемая функция?', options: ['Число', 'Список действий, которые сеть должна выполнить', 'Boolean', 'Ничего'], correct: 1, why: 'Сама функция не пишет: пока она считает, ничего не изменено.' },
+  { q: 'Что означает @Callable(i)?', options: ['Функция вызывается изнутри', 'Функцию можно вызвать снаружи, а i — сведения о вызвавшем', 'Функция читает состояние', 'Функция возвращает Int'], correct: 1, why: 'Имя в скобках произвольно, но принято писать i.' },
+  { q: 'Что произойдёт, если по дороге сработает throw?', options: ['Запишется то, что успело', 'Не запишется ничего: список действий так и не вернётся', 'Транзакция зависнет', 'Запишется пустой список'], correct: 1, why: 'Встроенная «всё или ничего» — аналог revert в Solidity.' },
+]} />
+
+</Block>
+
+## Кто вызывает и чьё состояние меняется
+
+<Figure scheme="wdp-who" caption="i.caller — вызвавший, this — сам dApp; перепутать их значит написать не ту программу" />
+
+Внутри функции доступны два разных адреса, и путать их нельзя:
+
+- **`this`** — аккаунт, на котором стоит скрипт. Записи идут в **его** состояние, деньги `ScriptTransfer` уходят с **его** счёта.
+- **`i.caller`** — тот, кто вызвал функцию. Он подписал транзакцию типа 16 и заплатил комиссию.
+
+Отсюда типичный приём — привязать данные к вызвавшему составным ключом:
+
+```ride
+func kluch(a: Address) = "vklad_" + a.toString()
+```
+
+<Hint type="important">
+Состояние вызвавшего dApp изменить **не может**. Он пишет только в своё. Поэтому все данные пользователей хранятся в состоянии самого приложения, и ключи делают составными — иначе двум пользователям не разойтись.
+</Hint>
+
+Вместе с `i` приезжает ещё несколько полезных вещей:
+
+| Поле | Что в нём |
+| --- | --- |
+| `i.caller` | адрес вызвавшего |
+| `i.callerPublicKey` | его публичный ключ |
+| `i.payments` | что приложено к вызову (следующая глава) |
+| `i.transactionId` | идентификатор этой транзакции |
+| `i.fee` | заплаченная комиссия |
+
+<SectionAnchor chapterId="waves-dapp" sectionId="kto-vyzyvaet" />
+
+## Устанавливаем и вызываем
+
+Установка — та же транзакция `SetScript`, что и для смарт-аккаунта:
+
+```text
+сложность: 182 | размер: 752
+в блоке: 24
+```
+
+Вызов — транзакция типа 16:
+
+```js
+const { invokeScript } = require('@waves/waves-transactions');
+
+const tx = invokeScript({
+  dApp: '3M52rTnLTitKusqJ9JCtJs4JCiptN9Yq4RX',
+  call: { function: 'zavesti', args: [
+    { type: 'string', value: 'z-1' },
+    { type: 'string', value: 'Kovalik Oleg' },
+  ] },
+  chainId: 'R',
+}, seedПользователя);
+```
+
+```text
+тип: 16 | комиссия: 500000
+в блоке: 24 | статус: succeeded
+изменения состояния: {"data":[{"key":"z_z-1","type":"string","value":"Kovalik Oleg"},
+                              {"key":"z_z-1_ball","type":"integer","value":0}],
+                      "transfers":[],"issues":[],"burns":[],"invokes":[]}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'dApp:', label: 'к кому идём', note: 'адрес аккаунта со скриптом; может быть и псевдоним' },
+  { text: 'call.function', label: 'какую функцию зовём', note: 'имя ровно как в скрипте; регистр важен' },
+  { text: 'args: [{ type, value }]', label: 'аргументы', note: 'тип указывают явно: string, integer, boolean, binary, list' },
+  { text: 'stateChanges', label: 'что получилось', note: 'узел возвращает ровно те действия, которые вернула функция' },
+]} />
+
+Проверяем состояние dApp:
+
+```text
+[{"key":"z_z-1","type":"string","value":"Kovalik Oleg"},
+ {"key":"z_z-1_ball","type":"integer","value":0}]
+```
+
+<SectionAnchor chapterId="waves-dapp" sectionId="ustanavlivaem" />
+
+## Отказы
+
+Вторая функция — с проверкой диапазона:
+
+```ride
+@Callable(i)
+func postavit(id: String, ball: Int) = {
+  let kluch = "z_" + id
+  strict fio = getStringValue(this, kluch)
+  if (ball < 2 || ball > 5) then throw("Ball vne diapazona 2..5")
+  else [ IntegerEntry(kluch + "_ball", ball) ]
+}
+```
+
+Обратите внимание на `strict`: чтение нужно ради **побочного эффекта** — упасть, если зачётки нет. Под `let` эта проверка бы не выполнилась.
+
+Три отказа подряд, все с живого узла:
+
+```text
+повторное заведение:
+{"error":306,"message":"Error while executing dApp: Zachetka z-1 uzhe zavedena"}
+
+балл вне диапазона:
+{"error":306,"message":"Error while executing dApp: Ball vne diapazona 2..5"}
+
+несуществующая функция:
+{"error":306,"message":"Error while executing dApp: @Callable function 'netTakoy' doesn't exist in the script"}
+```
+
+<Hint type="fact">
+`error: 306` — «скрипт dApp упал». В отличие от смарт-аккаунта, здесь узел передаёт **ваш текст** из `throw`. Поэтому сообщения стоит писать осмысленно: они и есть интерфейс ошибок вашего приложения.
+</Hint>
+
+<SectionAnchor chapterId="waves-dapp" sectionId="otkazy" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="waves-dapp" quizId="quiz-2" questions={[
+  { q: 'Чем this отличается от i.caller?', options: ['Ничем', 'this — сам dApp, его состояние и его счёт; i.caller — тот, кто вызвал', 'this — узел', 'i.caller — адрес скрипта'], correct: 1, why: 'Состояние вызвавшего dApp изменить не может — только своё.' },
+  { q: 'Почему чтение зачётки объявлено через strict?', options: ['Так короче', 'Оно нужно ради побочного эффекта — упасть, если зачётки нет; под let не выполнилось бы', 'strict быстрее', 'Иначе не скомпилируется'], correct: 1, why: 'Классическая ловушка ленивых значений.' },
+  { q: 'Что означает error 306?', options: ['Нет связи', 'Скрипт dApp упал, и узел передал ваш текст из throw', 'Мало комиссии', 'Неверная подпись'], correct: 1, why: 'Поэтому тексты ошибок и есть интерфейс приложения.' },
+]} />
+
+</Block>
+
+## Та же задача на трёх платформах
+
+Стоит сравнить прямо сейчас, пока все три реализации свежи.
+
+| | Solidity | Чейнкод Fabric | dApp на RIDE |
+| --- | --- | --- | --- |
+| Где данные | поля контракта | общее хранилище | состояние аккаунта |
+| Проверка | `require` | `throw` | `throw` |
+| Возврат результата | изменяет поля | `putState` | список действий |
+| «Всё или ничего» | `revert` | набор изменений | список не вернулся |
+| Кто вызвал | `msg.sender` | `ctx.clientIdentity` | `i.caller` |
+| Стоимость вызова | ~96 000 газа | нет платы | 0,005 WAVES |
+
+Логика во всех трёх одинаковая, а вот способ вернуть результат — разный. В RIDE он самый непривычный и самый строгий: функция **описывает** изменения, а применяет их сеть.
+
+<SectionAnchor chapterId="waves-dapp" sectionId="tri-platformy" />
+
+## Типичные ошибки
+
+**Ошибка 1. Вернуть действие вместо списка.**
+
+```text
+CallableFunction needs to return (List[BinaryEntry|BooleanEntry|…], Any) | List[…]
+```
+
+Даже одно действие оборачивают в квадратные скобки.
+
+**Ошибка 2. Проверка под `let`.**
+
+Та же ловушка, что и в прошлой главе, но здесь дороже: проверка в dApp защищает чужие деньги.
+
+**Ошибка 3. Писать в состояние вызвавшего.**
+
+Нельзя. Данные пользователей живут в состоянии dApp под составными ключами.
+
+**Ошибка 4. Две функции с одинаковым именем.**
+
+```text
+Compilation failed: [Value 'f' can't be defined because function with this name is already defined]
+```
+
+Перегрузки функций в RIDE нет.
+
+**Ошибка 5. Не проверить `applicationStatus`.**
+
+Вызов может попасть в блок и не примениться. Проверять надо не код ответа, а состояние или `stateChanges`.
+
+<SectionAnchor chapterId="waves-dapp" sectionId="oshibki" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="waves-dapp" quizId="quiz-3" questions={[
+  { q: 'Функция возвращает одно действие без скобок. Что скажет компилятор?', options: ['Ничего', 'Потребует список и перечислит все допустимые типы действий', 'Ошибку типа аргумента', 'Предупреждение'], correct: 1, why: 'Заодно этот список можно не запоминать — компилятор его печатает.' },
+  { q: 'Можно ли объявить две @Callable-функции с одним именем?', options: ['Да, если разные аргументы', 'Нет: перегрузки функций в RIDE нет', 'Да, в разных блоках', 'Да, в разных версиях'], correct: 1, why: 'Компилятор говорит «function with this name is already defined».' },
+  { q: 'Где хранят данные пользователей dApp?', options: ['В состоянии каждого пользователя', 'В состоянии самого dApp под составными ключами', 'В токенах', 'В транзакциях'], correct: 1, why: 'Состояние вызвавшего dApp менять не может.' },
+]} />
+
+</Block>
+
+## Шпаргалка по главе
+
+<Block kind="cheatsheet">
+
+| Что нужно | Как |
+| --- | --- |
+| Объявить вызываемую функцию | `@Callable(i)` + `func имя(арг: Тип) = [ … ]` |
+| Записать в состояние | `IntegerEntry(k, v)`, `StringEntry(k, v)` |
+| Удалить ключ | `DeleteEntry(k)` |
+| Отправить деньги | `ScriptTransfer(adres, summa, unit)` |
+| Отказать | `throw("текст")` |
+| Прочитать своё состояние | `getInteger(this, k)`, `getStringValue(this, k)` |
+| Узнать вызвавшего | `i.caller` |
+| Вызвать снаружи | `invokeScript({ dApp, call: { function, args }, chainId }, seed)` |
+| Посмотреть результат | поле `stateChanges` в `/transactions/info/<id>` |
+
+</Block>
+
+<SectionAnchor chapterId="waves-dapp" sectionId="shpargalka" />
+
+## Словарь главы
+
+<Block kind="vocab">
+
+| Термин | Что это |
+| --- | --- |
+| dApp | Аккаунт со скриптом `CONTENT_TYPE DAPP` |
+| `@Callable` | Пометка функции, вызываемой снаружи |
+| `i` | Сведения о вызове: кто, с чем, какой транзакцией |
+| `this` | Сам dApp: его состояние и его счёт |
+| Список действий | То, что возвращает функция; применяет его сеть |
+| `stateChanges` | Что именно изменил вызов; видно в ответе узла |
+| `error: 306` | Скрипт dApp упал; текст — ваш из `throw` |
+| Составной ключ | `"vklad_" + i.caller.toString()` — способ разойтись пользователям |
+
+</Block>
+
+<SectionAnchor chapterId="waves-dapp" sectionId="slovar" />
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="waves-dapp"
+  trainerId="trainer-waves-dapp"
+  targetCpm={90}
+  targetAccuracy={88}
+  pools={[
+    { label: 'Каркас dApp', snippets: [
+      '{-# CONTENT_TYPE DAPP #-}',
+      '@Callable(i)',
+      'func zavesti(id: String, fio: String) = {',
+    ] },
+    { label: 'Действия', snippets: [
+      '[ StringEntry(kluch, fio), IntegerEntry(kluch + "_ball", 0) ]',
+      'ScriptTransfer(i.caller, skolko, unit)',
+      'throw("Ball vne diapazona 2..5")',
+    ] },
+    { label: 'Вызов снаружи', snippets: [
+      "invokeScript({ dApp, call: { function: 'zavesti', args: [] }, chainId: 'R' }, seed)",
+      "{ type: 'string', value: 'z-1' }",
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="waves-dapp" sectionId="trenazher" />
+
+## Что должен уметь после главы
+
+- написать dApp с вызываемыми функциями и установить его на аккаунт;
+- объяснить, почему функция возвращает список, а не пишет сама;
+- перечислить основные действия и сказать, что делает каждое;
+- отличить `this` от `i.caller` и хранить данные пользователей правильно;
+- вызвать функцию снаружи и прочитать `stateChanges`;
+- разобрать три отказа dApp и объяснить, откуда берётся текст ошибки.
+
+<SectionAnchor chapterId="waves-dapp" sectionId="chto-umet" />
+
+## Проверка по главе
+
+<ChapterExam chapterId="waves-dapp" questions={[
+  { q: 'Чем DAPP отличается от EXPRESSION?', options: ['Ничем', 'У DAPP есть вызываемые снаружи функции, меняющие состояние', 'DAPP быстрее', 'EXPRESSION новее'], correct: 1, why: 'Скрипт-выражение умеет только сказать да или нет своей исходящей транзакции.' },
+  { q: 'Что возвращает @Callable-функция?', options: ['Boolean', 'Список действий, которые применит сеть', 'Число', 'Ничего'], correct: 1, why: 'Пока функция считает, ничего не записано.' },
+  { q: 'Что такое this внутри dApp?', options: ['Вызвавший', 'Сам dApp: его состояние и его счёт', 'Узел', 'Транзакция'], correct: 1, why: 'Вызвавший — это i.caller.' },
+  { q: 'Может ли dApp записать в состояние вызвавшего?', options: ['да', 'нет: только в своё', 'да, с его подписью', 'да, если он разрешил'], correct: 1, why: 'Поэтому данные пользователей хранят под составными ключами в состоянии dApp.' },
+  { q: 'Сработал throw посреди функции. Что запишется?', options: ['то, что успело', 'ничего: список действий так и не вернулся', 'пустой список', 'зависит от порядка'], correct: 1, why: 'Встроенная «всё или ничего».' },
+  { q: 'Действие для отправки денег со счёта dApp', options: ['Transfer', 'ScriptTransfer', 'Payment', 'Send'], correct: 1, why: 'Оно кладётся в тот же список, что и записи в состояние.' },
+  { q: 'Номер типа транзакции вызова', options: ['4', '16', '12', '13'], correct: 1, why: '4 — перевод, 12 — данные, 13 — установка скрипта.' },
+  { q: 'Комиссия за вызов dApp', options: ['0,001 WAVES', '0,005 WAVES', '1 WAVES', 'зависит от сложности'], correct: 1, why: 'Вызов дороже простого перевода в пять раз.' },
+  { q: 'error 306 означает', options: ['нет связи', 'скрипт dApp упал; текст — ваш из throw', 'мало комиссии', 'скрипт аккаунта отказал'], correct: 1, why: 'Отказ скрипта аккаунта — это 307 и без всякого текста.' },
+  { q: 'Где посмотреть, что именно изменил вызов?', options: ['в блоке', 'в поле stateChanges ответа /transactions/info/<id>', 'в логах узла', 'нигде'], correct: 1, why: 'Там ровно те действия, которые вернула функция.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [dApp на RIDE](https://docs.waves.tech/ru/ride/script/script-type/dapp-script) — структура и ограничения.
+- [Действия скрипта](https://docs.waves.tech/ru/ride/structures/script-actions/) — полный список с полями.
+- [Транзакция вызова](https://docs.waves.tech/ru/blockchain/transaction-type/invoke-script-transaction) — поля и комиссия.
+- [Waves IDE](https://waves-ide.com/) — редактор с развёртыванием в тестовую сеть в один клик.
