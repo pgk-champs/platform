@@ -36,7 +36,7 @@ import EyeDp from '@site/src/components/EyeDp';
 
 Здесь разберём первую половину работы: как читать числа и цвета на макете, чем `dp` отличается от `sp`, как выбрать между `Box`, `Column` и `Row` и как понять, какое именно свойство `Arrangement` или `Alignment` нужно. Вторая половина — сборка настоящей карточки по шагам — в следующей главе.
 
-Как и в двух прошлых главах, сам Jetpack Compose в браузере не запускается — нужен настоящий Android-проект. Compose-код здесь даётся статичными блоками с построчным разбором. А там, где под капотом обычный Kotlin — числа, строки, функции, объекты, — глава даёт исполняемые примеры, которые можно запустить прямо здесь.
+Сам Jetpack Compose в браузере не запускается — нужен Android-проект, поэтому Compose-код здесь даётся статичными блоками с построчным разбором. Но статичный не значит непроверенный: весь код этой главы собран настоящим компилятором в библиотечном модуле Android, и все сообщения об ошибках ниже — его подлинный вывод. А там, где под капотом обычный Kotlin — числа, строки, функции, объекты, — глава даёт исполняемые примеры, которые можно запустить прямо здесь.
 
 <CollapsibleToc toc={toc} chapterId="layout-by-mockup" />
 
@@ -390,6 +390,10 @@ fun main() {
 
 ## Типичные ошибки чтения макета
 
+<Hint type="important">
+Все сообщения ниже сняты с настоящей сборки, а не пересказаны: библиотечный модуль Android, Kotlin 2.0.21, Compose BOM 2024.10.01, плагин сборки 8.7.3, compileSdk 34. Формулировки компилятора меняются от версии к версии — на Kotlin 1.x та же ошибка про `weight` звучала как `Unresolved reference: weight`, без кавычек и точки. Если у вас текст отличается, сверьте версии, прежде чем искать другую причину.
+</Hint>
+
 **Ошибка 1. `dp` вместо `sp` для текста.**
 
 ```kotlin
@@ -397,10 +401,14 @@ Text(text = "Цена", fontSize = 16.dp)
 ```
 
 ```text
-Argument type mismatch: actual type is 'Dp', but 'TextUnit' was expected.
+e: Probe.kt:5:23 None of the following candidates is applicable:
+fun Text(text: AnnotatedString, modifier: Modifier = ..., color: Color = ..., fontSize: TextUnit = ..., …): Unit
+fun Text(text: String, modifier: Modifier = ..., color: Color = ..., fontSize: TextUnit = ..., …): Unit
 ```
 
-Компилятор ловит это сразу: `fontSize` принимает `TextUnit`, а `.dp` даёт `Dp`. Хуже другой случай — когда размер задан через `TextStyle` с `fontSize` в `sp`, а отступы вокруг текста посчитаны «на глаз» в тех же числах. Тогда при увеличенном системном шрифте текст вырастет, а отступы — нет, и строка вылезет за карточку.
+Сообщение выглядит пугающе и как будто не по делу: компилятор не называет виноватый аргумент, а вываливает список всех подходящих по имени функций. Читать его надо так — раз ни одна не подошла, ищите в сигнатуре свой параметр: `fontSize: TextUnit`. Вот и ответ, `.dp` даёт `Dp`, а нужен `TextUnit`, то есть `.sp`.
+
+Хуже другой случай — когда размер задан через `TextStyle` с `fontSize` в `sp`, а отступы вокруг текста посчитаны «на глаз» в тех же числах. Тогда при увеличенном системном шрифте текст вырастет, а отступы — нет, и строка вылезет за карточку.
 
 **Ошибка 2. Позиционный аргумент `Box`.**
 
@@ -409,7 +417,8 @@ Box(Alignment.Center) { Text("Привет") }
 ```
 
 ```text
-Argument type mismatch: actual type is 'Alignment', but 'Modifier' was expected.
+e: Probe.kt:6:27 Argument type mismatch: actual type is 'androidx.compose.ui.Alignment',
+   but 'androidx.compose.ui.Modifier' was expected.
 ```
 
 Первый безымянный параметр `Box` — это `modifier`, а не `contentAlignment`. Писать надо с именем: `Box(contentAlignment = Alignment.Center)`.
@@ -423,7 +432,7 @@ Box {
 ```
 
 ```text
-Unresolved reference: weight
+e: Probe.kt:6:59 Unresolved reference 'weight'.
 ```
 
 `weight` — функция-расширение для `RowScope` и `ColumnScope`. Внутри `Box` такого получателя нет, и имя просто не находится. То же правило работает в обратную сторону: `Modifier.align(Alignment.TopEnd)` с двумя координатами существует только внутри `Box`.
@@ -435,14 +444,14 @@ Row(horizontalArrangment = Arrangement.SpaceBetween) { }
 ```
 
 ```text
-Cannot find a parameter with this name: horizontalArrangment
+e: Probe.kt:5:27 No parameter with name 'horizontalArrangment' found.
 ```
 
 Сообщение точное, но взгляд по нему скользит: `Arrangment` без `e` выглядит почти как правильное слово. Если параметр «не находится», а имя выглядит верным — читайте его по буквам.
 
 <Block kind="quiz" title="Ошибки чтения макета" chapterId="layout-by-mockup" blockId="quiz-reading-errors">
 <SelfCheck chapterId="layout-by-mockup" quizId="quiz-reading-errors" questions={[
-  { q: 'Компилятор говорит «actual type is Dp, but TextUnit was expected». Где ошибка?', options: ['В имени переменной', 'Размер текста задан через .dp вместо .sp', 'Не хватает Modifier', 'Text вызван вне Composable'], correct: 1, why: 'fontSize принимает TextUnit, а .dp даёт Dp — это ловится сразу при компиляции.' },
+  { q: 'Компилятор на вызове Text выдал «None of the following candidates is applicable» и список перегрузок. Как это читать?', options: ['Text сломан, нужна другая версия Compose', 'Ни одна перегрузка не подошла по типам: ищите в сигнатуре свой параметр — fontSize: TextUnit, а .dp даёт Dp', 'Не хватает импорта', 'Text вызван вне Composable'], correct: 1, why: 'Compose не называет виноватый аргумент, а вываливает все подходящие по имени функции — виноватый ищут сами.' },
   { q: 'Box(Alignment.Center) { … } не компилируется. Почему?', options: ['Box не принимает Alignment', 'Первый безымянный параметр Box — modifier, а не contentAlignment', 'Alignment.Center не существует', 'Нужен Modifier.align'], correct: 1, why: 'Писать надо с именем: Box(contentAlignment = Alignment.Center).' },
   { q: 'Modifier.weight(1f) внутри Box даёт «Unresolved reference». Почему?', options: ['Опечатка в имени', 'weight — расширение для RowScope и ColumnScope, внутри Box такого получателя нет', 'weight принимает Int', 'Нужен импорт'], correct: 1, why: 'То же правило в обратную сторону: align с двумя координатами существует только внутри Box.' },
 ]} />
@@ -562,7 +571,7 @@ Cannot find a parameter with this name: horizontalArrangment
 <Block kind="quiz" title="Экзамен главы" chapterId="layout-by-mockup" blockId="exam">
 <ChapterExam chapterId="layout-by-mockup" questions={[
   { q: 'Для Color(0xFF4CAF50) в схеме ARGB — какая пара чисел (в десятичной записи) верна для каналов alpha и green?', options: ['alpha=255, green=175', 'alpha=76, green=175', 'alpha=255, green=80', 'alpha=255, green=76'], correct: 0, why: 'Порядок каналов — alpha, red, green, blue: FF=255 (alpha), 4C=76 (red), AF=175 (green), 50=80 (blue).' },
-  { q: 'В коде написано Box(Alignment.Center) { Text("Привет") }. Что скажет компилятор?', options: ['Ничего, Alignment.Center — верный первый аргумент Box', 'Argument type mismatch: actual type is Alignment, but Modifier was expected', 'Box вообще не принимает Alignment ни в каком виде', 'Text должен быть первым аргументом'], correct: 1, why: 'У Box первый позиционный параметр — modifier, а не contentAlignment.' },
+  { q: 'В коде написано Box(Alignment.Center) { Text("Привет") }. Что скажет компилятор?', options: ['Ничего, Alignment.Center — верный первый аргумент Box', 'Argument type mismatch: actual type is Alignment, but Modifier was expected — первый безымянный параметр Box это modifier', 'Box вообще не принимает Alignment ни в каком виде', 'Text должен быть первым аргументом'], correct: 1, why: 'У Box первый позиционный параметр — modifier, а не contentAlignment.' },
   { q: 'Почему у fontSize используют .sp, а не .dp, хотя оба по умолчанию дают одно и то же число?', options: ['.dp работает только с целыми числами', 'sp учитывает системную настройку размера шрифта; с dp эта настройка перестанет работать для этого текста', 'Это соглашение об именовании без разницы в поведении', '.sp работает быстрее при отрисовке'], correct: 1, why: 'sp равен dp один в один по умолчанию, но масштабируется вместе с системной настройкой размера шрифта.' },
   { q: 'Ряд шириной 200 с двумя элементами по 40 (свободного места — 120). Какой зазор получится МЕЖДУ элементами при Arrangement.SpaceBetween?', options: ['60', '120', '40', '30'], correct: 1, why: 'SpaceBetween делит свободное место на itemCount - 1 = 1 промежуток и ничего не оставляет по краям.' },
   { q: 'Внутри Box { Image(...); Badge(...) } порядок вызова — сначала Image, потом Badge. Как они расположатся?', options: ['Рядом по горизонтали', 'Друг под другом, Image сверху', 'Друг на друге, Badge поверх Image', 'Порядок вызова не важен для Box'], correct: 2, why: 'Box кладёт детей друг на друга по порядку вызова.' },
