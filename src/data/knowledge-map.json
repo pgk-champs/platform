@@ -728,11 +728,19 @@
     "path": "blockchain/web-router.mdx"
   },
   {
+    "id": "web-redux",
+    "title": "Redux: общее состояние приложения",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 48,
+    "path": "blockchain/web-redux.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 48,
+    "order": 49,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]

@@ -523,6 +523,32 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="184" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>без перезагрузки</text>
     </g>
   ),
+  /* Redux: общее состояние приложения */
+  'web-redux': () => (
+    <g strokeLinecap="round">
+      <rect x="62" y="82" width="76" height="40" rx="10" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="107" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>store</text>
+
+      <rect x="22" y="36" width="60" height="26" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="52" y="54" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>action</text>
+
+      <rect x="118" y="36" width="62" height="26" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="149" y="54" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>reducer</text>
+
+      <path d="M82 49h32" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M114 49l-6-4M114 49l-6 4" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M149 62v16" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M149 78l-4-6M149 78l4-6" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <rect x="26" y="142" width="44" height="26" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <rect x="78" y="142" width="44" height="26" rx="7" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <rect x="130" y="142" width="44" height="26" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <path d="M100 122v14" stroke={ACCENT} strokeWidth={3} fill="none" />
+      <path d="M100 136l-4-6M100 136l4-6" stroke={ACCENT} strokeWidth={3} fill="none" />
+
+      <text x="100" y="188" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>7 → 1 вызов</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1516,7 +1542,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'web-fetch': { track: 'blockchain', num: '45', title: 'Данные из сети: загрузка, отказ, гонка ответов' },
   'web-forms': { track: 'blockchain', num: '46', title: 'Формы: ввод, проверка и суммы' },
   'web-router': { track: 'blockchain', num: '47', title: 'Навигация: несколько экранов в одном приложении' },
-  'waves-first-network': { track: 'blockchain', num: '48', title: 'Первая сеть на Waves Enterprise' },
+  'web-redux': { track: 'blockchain', num: '48', title: 'Redux: общее состояние приложения' },
+  'waves-first-network': { track: 'blockchain', num: '49', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },

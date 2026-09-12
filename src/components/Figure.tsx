@@ -77,6 +77,7 @@ import { webViteSchemes } from './figures/webVite';
 import { webFetchSchemes } from './figures/webFetch';
 import { webFormsSchemes } from './figures/webForms';
 import { webRouterSchemes } from './figures/webRouter';
+import { webReduxSchemes } from './figures/webRedux';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -151,6 +152,7 @@ const SCHEMES = {
   ...webFetchSchemes,
   ...webFormsSchemes,
   ...webRouterSchemes,
+  ...webReduxSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

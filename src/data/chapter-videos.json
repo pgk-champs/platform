@@ -2442,5 +2442,32 @@
       "title": "React Router V7 Tutorial - Routing, Nested Routes, Data Loading, Layouts...",
       "channel": "PedroTech"
     }
+  ],
+  "web-redux": [
+    {
+      "videoId": "5Qtqzeh5FeM",
+      "title": "1. Redux и React. Все о Redux. Понятная теория для всех. React + redux.",
+      "channel": "Ulbi TV"
+    },
+    {
+      "videoId": "KSgp8gn8v2I",
+      "title": "Все что нужно знать о Redux - action, dispatch, reducer, store",
+      "channel": "Веб-разработка - DevMagazine"
+    },
+    {
+      "videoId": "bOGx_LlwkGA",
+      "title": "Объясняя Redux за 5 минут",
+      "channel": "Алексей Волков про JavaScript"
+    },
+    {
+      "videoId": "gGp5cqnZArM",
+      "title": "Redux простым языком",
+      "channel": "Дмитрий Герасимов - о разработке в сфере IT просто"
+    },
+    {
+      "videoId": "wH357pfmWzA",
+      "title": "Redux ЛУЧШЕ useContext? Это МИФ!",
+      "channel": "Алексей Волков про JavaScript"
+    }
   ]
 }
