@@ -95,6 +95,8 @@ import { fabricVsEthSchemes } from './figures/fabricVsEth';
 import { wavesAccountSchemes } from './figures/wavesAccount';
 import { wavesTxSchemes } from './figures/wavesTx';
 import { wavesDataSchemes } from './figures/wavesData';
+import { wavesAssetsSchemes } from './figures/wavesAssets';
+import { wavesRideSchemes } from './figures/wavesRide';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -215,6 +217,8 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(wavesAccountSchemes),
     ...Object.keys(wavesTxSchemes),
     ...Object.keys(wavesDataSchemes),
+    ...Object.keys(wavesAssetsSchemes),
+    ...Object.keys(wavesRideSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

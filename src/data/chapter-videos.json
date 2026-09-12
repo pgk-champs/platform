@@ -2950,5 +2950,59 @@
       "title": "Waves: A global open-source platform for decentralized applications.",
       "channel": "Crypto Diamond"
     }
+  ],
+  "waves-assets": [
+    {
+      "videoId": "V3iFBDt8J64",
+      "title": "Создание токена на платформе Waves за 5 минут",
+      "channel": "Дмитрий Гриценко. Криптовалюты"
+    },
+    {
+      "videoId": "JyovitI-hNY",
+      "title": "Как создать свой токен на платформе Waves. (Ethereum vs Waves) [криптовалюта]",
+      "channel": "BITVISOR"
+    },
+    {
+      "videoId": "B8kCs2RRBas",
+      "title": "Understanding Waves Assets",
+      "channel": "Henry Odia"
+    },
+    {
+      "videoId": "FEq4kU9mAas",
+      "title": "Blockchains: Waves Smarts - Accounts and Assets",
+      "channel": "Inal Kardan"
+    },
+    {
+      "videoId": "a8iz1EnTQoQ",
+      "title": "How to Create Waves Asset (Guide)",
+      "channel": "LITE CRYPTO"
+    }
+  ],
+  "waves-ride": [
+    {
+      "videoId": "j3ZRmMSiXmE",
+      "title": "RIDE: функциональный язык смарт-контрактов. Михаил Потанин",
+      "channel": "FPURE"
+    },
+    {
+      "videoId": "kOUuxvD8ZSo",
+      "title": "Inal Kardanov Как писать скрипты (смарт контракты) Waves ч.1",
+      "channel": "Ярослав Логинов"
+    },
+    {
+      "videoId": "rPu5u5AQhQU",
+      "title": "Ride Programing Language, Waves Tech",
+      "channel": "Gg Pro"
+    },
+    {
+      "videoId": "r_jCNND2DN4",
+      "title": "Developing smart contracts on Waves Protocol | Waves Hackathon 2022 Workshop",
+      "channel": "DoraHacks"
+    },
+    {
+      "videoId": "sOZuE9Ebfko",
+      "title": "Waves Smart Contracts: Console Example",
+      "channel": "Waves Tech"
+    }
   ]
 }

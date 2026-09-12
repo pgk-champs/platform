@@ -95,6 +95,8 @@ import { fabricVsEthSchemes } from './figures/fabricVsEth';
 import { wavesAccountSchemes } from './figures/wavesAccount';
 import { wavesTxSchemes } from './figures/wavesTx';
 import { wavesDataSchemes } from './figures/wavesData';
+import { wavesAssetsSchemes } from './figures/wavesAssets';
+import { wavesRideSchemes } from './figures/wavesRide';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -187,6 +189,8 @@ const SCHEMES = {
   ...wavesAccountSchemes,
   ...wavesTxSchemes,
   ...wavesDataSchemes,
+  ...wavesAssetsSchemes,
+  ...wavesRideSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

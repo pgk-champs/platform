@@ -886,5 +886,21 @@
     "level": "база",
     "order": 66,
     "path": "blockchain/waves-data.mdx"
+  },
+  {
+    "id": "waves-assets",
+    "title": "Свои токены: выпуск, перевод, сжигание",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 67,
+    "path": "blockchain/waves-assets.mdx"
+  },
+  {
+    "id": "waves-ride",
+    "title": "Язык RIDE: выражение, которое отвечает да или нет",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 68,
+    "path": "blockchain/waves-ride.mdx"
   }
 ]

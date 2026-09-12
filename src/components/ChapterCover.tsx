@@ -918,6 +918,48 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="192" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>пишем только к себе</text>
     </g>
   ),
+  /* Свои токены: выпуск и оборот */
+  'waves-assets': () => (
+    <g strokeLinecap="round">
+      <rect x="26" y="38" width="148" height="46" rx="9" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="58" textAnchor="middle" fontSize="7.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>PGKPoint</text>
+      <text x="100" y="74" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>decimals 2</text>
+
+      <path d="M100 84 L100 100 M54 100 L146 100 M54 100 L54 112 M146 100 L146 112" stroke={ACCENT} strokeWidth={2.5} fill="none" />
+
+      <rect x="24" y="112" width="60" height="34" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      <text x="54" y="133" textAnchor="middle" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>750,00</text>
+
+      <rect x="116" y="112" width="60" height="34" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      <text x="146" y="133" textAnchor="middle" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>250,00</text>
+
+      <rect x="60" y="162" width="80" height="28" rx="7" fill="rgba(255,140,140,0.16)" stroke="rgba(255,140,140,0.85)" strokeWidth={2.5} />
+      <text x="100" y="180" textAnchor="middle" fontSize="6.5" fontWeight={800} fill="rgba(255,170,170,0.95)" fontFamily={MONO}>burn 100,00</text>
+
+      <text x="100" y="208" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>кода нет — ломать нечего</text>
+    </g>
+  ),
+  /* Язык RIDE */
+  'waves-ride': () => (
+    <g strokeLinecap="round">
+      <rect x="22" y="34" width="156" height="112" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="34" y="52" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.45)" fontFamily={MONO}>{'{-# STDLIB_VERSION 6 #-}'}</text>
+      <text x="34" y="68" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.45)" fontFamily={MONO}>{'{-# CONTENT_TYPE DAPP #-}'}</text>
+      <text x="34" y="92" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>@Callable(i)</text>
+      <text x="34" y="108" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>func zavesti(id)</text>
+      <text x="34" y="130" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>strict ball = …</text>
+
+      <rect x="30" y="158" width="64" height="30" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      <text x="62" y="171" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>let</text>
+      <text x="62" y="183" textAnchor="middle" fontSize="8" fontWeight={800} fill="rgba(255,255,255,0.65)" fontFamily={MONO}>3</text>
+
+      <rect x="106" y="158" width="64" height="30" rx="7" fill={SOFT} stroke={ACCENT} strokeWidth={2.5} />
+      <text x="138" y="171" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>strict</text>
+      <text x="138" y="183" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>184</text>
+
+      <text x="100" y="208" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>цена известна заранее</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1954,6 +1996,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'waves-account': { track: 'blockchain', num: '64', title: 'Аккаунт в Waves: сид, ключи, адрес' },
   'waves-tx': { track: 'blockchain', num: '65', title: 'Транзакции Waves: тип, комиссия, подпись' },
   'waves-data': { track: 'blockchain', num: '66', title: 'Состояние аккаунта: словарь вместо переменных' },
+  'waves-assets': { track: 'blockchain', num: '67', title: 'Свои токены: выпуск, перевод, сжигание' },
+  'waves-ride': { track: 'blockchain', num: '68', title: 'Язык RIDE: выражение, которое отвечает да или нет' },
   'waves-first-network': { track: 'blockchain', num: '63', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '27', title: 'Kotlin и Java: в чём разница' },

@@ -1,0 +1,490 @@
+---
+title: 'Язык RIDE: выражение, которое отвечает да или нет'
+audience: 'блокчейн'
+level: 'углубление'
+order: 68
+sidebar_position: 68
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="waves-ride" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+
+# Язык RIDE: выражение, которое отвечает да или нет
+
+<ChapterProgress chapterId="waves-ride" totalSections={14} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="waves-ride" />
+
+## Зачем это нужно
+
+Solidity похож на JavaScript: циклы, классы, изменяемые переменные, всё привычное. RIDE — не похож ни на что из того, что было раньше в треке, и это сделано нарочно.
+
+В RIDE **нет циклов**. Нет своих типов. Нет изменяемых переменных. Нет обращений наружу. Убрано ровно то, из-за чего стоимость выполнения программы нельзя предсказать заранее. Взамен появляется свойство, которого нет ни в Solidity, ни в чейнкоде Fabric: **цену любого скрипта считает компилятор**, до всякого запуска.
+
+Эта глава — про язык как таковой: из чего состоит скрипт, чем `let` отличается от `strict` и как читать сообщения компилятора. Всё ниже — вывод настоящего компилятора RIDE версии 2.3.0.
+
+<SectionAnchor chapterId="waves-ride" sectionId="zachem" />
+
+## Три директивы
+
+Любой скрипт начинается с трёх строк:
+
+```ride
+{-# STDLIB_VERSION 6 #-}
+{-# CONTENT_TYPE EXPRESSION #-}
+{-# SCRIPT_TYPE ACCOUNT #-}
+```
+
+<Figure scheme="rid-directives" caption="Три строки, которые решают, что это вообще за скрипт" />
+
+<SyntaxBreakdown parts={[
+  { text: '{-# … #-}', label: 'директива', note: 'не комментарий: компилятор читает её и меняет правила разбора' },
+  { text: 'STDLIB_VERSION 6', label: 'версия языка', note: 'от неё зависит набор функций и их цена: sigVerify в версии 3 стоит 102, в шестой — 182' },
+  { text: 'CONTENT_TYPE EXPRESSION', label: 'вид скрипта', note: 'выражение возвращает да или нет; DAPP содержит вызываемые функции' },
+  { text: 'SCRIPT_TYPE ACCOUNT', label: 'куда вешают', note: 'ACCOUNT на аккаунт, ASSET на токен' },
+]} />
+
+Самый простой скрипт, который что-то делает:
+
+```ride
+{-# STDLIB_VERSION 6 #-}
+{-# CONTENT_TYPE EXPRESSION #-}
+{-# SCRIPT_TYPE ACCOUNT #-}
+sigVerify(tx.bodyBytes, tx.proofs[0], tx.senderPublicKey)
+```
+
+```text
+сложность: 182 | размер base64: 88
+```
+
+Он воспроизводит поведение обычного аккаунта: «пропускай, если подпись верна». Скрипт-выражение **обязан вернуть `Boolean`** — если вернуть что-то другое, компилятор скажет прямо:
+
+```text
+Script should return boolean
+```
+
+<SectionAnchor chapterId="waves-ride" sectionId="direktivy" />
+
+## Значения вместо переменных
+
+```ride
+let a = 2
+let b = 3
+a + b == 5
+```
+
+```text
+сложность: 2 | размер: 44
+```
+
+Слово `let` объявляет **значение**, а не переменную. Поменять его нельзя:
+
+```ride
+let a = 1
+let a = 2
+```
+
+```text
+Compilation failed: [Value 'a' already defined in the scope in 85-111]
+```
+
+Строки складываются тем же плюсом:
+
+```ride
+let s = "IS" + "-21"
+s == "IS-21"
+```
+
+Деление — целочисленное:
+
+```ride
+(7 / 2) == 3
+```
+
+```text
+сложность: 2
+```
+
+А дробного числа просто нет:
+
+```ride
+let x = 1.5
+```
+
+```text
+Parse error: illegal expression in 95-96
+```
+
+<Hint type="important">
+Компилятор не понял `1.5` не как «плохое число», а как **непонятное выражение**: точки между цифрами в языке не бывает вовсе. Отсюда правило, знакомое по предыдущим главам: деньги считают целыми, а запятую ставят при показе.
+</Hint>
+
+<SectionAnchor chapterId="waves-ride" sectionId="znacheniya" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="waves-ride" quizId="quiz-1" questions={[
+  { q: 'Что задаёт директива STDLIB_VERSION?', options: ['Версию узла', 'Версию языка: набор доступных функций и их цену', 'Размер скрипта', 'Тип аккаунта'], correct: 1, why: 'Один и тот же sigVerify в версии 3 стоит 102, в шестой — 182.' },
+  { q: 'Что должен вернуть скрипт с CONTENT_TYPE EXPRESSION?', options: ['Число', 'Boolean — да или нет', 'Список действий', 'Ничего'], correct: 1, why: 'Иначе компилятор говорит «Script should return boolean».' },
+  { q: 'Почему let a = 1.5 не компилируется?', options: ['Число слишком большое', 'Дробных чисел в языке нет: точка между цифрами не разбирается вовсе', 'Нужен другой тип', 'Нужны кавычки'], correct: 1, why: 'Ошибка звучит как «illegal expression» — компилятор не понял выражение.' },
+]} />
+
+</Block>
+
+## `let` ленив, `strict` — нет
+
+Это место стоит запомнить особо: одно слово меняет цену скрипта в шестьдесят раз.
+
+```ride
+@Callable(i)
+func f() = {
+  let dorogo = sigVerify(base58'', base58'', base58'')
+  [ IntegerEntry("x", 1) ]
+}
+```
+
+```text
+сложность: 3
+```
+
+```ride
+@Callable(i)
+func f() = {
+  strict dorogo = sigVerify(base58'', base58'', base58'')
+  [ IntegerEntry("x", 1) ]
+}
+```
+
+```text
+сложность: 184
+```
+
+<Figure scheme="rid-let-strict" caption="Один и тот же код: 3 против 184" />
+
+Значение под `let` вычисляется **только если его кто-то спросил**. В обоих примерах `dorogo` дальше не используется — и в первом случае за него не платят вовсе.
+
+<Hint type="important">
+Отсюда ловушка, на которой теряют деньги. Проверку под `let` легко «потерять»:
+
+```ride
+let proverka = if (ball < 2 || ball > 5) then throw("plohoy ball") else true
+[ IntegerEntry(k, ball) ]
+```
+
+Проверка **не выполнится**: её никто не спросил. Всё, что должно упасть, объявляют через `strict` — или ставят прямо в выражение результата.
+</Hint>
+
+<SectionAnchor chapterId="waves-ride" sectionId="let-strict" />
+
+## `if` только с `else`
+
+```ride
+let a = 1
+if (a == 1) then true
+```
+
+```text
+Compilation failed: [expected a false branch in 116-116]
+```
+
+`if` в RIDE — не оператор ветвления, а **выражение**, которое обязано дать значение при любом исходе. Ветка `else` обязательна всегда.
+
+```ride
+if (1 == 1) then true else false
+```
+
+```text
+сложность: 1
+```
+
+<SectionAnchor chapterId="waves-ride" sectionId="if-else" />
+
+## `match`: разбор по типу
+
+```ride
+match tx {
+  case t: TransferTransaction => t.amount > 0
+  case d: DataTransaction => true
+  case _ => false
+}
+```
+
+```text
+сложность: 2 | размер: 172
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'match tx {', label: 'разбор значения', note: 'смотрим, какого именно типа пришедшая транзакция' },
+  { text: 'case t: TransferTransaction', label: 'ветка по типу', note: 'внутри ветки t уже имеет этот тип: доступно t.amount' },
+  { text: 'case _ =>', label: 'все остальные', note: 'без этой ветки компилятор потребует перечислить все типы' },
+]} />
+
+Уберём последнюю ветку:
+
+```text
+Compilation failed: [Matching not exhaustive: possibleTypes are Order, ReissueTransaction,
+BurnTransaction, MassTransferTransaction, ExchangeTransaction, TransferTransaction,
+SetAssetScriptTransaction, InvokeScriptTransaction, … while matched are TransferTransaction]
+```
+
+Компилятор перечислил **все** типы, которые вы не разобрали. Это не придирка: пропущенная ветка в скрипте на аккаунте означает, что какой-то вид транзакции пройдёт без проверки.
+
+<Hint type="fact">
+`Matching not exhaustive` — редкий случай, когда сообщение компилятора длиннее самой ошибки. Зато читать его не надо: достаточно добавить `case _ =>` и решить, что делать с остальными.
+</Hint>
+
+<SectionAnchor chapterId="waves-ride" sectionId="match" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="waves-ride" quizId="quiz-2" questions={[
+  { q: 'Чем let отличается от strict?', options: ['Ничем, это синонимы', 'Значение под let вычисляется только если его спросили; strict считается всегда', 'strict нельзя менять', 'let работает только в dApp'], correct: 1, why: 'В живом прогоне одно и то же выражение дало сложность 3 против 184.' },
+  { q: 'Проверка объявлена через let и нигде не используется. Что произойдёт?', options: ['Упадёт при компиляции', 'Молча не выполнится: её никто не спросил', 'Выполнится всё равно', 'Скрипт не установится'], correct: 1, why: 'Всё, что должно упасть, объявляют через strict.' },
+  { q: 'Почему if требует else?', options: ['Так удобнее читать', 'if — выражение: оно обязано дать значение при любом исходе', 'Это ошибка компилятора', 'else нужен только в dApp'], correct: 1, why: 'Без него компилятор говорит «expected a false branch».' },
+]} />
+
+</Block>
+
+## Чтение необязательных значений
+
+Чтение из состояния возвращает «значение или ничего»:
+
+```ride
+let v = getInteger(this, "ball")          // Int|Unit
+```
+
+Достать из него число можно тремя способами:
+
+```ride
+valueOrElse(getInteger(this, "ball"), 0)   // подставить запасное
+getIntegerValue(this, "ball")              // упасть, если нет
+match getInteger(this, "ball") {           // разобрать вручную
+  case n: Int => n
+  case _ => 0
+}
+```
+
+```text
+valueOrElse      → сложность 13
+getIntegerValue  → сложность 11
+```
+
+<Hint type="tip">
+`getIntegerValue` короче и **дешевле**, но падает на пустом ключе. Это ровно то, что нужно, когда отсутствие записи — ошибка: например, оценку ставят в несуществующую зачётку. А `valueOrElse` берут там, где пусто — законное состояние: например, вклад, которого ещё не было.
+</Hint>
+
+<SectionAnchor chapterId="waves-ride" sectionId="neobyazatelnye" />
+
+## Сложность
+
+Число, которое компилятор печатает рядом с размером, — **сложность**: счётчик работы скрипта. Каждая встроенная функция стоит фиксированно, цены сложены заранее.
+
+```text
+a + b                       → 2
+if (1 == 1) then true else false → 1
+getInteger(this, "ball")    → 11
+sha256(…)                   → 120
+sigVerify(…)                → 182
+```
+
+Узел показывает сложность каждой функции dApp отдельно:
+
+```bash
+curl .../addresses/scriptInfo/<адрес>
+```
+
+```text
+"callableComplexities":{"polozhit":20,"zabrat":22,"skolko":14}
+```
+
+<Hint type="important">
+В основной сети сложность ограничена и влияет на комиссию: тяжёлый скрипт стоит дороже, а слишком тяжёлый не примут. На локальном узле ограничения смягчены — у нас установилась и выполнилась функция сложностью 14 483. Поэтому проверять укладываемость надо в той сети, где будет работать приложение, а не на своей машине.
+</Hint>
+
+<SectionAnchor chapterId="waves-ride" sectionId="slozhnost" />
+
+## Чего в языке нет
+
+<Figure scheme="rid-no" caption="Пять отсутствующих возможностей — и то, ради чего их убрали" />
+
+- **Циклов.** Бесконечный скрипт написать нельзя в принципе. Списки обрабатывают функциями `FOLD`, у которых число шагов известно заранее.
+- **Своих типов и классов.** Структура данных известна компилятору целиком.
+- **Изменяемых переменных.** Объявленное один раз значение не меняется.
+- **Дробных чисел.** Деление целое: `7 / 2` даёт `3`.
+- **Обращений наружу.** Скрипт не ходит в сеть и не читает файлы: неоткуда взяться расхождению между узлами.
+
+Итог — то самое свойство, ради которого всё это сделано: **цена скрипта известна до запуска**.
+
+<SectionAnchor chapterId="waves-ride" sectionId="chego-net" />
+
+## Типичные ошибки
+
+**Ошибка 1. Проверка под `let`.**
+
+Разобрана выше. Самая дорогая ошибка в языке: код есть, а проверки нет.
+
+**Ошибка 2. `if` без `else`.**
+
+```text
+expected a false branch
+```
+
+**Ошибка 3. Неполный `match`.**
+
+```text
+Matching not exhaustive: possibleTypes are Order, ReissueTransaction, …
+```
+
+Добавить `case _ =>` и решить, что делать с остальными типами.
+
+**Ошибка 4. Опечатка в имени функции.**
+
+```ride
+sigVerifu(tx.bodyBytes, tx.proofs[0], tx.senderPublicKey)
+```
+
+```text
+Can't find a function 'sigVerifu'(ByteVector, ByteVector, ByteVector) or it is @Callable in 85-142
+```
+
+Обратите внимание: компилятор перечислил **типы аргументов**. Это же сообщение появится, если имя верное, а типы не те.
+
+**Ошибка 5. Присваивание вместо сравнения.**
+
+```ride
+let x = 5
+x = 6
+```
+
+```text
+Parse error: expected "let" or "strict" keyword in 95-96
+```
+
+Компилятор увидел строку, которая начинается с имени, и ждал объявления.
+
+<SectionAnchor chapterId="waves-ride" sectionId="oshibki" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="waves-ride" quizId="quiz-3" questions={[
+  { q: 'Чем valueOrElse отличается от getIntegerValue?', options: ['Ничем', 'valueOrElse подставляет запасное значение, getIntegerValue падает на пустом ключе', 'getIntegerValue дороже', 'valueOrElse работает только со строками'], correct: 1, why: 'Выбор зависит от того, законно ли отсутствие записи в вашей задаче.' },
+  { q: 'Почему в RIDE нет циклов?', options: ['Не успели добавить', 'Чтобы цену скрипта можно было посчитать до запуска', 'Они медленные', 'Их заменяет match'], correct: 1, why: 'Бесконечный скрипт написать нельзя в принципе.' },
+  { q: 'Что означает «Can t find a function sigVerifu(ByteVector, ByteVector, ByteVector)»?', options: ['Функция устарела', 'Нет функции с таким именем и такими типами аргументов', 'Нужна другая версия языка', 'Не хватает прав'], correct: 1, why: 'То же сообщение появится, если имя верное, а типы не те.' },
+]} />
+
+</Block>
+
+## Шпаргалка по главе
+
+<Block kind="cheatsheet">
+
+| Что нужно | Как |
+| --- | --- |
+| Шапка скрипта | три директивы: `STDLIB_VERSION`, `CONTENT_TYPE`, `SCRIPT_TYPE` |
+| Объявить значение | `let a = 2` — ленивое |
+| Заставить вычислить | `strict a = …` |
+| Ветвление | `if (…) then … else …` — `else` обязателен |
+| Разбор по типу | `match x { case t: Type => … case _ => … }` |
+| Чтение с запасным значением | `valueOrElse(getInteger(this, k), 0)` |
+| Чтение со строгим падением | `getIntegerValue(this, k)` |
+| Скомпилировать | `compile(src)` из `@waves/ride-js` |
+| Узнать сложность | поле `complexity` в результате компиляции |
+
+</Block>
+
+<SectionAnchor chapterId="waves-ride" sectionId="shpargalka" />
+
+## Словарь главы
+
+<Block kind="vocab">
+
+| Термин | Что это |
+| --- | --- |
+| Директива | Строка `{-# … #-}` в шапке; меняет правила разбора |
+| `EXPRESSION` | Скрипт-выражение: обязан вернуть `Boolean` |
+| `DAPP` | Скрипт-приложение с вызываемыми функциями |
+| `let` | Ленивое значение: считается только при обращении |
+| `strict` | Значение, которое вычисляется всегда |
+| Сложность | Счётчик работы скрипта; считается компилятором заранее |
+| `Int|Unit` | Тип «число или ничего»: результат чтения из состояния |
+| `Matching not exhaustive` | В `match` разобраны не все возможные типы |
+
+</Block>
+
+<SectionAnchor chapterId="waves-ride" sectionId="slovar" />
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="waves-ride"
+  trainerId="trainer-waves-ride"
+  targetCpm={90}
+  targetAccuracy={88}
+  pools={[
+    { label: 'Шапка', snippets: [
+      '{-# STDLIB_VERSION 6 #-}',
+      '{-# CONTENT_TYPE EXPRESSION #-}',
+      '{-# SCRIPT_TYPE ACCOUNT #-}',
+    ] },
+    { label: 'Основа языка', snippets: [
+      'let kluch = "z_" + id',
+      'strict fio = getStringValue(this, kluch)',
+      'if (ball < 2 || ball > 5) then throw("plohoy ball") else true',
+    ] },
+    { label: 'Разбор и чтение', snippets: [
+      'match getInteger(this, k) { case n: Int => n case _ => 0 }',
+      'valueOrElse(getInteger(this, "ball"), 0)',
+      'sigVerify(tx.bodyBytes, tx.proofs[0], tx.senderPublicKey)',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="waves-ride" sectionId="trenazher" />
+
+## Что должен уметь после главы
+
+- написать шапку скрипта и объяснить каждую директиву;
+- отличить `let` от `strict` и не потерять проверку;
+- написать `if` и `match` так, чтобы компилятор не ругался;
+- прочитать значение из состояния тремя способами и выбрать подходящий;
+- объяснить, что такое сложность и откуда она берётся;
+- назвать пять отсутствующих возможностей языка и объяснить, зачем их убрали;
+- разобрать пять типичных сообщений компилятора.
+
+<SectionAnchor chapterId="waves-ride" sectionId="chto-umet" />
+
+## Проверка по главе
+
+<ChapterExam chapterId="waves-ride" questions={[
+  { q: 'Сколько директив обязательно в шапке скрипта?', options: ['Одна', 'Три: версия языка, вид скрипта, куда вешают', 'Пять', 'Ни одной'], correct: 1, why: 'Без них компилятор не знает, по каким правилам читать текст.' },
+  { q: 'Что должен вернуть скрипт-выражение?', options: ['Число', 'Boolean', 'Список действий', 'Строку'], correct: 1, why: 'Иначе «Script should return boolean».' },
+  { q: 'let a = 1.5 не компилируется, потому что', options: ['число слишком точное', 'дробных чисел в языке нет вовсе', 'нужен другой тип', 'не хватает версии'], correct: 1, why: 'Ошибка звучит как «illegal expression».' },
+  { q: 'Чем let отличается от strict?', options: ['ничем', 'let ленив: считается только при обращении; strict — всегда', 'strict нельзя переопределить', 'let только для строк'], correct: 1, why: 'Одно и то же выражение: сложность 3 против 184.' },
+  { q: 'Проверку объявили через let и не использовали. Что будет?', options: ['ошибка компиляции', 'она молча не выполнится', 'выполнится всё равно', 'скрипт не установится'], correct: 1, why: 'Самая дорогая ошибка языка: код есть, проверки нет.' },
+  { q: 'Почему if требует else?', options: ['для читаемости', 'if — выражение и обязано дать значение при любом исходе', 'так короче', 'else нужен только в dApp'], correct: 1, why: '«expected a false branch».' },
+  { q: '«Matching not exhaustive» означает', options: ['слишком много веток', 'в match разобраны не все возможные типы', 'ошибку в типе', 'устаревший синтаксис'], correct: 1, why: 'Пропущенная ветка — это вид транзакции, который пройдёт без проверки.' },
+  { q: 'getIntegerValue на пустом ключе', options: ['вернёт 0', 'уронит скрипт', 'вернёт unit', 'вернёт null'], correct: 1, why: 'Когда пусто — законное состояние, берут valueOrElse.' },
+  { q: 'Сложность — это', options: ['размер скрипта', 'счётчик работы, посчитанный компилятором до запуска', 'число функций', 'комиссия'], correct: 1, why: 'Узел показывает её отдельно для каждой функции dApp.' },
+  { q: 'Зачем в RIDE убрали циклы?', options: ['не успели', 'чтобы цену скрипта можно было посчитать заранее', 'они медленные', 'их заменяет match'], correct: 1, why: 'Бесконечный скрипт написать нельзя в принципе.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Документация RIDE](https://docs.waves.tech/ru/ride/) — язык целиком на русском языке.
+- [Встроенные функции и их цена](https://docs.waves.tech/ru/ride/functions/built-in-functions/) — таблица сложностей.
+- [Waves IDE](https://waves-ide.com/) — редактор с подсветкой и компиляцией прямо в браузере.
+- [@waves/ride-js](https://github.com/wavesplatform/ride-js) — компилятор, которым получены все числа этой главы.

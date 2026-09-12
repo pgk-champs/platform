@@ -1,0 +1,342 @@
+---
+title: 'Свои токены: выпуск, перевод, сжигание'
+audience: 'блокчейн'
+level: 'база'
+order: 67
+sidebar_position: 67
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="waves-assets" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+
+# Свои токены: выпуск, перевод, сжигание
+
+<ChapterProgress chapterId="waves-assets" totalSections={11} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="waves-assets" />
+
+## Зачем это нужно
+
+В Ethereum свой токен — это контракт. Надо написать код, реализовать стандарт ERC-20 по букве, развернуть, проверить. Мы этим занимались четыре главы, и там было чего бояться: одна ошибка в `transferFrom` — и токен ломается.
+
+В Waves токен — это **транзакция**. Одна, типа 3. Кода нет вовсе: перевод, учёт балансов, сжигание встроены в саму сеть и работают одинаково для любого токена. Ошибиться в них невозможно, потому что писать их не надо.
+
+Эта глава — про то, что задают при выпуске, что после этого уже не поменять, и кто какие права получает. Все ответы узла — с локального узла Waves 1.6.4.
+
+<SectionAnchor chapterId="waves-assets" sectionId="zachem" />
+
+## Выпускаем токен
+
+```js
+const { issue } = require('@waves/waves-transactions');
+
+const tx = issue({
+  name: 'PGKPoint',
+  description: 'Ball za praktiku',
+  quantity: 100000,
+  decimals: 2,
+  reissuable: true,
+  chainId: 'R',
+}, seed);
+```
+
+```text
+тип: 3 | комиссия: 100000000 | id актива: 3fyDK2DaHYR9idYmbgwjJQ33r7t6zQTCQQTcQMQugAUm
+в блоке: 26
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'name: \'PGKPoint\'', label: 'имя', note: 'от 4 до 16 знаков; 3 знака библиотека не пропустит, 17 тоже' },
+  { text: 'quantity: 100000', label: 'сколько выпустить', note: 'в «копейках»: при двух знаках это 1000,00 балла' },
+  { text: 'decimals: 2', label: 'знаков после запятой', note: 'от 0 до 8; узел отвергает 9 с прямым сообщением' },
+  { text: 'reissuable: true', label: 'можно ли допечатать', note: 'разрешение допечатать позже; его можно закрыть навсегда, открыть обратно — нет' },
+  { text: 'комиссия 100000000', label: '1 WAVES', note: 'в тысячу раз дороже перевода — так сеть защищается от мусорных токенов' },
+  { text: 'id актива', label: 'откуда берётся', note: 'это идентификатор самой транзакции выпуска; отдельного адреса у токена нет' },
+]} />
+
+<Figure scheme="was-issue-fields" caption="Что задают при выпуске и что после этого уже не изменить" />
+
+Сведения об активе доступны сразу:
+
+```text
+{"assetId":"3fyDK2Da…","issueHeight":26,"issuer":"3M5HPFG1r9q79uxff6rm1Z3UFZcXXXHX32p",
+ "name":"PGKPoint","description":"Ball za praktiku","decimals":2,"reissuable":true,
+ "quantity":100000,"scripted":false,"minSponsoredAssetFee":null}
+```
+
+<Hint type="important">
+Идентификатор актива — это **идентификатор транзакции выпуска**. Отдельного адреса, как у контракта в Ethereum, у токена нет. Поэтому и «взломать токен» в Waves не получится: у него нет кода, который можно сломать.
+</Hint>
+
+<SectionAnchor chapterId="waves-assets" sectionId="vypuskaem" />
+
+## Знаки после запятой
+
+<Figure scheme="was-decimals" caption="Одно и то же число означает разное — смотреть надо decimals актива" />
+
+Проверим границу:
+
+```text
+decimals: 9 → код 400
+invalid decimals value: 9, decimals should be in interval [0; 8]
+```
+
+Число знаков задают один раз и **не меняют никогда**. Ошиблись — выпускайте новый токен: старый так и останется с неправильной запятой.
+
+<Hint type="tip">
+Ноль знаков — законный и часто правильный выбор. Билеты, места, голоса, экземпляры — всё, что не делится, выпускают с `decimals: 0`. Тогда `quantity: 100` означает ровно сто штук, и никакой арифметики с запятой в приложении не будет.
+</Hint>
+
+<SectionAnchor chapterId="waves-assets" sectionId="znaki" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="waves-assets" quizId="quiz-1" questions={[
+  { q: 'Что такое токен в Waves?', options: ['Смарт-контракт по стандарту', 'Транзакция типа 3: перевод и учёт встроены в саму сеть', 'Запись в состоянии аккаунта', 'Отдельный аккаунт'], correct: 1, why: 'Писать код перевода не надо, значит и ошибиться в нём невозможно.' },
+  { q: 'Откуда берётся идентификатор актива?', options: ['Генерируется случайно', 'Это идентификатор транзакции выпуска', 'Задаётся вручную', 'Это адрес контракта'], correct: 1, why: 'Отдельного адреса у токена нет вовсе.' },
+  { q: 'Можно ли изменить decimals после выпуска?', options: ['Да, транзакцией обновления', 'Нет: число знаков задают один раз навсегда', 'Да, если reissuable', 'Только в сторону увеличения'], correct: 1, why: 'Ошиблись — придётся выпускать новый токен.' },
+]} />
+
+</Block>
+
+## Переводим и проверяем баланс
+
+Перевод токена — та же транзакция типа 4, что и перевод WAVES, только с полем `assetId`:
+
+```js
+const tx = transfer({ amount: 25000, assetId: '3fyDK2Da…', recipient: b, chainId: 'R' }, seed);
+```
+
+```text
+в блоке: 26 | комиссия платится в WAVES: 100000
+баланс держателя: {"assetId":"3fyDK2Da…","balance":25000}
+```
+
+`25000` при двух знаках — это 250,00 балла. А комиссия — 0,001 **WAVES**, не токена.
+
+<Hint type="important">
+Аккаунт, на котором лежат токены, но нет WAVES, **не может их перевести**. Это первое, обо что спотыкаются в приложениях: пользователю прислали токен, а он не может им распорядиться. Лечится либо выдачей небольшой суммы WAVES, либо спонсированием комиссии — механизмом, при котором за перевод платит выпустивший.
+</Hint>
+
+<SectionAnchor chapterId="waves-assets" sectionId="perevodim" />
+
+## Кто что может
+
+<Figure scheme="was-rights" caption="Допечатать — только выпустивший; сжечь — любой, но только свои" />
+
+**Допвыпуск чужого токена** отвергается:
+
+```text
+код: 400
+{"error":112,"message":"State check failed. Reason: Asset was issued by other address"}
+```
+
+**Допвыпуск неперевыпускаемого токена** — даже самим выпустившим:
+
+```text
+код: 400
+{"error":112,"message":"State check failed. Reason: Asset is not reissuable"}
+```
+
+Это и есть способ раз и навсегда пообещать держателям, что токенов больше не станет: выпустить с `reissuable: false` либо позже закрыть допечатку транзакцией допвыпуска с этим флагом.
+
+**Сжигание** доступно любому держателю — но только со своего счёта:
+
+```js
+const tx = burn({ assetId, amount: 10000, chainId: 'R' }, seedДержателя);
+```
+
+```text
+в блоке: 27 | комиссия: 100000
+остаток у держателя: 15000
+общее количество: 90000
+```
+
+Обратите внимание: общее число токенов **уменьшилось** — со 100 000 до 90 000. Сожжённые токены исчезают из обращения насовсем.
+
+<Hint type="fact">
+Отобрать чужие токены нельзя никаким способом: ни выпустивший, ни владелец узла не могут списать их с чужого счёта. Если в задании нужен «отзыв», его реализуют иначе — например, токен выдают на смарт-аккаунт, который умеет вернуть его по запросу.
+</Hint>
+
+<SectionAnchor chapterId="waves-assets" sectionId="kto-chto-mozhet" />
+
+## Что всё-таки можно поменять
+
+Имя и описание меняются отдельной транзакцией — тип 17:
+
+```js
+const tx = updateAssetInfo({ assetId, name: 'PGKPoint', description: 'Novoe opisanie', chainId: 'R' }, seed);
+```
+
+```text
+тип: 17 | код: 200 | принято
+```
+
+<Hint type="tip">
+В основной сети между такими обновлениями есть обязательный промежуток — сто тысяч блоков, около двух месяцев. На локальном узле его нет, поэтому в опытах команда проходит сразу. Не удивляйтесь, если в тестовой сети она откажет с жалобой на интервал.
+</Hint>
+
+<SectionAnchor chapterId="waves-assets" sectionId="chto-pomenyat" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="waves-assets" quizId="quiz-2" questions={[
+  { q: 'Кто может сжечь токены?', options: ['Только выпустивший', 'Любой держатель — но только со своего счёта', 'Владелец узла', 'Никто'], correct: 1, why: 'Общее количество при этом уменьшается: 100 000 стало 90 000.' },
+  { q: 'Что означает «Asset is not reissuable»?', options: ['Токен заморожен', 'Допечатка закрыта навсегда: выпущено с reissuable: false', 'Нет прав', 'Кончились токены'], correct: 1, why: 'Так дают держателям твёрдое обещание, что токенов больше не станет.' },
+  { q: 'На счету токены, но нет WAVES. Что можно сделать?', options: ['Перевести токены', 'Ничего: комиссия платится в WAVES', 'Сжечь токены', 'Обменять токены на WAVES'], correct: 1, why: 'Лечится выдачей небольшой суммы WAVES или спонсированием комиссии.' },
+]} />
+
+</Block>
+
+## Типичные ошибки
+
+**Ошибка 1. Имя короче четырёх знаков.**
+
+```text
+tx "name", has wrong data: "ABC". Check tx data.
+```
+
+Библиотека ловит это ещё до отправки. Границы — от 4 до 16 знаков.
+
+**Ошибка 2. Описание длиннее тысячи знаков.**
+
+Тоже ловится библиотекой. Тысяча — потолок.
+
+**Ошибка 3. Путать `quantity` и «сколько штук».**
+
+```js
+quantity: 100000, decimals: 2     // это 1000,00, а не сто тысяч
+```
+
+Считать надо в «копейках», как и везде в сети.
+
+**Ошибка 4. Рассчитывать на отзыв токенов.**
+
+Отобрать выданное нельзя. Если задание требует отзыв, продумывать схему надо до выпуска, а не после.
+
+**Ошибка 5. Выпускать токен на каждый чих.**
+
+Выпуск стоит 1 WAVES. Там, где нужен просто счётчик или статус, хватит записи в состояние аккаунта — она в тысячу раз дешевле.
+
+<SectionAnchor chapterId="waves-assets" sectionId="oshibki" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="waves-assets" quizId="quiz-3" questions={[
+  { q: 'quantity: 100000 при decimals: 2 — это сколько?', options: ['сто тысяч токенов', '1000,00 токена', '100,000 токена', 'зависит от сети'], correct: 1, why: 'Считать надо в «копейках», как и все суммы в сети.' },
+  { q: 'Когда токен не нужен вовсе?', options: ['Когда мало пользователей', 'Когда нужен счётчик или статус: запись в состояние дешевле в тысячу раз', 'Когда нет WAVES', 'Когда сеть приватная'], correct: 1, why: 'Выпуск стоит 1 WAVES, запись данных — 0,001.' },
+  { q: 'Что делать, если задание требует отзыва выданных токенов?', options: ['Использовать транзакцию отзыва', 'Продумать схему до выпуска: например, выдавать на смарт-аккаунт', 'Сжечь их со счёта держателя', 'Заблокировать аккаунт'], correct: 1, why: 'Списать токены с чужого счёта не может никто.' },
+]} />
+
+</Block>
+
+## Шпаргалка по главе
+
+<Block kind="cheatsheet">
+
+| Что нужно | Как |
+| --- | --- |
+| Выпустить | `issue({ name, description, quantity, decimals, reissuable, chainId }, seed)` |
+| Перевести | `transfer({ amount, assetId, recipient, chainId }, seed)` |
+| Допечатать | `reissue({ assetId, quantity, reissuable, chainId }, seed)` |
+| Сжечь | `burn({ assetId, amount, chainId }, seed)` |
+| Сменить описание | `updateAssetInfo({ assetId, name, description, chainId }, seed)` |
+| Сведения об активе | `GET /assets/details/<id>` |
+| Баланс токена | `GET /assets/balance/<адрес>/<id>` |
+| Все токены адреса | `GET /assets/balance/<адрес>` |
+
+</Block>
+
+<SectionAnchor chapterId="waves-assets" sectionId="shpargalka" />
+
+## Словарь главы
+
+<Block kind="vocab">
+
+| Термин | Что это |
+| --- | --- |
+| Актив | Токен; идентифицируется идентификатором транзакции выпуска |
+| `decimals` | Число знаков после запятой, 0–8; задаётся навсегда |
+| `reissuable` | Разрешение допечатать; закрывается навсегда, обратно не открывается |
+| Допвыпуск | Транзакция типа 5; доступна только выпустившему |
+| Сжигание | Транзакция типа 6; доступна любому держателю со своего счёта |
+| Спонсирование | Механизм, при котором комиссию за перевод платит выпустивший |
+| `scripted` | Признак «на токен навешен скрипт» — отдельная возможность |
+
+</Block>
+
+<SectionAnchor chapterId="waves-assets" sectionId="slovar" />
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="waves-assets"
+  trainerId="trainer-waves-assets"
+  targetCpm={95}
+  targetAccuracy={88}
+  pools={[
+    { label: 'Выпуск', snippets: [
+      "const { issue, burn, reissue } = require('@waves/waves-transactions');",
+      "issue({ name: 'PGKPoint', quantity: 100000, decimals: 2, reissuable: true }, seed)",
+    ] },
+    { label: 'Оборот', snippets: [
+      "transfer({ amount: 25000, assetId, recipient, chainId: 'R' }, seed)",
+      "burn({ assetId, amount: 10000, chainId: 'R' }, seed)",
+      "reissue({ assetId, quantity: 1000, reissuable: false, chainId: 'R' }, seed)",
+    ] },
+    { label: 'Проверка', snippets: [
+      'curl http://127.0.0.1:6869/assets/details/3fyDK2Da',
+      'curl http://127.0.0.1:6869/assets/balance/3M5HPFG1/3fyDK2Da',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="waves-assets" sectionId="trenazher" />
+
+## Что должен уметь после главы
+
+- выпустить токен и объяснить каждое поле выпуска;
+- назвать границы имени, описания и числа знаков;
+- объяснить, откуда берётся идентификатор актива;
+- перевести токен и объяснить, в чём платится комиссия;
+- сказать, кто может допечатать и кто может сжечь;
+- объяснить, почему отобрать выданные токены нельзя;
+- решить, когда токен не нужен и хватит записи в состояние.
+
+<SectionAnchor chapterId="waves-assets" sectionId="chto-umet" />
+
+## Проверка по главе
+
+<ChapterExam chapterId="waves-assets" questions={[
+  { q: 'Что такое токен в Waves?', options: ['Контракт по стандарту ERC-20', 'Транзакция типа 3: перевод и учёт встроены в сеть', 'Запись в состоянии', 'Отдельный аккаунт'], correct: 1, why: 'Кода нет, значит и ломать нечего.' },
+  { q: 'Сколько стоит выпуск токена?', options: ['0,001 WAVES', '1 WAVES', 'нисколько', 'зависит от количества'], correct: 1, why: 'В тысячу раз дороже перевода — защита от мусорных токенов.' },
+  { q: 'Идентификатор актива — это', options: ['случайное число', 'идентификатор транзакции выпуска', 'адрес контракта', 'имя токена'], correct: 1, why: 'Отдельного адреса у токена нет.' },
+  { q: 'Границы поля name', options: ['1–32 знака', '4–16 знаков', '8–24 знака', 'без ограничений'], correct: 1, why: 'Три знака библиотека не пропустит, семнадцать тоже.' },
+  { q: 'Допустимые значения decimals', options: ['0–18', '0–8', '2–8', 'только 8'], correct: 1, why: 'Девять узел отвергает: «decimals should be in interval [0; 8]».' },
+  { q: 'quantity: 100000 при decimals: 2 — это', options: ['сто тысяч токенов', '1000,00 токена', '10,0000 токена', 'сто токенов'], correct: 1, why: 'Считают в «копейках», как и суммы в сети.' },
+  { q: 'Кто может допечатать токен?', options: ['любой держатель', 'только выпустивший, и только пока reissuable', 'владелец узла', 'никто'], correct: 1, why: 'Чужой даёт «Asset was issued by other address».' },
+  { q: 'Кто может сжечь токены?', options: ['только выпустивший', 'любой держатель, но только со своего счёта', 'узел', 'никто'], correct: 1, why: 'Общее количество при этом уменьшается.' },
+  { q: 'В чём платится комиссия за перевод токена?', options: ['в этом токене', 'в WAVES', 'по выбору', 'не платится'], correct: 1, why: 'Аккаунт с токенами, но без WAVES, не может ими распорядиться.' },
+  { q: 'Можно ли отобрать выданные токены?', options: ['да, выпустившему', 'нет: списать с чужого счёта не может никто', 'да, через узел', 'да, если reissuable'], correct: 1, why: 'Схему отзыва продумывают до выпуска — например, выдают на смарт-аккаунт.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [Токены Waves](https://docs.waves.tech/ru/blockchain/token/) — типы, поля, возможности.
+- [Транзакция выпуска](https://docs.waves.tech/ru/blockchain/transaction-type/issue-transaction) — все ограничения полей.
+- [Спонсирование комиссий](https://docs.waves.tech/ru/blockchain/token/sponsored-fee) — как платить за пользователя.
+- [Смарт-активы](https://docs.waves.tech/ru/blockchain/token/smart-asset) — когда токену всё-таки нужен код.
