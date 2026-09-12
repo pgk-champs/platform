@@ -3328,5 +3328,32 @@
       "title": "LaunchedEffect in Composable | Side Effects - Android SideEffects | Jetpack Compose [Kotlin]- 43",
       "channel": "Codetutor"
     }
+  ],
+  "kit-bars": [
+    {
+      "videoId": "1CWsL1V7sP0",
+      "title": "Scaffold и TopAppBar в Jetpack Compose | Android Studio - Kotlin | #21",
+      "channel": "Neco Ru"
+    },
+    {
+      "videoId": "i-25_mkVdkU",
+      "title": "BottomNavigation в Jetpack Compose | Android Studio - Kotlin | #20",
+      "channel": "Neco Ru"
+    },
+    {
+      "videoId": "vuxfr8tsDsU",
+      "title": "Scaffold (TopAppBar, BottomBar & FAB) - Android Jetpack Compose 12",
+      "channel": "Neat Roots"
+    },
+    {
+      "videoId": "njOvLy398o8",
+      "title": "Android Compose Scaffold | Designing TopAppBar Basics: Jetpack Compose - 23",
+      "channel": "Codetutor"
+    },
+    {
+      "videoId": "TDGIVvQU3dM",
+      "title": "Navigation в Jetpack Compose | Android Studio - Kotlin | #24",
+      "channel": "Neco Ru"
+    }
   ]
 }

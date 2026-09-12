@@ -109,6 +109,7 @@ import { kitButtonsSchemes } from './figures/kitButtons';
 import { kitInputsSchemes } from './figures/kitInputs';
 import { kitSelectSchemes } from './figures/kitSelect';
 import { kitSearchSchemes } from './figures/kitSearch';
+import { kitBarsSchemes } from './figures/kitBars';
 
 // jsdom не считает реальный layout (getBBox недоступен), поэтому ширина
 // текста здесь — оценка с запасом, откалиброванная по трём случаям
@@ -243,6 +244,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(kitInputsSchemes),
     ...Object.keys(kitSelectSchemes),
     ...Object.keys(kitSearchSchemes),
+    ...Object.keys(kitBarsSchemes),
     ...Object.keys(kotlinNullSchemes),
     ...Object.keys(tsJsSchemes),
     ...Object.keys(tsValuesSchemes),

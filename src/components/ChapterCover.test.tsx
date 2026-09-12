@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import ChapterCover, { CHAPTER_IDS, TrackBanner, coverFontSize } from './ChapterCover';
 
 test('покрыты все главы', () => {
-  expect(CHAPTER_IDS).toHaveLength(125);
+  expect(CHAPTER_IDS).toHaveLength(126);
 });
 
 test('заголовок обложки умещается в ширину 800', () => {
@@ -25,9 +25,9 @@ test('новые главы стоят в своих треках', () => {
     ['android-studio', 'МОБИЛКА', '00'],
     ['kotlin-flow', 'МОБИЛКА', '03'],
     ['kotlin-oop', 'МОБИЛКА', '07'],
-    ['kotlin-vs-java', 'МОБИЛКА', '32'],
-    ['kotlin-history', 'МОБИЛКА', '33'],
-    ['kotlin-coroutines', 'МОБИЛКА', '20'],
+    ['kotlin-vs-java', 'МОБИЛКА', '33'],
+    ['kotlin-history', 'МОБИЛКА', '34'],
+    ['kotlin-coroutines', 'МОБИЛКА', '21'],
     ['kotlin-null', 'МОБИЛКА', '02'],
     ['first-compose-screen', 'МОБИЛКА', '08'],
     ['ui-kit', 'МОБИЛКА', '12'],

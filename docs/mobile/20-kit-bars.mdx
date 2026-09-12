@@ -1,0 +1,377 @@
+---
+title: 'Хэдер и TabBar: шапка и нижняя панель как компоненты'
+audience: 'мобилка'
+level: 'углубление'
+order: 20
+sidebar_position: 20
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="kit-bars" />
+
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+
+# Хэдер и TabBar: шапка и нижняя панель как компоненты
+
+<ChapterProgress chapterId="kit-bars" totalSections={11} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="kit-bars" />
+
+## Зачем это нужно
+
+В критериях два отдельных пункта: «Создайте компонент TabBar» и «Создайте компонент „Хэдер“». И тут возникает законный вопрос: разве мы это уже не проходили? В главе про `Scaffold` были и шапка, и нижняя панель.
+
+Разница ровно та же, что была с кнопкой: `Scaffold` — **каркас экрана**, готовый и общий, а хэдер и панель — **ваши компоненты**, которые в этот каркас вставляют. Каркас берут как есть; компоненты пишут так, чтобы на всех экранах приложения они выглядели и вели себя одинаково. Это и оценивается.
+
+Заодно здесь встретится ошибка, которая уже была в главе про кнопки, — и это не совпадение.
+
+<SectionAnchor chapterId="kit-bars" sectionId="zachem" />
+
+## Каркас и компоненты
+
+<Figure scheme="kbr-scaffold-vs-kit" caption="Scaffold раскладывает слоты; что в них лежит — ваше дело" />
+
+```kotlin
+Scaffold(
+    topBar = { KitHeader(title = "Каталог", actions = { KitButtonGhost("Фильтр", onClick = {}) }) },
+    bottomBar = { KitTabBar(tabs = tabs, selectedId = current, onSelect = ::go) },
+) { innerPadding ->
+    CatalogList(modifier = Modifier.padding(innerPadding))
+}
+```
+
+Работа `Scaffold` — сложить четыре слота и посчитать отступы, чтобы содержимое не уехало под шапку и под панель. Работа `KitHeader` и `KitTabBar` — выглядеть одинаково на всех двенадцати экранах.
+
+<Hint type="tip">
+Признак, что компонент нужен: вы второй раз пишете `TopAppBar(title = { Text(...) }, navigationIcon = { ... })` с одними и теми же настройками. На третьем экране отличие уже проберётся — где-то другой отступ, где-то другой цвет. Компонент библиотеки существует именно для того, чтобы отличий не было.
+</Hint>
+
+<SectionAnchor chapterId="kit-bars" sectionId="karkas-i-komponenty" />
+
+## Шапка: три места
+
+<Figure scheme="kbr-header-slots" caption="Слева уводящее действие, посередине заголовок, справа действия над содержимым" />
+
+```kotlin
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun KitHeader(
+    title: String,
+    modifier: Modifier = Modifier,
+    centered: Boolean = false,
+    navigation: (@Composable () -> Unit)? = null,
+    actions: (@Composable () -> Unit)? = null,
+) {
+    val titleSlot: @Composable () -> Unit = { Text(text = title) }
+    val navSlot: @Composable () -> Unit = { navigation?.invoke() }
+    val actionsSlot: @Composable () -> Unit = { actions?.invoke() }
+
+    if (centered) {
+        CenterAlignedTopAppBar(
+            title = titleSlot,
+            modifier = modifier,
+            navigationIcon = navSlot,
+            actions = { Row { actionsSlot() } },
+        )
+    } else {
+        TopAppBar(
+            title = titleSlot,
+            modifier = modifier,
+            navigationIcon = navSlot,
+            actions = { Row { actionsSlot() } },
+        )
+    }
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: '@OptIn(ExperimentalMaterial3Api::class)', label: 'снова опт-ин', note: 'TopAppBar в Material 3 тоже помечен экспериментальным — без разрешения будет та же ошибка, что у шторки' },
+  { text: 'title: String', label: 'заголовок строкой', note: 'здесь строка уместна: заголовок шапки всегда текст, слот был бы усложнением на пустом месте' },
+  { text: 'navigation и actions — слоты', label: 'а здесь наоборот', note: 'слева и справа бывает что угодно: иконка, кнопка, два действия подряд' },
+  { text: 'navigation?.invoke()', label: 'вызов необязательного слота', note: 'у типа с вопросом нельзя написать navigation() — нужен invoke с безопасным вызовом' },
+  { text: 'centered: Boolean', label: 'редкий случай флага', note: 'в Material это два РАЗНЫХ компонента, и флаг просто выбирает между ними — списка флагов не набежит' },
+  { text: 'actions = { Row { … } }', label: 'почему Row', note: 'слот actions в Material раскрывается в строку, и несколько действий надо выложить самому' },
+]} />
+
+<Hint type="important">
+Обратите внимание на несимметричность: заголовок — строка, а `navigation` и `actions` — слоты. Это не непоследовательность. Правило простое: **слот там, где содержимое заранее неизвестно**. Заголовок всегда текст, а слева может быть стрелка, крестик или три полоски.
+</Hint>
+
+<SectionAnchor chapterId="kit-bars" sectionId="shapka-tri-mesta" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-bars" quizId="quiz-1" questions={[
+  { q: 'Чем KitHeader отличается от Scaffold?', options: ['Ничем, это одно и то же', 'Scaffold — готовый каркас, раскладывающий слоты; KitHeader — ваш компонент, который в этот слот кладут', 'KitHeader работает быстрее', 'Scaffold устарел'], correct: 1, why: 'Каркас берут как есть, компоненты пишут свои, чтобы экраны выглядели одинаково.' },
+  { q: 'Почему заголовок — строка, а navigation и actions — слоты?', options: ['Непоследовательность', 'Слот нужен там, где содержимое заранее неизвестно: заголовок всегда текст, а слева бывает стрелка, крестик или меню', 'Так требует Material', 'Строка быстрее'], correct: 1, why: 'Слот для заголовка был бы усложнением на пустом месте.' },
+  { q: 'Зачем в actions обёртка Row?', options: ['Для отступов', 'Слот actions раскрывается в строку, и несколько действий надо выложить самому', 'Чтобы работал modifier', 'Для выравнивания по центру'], correct: 1, why: 'Material отдаёт место, а раскладку внутри делает вызывающий.' },
+]} />
+
+</Block>
+
+## Нижняя панель
+
+```kotlin
+data class KitTab(
+    val id: String,
+    val label: String,
+    val badge: Int? = null,
+)
+
+@Composable
+fun KitTabBar(
+    tabs: List<KitTab>,
+    selectedId: String,
+    onSelect: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    icon: @Composable (KitTab) -> Unit = {},
+) {
+    NavigationBar(modifier = modifier) {
+        tabs.forEach { tab ->
+            NavigationBarItem(
+                selected = tab.id == selectedId,
+                onClick = { onSelect(tab.id) },
+                icon = {
+                    if (tab.badge != null && tab.badge > 0) {
+                        BadgedBox(badge = { Badge { Text(tab.badge.toString()) } }) { icon(tab) }
+                    } else {
+                        icon(tab)
+                    }
+                },
+                label = { Text(tab.label) },
+                alwaysShowLabel = true,
+            )
+        }
+    }
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'data class KitTab', label: 'описание вкладки', note: 'вкладка — это данные, а не разметка: список вкладок можно хранить, передавать и проверять' },
+  { text: 'badge: Int? = null', label: 'счётчик на значке', note: 'корзина с тремя товарами, непрочитанные — то, что оценивают отдельным пунктом' },
+  { text: 'selected = tab.id == selectedId', label: 'выбранность вычисляется', note: 'не хранится: сравнили идентификатор вкладки с тем, что пришло снаружи' },
+  { text: 'icon: @Composable (KitTab) -> Unit', label: 'слот с аргументом', note: 'тот же приём, что у шторки: компонент отдаёт вкладку, а рисует значок вызывающий' },
+  { text: 'tab.badge != null && tab.badge > 0', label: 'ноль не показываем', note: 'значок с нулём — частая недоделка: пустая корзина не должна носить «0»' },
+  { text: 'alwaysShowLabel = true', label: 'подписи всегда', note: 'по умолчанию Material прячет подписи невыбранных вкладок; на макетах чемпионата они обычно видны все' },
+]} />
+
+<SectionAnchor chapterId="kit-bars" sectionId="nizhnyaya-panel" />
+
+## Кто помнит выбранную вкладку
+
+<Figure scheme="kbr-tab-state" caption="Два источника истины всегда расходятся — вопрос только в том, когда это заметят" />
+
+Соблазн — хранить выбранную вкладку внутри панели: `var selected by remember { … }`. Так короче, и на первый взгляд работает.
+
+Сломается это в трёх местах:
+
+- **вернулись на экран** — панель сбросилась на первую вкладку, а показывается третья;
+- **перешли из уведомления или по ссылке** — открылся экран корзины, а подсвечен каталог;
+- **нажали «назад»** — экран сменился, панель нет.
+
+Причина одна: выбранная вкладка есть у двух хозяев — у панели и у навигации, и они расходятся.
+
+Правильно — то же правило, что у поля ввода: компонент показывает и сообщает, а помнит вызывающий. Причём вызывающий не хранит это отдельно, а **вычисляет из текущего маршрута**:
+
+```kotlin
+val current = navController.currentBackStackEntryAsState().value?.destination?.route ?: "catalog"
+
+KitTabBar(
+    tabs = tabs,
+    selectedId = current,
+    onSelect = { navController.navigate(it) },
+)
+```
+
+<Hint type="important">
+Источник истины один — текущий маршрут навигации. Панель не хранит ничего, и рассогласоваться нечему. Это тот же принцип, что и у состояния из главы про `ViewModel`: если одно и то же значение живёт в двух местах, они разойдутся — вопрос только в том, когда это заметят.
+</Hint>
+
+<SectionAnchor chapterId="kit-bars" sectionId="kto-pomnit" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-bars" quizId="quiz-2" questions={[
+  { q: 'Почему выбранную вкладку не хранят внутри панели?', options: ['Так медленнее', 'Тогда у неё два хозяина — панель и навигация; при возврате на экран или переходе по ссылке они разойдутся', 'Compose не позволяет', 'Из-за памяти'], correct: 1, why: 'Источник истины один — текущий маршрут навигации.' },
+  { q: 'Как вычисляют выбранную вкладку?', options: ['Храня отдельное состояние', 'Сравнивая идентификатор вкладки с текущим маршрутом навигации', 'По порядковому номеру', 'По последнему нажатию'], correct: 1, why: 'selected = tab.id == selectedId — выбранность вычисляется, а не хранится.' },
+  { q: 'Зачем проверка tab.badge > 0?', options: ['Для типов', 'Чтобы пустая корзина не носила значок «0» — частая недоделка', 'Для производительности', 'Badge не принимает ноль'], correct: 1, why: 'Ноль на значке выглядит как забытая отладка.' },
+]} />
+
+</Block>
+
+## Ошибка, которая уже была
+
+```kotlin
+@Composable fun P() { NavigationBarItem(selected = true, onClick = {}, icon = { Text("к") }) }
+```
+
+```text
+e: Probe.kt:5:23 Unresolved reference 'NavigationBarItem'.
+```
+
+Имя написано правильно, импорт на месте — а ссылка не находится. Это ровно та же история, что с `Modifier.weight` в главе про кнопки: `NavigationBarItem` объявлена как расширение для `RowScope`, а он существует только внутри `NavigationBar { … }`.
+
+<Hint type="fact">
+«Неразрешённая ссылка» на функцию, которая точно существует, почти всегда означает одно: вы вне того контекста, для которого она объявлена. `weight` — внутри `Row` или `Column`, `align` с двумя координатами — внутри `Box`, `NavigationBarItem` — внутри `NavigationBar`. Полезнее запомнить признак, чем список.
+</Hint>
+
+Вторая ошибка проще:
+
+```kotlin
+NavigationBar { NavigationBarItem(onClick = {}, icon = { Text("к") }) }
+```
+
+```text
+e: Probe.kt:6:71 No value passed for parameter 'selected'.
+```
+
+У `NavigationBarItem` нет умолчания для `selected` — и это осознанно: вкладка обязана знать, выбрана она или нет, а разумного значения по умолчанию тут не существует.
+
+<SectionAnchor chapterId="kit-bars" sectionId="oshibka-uzhe-byla" />
+
+## Типичные ошибки
+
+**Ошибка 1. Хранить выбранную вкладку в панели.**
+
+Разобрано выше: рассогласование с навигацией.
+
+**Ошибка 2. Значок с нулём.**
+
+Пустая корзина носит «0». Проверка на `> 0` — одна строка.
+
+**Ошибка 3. Подписи прячутся.**
+
+`alwaysShowLabel` по умолчанию скрывает подписи невыбранных вкладок. Если на макете видны все — параметр надо задать явно.
+
+**Ошибка 4. Шапка собирается заново на каждом экране.**
+
+Двенадцать экранов — двенадцать слегка разных шапок. Это ровно то, против чего пункт критериев.
+
+**Ошибка 5. `Scaffold` есть, а `innerPadding` не использован.**
+
+Содержимое уезжает под шапку. Ошибка не из этой главы, но проявляется именно здесь — когда шапка наконец появилась.
+
+**Ошибка 6. Больше пяти вкладок.**
+
+Material рассчитан на три–пять. Шесть не помещаются по ширине на узком экране, подписи начинают обрезаться.
+
+<SectionAnchor chapterId="kit-bars" sectionId="oshibki" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-bars" quizId="quiz-3" questions={[
+  { q: 'NavigationBarItem даёт «Unresolved reference», хотя импорт на месте. Почему?', options: ['Опечатка в имени', 'Она объявлена как расширение для RowScope и существует только внутри NavigationBar', 'Нужна другая версия', 'Нужен @OptIn'], correct: 1, why: 'Тот же признак, что у weight вне Row и align вне Box.' },
+  { q: 'Почему у selected нет значения по умолчанию?', options: ['Забыли добавить', 'Разумного умолчания не существует: вкладка обязана знать, выбрана она или нет', 'Так короче', 'Это ошибка Material'], correct: 1, why: 'Компилятор говорит: «No value passed for parameter selected».' },
+  { q: 'Сколько вкладок помещается в нижнюю панель?', options: ['Сколько угодно', 'Три–пять: шесть не помещаются по ширине на узком экране', 'Ровно четыре', 'До десяти'], correct: 1, why: 'При большем числе подписи начинают обрезаться.' },
+]} />
+
+</Block>
+
+## Шпаргалка по главе
+
+<Block kind="cheatsheet">
+
+| Что нужно | Как |
+| --- | --- |
+| Шапка в каркасе | `Scaffold(topBar = { KitHeader(…) })` |
+| Панель в каркасе | `Scaffold(bottomBar = { KitTabBar(…) })` |
+| Разрешить шапку | `@OptIn(ExperimentalMaterial3Api::class)` |
+| Заголовок по центру | отдельный компонент `CenterAlignedTopAppBar` |
+| Вызов необязательного слота | `navigation?.invoke()` |
+| Несколько действий справа | `actions = { Row { … } }` |
+| Выбранная вкладка | `selected = tab.id == selectedId`, а `selectedId` — из маршрута |
+| Значок со счётчиком | `BadgedBox` + проверка `badge > 0` |
+| Подписи всех вкладок | `alwaysShowLabel = true` |
+
+</Block>
+
+<SectionAnchor chapterId="kit-bars" sectionId="shpargalka" />
+
+## Слова главы
+
+<Block kind="vocab">
+
+| Термин | Что это |
+| --- | --- |
+| Каркас экрана | `Scaffold`: раскладывает слоты и считает отступы |
+| Шапка | Верхняя полоса: уводящее действие, заголовок, действия |
+| Нижняя панель | Переключение основных разделов приложения |
+| Значок-счётчик | `Badge`: число поверх значка вкладки |
+| Источник истины | Единственное место, где значение хранится |
+| Расширение для области | Функция, доступная только внутри своего контейнера |
+
+</Block>
+
+<SectionAnchor chapterId="kit-bars" sectionId="slovar" />
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="kit-bars"
+  trainerId="trainer-kit-bars"
+  targetCpm={95}
+  targetAccuracy={90}
+  pools={[
+    { label: 'Шапка', snippets: [
+      'TopAppBar(title = titleSlot, navigationIcon = navSlot)',
+      'actions = { Row { actionsSlot() } },',
+      'navigation?.invoke()',
+    ] },
+    { label: 'Панель', snippets: [
+      'NavigationBar(modifier = modifier) {',
+      'selected = tab.id == selectedId,',
+      'BadgedBox(badge = { Badge { Text(tab.badge.toString()) } })',
+    ] },
+    { label: 'Связка с каркасом', snippets: [
+      'Scaffold(topBar = { KitHeader(title = "Каталог") })',
+      'onSelect = { navController.navigate(it) },',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="kit-bars" sectionId="trenazher" />
+
+## Что должен уметь после главы
+
+- объяснить разницу между каркасом экрана и компонентом библиотеки;
+- собрать шапку с тремя местами и обосновать, где строка, а где слот;
+- вызвать необязательный слот правильно;
+- собрать нижнюю панель со значками-счётчиками;
+- объяснить, почему выбранную вкладку вычисляют из маршрута, а не хранят;
+- узнать по «неразрешённой ссылке», что вы вне нужного контекста.
+
+<SectionAnchor chapterId="kit-bars" sectionId="chto-umet" />
+
+## Проверка по главе
+
+<ChapterExam chapterId="kit-bars" questions={[
+  { q: 'Чем Scaffold отличается от KitHeader?', options: ['ничем', 'Scaffold — готовый каркас со слотами, KitHeader — ваш компонент, который в слот кладут', 'KitHeader быстрее', 'Scaffold устарел'], correct: 1, why: 'Каркас берут как есть, компоненты пишут свои.' },
+  { q: 'Три места в шапке — это', options: ['заголовок, подзаголовок, иконка', 'уводящее действие слева, заголовок, действия справа', 'иконка, текст, кнопка', 'поиск, меню, профиль'], correct: 1, why: 'Слева — то, что уводит с экрана; справа — действия над содержимым.' },
+  { q: 'Почему заголовок строкой, а navigation слотом?', options: ['непоследовательность', 'слот нужен там, где содержимое заранее неизвестно', 'требование Material', 'строка быстрее'], correct: 1, why: 'Заголовок всегда текст, а слева бывает стрелка, крестик или меню.' },
+  { q: 'Как вызвать необязательный слот?', options: ['navigation()', 'navigation?.invoke()', 'invoke(navigation)', 'if (navigation != null) navigation'], correct: 1, why: 'У типа с вопросом круглые скобки напрямую не работают.' },
+  { q: 'Выбранную вкладку хранят', options: ['внутри панели', 'снаружи — и вычисляют из текущего маршрута навигации', 'в базе', 'в системе'], correct: 1, why: 'Иначе у значения два хозяина, и они разойдутся.' },
+  { q: 'Что сломается, если панель помнит вкладку сама?', options: ['ничего', 'возврат на экран, переход по ссылке и кнопка «назад» рассогласуют панель с содержимым', 'замедлится отрисовка', 'перестанут работать значки'], correct: 1, why: 'Два источника истины всегда расходятся.' },
+  { q: 'Зачем проверка badge > 0?', options: ['для типов', 'чтобы пустая корзина не носила значок «0»', 'для скорости', 'Badge не принимает ноль'], correct: 1, why: 'Ноль на значке выглядит как забытая отладка.' },
+  { q: 'alwaysShowLabel = true нужен, чтобы', options: ['ускорить панель', 'показывать подписи всех вкладок, а не только выбранной', 'включить значки', 'выровнять по центру'], correct: 1, why: 'По умолчанию Material прячет подписи невыбранных.' },
+  { q: 'NavigationBarItem вне NavigationBar даёт', options: ['предупреждение', '«Unresolved reference»: она объявлена для RowScope', 'ошибку типа', 'ничего'], correct: 1, why: 'Тот же признак, что у weight вне Row.' },
+  { q: 'Сколько вкладок помещается в нижнюю панель?', options: ['сколько угодно', 'три–пять', 'ровно четыре', 'до десяти'], correct: 1, why: 'Дальше подписи обрезаются на узком экране.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [App bars в Material 3](https://developer.android.com/develop/ui/compose/components/app-bars) — виды шапок и их слоты.
+- [Navigation bar](https://developer.android.com/develop/ui/compose/components/navigation-bar) — нижняя панель, значки и подписи.
+- [Навигация в Compose](https://developer.android.com/develop/ui/compose/navigation) — откуда берётся текущий маршрут.
+- [Scaffold](https://developer.android.com/develop/ui/compose/components/scaffold) — как каркас считает отступы для содержимого.
