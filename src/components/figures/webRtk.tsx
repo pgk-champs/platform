@@ -50,7 +50,7 @@ export const webRtkSchemes: Schemes = {
         { y: 84, n: 's.vault.amount', a: 1, b: 0, v: 'то, что надо', ok: true },
         { y: 132, n: 's.vault', a: 1, b: 1, v: 'лишняя работа', ok: false },
         { y: 180, n: 's.vault.ops.filter(…)', a: 1, b: 1, v: 'каждый раз новый массив', ok: false },
-        { y: 228, n: 'селектор с запоминанием', a: 0, b: 0, v: 'ops не менялись — и не пересчитался', ok: true },
+        { y: 228, n: 'селектор с запоминанием', a: 0, b: 0, v: 'ops не менялись — пересчёта нет', ok: true },
       ].map((r) => (
         <g key={r.y}>
           <rect x={30} y={r.y} width={280} height={36} rx={8}
