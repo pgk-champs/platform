@@ -707,6 +707,22 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="190" textAnchor="middle" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>замысел — только здесь</text>
     </g>
   ),
+  /* Чек-лист и отчёт: как сдавать безопасность */
+  'audit-report': () => (
+    <g strokeLinecap="round">
+      <rect x="30" y="40" width="140" height="128" rx="10" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      {[58, 80, 102, 124, 146].map((y, i) => (
+        <g key={y}>
+          {i < 4
+            ? <path d={`M44 ${y}l5 5 9-11`} stroke={ACCENT} strokeWidth={3} fill="none" />
+            : <circle cx="49" cy={y} r="4.5" fill="none" stroke="rgba(255,205,140,0.9)" strokeWidth={3} />}
+          <rect x="68" y={y - 5} width={i === 3 ? 58 : 86} height="6" rx="3" fill="rgba(255,255,255,0.25)" />
+        </g>
+      ))}
+
+      <text x="100" y="186" textAnchor="middle" fontSize="7.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>5 → 1 находка</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1708,7 +1724,8 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'dapp-full': { track: 'blockchain', num: '53', title: 'dApp целиком: чтение, транзакция, события' },
   'audit-vulns': { track: 'blockchain', num: '54', title: 'Уязвимости: как из контрактов уходят деньги' },
   'audit-tools': { track: 'blockchain', num: '55', title: 'Инструменты аудита: что находит машина' },
-  'waves-first-network': { track: 'blockchain', num: '56', title: 'Первая сеть на Waves Enterprise' },
+  'audit-report': { track: 'blockchain', num: '56', title: 'Чек-лист и отчёт: как сдавать безопасность' },
+  'waves-first-network': { track: 'blockchain', num: '57', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '26', title: 'Kotlin и Java: в чём разница' },
   'kotlin-history': { track: 'mobile', num: '27', title: 'История Java, Android и Kotlin' },

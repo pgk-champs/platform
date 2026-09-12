@@ -2658,5 +2658,32 @@
       "title": "Static Analysis Tools: Slither & Mythril Overview — Forge College",
       "channel": "Forge College"
     }
+  ],
+  "audit-report": [
+    {
+      "videoId": "wldpTGH6T94",
+      "title": "Инструментарий аудитора смарт-контрактов. Алгыз Иевлев.",
+      "channel": "Positive Events"
+    },
+    {
+      "videoId": "IM_a5PZbAGo",
+      "title": "Аудит безопасности смарт-контрактов / Дмитрий Мишунин (HashEx)",
+      "channel": "Blockchain Channel"
+    },
+    {
+      "videoId": "C0c7pKTVPRY",
+      "title": "Реальное тестовое на аудитора смарт-контрактов Solidity - разбираем",
+      "channel": "Блокчейн-разработка с Юлией Бедросовой"
+    },
+    {
+      "videoId": "TmZ8gH-toX0",
+      "title": "How to Audit a Smart Contract | Can you find the Solidity Security Vulnerabilities?",
+      "channel": "Patrick Collins"
+    },
+    {
+      "videoId": "v0WOjg8WWgA",
+      "title": "Smart contract auditor: from zero to hero 👾 Сергей Прилуцкий",
+      "channel": "Cyber Academy"
+    }
   ]
 }

@@ -792,11 +792,19 @@
     "path": "blockchain/audit-tools.mdx"
   },
   {
+    "id": "audit-report",
+    "title": "Чек-лист и отчёт: как сдавать безопасность",
+    "audience": "блокчейн",
+    "level": "углубление",
+    "order": 56,
+    "path": "blockchain/audit-report.mdx"
+  },
+  {
     "id": "waves-first-network",
     "title": "Первая сеть на Waves Enterprise",
     "audience": "блокчейн",
     "level": "база",
-    "order": 56,
+    "order": 57,
     "path": "blockchain/waves-first-network.mdx"
   }
 ]
