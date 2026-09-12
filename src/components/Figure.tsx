@@ -92,6 +92,9 @@ import { fabricChaincodeSchemes } from './figures/fabricChaincode';
 import { fabricLifecycleSchemes } from './figures/fabricLifecycle';
 import { fabricTxSchemes } from './figures/fabricTx';
 import { fabricVsEthSchemes } from './figures/fabricVsEth';
+import { wavesAccountSchemes } from './figures/wavesAccount';
+import { wavesTxSchemes } from './figures/wavesTx';
+import { wavesDataSchemes } from './figures/wavesData';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -181,6 +184,9 @@ const SCHEMES = {
   ...fabricLifecycleSchemes,
   ...fabricTxSchemes,
   ...fabricVsEthSchemes,
+  ...wavesAccountSchemes,
+  ...wavesTxSchemes,
+  ...wavesDataSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

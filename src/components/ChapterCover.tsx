@@ -858,6 +858,66 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="210" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>одна зачётка, два пути</text>
     </g>
   ),
+  /* Аккаунт в Waves: сид, ключи, адрес */
+  'waves-account': () => (
+    <g strokeLinecap="round">
+      {[
+        { y: 36, t: 'seed', ok: true },
+        { y: 78, t: 'priv key', ok: false },
+        { y: 120, t: 'pub key', ok: false },
+        { y: 162, t: '3M…', ok: true },
+      ].map((s, i) => (
+        <g key={s.t}>
+          <rect x="34" y={s.y} width="132" height="30" rx="8"
+            fill={s.ok ? SOFT : 'rgba(0,0,0,0.3)'} stroke={s.ok ? ACCENT : INK} strokeWidth={2.5} />
+          <text x="100" y={s.y + 19} textAnchor="middle" fontSize="7" fontWeight={800}
+            fill={s.ok ? ACCENT : 'rgba(255,255,255,0.6)'} fontFamily={MONO}>{s.t}</text>
+          {i < 3 && <path d={`M100 ${s.y + 30} L100 ${s.y + 42}`} stroke={ACCENT} strokeWidth={2.5} />}
+        </g>
+      ))}
+      <path d="M172 178 L186 178 L186 52 L172 52" stroke="rgba(255,140,140,0.7)" strokeWidth={2} fill="none" strokeDasharray="4 4" />
+      <text x="100" y="208" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>только в одну сторону</text>
+    </g>
+  ),
+  /* Транзакции Waves: тип, комиссия, подпись */
+  'waves-tx': () => (
+    <g strokeLinecap="round">
+      {[
+        { y: 38, n: '3', t: 'Issue' },
+        { y: 82, n: '4', t: 'Transfer' },
+        { y: 126, n: '12', t: 'Data' },
+        { y: 170, n: '16', t: 'Invoke' },
+      ].map((r, i) => (
+        <g key={r.n}>
+          <circle cx="46" cy={r.y + 15} r="14" fill={SOFT} stroke={ACCENT} strokeWidth={2.5} />
+          <text x="46" y={r.y + 19} textAnchor="middle" fontSize="8" fontWeight={800} fill="#fff" fontFamily={MONO}>{r.n}</text>
+          <rect x="70" y={r.y} width="104" height="30" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+          <text x="122" y={r.y + 19} textAnchor="middle" fontSize="7" fontWeight={800} fill={i === 1 ? ACCENT : 'rgba(255,255,255,0.6)'} fontFamily={MONO}>{r.t}</text>
+        </g>
+      ))}
+      <text x="100" y="212" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>цена по типу, не аукцион</text>
+    </g>
+  ),
+  /* Состояние аккаунта: словарь */
+  'waves-data': () => (
+    <g strokeLinecap="round">
+      <rect x="22" y="40" width="156" height="130" rx="10" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      {[
+        { y: 60, k: 'gruppa', v: 'IS-21' },
+        { y: 84, k: 'ball', v: '5' },
+        { y: 108, k: 'dopusk', v: 'true' },
+        { y: 132, k: 'z_z-1', v: '…' },
+      ].map((r) => (
+        <g key={r.k}>
+          <text x="36" y={r.y} fontSize="6.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>{r.k}</text>
+          <text x="120" y={r.y} fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.65)" fontFamily={MONO}>{r.v}</text>
+        </g>
+      ))}
+      <rect x="30" y="142" width="140" height="20" rx="5" fill={SOFT} stroke={ACCENT} strokeWidth={2} />
+      <text x="100" y="156" textAnchor="middle" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>type 12</text>
+      <text x="100" y="192" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>пишем только к себе</text>
+    </g>
+  ),
   'waves-first-network': () => (
     <g>
       <path d="M100 44L44 134M100 44l56 90M44 134h112" stroke="rgba(255,255,255,0.4)" strokeWidth={3} fill="none" />
@@ -1891,6 +1951,9 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'fabric-lifecycle': { track: 'blockchain', num: '60', title: 'Жизненный цикл чейнкода: пять шагов' },
   'fabric-tx': { track: 'blockchain', num: '61', title: 'Путь транзакции: почему «успешно» не значит «записано»' },
   'fabric-vs-eth': { track: 'blockchain', num: '62', title: 'Fabric и Ethereum: одна задача, два решения' },
+  'waves-account': { track: 'blockchain', num: '64', title: 'Аккаунт в Waves: сид, ключи, адрес' },
+  'waves-tx': { track: 'blockchain', num: '65', title: 'Транзакции Waves: тип, комиссия, подпись' },
+  'waves-data': { track: 'blockchain', num: '66', title: 'Состояние аккаунта: словарь вместо переменных' },
   'waves-first-network': { track: 'blockchain', num: '63', title: 'Первая сеть на Waves Enterprise' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'kotlin-vs-java': { track: 'mobile', num: '27', title: 'Kotlin и Java: в чём разница' },

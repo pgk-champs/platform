@@ -862,5 +862,29 @@
     "level": "база",
     "order": 63,
     "path": "blockchain/waves-first-network.mdx"
+  },
+  {
+    "id": "waves-account",
+    "title": "Аккаунт в Waves: сид, ключи, адрес",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 64,
+    "path": "blockchain/waves-account.mdx"
+  },
+  {
+    "id": "waves-tx",
+    "title": "Транзакции Waves: тип, комиссия, подпись",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 65,
+    "path": "blockchain/waves-tx.mdx"
+  },
+  {
+    "id": "waves-data",
+    "title": "Состояние аккаунта: словарь вместо переменных",
+    "audience": "блокчейн",
+    "level": "база",
+    "order": 66,
+    "path": "blockchain/waves-data.mdx"
   }
 ]
