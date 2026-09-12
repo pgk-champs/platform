@@ -1,0 +1,366 @@
+---
+title: 'Карточка и адаптивность: компонент решает сам'
+audience: 'мобилка'
+level: 'углубление'
+order: 21
+sidebar_position: 21
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="kit-card" />
+
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import CodeTyping from '@site/src/components/CodeTyping';
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+
+# Карточка и адаптивность: компонент решает сам
+
+<ChapterProgress chapterId="kit-card" totalSections={10} totalQuizzes={4} totalTrainers={1} />
+
+<CollapsibleToc toc={toc} chapterId="kit-card" />
+
+## Зачем это нужно
+
+Последний компонент списка — «Создайте компонент карточки». И рядом, отдельной строкой, пункт, который относится ко всей библиотеке сразу: **«Все компоненты библиотеки адаптивны»**.
+
+Второй пункт коварнее первого. «Адаптивность» звучит расплывчато, проверяется придирчиво, а компилятор про неё не скажет ни слова: всё, что её ломает, — совершенно законный код.
+
+Эта глава закрывает оба пункта: карточка как компонент и четыре проверки, из которых складывается адаптивность.
+
+<SectionAnchor chapterId="kit-card" sectionId="zachem" />
+
+## Карточка в списке и в сетке
+
+<Figure scheme="kc-two-layouts" caption="Узко — столбиком, широко — строкой; выбирает сама карточка" />
+
+Одна и та же карточка товара на макете нарисована дважды: в каталоге сеткой по две в ряд (узкая, столбиком) и в корзине списком (широкая, строкой).
+
+Соблазн — сделать два компонента или добавить параметр `horizontal: Boolean`. Оба решения перекладывают выбор на вызывающего, а он о доступной ширине знает не больше карточки.
+
+Правильно — карточка смотрит на **свою** ширину:
+
+```kotlin
+BoxWithConstraints {
+    val wide = maxWidth.value >= wideFrom
+    if (wide) {
+        Row(…) { image?.invoke(); KitCardTexts(…); action?.invoke() }
+    } else {
+        Column(…) { image?.invoke(); KitCardTexts(…); action?.invoke() }
+    }
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'BoxWithConstraints', label: 'контейнер, знающий свой размер', note: 'внутри его лямбды доступны maxWidth, minWidth, maxHeight — то, что родитель разрешил занять' },
+  { text: 'maxWidth.value', label: 'ширина числом', note: 'maxWidth имеет тип Dp; .value достаёт из него число для сравнения' },
+  { text: 'wideFrom: Int = 360', label: 'порог параметром', note: 'не вшит в компонент: на планшете или в другой сетке его можно сдвинуть' },
+  { text: 'image?.invoke()', label: 'один и тот же слот', note: 'в обеих ветках вызывается то же содержимое — меняется только контейнер вокруг' },
+]} />
+
+Попытка узнать ширину не в том месте:
+
+```kotlin
+@Composable fun P() { Text(maxWidth.toString()) }
+```
+
+```text
+e: Probe.kt:4:28 Unresolved reference 'maxWidth'.
+```
+
+Знакомый признак из прошлой главы: имя есть, а контекста нет. `maxWidth` существует только внутри `BoxWithConstraints`.
+
+<Hint type="important">
+Вызывающий не должен выбирать вид карточки. Он говорит, сколько места даёт, — и всё. Это тот же принцип, что с `modifier`: снаружи задают **условия**, а компонент решает, как в них уложиться.
+</Hint>
+
+<SectionAnchor chapterId="kit-card" sectionId="spisok-i-setka" />
+
+## Четыре проверки адаптивности
+
+<Figure scheme="kc-what-is-adaptive" caption="Ни одну из четырёх компилятор не поймает" />
+
+**Первая: нет жёсткой ширины.**
+
+```kotlin
+Card(modifier = Modifier.width(320.dp)) { … }
+```
+
+```text
+(сборка проходит, ошибок нет)
+```
+
+Компилятор доволен. На узком экране такая карточка вылезет за край, на широком — оставит пустоту справа. Вместо этого: `fillMaxWidth()` там, где карточка занимает всю ширину, и `widthIn(max = …)` там, где надо ограничить рост на планшете.
+
+**Вторая: длинный текст обрезается.**
+
+```kotlin
+Text("Очень длинное название товара, которое не поместится ни на каком экране целиком")
+```
+
+```text
+(сборка проходит, ошибок нет)
+```
+
+<Figure scheme="kc-long-text" caption="Три места, где ломается длинное название" />
+
+Без `maxLines` карточка растёт вниз, и в сетке соседние карточки встают лесенкой. С `maxLines`, но без `overflow`, текст обрывается на полуслове без многоточия — выглядит как обрезанная вёрстка, а не как сокращение.
+
+```kotlin
+Text(
+    text = title,
+    maxLines = 2,
+    overflow = TextOverflow.Ellipsis,
+)
+```
+
+**Третья: раскладку выбирает компонент.** Разобрана выше.
+
+**Четвёртая: высота от содержимого.** `height(180.dp)` фиксирует высоту, и при крупном системном шрифте текст обрежется по нижнему краю. `heightIn(min = 180.dp)` задаёт минимум, оставляя карточке право вырасти.
+
+<Hint type="fact">
+Все четыре проверяются одинаково: переключить размер шрифта в настройках на крупный, повернуть экран и открыть тот товар, у которого самое длинное название. Три действия, полторы минуты — и видно всё, чего не видит компилятор.
+</Hint>
+
+<SectionAnchor chapterId="kit-card" sectionId="chetyre-proverki" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-card" quizId="quiz-1" questions={[
+  { q: 'Кто должен выбирать, столбиком карточка или строкой?', options: ['Вызывающий, параметром horizontal', 'Сама карточка — по доступной ей ширине через BoxWithConstraints', 'Тема приложения', 'Система по размеру экрана'], correct: 1, why: 'Снаружи задают условия, компонент решает, как в них уложиться.' },
+  { q: 'Modifier.width(320.dp) у карточки. Что скажет компилятор?', options: ['Ошибку адаптивности', 'Ничего: код законный, а на узком экране карточка вылезет за край', 'Предупреждение', 'Заменит на fillMaxWidth'], correct: 1, why: 'Ни одну из четырёх проверок адаптивности компилятор не поймает.' },
+  { q: 'Почему maxLines без overflow — плохо?', options: ['Так нельзя', 'Текст обрывается на полуслове без многоточия и выглядит как обрезанная вёрстка', 'Замедляет отрисовку', 'Ломает высоту'], correct: 1, why: 'TextOverflow.Ellipsis делает обрыв намеренным на вид.' },
+]} />
+
+</Block>
+
+## Компонент целиком
+
+```kotlin
+@Composable
+fun KitProductCard(
+    title: String,
+    price: String,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    onClick: (() -> Unit)? = null,
+    image: (@Composable () -> Unit)? = null,
+    action: (@Composable () -> Unit)? = null,
+    wideFrom: Int = 360,
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
+    ) {
+        BoxWithConstraints {
+            val wide = maxWidth.value >= wideFrom
+            …
+        }
+    }
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'title: String, price: String', label: 'обязательное', note: 'карточка товара без названия и цены не бывает' },
+  { text: 'onClick: (() -> Unit)? = null', label: 'нажатие необязательно', note: 'в корзине карточка может быть некликабельной — тогда и рябь при нажатии не нужна' },
+  { text: '.then(if (onClick != null) …)', label: 'условный модификатор', note: 'then приклеивает модификатор только когда он нужен; иначе карточка была бы нажимаемой всегда' },
+  { text: 'Modifier (пустой) в else', label: 'пустышка как «ничего»', note: 'тот самый объект без изменений — здесь он означает «не добавлять ничего»' },
+  { text: 'image и action — слоты', label: 'карточка не знает содержимого', note: 'картинка, заглушка, значок скидки; кнопка, счётчик количества или ничего' },
+]} />
+
+И тексты отдельной приватной функцией — они одинаковы в обеих раскладках:
+
+```kotlin
+@Composable
+private fun KitCardTexts(title: String, subtitle: String?, price: String, modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        Text(text = title, style = MaterialTheme.typography.titleMedium,
+             maxLines = 2, overflow = TextOverflow.Ellipsis)
+        if (subtitle != null) {
+            Text(text = subtitle, style = MaterialTheme.typography.bodySmall,
+                 maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        Text(text = price, style = MaterialTheme.typography.titleLarge)
+    }
+}
+```
+
+<Hint type="tip">
+Заголовок в две строки, подзаголовок в одну, цена без ограничения — это не произвол. Цену обрезать нельзя никогда: «1 990…» хуже, чем сломанная вёрстка, потому что вводит в заблуждение. Всё, что человек может неверно прочитать, обрезать не стоит.
+</Hint>
+
+<SectionAnchor chapterId="kit-card" sectionId="komponent-tselikom" />
+
+## Почему не WindowSizeClass
+
+Для адаптивности в Android есть готовый механизм — классы размеров окна: компактный, средний, развёрнутый. Он полезен, но решает **другую** задачу: как перестроить **экран целиком** — показать список и деталь рядом на планшете вместо двух экранов подряд.
+
+Компоненту библиотеки он не подходит по простой причине: карточка может оказаться узкой и на широком экране — например, в сетке по три в ряд. Класс размера окна скажет «развёрнутый», а места у карточки будет 200 точек.
+
+<Hint type="important">
+Правило: **экран** смотрит на размер окна, **компонент** — на свои ограничения. Компонент, который принимает решения по размеру окна, сломается в первой же сетке.
+</Hint>
+
+<SectionAnchor chapterId="kit-card" sectionId="pochemu-ne-windowsizeclass" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-card" quizId="quiz-2" questions={[
+  { q: 'Зачем .then(if (onClick != null) Modifier.clickable { … } else Modifier)?', options: ['Для красоты', 'Чтобы карточка была нажимаемой только когда нажатие вообще предусмотрено', 'Так быстрее', 'Иначе не скомпилируется'], correct: 1, why: 'Пустой Modifier в else означает «не добавлять ничего».' },
+  { q: 'Почему цену не ограничивают по числу строк?', options: ['Она короткая', 'Обрезанная цена вводит в заблуждение: «1 990…» хуже сломанной вёрстки', 'Так требует Material', 'Она всегда помещается'], correct: 1, why: 'Всё, что человек может неверно прочитать, обрезать не стоит.' },
+  { q: 'Почему компонент не смотрит на класс размера окна?', options: ['Его нет в Compose', 'Карточка бывает узкой и на широком экране — например, в сетке по три в ряд', 'Он работает медленно', 'Он для планшетов'], correct: 1, why: 'Экран смотрит на окно, компонент — на свои ограничения.' },
+]} />
+
+</Block>
+
+## Типичные ошибки
+
+**Ошибка 1. Жёсткая ширина в компоненте.**
+
+`width(320.dp)` — и карточка вылезает на узком экране.
+
+**Ошибка 2. Параметр «горизонтальная ли карточка».**
+
+Перекладывает решение на вызывающего, который знает не больше.
+
+**Ошибка 3. Текст без ограничения строк.**
+
+Сетка превращается в лесенку из-за одного длинного названия.
+
+**Ошибка 4. Обрезанная цена.**
+
+Разобрано: вводит в заблуждение.
+
+**Ошибка 5. Фиксированная высота.**
+
+При крупном системном шрифте текст обрежется снизу. `heightIn(min = …)` вместо `height(…)`.
+
+**Ошибка 6. Проверка только на одном устройстве.**
+
+Эмулятор с одним разрешением и обычным шрифтом покажет, что всё хорошо. Три действия — крупный шрифт, поворот, самое длинное название — покажут правду.
+
+**Ошибка 7. Карточка знает про товар слишком много.**
+
+```kotlin
+fun KitProductCard(product: Product)
+```
+
+Библиотечный компонент, принимающий тип из предметной области, перестаёт быть библиотечным: его не переиспользовать для категории, акции или пункта заказа. Принимают отдельные значения и слоты.
+
+<SectionAnchor chapterId="kit-card" sectionId="oshibki" />
+
+<Block kind="quiz">
+
+<SelfCheck chapterId="kit-card" quizId="quiz-3" questions={[
+  { q: 'Почему компонент библиотеки не принимает тип Product?', options: ['Это медленно', 'Он перестаёт быть библиотечным: его не переиспользовать для категории, акции или пункта заказа', 'Так нельзя в Kotlin', 'Нужен интерфейс'], correct: 1, why: 'Принимают отдельные значения и слоты.' },
+  { q: 'Чем heightIn(min = …) лучше height(…)?', options: ['Ничем', 'Задаёт минимум, оставляя карточке право вырасти при крупном системном шрифте', 'Работает быстрее', 'Так требует Material'], correct: 1, why: 'Фиксированная высота обрежет текст снизу.' },
+  { q: 'Как проверить адаптивность за полторы минуты?', options: ['Запустить тесты', 'Крупный системный шрифт, поворот экрана и товар с самым длинным названием', 'Открыть на планшете', 'Посмотреть код'], correct: 1, why: 'Три действия показывают всё, чего не видит компилятор.' },
+]} />
+
+</Block>
+
+## Шпаргалка по главе
+
+<Block kind="cheatsheet">
+
+| Что нужно | Как |
+| --- | --- |
+| Узнать свою ширину | `BoxWithConstraints { maxWidth … }` |
+| Ширина карточки | `fillMaxWidth()` или `widthIn(max = …)`, не `width(…)` |
+| Высота | `heightIn(min = …)`, не `height(…)` |
+| Обрезать заголовок | `maxLines = 2, overflow = TextOverflow.Ellipsis` |
+| Цена | без ограничения строк |
+| Условный модификатор | `.then(if (…) Modifier.clickable { … } else Modifier)` |
+| Что принимать | отдельные значения и слоты, не тип из предметной области |
+| Проверка | крупный шрифт + поворот + самое длинное название |
+
+</Block>
+
+<SectionAnchor chapterId="kit-card" sectionId="shpargalka" />
+
+## Слова главы
+
+<Block kind="vocab">
+
+| Термин | Что это |
+| --- | --- |
+| `BoxWithConstraints` | Контейнер, внутри которого известны собственные ограничения |
+| Ограничения | Сколько места родитель разрешил занять: `maxWidth`, `maxHeight` |
+| Порог раскладки | Ширина, начиная с которой компонент перестраивается |
+| `TextOverflow.Ellipsis` | Многоточие вместо обрыва на полуслове |
+| Класс размера окна | Компактный, средний, развёрнутый — для экрана, не для компонента |
+| Условный модификатор | Приклеенный через `.then` только при выполнении условия |
+
+</Block>
+
+<SectionAnchor chapterId="kit-card" sectionId="slovar" />
+
+<Block kind="trainer">
+
+<CodeTyping
+  chapterId="kit-card"
+  trainerId="trainer-kit-card"
+  targetCpm={95}
+  targetAccuracy={90}
+  pools={[
+    { label: 'Адаптивная раскладка', snippets: [
+      'BoxWithConstraints {',
+      'val wide = maxWidth.value >= wideFrom',
+      'Modifier.widthIn(max = 480.dp)',
+    ] },
+    { label: 'Текст', snippets: [
+      'maxLines = 2,',
+      'overflow = TextOverflow.Ellipsis,',
+      'style = MaterialTheme.typography.titleMedium,',
+    ] },
+    { label: 'Условный модификатор', snippets: [
+      '.then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)',
+      'Modifier.heightIn(min = 180.dp)',
+    ] },
+  ]}
+/>
+
+</Block>
+
+<SectionAnchor chapterId="kit-card" sectionId="trenazher" />
+
+## Что должен уметь после главы
+
+- собрать карточку, которая сама выбирает раскладку по доступной ширине;
+- назвать четыре проверки адаптивности и объяснить, почему компилятор молчит на всех;
+- обрезать длинный текст правильно и сказать, что обрезать нельзя;
+- объяснить разницу между ограничениями компонента и классом размера окна;
+- приклеить модификатор условно;
+- проверить адаптивность тремя действиями за полторы минуты.
+
+<SectionAnchor chapterId="kit-card" sectionId="chto-umet" />
+
+## Проверка по главе
+
+<ChapterExam chapterId="kit-card" questions={[
+  { q: 'Кто выбирает, столбиком карточка или строкой?', options: ['вызывающий параметром', 'сама карточка по доступной ей ширине', 'тема', 'система'], correct: 1, why: 'Снаружи задают условия, компонент решает, как в них уложиться.' },
+  { q: 'Где доступен maxWidth?', options: ['в любом Composable', 'только внутри BoxWithConstraints', 'в Modifier', 'в теме'], correct: 1, why: 'Иначе «Unresolved reference maxWidth» — тот же признак, что у weight вне Row.' },
+  { q: 'Modifier.width(320.dp) у карточки — что скажет компилятор?', options: ['ошибку', 'ничего: код законный, а карточка вылезет на узком экране', 'предупреждение', 'исправит сам'], correct: 1, why: 'Ни одну проверку адаптивности компилятор не ловит.' },
+  { q: 'Чем заменить фиксированную ширину?', options: ['ничем', 'fillMaxWidth() или widthIn(max = …)', 'wrapContentWidth()', 'weight(1f)'], correct: 1, why: 'Первое — занять всё, второе — ограничить рост на планшете.' },
+  { q: 'Текст без maxLines в сетке приводит к', options: ['обрезке', 'лесенке: карточки растут вниз по-разному', 'ошибке', 'переносу на новый экран'], correct: 1, why: 'На макете все карточки одной высоты.' },
+  { q: 'maxLines без overflow даёт', options: ['многоточие', 'обрыв на полуслове без многоточия', 'перенос', 'ошибку'], correct: 1, why: 'Выглядит как обрезанная вёрстка, а не как сокращение.' },
+  { q: 'Почему цену не обрезают?', options: ['она короткая', 'обрезанная цена вводит в заблуждение', 'так требует Material', 'она всегда помещается'], correct: 1, why: 'Всё, что можно неверно прочитать, обрезать не стоит.' },
+  { q: 'Почему компонент не смотрит на класс размера окна?', options: ['его нет', 'карточка бывает узкой и на широком экране — например в сетке по три', 'он медленный', 'он только для планшетов'], correct: 1, why: 'Экран смотрит на окно, компонент — на свои ограничения.' },
+  { q: 'Зачем .then(if (…) … else Modifier)?', options: ['для красоты', 'приклеить модификатор только когда он нужен — иначе карточка нажималась бы всегда', 'для скорости', 'обязательное требование'], correct: 1, why: 'Пустой Modifier означает «не добавлять ничего».' },
+  { q: 'Почему компонент библиотеки не принимает тип Product?', options: ['медленно', 'его тогда не переиспользовать для категории, акции или пункта заказа', 'нельзя в Kotlin', 'нужен интерфейс'], correct: 1, why: 'Принимают отдельные значения и слоты.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [BoxWithConstraints](https://developer.android.com/develop/ui/compose/layouts/basics#boxwithconstraints) — как компонент узнаёт свои ограничения.
+- [Адаптивные приложения](https://developer.android.com/develop/ui/compose/layouts/adaptive) — классы размеров окна и когда они нужны.
+- [Работа с текстом](https://developer.android.com/develop/ui/compose/text/style-text#overflow) — `maxLines`, `overflow` и переносы.
+- [Cards в Material 3](https://developer.android.com/develop/ui/compose/components/card) — виды карточек и их поведение.

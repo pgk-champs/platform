@@ -2196,6 +2196,54 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="236" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>одинаково на всех экранах</text>
     </g>
   ),
+  /* Карточка и адаптивность */
+  'kit-card': () => (
+    <g strokeLinecap="round">
+      <rect x="24" y="36" width="70" height="92" rx="9" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      <rect x="32" y="44" width="54" height="30" rx="5" fill="rgba(255,255,255,0.1)" />
+      <rect x="32" y="80" width="42" height="5" rx="2" fill="rgba(255,255,255,0.3)" />
+      <rect x="32" y="90" width="30" height="4" rx="2" fill="rgba(255,255,255,0.18)" />
+      <text x="32" y="110" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>1 990 ₽</text>
+      <text x="59" y="140" textAnchor="middle" fontSize="5" fontWeight={800} fill="rgba(255,255,255,0.4)" fontFamily={MONO}>узко</text>
+
+      <rect x="104" y="52" width="72" height="60" rx="9" fill={SOFT} stroke={ACCENT} strokeWidth={2.5} />
+      <rect x="110" y="58" width="24" height="24" rx="4" fill="rgba(255,255,255,0.12)" />
+      <rect x="140" y="62" width="30" height="5" rx="2" fill="rgba(255,255,255,0.3)" />
+      <rect x="140" y="72" width="20" height="4" rx="2" fill="rgba(255,255,255,0.18)" />
+      <text x="110" y="102" fontSize="6" fontWeight={800} fill={ACCENT} fontFamily={MONO}>1 990 ₽</text>
+      <text x="140" y="140" textAnchor="middle" fontSize="5" fontWeight={800} fill="rgba(255,255,255,0.4)" fontFamily={MONO}>широко</text>
+
+      <rect x="26" y="156" width="148" height="34" rx="7" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      <text x="100" y="171" textAnchor="middle" fontSize="5.5" fontWeight={800} fill="rgba(255,255,255,0.55)" fontFamily={MONO}>BoxWithConstraints</text>
+      <text x="100" y="183" textAnchor="middle" fontSize="5.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>maxWidth &gt;= 360</text>
+
+      <text x="100" y="210" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>компонент решает сам</text>
+    </g>
+  ),
+  /* Иконочный шрифт */
+  'kit-icon-font': () => (
+    <g strokeLinecap="round">
+      {[0, 1, 2, 3].map((i) => (
+        <rect key={i} x={24 + i * 38} y="38" width="30" height="30" rx="6"
+          fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={2.5} />
+      ))}
+      <text x="100" y="84" textAnchor="middle" fontSize="5" fontWeight={800} fill="rgba(255,255,255,0.4)" fontFamily={MONO}>четыре svg</text>
+
+      <path d="M100 92 L100 108 M94 102 L100 108 L106 102" stroke={ACCENT} strokeWidth={2.5} fill="none" />
+
+      <rect x="34" y="114" width="132" height="32" rx="8" fill={SOFT} stroke={ACCENT} strokeWidth={3} />
+      <text x="100" y="134" textAnchor="middle" fontSize="6.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>kit_icons.ttf</text>
+
+      <path d="M100 146 L100 162 M94 156 L100 162 L106 156" stroke={ACCENT} strokeWidth={2.5} fill="none" />
+
+      {['F101', 'F102', 'F103', 'F104'].map((t, i) => (
+        <text key={t} x={40 + i * 40} y="182" textAnchor="middle" fontSize="5.5" fontWeight={800}
+          fill={i === 3 ? ACCENT : 'rgba(255,255,255,0.45)'} fontFamily={MONO}>{t}</text>
+      ))}
+
+      <text x="100" y="208" textAnchor="middle" fontSize="6" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>1932 байта на всё</text>
+    </g>
+  ),
   'kotlin-coroutines': () => (
     <g strokeLinecap="round">
       <rect x="14" y="44" width="172" height="30" rx="9" fill={SOFT} stroke={INK} strokeWidth={3} />
@@ -2261,20 +2309,22 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'kit-select': { track: 'mobile', num: '18', title: 'Селект и нижняя шторка: выбор одного из списка' },
   'kit-search': { track: 'mobile', num: '19', title: 'Поиск: пауза в наборе и пять состояний выдачи' },
   'kit-bars': { track: 'mobile', num: '20', title: 'Хэдер и TabBar: шапка и нижняя панель как компоненты' },
-  'kotlin-coroutines': { track: 'mobile', num: '21', title: 'Корутины: как приложение не зависает' },
-  'flow-streams': { track: 'mobile', num: '22', title: 'Flow: поток значений во времени' },
-  'viewmodel-state': { track: 'mobile', num: '23', title: 'ViewModel: состояние, которое переживает поворот' },
-  'app-layers': { track: 'mobile', num: '24', title: 'Слои приложения: data, domain и репозиторий' },
-  'network-retrofit': { track: 'mobile', num: '25', title: 'Сеть: тот же экран, но с настоящими данными' },
-  'network-errors': { track: 'mobile', num: '26', title: 'Когда сети нет: ошибки, повторы и что видит пользователь' },
-  'data-storage': { track: 'mobile', num: '27', title: 'Хранение на устройстве: DataStore и Room' },
-  'cache-offline': { track: 'mobile', num: '28', title: 'Кэш и офлайн: база как источник истины' },
-  'clean-code': { track: 'mobile', num: '29', title: 'Чистый код: комментарии и логирование, которые оценивают' },
-  'auth-session': { track: 'mobile', num: '30', title: 'Авторизация: вход, живая сессия и биометрия' },
-  'device-features': { track: 'mobile', num: '31', title: 'Возможности устройства: камера, уведомления, виджет' },
-  'testing-mobile': { track: 'mobile', num: '32', title: 'Тестирование: MockWebServer, фейки и TDD' },
-  'kotlin-vs-java': { track: 'mobile', num: '33', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '34', title: 'История Java, Android и Kotlin' },
+  'kit-card': { track: 'mobile', num: '21', title: 'Карточка и адаптивность: компонент решает сам' },
+  'kit-icon-font': { track: 'mobile', num: '22', title: 'Иконочный шрифт: свои иконки одним файлом' },
+  'kotlin-coroutines': { track: 'mobile', num: '23', title: 'Корутины: как приложение не зависает' },
+  'flow-streams': { track: 'mobile', num: '24', title: 'Flow: поток значений во времени' },
+  'viewmodel-state': { track: 'mobile', num: '25', title: 'ViewModel: состояние, которое переживает поворот' },
+  'app-layers': { track: 'mobile', num: '26', title: 'Слои приложения: data, domain и репозиторий' },
+  'network-retrofit': { track: 'mobile', num: '27', title: 'Сеть: тот же экран, но с настоящими данными' },
+  'network-errors': { track: 'mobile', num: '28', title: 'Когда сети нет: ошибки, повторы и что видит пользователь' },
+  'data-storage': { track: 'mobile', num: '29', title: 'Хранение на устройстве: DataStore и Room' },
+  'cache-offline': { track: 'mobile', num: '30', title: 'Кэш и офлайн: база как источник истины' },
+  'clean-code': { track: 'mobile', num: '31', title: 'Чистый код: комментарии и логирование, которые оценивают' },
+  'auth-session': { track: 'mobile', num: '32', title: 'Авторизация: вход, живая сессия и биометрия' },
+  'device-features': { track: 'mobile', num: '33', title: 'Возможности устройства: камера, уведомления, виджет' },
+  'testing-mobile': { track: 'mobile', num: '34', title: 'Тестирование: MockWebServer, фейки и TDD' },
+  'kotlin-vs-java': { track: 'mobile', num: '35', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '36', title: 'История Java, Android и Kotlin' },
   'what-is-blockchain': { track: 'blockchain', num: '01', title: 'Что такое блокчейн' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'solidity-hello': { track: 'blockchain', num: '03', title: 'Первый контракт: из чего состоит код' },

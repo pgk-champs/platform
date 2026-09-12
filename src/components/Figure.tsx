@@ -110,6 +110,8 @@ import { kitInputsSchemes } from './figures/kitInputs';
 import { kitSelectSchemes } from './figures/kitSelect';
 import { kitSearchSchemes } from './figures/kitSearch';
 import { kitBarsSchemes } from './figures/kitBars';
+import { kitCardSchemes } from './figures/kitCard';
+import { kitIconFontSchemes } from './figures/kitIconFont';
 import './trainers.css';
 
 /* Иллюстрация с подписью. Сами схемы живут в figures/ по трекам — так над
@@ -217,6 +219,8 @@ const SCHEMES = {
   ...kitSelectSchemes,
   ...kitSearchSchemes,
   ...kitBarsSchemes,
+  ...kitCardSchemes,
+  ...kitIconFontSchemes,
   ...kotlinNullSchemes,
   ...tsJsSchemes,
   ...tsValuesSchemes,

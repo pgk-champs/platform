@@ -320,11 +320,27 @@
     "path": "mobile/kit-bars.mdx"
   },
   {
+    "id": "kit-card",
+    "title": "Карточка и адаптивность: компонент решает сам",
+    "audience": "мобилка",
+    "level": "углубление",
+    "order": 21,
+    "path": "mobile/kit-card.mdx"
+  },
+  {
+    "id": "kit-icon-font",
+    "title": "Иконочный шрифт: свои иконки одним файлом",
+    "audience": "мобилка",
+    "level": "углубление",
+    "order": 22,
+    "path": "mobile/kit-icon-font.mdx"
+  },
+  {
     "id": "kotlin-coroutines",
     "title": "Корутины: как приложение не зависает",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 21,
+    "order": 23,
     "path": "mobile/kotlin-coroutines.mdx"
   },
   {
@@ -332,7 +348,7 @@
     "title": "Flow: поток значений во времени",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 22,
+    "order": 24,
     "path": "mobile/flow-streams.mdx"
   },
   {
@@ -340,7 +356,7 @@
     "title": "ViewModel: состояние, которое переживает поворот",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 23,
+    "order": 25,
     "path": "mobile/viewmodel-state.mdx"
   },
   {
@@ -348,7 +364,7 @@
     "title": "Слои приложения: data, domain и репозиторий",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 24,
+    "order": 26,
     "path": "mobile/app-layers.mdx"
   },
   {
@@ -356,7 +372,7 @@
     "title": "Сеть: тот же экран, но с настоящими данными",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 25,
+    "order": 27,
     "path": "mobile/network-retrofit.mdx"
   },
   {
@@ -364,7 +380,7 @@
     "title": "Когда сети нет: ошибки, повторы и что видит пользователь",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 26,
+    "order": 28,
     "path": "mobile/network-errors.mdx"
   },
   {
@@ -372,7 +388,7 @@
     "title": "Хранение на устройстве: DataStore и Room",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 27,
+    "order": 29,
     "path": "mobile/data-storage.mdx"
   },
   {
@@ -380,7 +396,7 @@
     "title": "Кэш и офлайн: база как источник истины",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 28,
+    "order": 30,
     "path": "mobile/cache-offline.mdx"
   },
   {
@@ -388,7 +404,7 @@
     "title": "Чистый код: комментарии и логирование, которые оценивают",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 29,
+    "order": 31,
     "path": "mobile/clean-code.mdx"
   },
   {
@@ -396,7 +412,7 @@
     "title": "Авторизация: вход, живая сессия и биометрия",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 30,
+    "order": 32,
     "path": "mobile/auth-session.mdx"
   },
   {
@@ -404,7 +420,7 @@
     "title": "Возможности устройства: камера, уведомления, виджет",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 31,
+    "order": 33,
     "path": "mobile/device-features.mdx"
   },
   {
@@ -412,7 +428,7 @@
     "title": "Тестирование: MockWebServer, фейки и TDD",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 32,
+    "order": 34,
     "path": "mobile/testing-mobile.mdx"
   },
   {
@@ -420,7 +436,7 @@
     "title": "Kotlin и Java: в чём разница",
     "audience": "мобилка",
     "level": "база",
-    "order": 33,
+    "order": 35,
     "path": "mobile/kotlin-vs-java.mdx"
   },
   {
@@ -428,7 +444,7 @@
     "title": "История Java, Android и Kotlin",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 34,
+    "order": 36,
     "path": "mobile/kotlin-history.mdx"
   },
   {

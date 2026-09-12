@@ -3355,5 +3355,59 @@
       "title": "Navigation в Jetpack Compose | Android Studio - Kotlin | #24",
       "channel": "Neco Ru"
     }
+  ],
+  "kit-card": [
+    {
+      "videoId": "DzUrk9hEoGw",
+      "title": "Курс по Jetpack Compose Android  | Card, Box, Image | #3 | Android Studio",
+      "channel": "Neco Ru"
+    },
+    {
+      "videoId": "ACKz8_uoF6A",
+      "title": "Верстка экрана в Jetpack Compose Beta. Часть 1. [Ru, Android] / Мобильный разработчик",
+      "channel": "Алексей Гладков"
+    },
+    {
+      "videoId": "BbrLgWsLZyU",
+      "title": "Верстка экрана в Jetpack Compose Beta. Часть 2. [Ru, Android] / Мобильный разработчик",
+      "channel": "Алексей Гладков"
+    },
+    {
+      "videoId": "RWjUHY7HO5o",
+      "title": "Android Jetpack Compose Card Implementation | Beginner Tutorial",
+      "channel": "magic light"
+    },
+    {
+      "videoId": "4FO3_PAbs0U",
+      "title": "Использование ConstrainLayout в Jetpack Compose Android Studio + Kotlin",
+      "channel": "Neco Ru"
+    }
+  ],
+  "kit-icon-font": [
+    {
+      "videoId": "dApWSTyFZEU",
+      "title": "Как создать иконочный шрифт из SVG",
+      "channel": "Webmassa"
+    },
+    {
+      "videoId": "xE2NgrQo1fM",
+      "title": "Создание иконочного шрифта для верстки",
+      "channel": "WebDesign Master"
+    },
+    {
+      "videoId": "gLJ5mxHUWNI",
+      "title": "Как создать для сайта свой ИКОНОЧНЫЙ ШРИФТ за 5 минут",
+      "channel": "ПРО ФРОНТЕНД"
+    },
+    {
+      "videoId": "vVrNmM-dtsc",
+      "title": "Use Custom Fonts in Jetpack Compose Apps!",
+      "channel": "Charfaoui Younes"
+    },
+    {
+      "videoId": "lrxBud5I5Qs",
+      "title": "SVG или иконочный шрифт ? (font awesome, icomoon)",
+      "channel": "От 0 до 1"
+    }
   ]
 }
