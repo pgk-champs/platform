@@ -3571,5 +3571,32 @@
       "title": "Инди-разработка Android-приложений. Боли, идеи и заработок",
       "channel": "Android Broadcast. Все об Андроид разработке"
     }
+  ],
+  "console-io": [
+    {
+      "videoId": "5zlHMEo3KuQ",
+      "title": "Kotlin Input & Output Explained | println(), print(), readln() & User Input",
+      "channel": "Dev Trio"
+    },
+    {
+      "videoId": "e4Wg9L59ANk",
+      "title": "Kotlin Newbie To Pro - NULL VALUES AND USER INPUT - Part 10",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "16pnhZnzI80",
+      "title": "Kotlin Tutorial: Interactive program (with user input)",
+      "channel": "The Android Factory"
+    },
+    {
+      "videoId": "kLbWVzTdw2o",
+      "title": "Console Input Output | print, println, readln, String Templates | Kotlin Course #1.4",
+      "channel": "ThinkProgramming-English"
+    },
+    {
+      "videoId": "0Mri70Oi3qs",
+      "title": "Урок 10: Функции (методы), тип возвращаемого значения, return // Котлин курс с нуля",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    }
   ]
 }

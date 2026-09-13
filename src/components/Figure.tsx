@@ -35,6 +35,7 @@ import { shopCartSchemes } from './figures/shopCart';
 import { shopFilesSchemes } from './figures/shopFiles';
 import { shopFailuresSchemes } from './figures/shopFailures';
 import { shopDaySchemes } from './figures/shopDay';
+import { consoleIoSchemes } from './figures/consoleIo';
 import { authSessionSchemes } from './figures/authSession';
 import { deviceFeaturesSchemes } from './figures/deviceFeatures';
 import { testingMobileSchemes } from './figures/testingMobile';
@@ -159,6 +160,7 @@ const SCHEMES = {
   ...shopFilesSchemes,
   ...shopFailuresSchemes,
   ...shopDaySchemes,
+  ...consoleIoSchemes,
   ...authSessionSchemes,
   ...deviceFeaturesSchemes,
   ...testingMobileSchemes,
