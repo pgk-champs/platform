@@ -30,6 +30,7 @@ import { dataStorageSchemes } from './figures/dataStorage';
 import { cleanCodeSchemes } from './figures/cleanCode';
 import { cacheOfflineSchemes } from './figures/cacheOffline';
 import { shopCatalogSchemes } from './figures/shopCatalog';
+import { shopAuthSchemes } from './figures/shopAuth';
 import { authSessionSchemes } from './figures/authSession';
 import { deviceFeaturesSchemes } from './figures/deviceFeatures';
 import { testingMobileSchemes } from './figures/testingMobile';
@@ -177,6 +178,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(cleanCodeSchemes),
     ...Object.keys(cacheOfflineSchemes),
     ...Object.keys(shopCatalogSchemes),
+    ...Object.keys(shopAuthSchemes),
     ...Object.keys(authSessionSchemes),
     ...Object.keys(deviceFeaturesSchemes),
     ...Object.keys(testingMobileSchemes),

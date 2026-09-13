@@ -1906,6 +1906,27 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="182" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>конверт, не список</text>
     </g>
   ),
+  /* форма с подписью под нужным полем и токен-полоска — арт «shop-auth» */
+  'shop-auth': () => (
+    <g strokeLinecap="round">
+      <rect x="24" y="34" width="152" height="106" rx="14" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+
+      <rect x="38" y="50" width="124" height="16" rx="6" fill="rgba(255,255,255,0.12)" stroke={SOFT} strokeWidth={2} />
+      <text x="46" y="62" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>email</text>
+
+      <rect x="38" y="74" width="124" height="16" rx="6" fill="rgba(255,255,255,0.12)" stroke={SOFT} strokeWidth={2} />
+      <text x="46" y="86" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.6)" fontFamily={MONO}>password</text>
+
+      <rect x="38" y="98" width="124" height="16" rx="6" fill="rgba(255,255,255,0.08)" stroke={ACCENT} strokeWidth={2} />
+      <text x="46" y="110" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>passwordConfirm</text>
+      <text x="38" y="128" fontSize="7" fontWeight={800} fill={ACCENT} fontFamily={MONO}>пароли не совпадают</text>
+
+      <rect x="30" y="150" width="34" height="12" rx="4" fill="rgba(255,255,255,0.18)" />
+      <rect x="68" y="150" width="72" height="12" rx="4" fill={ACCENT} />
+      <rect x="144" y="150" width="26" height="12" rx="4" fill="rgba(255,255,255,0.18)" />
+      <text x="100" y="182" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>ошибка знает поле</text>
+    </g>
+  ),
   /* три разрешения: два зелёных, одно перечёркнуто — арт «device-features» */
   'device-features': () => (
     <g strokeLinecap="round">
@@ -2341,6 +2362,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'clean-code': { track: 'mobile', num: '31', title: 'Чистый код: комментарии и логирование, которые оценивают' },
   'auth-session': { track: 'mobile', num: '32', title: 'Авторизация: вход, живая сессия и биометрия' },
   'shop-catalog': { track: 'mobile', num: '33', title: 'Каталог: конверт, страницы, поиск' },
+  'shop-auth': { track: 'mobile', num: '34', title: 'Регистрация и вход на сервере задания' },
   'device-features': { track: 'mobile', num: '39', title: 'Возможности устройства: камера, уведомления, виджет' },
   'testing-mobile': { track: 'mobile', num: '40', title: 'Тестирование: MockWebServer, фейки и TDD' },
   'kotlin-vs-java': { track: 'mobile', num: '41', title: 'Kotlin и Java: в чём разница' },

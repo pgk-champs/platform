@@ -3436,5 +3436,32 @@
       "title": "How To Generate Types And Use API Rules In Pocketbase",
       "channel": "Programonaut"
     }
+  ],
+  "shop-auth": [
+    {
+      "videoId": "2hJi-w21S-0",
+      "title": "Retrofit - авторизация, практика. Часть 1   | Android Studio (Kotlin)",
+      "channel": "Neco Ru"
+    },
+    {
+      "videoId": "eUEJRaJfS_k",
+      "title": "Let's Build: Authenticated API's with PocketBase",
+      "channel": "Sam Wyndham"
+    },
+    {
+      "videoId": "kp53qL_O5gk",
+      "title": "Preferences DataStore - MAD Skills",
+      "channel": "Android Developers"
+    },
+    {
+      "videoId": "zx9GUaKH2Ew",
+      "title": "Building Secure APIs with JWT and Token Refresh Mechanism in Android using OkHttp Interceptors",
+      "channel": "Rahul Ray"
+    },
+    {
+      "videoId": "ozh0U2vZsrQ",
+      "title": "How To Generate Types And Use API Rules In Pocketbase",
+      "channel": "Programonaut"
+    }
   ]
 }

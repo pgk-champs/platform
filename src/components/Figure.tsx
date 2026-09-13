@@ -30,6 +30,7 @@ import { dataStorageSchemes } from './figures/dataStorage';
 import { cleanCodeSchemes } from './figures/cleanCode';
 import { cacheOfflineSchemes } from './figures/cacheOffline';
 import { shopCatalogSchemes } from './figures/shopCatalog';
+import { shopAuthSchemes } from './figures/shopAuth';
 import { authSessionSchemes } from './figures/authSession';
 import { deviceFeaturesSchemes } from './figures/deviceFeatures';
 import { testingMobileSchemes } from './figures/testingMobile';
@@ -149,6 +150,7 @@ const SCHEMES = {
   ...cleanCodeSchemes,
   ...cacheOfflineSchemes,
   ...shopCatalogSchemes,
+  ...shopAuthSchemes,
   ...authSessionSchemes,
   ...deviceFeaturesSchemes,
   ...testingMobileSchemes,

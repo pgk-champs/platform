@@ -424,6 +424,14 @@
     "path": "mobile/shop-catalog.mdx"
   },
   {
+    "id": "shop-auth",
+    "title": "Регистрация и вход на сервере задания",
+    "audience": "мобилка",
+    "level": "углубление",
+    "order": 34,
+    "path": "mobile/shop-auth.mdx"
+  },
+  {
     "id": "device-features",
     "title": "Возможности устройства: камера, уведомления, виджет",
     "audience": "мобилка",
