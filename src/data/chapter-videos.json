@@ -3463,5 +3463,32 @@
       "title": "How To Generate Types And Use API Rules In Pocketbase",
       "channel": "Programonaut"
     }
+  ],
+  "shop-cart": [
+    {
+      "videoId": "rAk1j2CmPJs",
+      "title": "Easy Retrofit 2 Tutorial in Android Studio using Kotlin & Coroutines",
+      "channel": "Indently"
+    },
+    {
+      "videoId": "8IhNq0ng-wk",
+      "title": "Retrofit Android Tutorial - Make API Calls",
+      "channel": "Ahmed Guedmioui"
+    },
+    {
+      "videoId": "AasI-0IRXUM",
+      "title": "Pagination from Remote API & Local Cache Using Paging3, Compose and Clean Architecture",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "lT3-NBWV9HU",
+      "title": "Retrofit with Kotlin- the ULTIMATE GUIDE",
+      "channel": "Codersee- Kotlin on the backend"
+    },
+    {
+      "videoId": "c6nhD7jbn3A",
+      "title": "Android Studio (Kotlin) Simple MVVM Retrofit Pagination 3",
+      "channel": "Ferer Atlus"
+    }
   ]
 }

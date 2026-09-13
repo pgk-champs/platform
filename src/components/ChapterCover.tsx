@@ -1927,6 +1927,26 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="182" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>ошибка знает поле</text>
     </g>
   ),
+  /* корзина: строки с количествами и итог, которого сервер не знает — арт «shop-cart» */
+  'shop-cart': () => (
+    <g strokeLinecap="round">
+      <rect x="20" y="36" width="160" height="100" rx="14" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+
+      <rect x="32" y="48" width="136" height="24" rx="7" fill="rgba(255,255,255,0.1)" stroke={SOFT} strokeWidth={2} />
+      <rect x="38" y="53" width="14" height="14" rx="4" fill={SOFT} />
+      <text x="58" y="64" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>Nike Air Max · ×3</text>
+
+      <rect x="32" y="78" width="136" height="24" rx="7" fill="rgba(255,255,255,0.1)" stroke={SOFT} strokeWidth={2} />
+      <rect x="38" y="83" width="14" height="14" rx="4" fill={SOFT} />
+      <text x="58" y="94" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>Air Force 1 · ×1</text>
+
+      <rect x="32" y="108" width="136" height="20" rx="7" fill={ACCENT} />
+      <text x="100" y="122" textAnchor="middle" fontSize="8" fontWeight={800} fill={DARK} fontFamily={MONO}>итого 41 300 ₽</text>
+
+      <text x="100" y="152" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>сервер хранит только id и count</text>
+      <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>сумму считаем сами</text>
+    </g>
+  ),
   /* три разрешения: два зелёных, одно перечёркнуто — арт «device-features» */
   'device-features': () => (
     <g strokeLinecap="round">
@@ -2363,6 +2383,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'auth-session': { track: 'mobile', num: '32', title: 'Авторизация: вход, живая сессия и биометрия' },
   'shop-catalog': { track: 'mobile', num: '33', title: 'Каталог: конверт, страницы, поиск' },
   'shop-auth': { track: 'mobile', num: '34', title: 'Регистрация и вход на сервере задания' },
+  'shop-cart': { track: 'mobile', num: '35', title: 'Корзина и заказ: сервер без проверок' },
   'device-features': { track: 'mobile', num: '39', title: 'Возможности устройства: камера, уведомления, виджет' },
   'testing-mobile': { track: 'mobile', num: '40', title: 'Тестирование: MockWebServer, фейки и TDD' },
   'kotlin-vs-java': { track: 'mobile', num: '41', title: 'Kotlin и Java: в чём разница' },

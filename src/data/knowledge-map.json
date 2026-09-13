@@ -432,6 +432,14 @@
     "path": "mobile/shop-auth.mdx"
   },
   {
+    "id": "shop-cart",
+    "title": "Корзина и заказ: сервер, который ничего не проверяет",
+    "audience": "мобилка",
+    "level": "углубление",
+    "order": 35,
+    "path": "mobile/shop-cart.mdx"
+  },
+  {
     "id": "device-features",
     "title": "Возможности устройства: камера, уведомления, виджет",
     "audience": "мобилка",
