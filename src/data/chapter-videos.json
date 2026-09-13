@@ -3490,5 +3490,32 @@
       "title": "Android Studio (Kotlin) Simple MVVM Retrofit Pagination 3",
       "channel": "Ferer Atlus"
     }
+  ],
+  "shop-files": [
+    {
+      "videoId": "kALjGUDN4qM",
+      "title": "Upload Image to Server using Retrofit in Android Studio Kotlin Tutorial | Part 2",
+      "channel": "Generic Apps"
+    },
+    {
+      "videoId": "u6sJdfQ5BwE",
+      "title": "Retrofit Tutorial — How to Upload Multiple Files to Server",
+      "channel": "Future Studio"
+    },
+    {
+      "videoId": "K5qOmCzmmC4",
+      "title": "How to load a network image in Jetpack Compose! (Coil)",
+      "channel": "The Android Factory"
+    },
+    {
+      "videoId": "uHX5NB6wHao",
+      "title": "THIS Is How You Use the New Android 13 Photo Picker (It's AMAZING!)",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "SFeU2gkNVYs",
+      "title": "Image loading in Android via Coil | Bored Ape Yacht Club | Kotlin 2022",
+      "channel": "The Android Factory"
+    }
   ]
 }

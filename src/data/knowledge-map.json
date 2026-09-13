@@ -440,6 +440,14 @@
     "path": "mobile/shop-cart.mdx"
   },
   {
+    "id": "shop-files",
+    "title": "Картинки и загрузка файлов",
+    "audience": "мобилка",
+    "level": "углубление",
+    "order": 36,
+    "path": "mobile/shop-files.mdx"
+  },
+  {
     "id": "device-features",
     "title": "Возможности устройства: камера, уведомления, виджет",
     "audience": "мобилка",
