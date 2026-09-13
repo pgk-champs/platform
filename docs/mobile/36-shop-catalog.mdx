@@ -1,0 +1,595 @@
+---
+title: 'Каталог магазина: конверт, страницы, поиск'
+audience: 'мобилка'
+level: 'углубление'
+order: 36
+sidebar_position: 36
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="shop-catalog" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import KotlinPlay from '@site/src/components/KotlinPlay';
+
+# Каталог магазина: конверт, страницы, поиск
+
+<ChapterProgress chapterId="shop-catalog" totalSections={14} totalQuizzes={5} totalTrainers={0} />
+
+<CollapsibleToc toc={toc} chapterId="shop-catalog" />
+
+## Зачем это нужно
+
+До сих пор сеть в главах была учебной: мы разбирали, как устроен HTTP, как Retrofit превращает интерфейс в запросы и что делать с ошибками. Сервер при этом был условным.
+
+Начиная с этой главы сервер настоящий — тот самый, по которому устроено региональное задание. В задании он называется MatuleApp, и у него есть спецификация с четырнадцатью запросами: каталог, карточка товара, акции, регистрация, вход, профиль, корзина, заказ. Следующие шесть глав проходят по ним все.
+
+Важная деталь, которая в тексте задания не написана, но звучит от экспертов: **сервер сделан на PocketBase, а клиентские библиотеки `pocketbase` и `supabase` использовать нельзя**. Запросы пишутся руками — тем самым Retrofit, который мы уже умеем. Это значит, что повадки PocketBase придётся знать: он отвечает не так, как «учебный REST из статьи», и половина потерянных на площадке баллов — это непонимание его ответов.
+
+<SectionAnchor chapterId="shop-catalog" sectionId="zachem" />
+
+## Стенд, на котором мы работаем
+
+Настоящий адрес из задания — `api.matule.ru` — сейчас не отвечает: его поднимают на время чемпионата. Поэтому для тренировки развёрнут точно такой же сервер:
+
+```
+https://style-matule.apis.alspio.com/api
+```
+
+Это PocketBase 0.40.4 с коллекциями по спецификации задания: `products`, `news`, `cart`, `orders`, `project` и `users`. Все примеры в этой и следующих главах сняты именно с него — включая коды ошибок и тексты сообщений.
+
+Проверить, что он жив, можно прямо из терминала, ещё не написав ни строчки Kotlin:
+
+```bash
+curl -s "https://style-matule.apis.alspio.com/api/collections/products/records?perPage=2"
+```
+
+<Hint type="tip">
+Начинать работу с сетевым слоем всегда стоит с `curl`. Если запрос не работает из терминала, искать ошибку в Kotlin бессмысленно — и наоборот: когда `curl` отдаёт нужное тело, любая последующая проблема точно в клиенте.
+</Hint>
+
+Адрес коллекции строится по одному правилу: `/api/collections/{имя}/records`. Имя — то, как коллекция названа в базе. Никаких `/products`, `/api/v1/goods` и прочего: PocketBase раздаёт все коллекции одинаково.
+
+<SectionAnchor chapterId="shop-catalog" sectionId="stend" />
+
+## Конверт вместо списка
+
+Первое, обо что спотыкаются почти все: запрос каталога возвращает **не массив товаров**. Вот настоящий ответ на запрос выше, целиком:
+
+```json
+{
+  "items": [
+    {
+      "approximateCost": "10 500 ₽",
+      "collectionId": "pbc_4092854851",
+      "collectionName": "products",
+      "description": "Лёгкие кроссовки с большой воздушной подушкой",
+      "id": "8ezt4dmrek7plpz",
+      "price": 10500,
+      "title": "Nike Air Max 270",
+      "type": "мужская",
+      "typeCloses": "кроссовки"
+    },
+    {
+      "approximateCost": "9 800 ₽",
+      "collectionId": "pbc_4092854851",
+      "collectionName": "products",
+      "description": "Классика, которая не выходит из моды",
+      "id": "auzbdtixz85k04y",
+      "price": 9800,
+      "title": "Nike Air Force 1",
+      "type": "унисекс",
+      "typeCloses": "кроссовки"
+    }
+  ],
+  "page": 1,
+  "perPage": 2,
+  "totalItems": 12,
+  "totalPages": 6
+}
+```
+
+Снаружи объект с пятью ключами. Четыре из них — числа про страницы, и только `items` содержит товары.
+
+<Figure scheme="sc-envelope" caption="Ответ PocketBase: четыре числа снаружи, товары внутри" />
+
+Разберём числа по одному, потому что их путают:
+
+- `page` — какая страница пришла. Та, что запросили.
+- `perPage` — сколько записей на странице. Тоже та, что запросили.
+- `totalItems` — сколько записей **всего в коллекции** после фильтра. Не сколько пришло! В примере пришло 2, а `totalItems` равен 12.
+- `totalPages` — на сколько страниц это бьётся при текущем `perPage`. 12 товаров по 2 — шесть страниц.
+
+<Hint type="important">
+`totalItems` — это счётчик всей выборки, а не длина `items`. Если написать «показано `totalItems` товаров» под списком из двух карточек, экран соврёт. Длина списка — это `items.size`.
+</Hint>
+
+Проверим разбор этого тела на настоящем компиляторе. Тело ниже — сокращённая копия ответа выше, а классы — те самые, что поедут в проект:
+
+<KotlinPlay code={`import kotlinx.serialization.*
+import kotlinx.serialization.json.*
+
+@Serializable
+data class ProductDto(
+    val id: String,
+    val title: String,
+    val description: String = "",
+    val price: Int = 0,
+    val typeCloses: String = "",
+)
+
+@Serializable
+data class PageResponse<T>(
+    val page: Int,
+    val perPage: Int,
+    val totalPages: Int,
+    val totalItems: Int,
+    val items: List<T>,
+)
+
+val body = """
+{"items":[{"approximateCost":"10 500 ₽","collectionId":"pbc_4092854851","collectionName":"products",
+"description":"Лёгкие кроссовки с большой воздушной подушкой","id":"8ezt4dmrek7plpz","price":10500,
+"title":"Nike Air Max 270","type":"мужская","typeCloses":"кроссовки"}],
+"page":1,"perPage":1,"totalItems":12,"totalPages":12}
+"""
+
+fun main() {
+    val json = Json { ignoreUnknownKeys = true }
+    val page = json.decodeFromString<PageResponse<ProductDto>>(body)
+    println("страница \${page.page} из \${page.totalPages}, всего \${page.totalItems}")
+    page.items.forEach { println("  \${it.title} — \${it.price} ₽ (\${it.typeCloses})") }
+}`} />
+
+Вывод настоящего прогона:
+
+```
+страница 1 из 12, всего 12
+  Nike Air Max 270 — 10500 ₽ (кроссовки)
+```
+
+<Block kind="quiz">
+<SelfCheck chapterId="shop-catalog" questions={[
+  { q: 'Каталог вернул тело, где items содержит 3 записи, а totalItems равен 12. Сколько товаров в коллекции?', options: ['3', '12', '15', 'Неизвестно'], correct: 1, why: 'items — это то, что поместилось на запрошенную страницу; totalItems — размер всей выборки.' },
+  { q: 'Почему ответ каталога нельзя разобрать сразу в List<ProductDto>?', options: ['Товаров слишком много', 'Снаружи объект с полями page, perPage, items, а не массив — разбор упадёт на первом же символе', 'PocketBase шифрует ответ', 'Нужен другой конвертер'], correct: 1, why: 'Массив начинается с «[», а тело начинается с «{» — парсер сообщает об этом прямо.' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="shop-catalog" sectionId="konvert" />
+
+## Что подключаем
+
+Ничего нового относительно главы про Retrofit — тот же набор, никаких библиотек PocketBase:
+
+```kotlin
+dependencies {
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
+}
+```
+
+Плюс плагин сериализации в том же файле, без него аннотация `@Serializable` не породит код разбора:
+
+```kotlin
+plugins {
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
+}
+```
+
+И разрешение в манифесте — про него забывают каждый раз:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
+
+<Hint type="fact">
+Версия плагина сериализации должна совпадать с версией Kotlin в проекте. При расхождении сборка падает с сообщением о несовместимом компиляторном плагине, и найти причину по тексту ошибки тяжело — проще держать обе версии рядом в одном месте.
+</Hint>
+
+<SectionAnchor chapterId="shop-catalog" sectionId="zavisimosti" />
+
+## Описываем товар
+
+Теперь класс под одну запись. Смотрим на настоящее тело и переносим поля:
+
+```kotlin
+@Serializable
+data class ProductDto(
+    val id: String,
+    val title: String,
+    val description: String = "",
+    val price: Int = 0,
+    val typeCloses: String = "",
+    val type: String = "",
+    val approximateCost: String = "",
+)
+```
+
+<SyntaxBreakdown parts={[
+  { text: '@Serializable', label: 'аннотация', note: 'просит плагин сгенерировать для этого класса код разбора и сборки JSON. Без неё Retrofit скажет, что для типа нет сериализатора' },
+  { text: 'data class', label: 'класс-данные', note: 'Kotlin сам сделает equals, hashCode, toString и copy — для DTO это ровно то, что нужно' },
+  { text: 'ProductDto', label: 'имя', note: 'суффикс Dto (data transfer object) отмечает: это форма сервера, а не модель приложения. Дальше её обычно переводят в свой Product' },
+  { text: 'val id: String', label: 'обязательное поле', note: 'без значения по умолчанию. Если сервер его не пришлёт, разбор упадёт с MissingFieldException' },
+  { text: '= ""', label: 'значение по умолчанию', note: 'делает поле необязательным: нет в теле — подставится пустая строка, и разбор продолжится' },
+]} />
+
+Имена свойств совпадают с именами полей сервера — `typeCloses` и `approximateCost` написаны именно так, «верблюдом» и по-английски, как их назвали авторы задания. Если хочется в коде свои имена, это делается аннотацией `@SerialName("typeCloses")`, а не переименованием свойства.
+
+<Hint type="important">
+Решение, какие поля сделать обязательными, — не формальность. Обязательное поле, которого сервер вдруг не прислал, роняет **весь список**, а не одну карточку: исключение вылетает из разбора всего тела. Безопасная стратегия для конкурсного дня — обязательными оставить `id` и то, без чего карточка бессмысленна, остальным дать значения по умолчанию.
+</Hint>
+
+<SectionAnchor chapterId="shop-catalog" sectionId="dto" />
+
+## Один конверт на все коллекции
+
+Конверт у PocketBase одинаковый для любой коллекции: и у товаров, и у акций, и у заказов снаружи те же пять ключей. Значит, описывать его отдельно под каждый тип не надо — достаточно одного обобщённого класса:
+
+```kotlin
+@Serializable
+data class PageResponse<T>(
+    val page: Int,
+    val perPage: Int,
+    val totalPages: Int,
+    val totalItems: Int,
+    val items: List<T>,
+)
+```
+
+<SyntaxBreakdown parts={[
+  { text: '<T>', label: 'параметр типа', note: 'заглушка под тип элементов. Конкретный тип подставляется в месте использования: PageResponse<ProductDto>, PageResponse<NewsDto>' },
+  { text: 'items: List<T>', label: 'список элементов', note: 'единственное место, где T реально нужен — всё остальное в конверте одинаково' },
+  { text: 'PageResponse<ProductDto>', label: 'подстановка', note: 'на этом месте T превращается в ProductDto, и сериализатор знает, как разбирать каждый элемент' },
+]} />
+
+Это та самая обобщённость (`generics`), которую разбирали в главах про Kotlin. Здесь видно, зачем она нужна на практике: без неё пришлось бы писать `ProductPage`, `NewsPage`, `OrderPage` — пять одинаковых классов, отличающихся одной строкой.
+
+<Block kind="quiz">
+<SelfCheck chapterId="shop-catalog" questions={[
+  { q: 'Зачем PageResponse сделан обобщённым?', options: ['Так быстрее работает', 'Конверт у всех коллекций одинаковый, меняется только тип элементов — обобщённость позволяет описать его один раз', 'Этого требует Retrofit', 'Чтобы работал ignoreUnknownKeys'], correct: 1, why: 'Иначе получилось бы пять почти одинаковых классов, отличающихся типом одного поля.' },
+  { q: 'Что произойдёт, если у поля price убрать значение по умолчанию, а сервер его не пришлёт?', options: ['Подставится 0', 'Подставится null', 'Разбор всего тела упадёт с MissingFieldException, и список не покажется целиком', 'Эта запись пропустится'], correct: 2, why: 'Исключение вылетает из разбора всего ответа — одна неполная запись уносит с собой весь список.' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="shop-catalog" sectionId="page-generic" />
+
+## Интерфейс запросов
+
+Дальше описываем, какие запросы умеет наш клиент. Пока два: список товаров и один товар по идентификатору.
+
+```kotlin
+interface MatuleApi {
+
+    @GET("collections/products/records")
+    suspend fun catalog(
+        @Query("page") page: Int = 1,
+        @Query("perPage") perPage: Int = 30,
+        @Query("filter") filter: String? = null,
+    ): PageResponse<ProductDto>
+
+    @GET("collections/products/records/{id}")
+    suspend fun product(@Path("id") id: String): ProductDto
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: '@GET("collections/products/records")', label: 'метод и путь', note: 'путь относительный: он приклеится к базовому адресу. Ведущего слэша НЕТ — иначе путь заменит собой весь путь базового адреса, и /api потеряется' },
+  { text: 'suspend', label: 'приостанавливаемая', note: 'Retrofit умеет отдавать результат прямо, без Call и колбэков, если метод помечен suspend. Вызывается из корутины' },
+  { text: '@Query("page") page: Int = 1', label: 'параметр запроса', note: 'превратится в ?page=1 в адресе. Имя в скобках — то, что ждёт сервер; имя переменной может быть любым' },
+  { text: 'filter: String? = null', label: 'необязательный параметр', note: 'если передать null, Retrofit просто не добавит этот параметр в адрес — удобно для поиска, который включается не всегда' },
+  { text: '@GET(".../{id}")', label: 'подстановка в путь', note: 'фигурные скобки — место, куда подставится значение' },
+  { text: '@Path("id") id: String', label: 'значение подстановки', note: 'имя в скобках должно совпасть с именем в фигурных скобках пути, иначе Retrofit падает при создании клиента' },
+  { text: ': ProductDto', label: 'тип ответа', note: 'у одиночной записи конверта НЕТ: сервер отдаёт сам объект, поэтому здесь не PageResponse' },
+]} />
+
+<Figure scheme="sc-request-path" caption="Путь одного вызова: от метода интерфейса до разобранного объекта" />
+
+Обратите внимание на асимметрию: список приходит в конверте, **одна запись — без конверта**. Это не наша прихоть, так устроен PocketBase, и забыть об этом — верный способ получить ошибку разбора на карточке товара.
+
+<SectionAnchor chapterId="shop-catalog" sectionId="interface" />
+
+## Собираем клиент
+
+Интерфейс — это только описание. Реализацию делает Retrofit:
+
+```kotlin
+private const val BASE = "https://style-matule.apis.alspio.com/api/"
+
+val json = Json { ignoreUnknownKeys = true }
+
+val api: MatuleApi = Retrofit.Builder()
+    .baseUrl(BASE)
+    .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+    .build()
+    .create(MatuleApi::class.java)
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'BASE = "…/api/"', label: 'базовый адрес', note: 'обязан заканчиваться слэшем. Без него Retrofit бросает IllegalArgumentException прямо при сборке — до всякой сети' },
+  { text: 'Json { ignoreUnknownKeys = true }', label: 'настройка разбора', note: 'разрешает игнорировать поля, которых нет в DTO. PocketBase всегда добавляет collectionId и collectionName — без этой настройки разбор упадёт на них' },
+  { text: '.addConverterFactory(…)', label: 'кто разбирает тело', note: 'связывает Retrofit и kotlinx.serialization. Без конвертера Retrofit не знает, что делать с телом, и падает с «Unable to create converter»' },
+  { text: 'asConverterFactory("application/json".toMediaType())', label: 'тип содержимого', note: 'говорит, для какого Content-Type применять этот конвертер' },
+  { text: '.create(MatuleApi::class.java)', label: 'реализация интерфейса', note: 'Retrofit во время выполнения создаёт объект, реализующий интерфейс. Именно здесь всплывают ошибки в аннотациях' },
+]} />
+
+<Hint type="tip">
+Объект `Json` создаётся **один раз** и переиспользуется. Если писать `Json { … }` внутри каждой функции, компилятор Kotlin выдаст предупреждение «Redundant creation of Json format. Creating instances for each usage can be slow» — и будет прав: настройка формата стоит дороже, чем кажется.
+</Hint>
+
+<SectionAnchor chapterId="shop-catalog" sectionId="klient" />
+
+## Первый прогон
+
+Собранный клиент, вызванный против живого стенда, печатает вот что:
+
+```
+каталог: всего 12, страниц 4, на странице 3
+   Nike Air Max 270 — 10500 ₽ (кроссовки, мужская)
+   Nike Air Force 1 — 9800 ₽ (кроссовки, унисекс)
+   Adidas Superstar — 8700 ₽ (кроссовки, унисекс)
+товар по id: Nike Air Max 270, 10 500 ₽
+```
+
+Смотреть здесь надо на строку «всего 12, страниц 4»: `perPage` был равен трём, поэтому двенадцать товаров разложились на четыре страницы. Число страниц не постоянное свойство коллекции — оно зависит от того, о каком размере страницы мы попросили.
+
+<Hint type="fact">
+Поле `approximateCost` приходит уже отформатированным: `"10 500 ₽"` — строка с неразрывным пробелом и знаком рубля. А `price` — число `10500`. Для сортировки и подсчёта суммы корзины нужен `price`; `approximateCost` годится только на показ.
+</Hint>
+
+<SectionAnchor chapterId="shop-catalog" sectionId="progon" />
+
+## Арифметика страниц
+
+Пагинация — место, где ошибаются молча. Сервер не сообщает «страницы кончились» отдельным признаком: он просто отдаёт меньше записей или вовсе пустой список.
+
+<Figure scheme="sc-paging" caption="Двенадцать товаров при perPage = 5: три полные страницы и запрос за пределом" />
+
+Вот как это выглядит на настоящих числах. Запрос `?page=9&perPage=5` при двенадцати товарах возвращает:
+
+```json
+{
+  "items": [],
+  "page": 9,
+  "perPage": 5,
+  "totalItems": 12,
+  "totalPages": 3
+}
+```
+
+Код ответа при этом — **200 OK**. Не 404, не ошибка. Пустой список за пределом диапазона — нормальный ответ, и отличить его от «ничего не нашлось» можно только по числам.
+
+Ту же арифметику легко проверить локально, не поднимая сервер:
+
+<KotlinPlay code={`data class Page<T>(
+    val page: Int,
+    val perPage: Int,
+    val totalItems: Int,
+    val totalPages: Int,
+    val items: List<T>,
+)
+
+val catalog = listOf(
+    "Nike Air Max 270", "Nike Air Force 1", "Adidas Superstar", "Adidas Ultraboost 22",
+    "Puma Suede Classic", "New Balance 574", "Reebok Club C 85", "Converse Chuck 70",
+    "Vans Old Skool", "Asics Gel-Lyte III", "Salomon XT-6", "Timberland 6-Inch",
+)
+
+fun slice(page: Int, perPage: Int): Page<String> {
+    val from = (page - 1) * perPage
+    val items = catalog.drop(maxOf(from, 0)).take(perPage)
+    val totalPages = (catalog.size + perPage - 1) / perPage
+    return Page(page, perPage, catalog.size, totalPages, items)
+}
+
+fun main() {
+    for (n in listOf(1, 2, 3, 9)) {
+        val p = slice(n, 5)
+        println("page=\${p.page} perPage=\${p.perPage} totalItems=\${p.totalItems} totalPages=\${p.totalPages}")
+        println("  items: \${p.items.size} \${p.items}")
+    }
+    println()
+    println("последняя страница? " + (slice(3, 5).let { it.page >= it.totalPages }))
+    println("последняя страница? " + (slice(1, 5).let { it.page >= it.totalPages }))
+}`} />
+
+Вывод совпадает с тем, что отдаёт сервер:
+
+```
+page=1 perPage=5 totalItems=12 totalPages=3
+  items: 5 [Nike Air Max 270, Nike Air Force 1, Adidas Superstar, Adidas Ultraboost 22, Puma Suede Classic]
+page=2 perPage=5 totalItems=12 totalPages=3
+  items: 5 [New Balance 574, Reebok Club C 85, Converse Chuck 70, Vans Old Skool, Asics Gel-Lyte III]
+page=3 perPage=5 totalItems=12 totalPages=3
+  items: 2 [Salomon XT-6, Timberland 6-Inch]
+page=9 perPage=5 totalItems=12 totalPages=3
+  items: 0 []
+
+последняя страница? true
+последняя страница? false
+```
+
+Отсюда единственное правило подгрузки, которое стоит запомнить:
+
+```kotlin
+val hasMorePages = page < totalPages
+```
+
+Не `items.isNotEmpty()`, не «пока приходит ровно perPage записей». Только сравнение с `totalPages` — оно верно и на последней неполной странице, и за пределом диапазона.
+
+<Block kind="quiz">
+<SelfCheck chapterId="shop-catalog" questions={[
+  { q: 'Запрос ?page=9&perPage=5 при 12 товарах. Какой код ответа?', options: ['404', '400', '200 с пустым items', '204'], correct: 2, why: 'Страница за пределом — не ошибка: приходит 200, пустой items и настоящие totalItems с totalPages.' },
+  { q: 'Как правильно понять, что страницы кончились?', options: ['items пустой', 'Пришло меньше perPage записей', 'page >= totalPages', 'Сервер вернул 404'], correct: 2, why: 'На последней неполной странице items не пуст, а записей меньше perPage — оба других признака здесь врут.' },
+  { q: 'Сколько страниц у 12 товаров при perPage = 3?', options: ['3', '4', '6', 'Зависит от фильтра'], correct: 1, why: 'Число страниц считает сервер и кладёт в totalPages — при perPage = 3 это 4.' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="shop-catalog" sectionId="stranicy" />
+
+## Поиск
+
+Поиск в PocketBase — это не отдельный эндпоинт, а параметр `filter` у того же запроса каталога. Синтаксис свой:
+
+```
+?filter=(title ?~ 'Nike')
+```
+
+<SyntaxBreakdown parts={[
+  { text: '(', label: 'скобки', note: 'выражение фильтра принято оборачивать в скобки — так его проще собирать из нескольких условий через && и ||' },
+  { text: 'title', label: 'поле', note: 'имя поля коллекции. Опечатка здесь даёт 400, а не пустой результат' },
+  { text: '?~', label: 'оператор «содержит»', note: 'частичное совпадение без учёта регистра. Знак вопроса означает «хотя бы для одного значения» — он же работает на списочных полях' },
+  { text: "'Nike'", label: 'значение', note: 'в одинарных кавычках. Это часть URL, поэтому значение обязано быть закодировано: пробелы и кириллица напрямую не поедут' },
+]} />
+
+Запрос `?filter=(title ?~ 'Nike')` на стенде возвращает:
+
+```json
+{
+  "items": [
+    { "id": "8ezt4dmrek7plpz", "title": "Nike Air Max 270", "price": 10500, "…": "…" },
+    { "id": "auzbdtixz85k04y", "title": "Nike Air Force 1", "price": 9800,  "…": "…" }
+  ],
+  "page": 1,
+  "perPage": 30,
+  "totalItems": 2,
+  "totalPages": 1
+}
+```
+
+Главное про пустой результат:
+
+<Hint type="important">
+Когда ничего не найдено, сервер отвечает **200 с `totalItems: 0`**, а не 404. Значит, обрабатывать «ничего не найдено» надо не в ветке ошибки, а в ветке успеха: проверкой `items.isEmpty()` после удачного запроса. Экран «Ничего не найдено» и экран «Ошибка сети» — это разные экраны, и путать их нельзя.
+</Hint>
+
+В коде поиск получается коротким — параметр уже описан в интерфейсе:
+
+```kotlin
+val found = api.catalog(filter = "(title ?~ '$query')")
+```
+
+Живой прогон:
+
+```
+поиск Nike: 2 → [Nike Air Max 270, Nike Air Force 1]
+```
+
+Рядом полезны ещё два параметра того же запроса. Фильтр по точному совпадению — `?filter=(typeCloses='кеды')` — на стенде отдаёт четыре записи. Сортировка — `?sort=-price`, где минус означает «по убыванию»: первым приходит Salomon XT-6 за 18 400.
+
+<Hint type="fact">
+Сортировать можно только по существующим полям. Запрос `?sort=created` на этом стенде даёт **400** — системного поля `created` у коллекции нет, хотя в документации PocketBase оно упоминается. Проверять доступные поля надо по настоящему ответу, а не по документации.
+</Hint>
+
+<SectionAnchor chapterId="shop-catalog" sectionId="poisk" />
+
+## Типичные ошибки
+
+Все четыре сообщения ниже сняты с настоящего прогона: Kotlin 2.0.21, Retrofit 2.11.0, kotlinx.serialization 1.7.3.
+
+**1. Конверт разбирают как список.** Самая частая: в интерфейсе написано `: List<ProductDto>` вместо `: PageResponse<ProductDto>`.
+
+```
+kotlinx.serialization.json.internal.JsonDecodingException
+Unexpected JSON token at offset 0: Expected start of the array '[', but had '{' instead at path: $
+JSON input: {"items":[{"approximateCost":".....
+```
+
+Сообщение прямое: ждали `[`, получили `{`. «Offset 0» означает, что ошибка на самом первом символе тела, — то есть дело не в отдельной записи, а в форме всего ответа.
+
+**2. Опечатка в имени поля DTO.** Написали `titl` вместо `title`:
+
+```
+kotlinx.serialization.MissingFieldException
+Field 'titl' is required for type with serial name 'probe.Broken', but it was missing at path: $.items[0]
+```
+
+Обратите внимание: компилятор такую ошибку **не поймает** — с точки зрения Kotlin класс безупречен. Она всплывает только при первом запуске, и путь `$.items[0]` показывает, на какой именно записи.
+
+**3. Базовый адрес без завершающего слэша.**
+
+```
+java.lang.IllegalArgumentException
+baseUrl must end in /: https://style-matule.apis.alspio.com/api
+```
+
+Эта ошибка вылетает **при сборке клиента**, до всякой сети. Хорошая новость: заметно сразу, а не на площадке.
+
+**4. Хост не отвечает.**
+
+```
+java.net.UnknownHostException
+api.matule.ru: nodename nor servname provided, or not known
+```
+
+Так выглядит опечатка в адресе и так же выглядит отсутствие интернета у устройства. Разбирать эти случаи будем в отдельной главе про отказы — пока важно знать, что это исключение, а не код ответа: у него нет ни 404, ни 500, потому что до сервера дело не дошло.
+
+<Hint type="important">
+К этим четырём добавляется пятая, у которой вообще нет текста: приложение падает с `SecurityException`, если в манифесте нет `<uses-permission android:name="android.permission.INTERNET" />`. Код при этом выглядит правильным, и искать в нём нечего.
+</Hint>
+
+<Block kind="quiz">
+<SelfCheck chapterId="shop-catalog" questions={[
+  { q: 'Разбор упал с «Expected start of the array \'[\', but had \'{\' instead». Где ошибка?', options: ['В теле ответа сервера', 'Тип ответа в интерфейсе описан как список, а сервер присылает конверт-объект', 'Не хватает ignoreUnknownKeys', 'Неверный базовый адрес'], correct: 1, why: 'Offset 0 указывает на самый первый символ тела — значит, не совпадает форма всего ответа.' },
+  { q: 'MissingFieldException с путём $.items[0]. Что это значит?', options: ['Сервер недоступен', 'В DTO объявлено обязательное поле, которого в первой записи ответа нет — например, из-за опечатки в имени', 'Кончились страницы', 'Нет разрешения INTERNET'], correct: 1, why: 'Компилятор такую ошибку не ловит: класс корректен, расходятся имена в классе и в теле.' },
+  { q: 'Когда вылетает «baseUrl must end in /»?', options: ['При первом запросе', 'При сборке клиента, ещё до обращения к сети', 'При разборе ответа', 'Только в релизной сборке'], correct: 1, why: 'Retrofit проверяет базовый адрес в момент build() — это самая безобидная из ошибок, потому что видна сразу.' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="shop-catalog" sectionId="oshibki" />
+
+## Что засчитывает эксперт
+
+По критериям регионального задания в этой главе закрыты два запроса из четырнадцати: получение списка товаров и получение товара по идентификатору. Эксперт смотрит на результат, а не на код, поэтому проверяется обычно так:
+
+- список открывается и показывает данные сервера, а не зашитые;
+- карточка товара открывается по нажатию и показывает того самого, на кого нажали;
+- поиск что-то находит и при пустом результате не выглядит как ошибка;
+- при выключенной сети приложение не падает.
+
+Последний пункт формально относится к другому критерию, но проверяется на этом же экране — самолётным режимом. Поэтому даже в первой сетевой главе имеет смысл сразу обернуть вызов в `try`, а полноценную обработку отказов сделать позже.
+
+<Hint type="tip">
+На площадке размер страницы удобно ставить большим — `perPage=100`. Двенадцать товаров придут одной страницей, бесконечную подгрузку делать не придётся, а критерий «список показывает данные сервера» будет закрыт. Пагинацию добавляйте, когда закрыты все запросы: она не отдельный критерий, а часть хорошего списка.
+</Hint>
+
+<SectionAnchor chapterId="shop-catalog" sectionId="kriterij" />
+
+## Куда углубиться
+
+- `?fields=title,price` — попросить только нужные поля. Ответ становится заметно короче, и DTO может быть меньше.
+- `?expand=` — подтянуть связанные записи одним запросом вместо двух.
+- Сложные фильтры: `(price > 8000 && typeCloses = 'кеды')`, экранирование кавычек и кодирование кириллицы в URL.
+- `Paging 3` — библиотека Android под бесконечные списки: сама просит следующую страницу и хранит состояние.
+- `MockWebServer` — поднять фальшивый сервер в тесте и проверить, что клиент собрал правильный адрес.
+
+<SectionAnchor chapterId="shop-catalog" sectionId="uglubitsya" />
+
+<ChapterExam chapterId="shop-catalog" questions={[
+  { q: 'Как строится адрес коллекции в PocketBase?', options: ['/api/products', '/api/collections/{имя}/records', '/api/v1/{имя}', '/{имя}/list'], correct: 1, why: 'Все коллекции раздаются одинаково, имя подставляется в середину пути.' },
+  { q: 'Что означает totalItems в ответе каталога?', options: ['Сколько записей пришло в items', 'Сколько записей всего в выборке после фильтра', 'Сколько страниц', 'Размер страницы'], correct: 1, why: 'Длина пришедшего списка — это items.size; totalItems считает всю выборку.' },
+  { q: 'Почему нужен ignoreUnknownKeys при работе с PocketBase?', options: ['Ускоряет разбор', 'PocketBase всегда добавляет служебные collectionId и collectionName — без этой настройки строгий разбор на них падает', 'Это требование Retrofit', 'Иначе не работают значения по умолчанию'], correct: 1, why: 'Сообщение при строгом разборе выглядит как «Encountered an unknown key \'collectionId\'».' },
+  { q: 'Запрос одного товара по id возвращает…', options: ['PageResponse с одним элементом', 'Сам объект товара, без конверта', 'Массив из одного элемента', 'Только идентификатор'], correct: 1, why: 'Конверт бывает только у списков — это асимметрия PocketBase, о которой легко забыть.' },
+  { q: 'Поиск ничего не нашёл. Что приходит?', options: ['404', '204 без тела', '200 с пустым items и totalItems равным нулю', '400'], correct: 2, why: 'Поэтому пустой результат обрабатывается в ветке успеха, а не в ветке ошибки.' },
+  { q: 'Что делает @Query("perPage") perPage: Int = 30?', options: ['Ограничивает размер ответа на стороне клиента', 'Добавляет в адрес ?perPage=30 и позволяет вызвать метод без этого аргумента', 'Задаёт таймаут', 'Включает пагинацию в Retrofit'], correct: 1, why: 'Имя в скобках — то, что ждёт сервер; значение по умолчанию — удобство вызова.' },
+  { q: 'Какой оператор фильтра означает «содержит подстроку»?', options: ['=', '~', '?~', 'LIKE'], correct: 2, why: 'Например (title ?~ \'Nike\') — совпадение без учёта регистра и по части строки.' },
+  { q: 'Клиент собирается, но падает с IllegalArgumentException про baseUrl. Причина?', options: ['Сервер недоступен', 'Базовый адрес не заканчивается слэшем', 'Не подключён конвертер', 'Опечатка в DTO'], correct: 1, why: 'Проверка происходит в момент build(), до любого сетевого обращения.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [PocketBase — Web API: список записей](https://pocketbase.io/docs/api-records/) — параметры `page`, `perPage`, `filter`, `sort`, `fields` и точный вид ответа.
+- [Синтаксис фильтров PocketBase](https://pocketbase.io/docs/api-rules-and-filters/) — все операторы, включая `?~`, `?=` и логические связки.
+- [Retrofit — аннотации запросов](https://lysine.dev/retrofit/) — `@GET`, `@Query`, `@Path` и правила склейки путей.
+- [kotlinx.serialization — руководство](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/serialization-guide.md) — `ignoreUnknownKeys`, значения по умолчанию, обобщённые классы.

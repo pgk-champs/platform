@@ -177,6 +177,28 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>приходит строка</text>
     </g>
   ),
+  /* след вызовов с подсвеченной своей строкой — арт «debug-skill» */
+  'debug-skill': () => (
+    <g strokeLinecap="round">
+      <rect x="20" y="38" width="160" height="98" rx="12" fill="rgba(0,0,0,0.42)" stroke={INK} strokeWidth={3} />
+
+      <text x="30" y="56" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.8)" fontFamily={MONO}>IndexOutOfBounds: 5/1</text>
+      <text x="34" y="70" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.35)" fontFamily={MONO}>at java.util.Collections…</text>
+
+      <rect x="28" y="76" width="144" height="14" rx="5" fill={SOFT} stroke={ACCENT} strokeWidth={2} />
+      <text x="34" y="86" fontSize="6.5" fontWeight={800} fill={ACCENT} fontFamily={MONO}>at Catalog.byIndex(Main.kt:6)</text>
+
+      <text x="34" y="102" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.35)" fontFamily={MONO}>at Screen.show(Main.kt:12)</text>
+      <text x="34" y="114" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.35)" fontFamily={MONO}>at MainKt.main(Main.kt:24)</text>
+      <text x="34" y="130" fontSize="6.5" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>Caused by: …</text>
+
+      <circle cx="172" cy="83" r="9" fill="none" stroke={ACCENT} strokeWidth={2.5} />
+      <path d="M179 90l8 9" stroke={ACCENT} strokeWidth={3} />
+
+      <text x="100" y="156" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.5)" fontFamily={MONO}>первая своя строка</text>
+      <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>сузить и объяснить</text>
+    </g>
+  ),
   'first-compose-screen': () => (
     <g>
       <rect x="56" y="16" width="88" height="152" rx="18" fill="rgba(0,0,0,0.22)" stroke={INK} strokeWidth={3} />
@@ -2454,41 +2476,42 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'composition': { track: 'mobile', num: '07', title: 'Композиция классов' },
   'kotlin-oop': { track: 'mobile', num: '08', title: 'ООП на Kotlin: классы, наследование, интерфейсы' },
   'console-io': { track: 'mobile', num: '09', title: 'Взаимодействие с консолью' },
-  'first-compose-screen': { track: 'mobile', num: '10', title: 'Первый экран Compose' },
-  'state-events': { track: 'mobile', num: '11', title: 'Состояние и события' },
-  'layout-by-mockup': { track: 'mobile', num: '12', title: 'Вёрстка по макету' },
-  'layout-card': { track: 'mobile', num: '13', title: 'Карточка по макету: от картинки к коду' },
-  'ui-kit': { track: 'mobile', num: '14', title: 'Многомодульность и UI Kit' },
-  'lazy-lists': { track: 'mobile', num: '15', title: 'Списки: LazyColumn и всё, что не нарисовать циклом' },
-  'material-theme': { track: 'mobile', num: '16', title: 'Material 3: тема, которую вам уже сгенерировали' },
-  'scaffold-bars': { track: 'mobile', num: '17', title: 'Scaffold: каркас экрана, шапка и нижняя панель' },
-  'kit-buttons': { track: 'mobile', num: '18', title: 'Компонент библиотеки: кнопки, слоты и состояния' },
-  'kit-inputs': { track: 'mobile', num: '19', title: 'Поля ввода: подпись, ошибка и клавиатура' },
-  'kit-select': { track: 'mobile', num: '20', title: 'Селект и нижняя шторка: выбор одного из списка' },
-  'kit-search': { track: 'mobile', num: '21', title: 'Поиск: пауза в наборе и пять состояний выдачи' },
-  'kit-bars': { track: 'mobile', num: '22', title: 'Хэдер и TabBar: шапка и нижняя панель как компоненты' },
-  'kit-card': { track: 'mobile', num: '23', title: 'Карточка и адаптивность: компонент решает сам' },
-  'kit-icon-font': { track: 'mobile', num: '24', title: 'Иконочный шрифт: свои иконки одним файлом' },
-  'kotlin-coroutines': { track: 'mobile', num: '25', title: 'Корутины: как приложение не зависает' },
-  'flow-streams': { track: 'mobile', num: '26', title: 'Flow: поток значений во времени' },
-  'viewmodel-state': { track: 'mobile', num: '27', title: 'ViewModel: состояние, которое переживает поворот' },
-  'app-layers': { track: 'mobile', num: '28', title: 'Слои приложения: data, domain и репозиторий' },
-  'network-retrofit': { track: 'mobile', num: '29', title: 'Сеть: тот же экран, но с настоящими данными' },
-  'network-errors': { track: 'mobile', num: '30', title: 'Когда сети нет: ошибки, повторы и что видит пользователь' },
-  'data-storage': { track: 'mobile', num: '31', title: 'Хранение на устройстве: DataStore и Room' },
-  'cache-offline': { track: 'mobile', num: '32', title: 'Кэш и офлайн: база как источник истины' },
-  'clean-code': { track: 'mobile', num: '33', title: 'Чистый код: комментарии и логирование, которые оценивают' },
-  'auth-session': { track: 'mobile', num: '34', title: 'Авторизация: вход, живая сессия и биометрия' },
-  'shop-catalog': { track: 'mobile', num: '35', title: 'Каталог: конверт, страницы, поиск' },
-  'shop-auth': { track: 'mobile', num: '36', title: 'Регистрация и вход на сервере задания' },
-  'shop-cart': { track: 'mobile', num: '37', title: 'Корзина и заказ: сервер без проверок' },
-  'shop-files': { track: 'mobile', num: '38', title: 'Картинки и загрузка файлов' },
-  'shop-failures': { track: 'mobile', num: '39', title: 'Отказы, повторы и выход из аккаунта' },
-  'shop-day': { track: 'mobile', num: '40', title: 'Магазин за один конкурсный день' },
-  'device-features': { track: 'mobile', num: '41', title: 'Возможности устройства: камера, уведомления, виджет' },
-  'testing-mobile': { track: 'mobile', num: '42', title: 'Тестирование: MockWebServer, фейки и TDD' },
-  'kotlin-vs-java': { track: 'mobile', num: '43', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '44', title: 'История Java, Android и Kotlin' },
+  'debug-skill': { track: 'mobile', num: '10', title: 'Поиск ошибок: след, сужение, причина' },
+  'first-compose-screen': { track: 'mobile', num: '11', title: 'Первый экран Compose' },
+  'state-events': { track: 'mobile', num: '12', title: 'Состояние и события' },
+  'layout-by-mockup': { track: 'mobile', num: '13', title: 'Вёрстка по макету' },
+  'layout-card': { track: 'mobile', num: '14', title: 'Карточка по макету: от картинки к коду' },
+  'ui-kit': { track: 'mobile', num: '15', title: 'Многомодульность и UI Kit' },
+  'lazy-lists': { track: 'mobile', num: '16', title: 'Списки: LazyColumn и всё, что не нарисовать циклом' },
+  'material-theme': { track: 'mobile', num: '17', title: 'Material 3: тема, которую вам уже сгенерировали' },
+  'scaffold-bars': { track: 'mobile', num: '18', title: 'Scaffold: каркас экрана, шапка и нижняя панель' },
+  'kit-buttons': { track: 'mobile', num: '19', title: 'Компонент библиотеки: кнопки, слоты и состояния' },
+  'kit-inputs': { track: 'mobile', num: '20', title: 'Поля ввода: подпись, ошибка и клавиатура' },
+  'kit-select': { track: 'mobile', num: '21', title: 'Селект и нижняя шторка: выбор одного из списка' },
+  'kit-search': { track: 'mobile', num: '22', title: 'Поиск: пауза в наборе и пять состояний выдачи' },
+  'kit-bars': { track: 'mobile', num: '23', title: 'Хэдер и TabBar: шапка и нижняя панель как компоненты' },
+  'kit-card': { track: 'mobile', num: '24', title: 'Карточка и адаптивность: компонент решает сам' },
+  'kit-icon-font': { track: 'mobile', num: '25', title: 'Иконочный шрифт: свои иконки одним файлом' },
+  'kotlin-coroutines': { track: 'mobile', num: '26', title: 'Корутины: как приложение не зависает' },
+  'flow-streams': { track: 'mobile', num: '27', title: 'Flow: поток значений во времени' },
+  'viewmodel-state': { track: 'mobile', num: '28', title: 'ViewModel: состояние, которое переживает поворот' },
+  'app-layers': { track: 'mobile', num: '29', title: 'Слои приложения: data, domain и репозиторий' },
+  'network-retrofit': { track: 'mobile', num: '30', title: 'Сеть: тот же экран, но с настоящими данными' },
+  'network-errors': { track: 'mobile', num: '31', title: 'Когда сети нет: ошибки, повторы и что видит пользователь' },
+  'data-storage': { track: 'mobile', num: '32', title: 'Хранение на устройстве: DataStore и Room' },
+  'cache-offline': { track: 'mobile', num: '33', title: 'Кэш и офлайн: база как источник истины' },
+  'clean-code': { track: 'mobile', num: '34', title: 'Чистый код: комментарии и логирование, которые оценивают' },
+  'auth-session': { track: 'mobile', num: '35', title: 'Авторизация: вход, живая сессия и биометрия' },
+  'shop-catalog': { track: 'mobile', num: '36', title: 'Каталог: конверт, страницы, поиск' },
+  'shop-auth': { track: 'mobile', num: '37', title: 'Регистрация и вход на сервере задания' },
+  'shop-cart': { track: 'mobile', num: '38', title: 'Корзина и заказ: сервер без проверок' },
+  'shop-files': { track: 'mobile', num: '39', title: 'Картинки и загрузка файлов' },
+  'shop-failures': { track: 'mobile', num: '40', title: 'Отказы, повторы и выход из аккаунта' },
+  'shop-day': { track: 'mobile', num: '41', title: 'Магазин за один конкурсный день' },
+  'device-features': { track: 'mobile', num: '42', title: 'Возможности устройства: камера, уведомления, виджет' },
+  'testing-mobile': { track: 'mobile', num: '43', title: 'Тестирование: MockWebServer, фейки и TDD' },
+  'kotlin-vs-java': { track: 'mobile', num: '44', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '45', title: 'История Java, Android и Kotlin' },
   'what-is-blockchain': { track: 'blockchain', num: '01', title: 'Что такое блокчейн' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'solidity-hello': { track: 'blockchain', num: '03', title: 'Первый контракт: из чего состоит код' },

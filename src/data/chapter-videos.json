@@ -3625,5 +3625,32 @@
       "title": "Урок 10: Функции (методы), тип возвращаемого значения, return // Котлин курс с нуля",
       "channel": "Kotlin & Android с нуля – Иван Ветров"
     }
+  ],
+  "debug-skill": [
+    {
+      "videoId": "FGbzHhioARQ",
+      "title": "Убийца багов: Как читать Stack Trace и чинить код в Idea. Ты больше не будешь бояться ошибок!",
+      "channel": "Ilya Lisov - Backend Development"
+    },
+    {
+      "videoId": "kfWzYoEQMMY",
+      "title": "Exceptions, Try-Catch, Stack Trace - Основи програмування Kotlin",
+      "channel": "Roman Andrushchenko"
+    },
+    {
+      "videoId": "dLGp3FJDRIA",
+      "title": "Неделя 2: 9  Ошибки выполнения; исключительные ситуации; Stack Trace",
+      "channel": "Web Applications Development"
+    },
+    {
+      "videoId": "8dsOy18zg1c",
+      "title": "#180 Kotlin Tutorial | Stack Trace with Default Handler",
+      "channel": "MIHIR MODI"
+    },
+    {
+      "videoId": "e4Wg9L59ANk",
+      "title": "Kotlin Newbie To Pro - NULL VALUES AND USER INPUT - Part 10",
+      "channel": "Philipp Lackner"
+    }
   ]
 }
