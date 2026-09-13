@@ -3544,5 +3544,32 @@
       "title": "Error handling in Android : easy way!",
       "channel": "Renaro Santos"
     }
+  ],
+  "shop-day": [
+    {
+      "videoId": "SvadOJrNdio",
+      "title": "The Only Retrofit Tutorial You’ll Ever Need! (with Jetpack Compose)",
+      "channel": "Android Knowledge"
+    },
+    {
+      "videoId": "G_HKJJLozUc",
+      "title": "Git - Pull request на практике / GitHub",
+      "channel": "Тимофей Коваленко"
+    },
+    {
+      "videoId": "MzicAnIEt0o",
+      "title": "Pull request на GitHub — инструкция для новичков | Хекслет",
+      "channel": "Хекслет - нормальные it-курсы"
+    },
+    {
+      "videoId": "u6sJdfQ5BwE",
+      "title": "Retrofit Tutorial — How to Upload Multiple Files to Server",
+      "channel": "Future Studio"
+    },
+    {
+      "videoId": "aGGdCup3FzQ",
+      "title": "Инди-разработка Android-приложений. Боли, идеи и заработок",
+      "channel": "Android Broadcast. Все об Андроид разработке"
+    }
   ]
 }

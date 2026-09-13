@@ -1984,6 +1984,27 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="182" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>пусто ≠ сломано</text>
     </g>
   ),
+  /* чек-лист прогона с галочками и лента дня — арт «shop-day» */
+  'shop-day': () => (
+    <g strokeLinecap="round">
+      <rect x="24" y="32" width="152" height="106" rx="14" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+
+      {[46, 64, 82, 100].map((y, i) => (
+        <g key={y}>
+          <path d={`M40 ${y + 4}l4 4 7-8`} stroke={ACCENT} strokeWidth={2.5} fill="none" />
+          <rect x="58" y={y - 3} width={i === 3 ? 52 : 96} height="8" rx="3" fill="rgba(255,255,255,0.2)" />
+        </g>
+      ))}
+      <text x="100" y="128" textAnchor="middle" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>Пройдено: 15 из 15</text>
+
+      <rect x="30" y="150" width="30" height="10" rx="4" fill={ACCENT} />
+      <rect x="66" y="150" width="30" height="10" rx="4" fill={ACCENT} />
+      <rect x="102" y="150" width="30" height="10" rx="4" fill={ACCENT} />
+      <rect x="138" y="150" width="30" height="10" rx="4" fill="rgba(255,255,255,0.18)" />
+
+      <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>срезами, не слоями</text>
+    </g>
+  ),
   /* три разрешения: два зелёных, одно перечёркнуто — арт «device-features» */
   'device-features': () => (
     <g strokeLinecap="round">
@@ -2423,6 +2444,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'shop-cart': { track: 'mobile', num: '35', title: 'Корзина и заказ: сервер без проверок' },
   'shop-files': { track: 'mobile', num: '36', title: 'Картинки и загрузка файлов' },
   'shop-failures': { track: 'mobile', num: '37', title: 'Отказы, повторы и выход из аккаунта' },
+  'shop-day': { track: 'mobile', num: '38', title: 'Магазин за один конкурсный день' },
   'device-features': { track: 'mobile', num: '39', title: 'Возможности устройства: камера, уведомления, виджет' },
   'testing-mobile': { track: 'mobile', num: '40', title: 'Тестирование: MockWebServer, фейки и TDD' },
   'kotlin-vs-java': { track: 'mobile', num: '41', title: 'Kotlin и Java: в чём разница' },

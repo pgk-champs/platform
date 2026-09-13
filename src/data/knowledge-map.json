@@ -456,6 +456,14 @@
     "path": "mobile/shop-failures.mdx"
   },
   {
+    "id": "shop-day",
+    "title": "Магазин за один конкурсный день",
+    "audience": "мобилка",
+    "level": "челлендж",
+    "order": 38,
+    "path": "mobile/shop-day.mdx"
+  },
+  {
     "id": "device-features",
     "title": "Возможности устройства: камера, уведомления, виджет",
     "audience": "мобилка",
