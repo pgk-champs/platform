@@ -1964,6 +1964,26 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>имя, а не ссылка</text>
     </g>
   ),
+  /* экран без сети с кнопкой повтора и погашенный токен — арт «shop-failures» */
+  'shop-failures': () => (
+    <g strokeLinecap="round">
+      <rect x="26" y="36" width="148" height="100" rx="14" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+
+      <circle cx="100" cy="66" r="14" fill="none" stroke={ACCENT} strokeWidth={3} />
+      <path d="M100 59v8" stroke={ACCENT} strokeWidth={3} />
+      <circle cx="100" cy="73" r="1.8" fill={ACCENT} />
+
+      <text x="100" y="94" textAnchor="middle" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.7)" fontFamily={MONO}>Нет соединения</text>
+      <rect x="62" y="104" width="76" height="18" rx="7" fill={ACCENT} />
+      <text x="100" y="117" textAnchor="middle" fontSize="8" fontWeight={800} fill={DARK} fontFamily={MONO}>Повторить</text>
+
+      <rect x="30" y="148" width="42" height="12" rx="4" fill="rgba(255,255,255,0.18)" />
+      <rect x="78" y="148" width="42" height="12" rx="4" fill="rgba(255,255,255,0.18)" />
+      <rect x="126" y="148" width="42" height="12" rx="4" fill={ACCENT} />
+
+      <text x="100" y="182" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>пусто ≠ сломано</text>
+    </g>
+  ),
   /* три разрешения: два зелёных, одно перечёркнуто — арт «device-features» */
   'device-features': () => (
     <g strokeLinecap="round">
@@ -2402,6 +2422,7 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'shop-auth': { track: 'mobile', num: '34', title: 'Регистрация и вход на сервере задания' },
   'shop-cart': { track: 'mobile', num: '35', title: 'Корзина и заказ: сервер без проверок' },
   'shop-files': { track: 'mobile', num: '36', title: 'Картинки и загрузка файлов' },
+  'shop-failures': { track: 'mobile', num: '37', title: 'Отказы, повторы и выход из аккаунта' },
   'device-features': { track: 'mobile', num: '39', title: 'Возможности устройства: камера, уведомления, виджет' },
   'testing-mobile': { track: 'mobile', num: '40', title: 'Тестирование: MockWebServer, фейки и TDD' },
   'kotlin-vs-java': { track: 'mobile', num: '41', title: 'Kotlin и Java: в чём разница' },

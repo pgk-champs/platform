@@ -3517,5 +3517,32 @@
       "title": "Image loading in Android via Coil | Bored Ape Yacht Club | Kotlin 2022",
       "channel": "The Android Factory"
     }
+  ],
+  "shop-failures": [
+    {
+      "videoId": "MiLN2vs2Oe0",
+      "title": "This Is My FAVORITE Error Handling Class",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "kos9ZDrpu_0",
+      "title": "Proper Error Handling in Android & Kotlin Multiplatform",
+      "channel": "Ahmed Guedmioui"
+    },
+    {
+      "videoId": "4KZ0NSTgQeA",
+      "title": "Sealed Class vs Sealed Interface in Kotlin – When to Use Each? | Android Interview Guide",
+      "channel": "DroidStack"
+    },
+    {
+      "videoId": "VWlwkqmTLHc",
+      "title": "In-Depth Guide to Coroutine Cancellation & Exception Handling - Android Studio Tutorial",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "6qhiPGvpRgU",
+      "title": "Error handling in Android : easy way!",
+      "channel": "Renaro Santos"
+    }
   ]
 }

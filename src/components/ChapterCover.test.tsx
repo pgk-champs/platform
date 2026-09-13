@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import ChapterCover, { CHAPTER_IDS, TrackBanner, coverFontSize } from './ChapterCover';
 
 test('покрыты все главы', () => {
-  expect(CHAPTER_IDS).toHaveLength(132);
+  expect(CHAPTER_IDS).toHaveLength(133);
 });
 
 test('заголовок обложки умещается в ширину 800', () => {

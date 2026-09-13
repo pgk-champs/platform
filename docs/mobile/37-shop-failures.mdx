@@ -1,0 +1,424 @@
+---
+title: 'Отказы, повторы и выход из аккаунта'
+audience: 'мобилка'
+level: 'углубление'
+order: 37
+sidebar_position: 37
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="shop-failures" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import KotlinPlay from '@site/src/components/KotlinPlay';
+
+# Отказы, повторы и выход из аккаунта
+
+<ChapterProgress chapterId="shop-failures" totalSections={10} totalQuizzes={4} totalTrainers={0} />
+
+<CollapsibleToc toc={toc} chapterId="shop-failures" />
+
+## Зачем это нужно
+
+Все предыдущие главы описывали, как что-то получается. Эта — про то, как всё это ломается, и про два критерия задания, которые целиком посвящены ошибкам.
+
+Проверяют их буквально: эксперт включает самолётный режим и смотрит на экран. Приложение, которое в этот момент падает или показывает пустоту без объяснений, теряет баллы независимо от того, насколько хорошо работает при живой сети.
+
+Сюда же попадает выход из аккаунта — потому что в спецификации задания он описан запросом, который на самом деле делает не то, что кажется.
+
+<SectionAnchor chapterId="shop-failures" sectionId="zachem" />
+
+## Отказы бывают трёх пород
+
+Retrofit сообщает о неудаче исключением, но исключения эти принципиально разные.
+
+**Первая порода: до сервера не дошли.** Сети нет, адрес не разрешается, соединение оборвалось. Кода ответа нет вовсе.
+
+```
+── хост не существует ──
+   UnknownHostException → NoNetwork
+```
+
+**Вторая: сервер не ответил вовремя.** Соединение было, ответа не дождались.
+
+```
+── таймаут: 1 миллисекунда на всё ──
+   SocketTimeoutException → Timeout
+```
+
+**Третья: сервер ответил, но отказом.** Код есть, тело есть, и это уже разговор.
+
+```
+── ошибка сервера 404 ──
+   HttpException → Server(code=404, message=Not Found)
+```
+
+<Hint type="important">
+Эта разница важнее, чем кажется. `UnknownHostException` и `SocketTimeoutException` наследуются от `IOException` — их ловит `catch (e: IOException)`. А `HttpException` от `IOException` **не** наследуется: он приходит из Retrofit, а не из сети.
+
+Поэтому `catch (e: IOException)` в одиночку пропустит все ошибки сервера — самые частые. Ловить надо обе ветки, а лучше `Throwable` в одном месте, где происходит разбор.
+</Hint>
+
+<SectionAnchor chapterId="shop-failures" sectionId="porody" />
+
+## Один разбор на всё приложение
+
+Экрану не нужно знать про `SocketTimeoutException`. Ему нужно знать, что показать. Между ними — небольшой разбор, который пишется один раз:
+
+```kotlin
+sealed interface Failure {
+    data object NoNetwork : Failure
+    data object Timeout : Failure
+    data class Server(val code: Int, val message: String) : Failure
+    data class Unknown(val cause: String) : Failure
+}
+
+private fun classify(e: Throwable): Failure = when (e) {
+    is UnknownHostException -> Failure.NoNetwork
+    is SocketTimeoutException -> Failure.Timeout
+    is HttpException -> Failure.Server(e.code(), e.message())
+    is IOException -> Failure.NoNetwork
+    else -> Failure.Unknown(e::class.simpleName ?: "?")
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'sealed interface', label: 'закрытый набор', note: 'вариантов ровно столько, сколько объявлено, и компилятор об этом знает: в when по Failure он потребует разобрать все и не даст забыть новый' },
+  { text: 'data object NoNetwork', label: 'вариант без данных', note: 'объект-одиночка: у «нет сети» нет подробностей, хранить нечего. data добавляет человеческий toString' },
+  { text: 'data class Server(val code: Int, …)', label: 'вариант с данными', note: 'у ошибки сервера есть код, и он нужен дальше — чтобы решить, повторять запрос или нет' },
+  { text: 'is IOException ->', label: 'ловушка в конце', note: 'порядок важен: SocketTimeoutException тоже IOException, и если поставить эту ветку выше, таймаут никогда не распознается' },
+]} />
+
+<Figure scheme="sx-classify" caption="Исключения превращаются в четыре исхода, а те — в подписи на экране" />
+
+<Hint type="fact">
+Порядок веток в `when` — не мелочь. `UnknownHostException` и `SocketTimeoutException` оба наследуются от `IOException`. Поставьте общую ветку `is IOException` первой — и обе частные окажутся мёртвым кодом: сработает всегда первая подходящая. Компилятор об этом **не предупредит**, потому что формально код корректен.
+</Hint>
+
+<SectionAnchor chapterId="shop-failures" sectionId="razbor" />
+
+## Четыре состояния экрана
+
+Списковый экран бывает в четырёх состояниях, и путать их нельзя: «пусто, потому что не нашли» и «пусто, потому что не дошли» — это разные экраны с разными кнопками.
+
+<KotlinPlay code={`/** То, во что приложение превращает любой отказ. */
+sealed interface Failure {
+    data object NoNetwork : Failure
+    data object Timeout : Failure
+    data class Server(val code: Int) : Failure
+    data object Unknown : Failure
+}
+
+/** Состояние экрана: ровно четыре, и больше ничего. */
+sealed interface UiState<out T> {
+    data object Loading : UiState<Nothing>
+    data class Content<T>(val data: T) : UiState<T>
+    data object Empty : UiState<Nothing>
+    data class Error(val failure: Failure) : UiState<Nothing>
+}
+
+fun message(f: Failure): String = when (f) {
+    Failure.NoNetwork -> "Нет соединения. Проверьте интернет и повторите"
+    Failure.Timeout -> "Сервер не ответил. Попробуйте ещё раз"
+    is Failure.Server -> when (f.code) {
+        400 -> "Не получилось. Проверьте введённые данные"
+        404 -> "Не найдено"
+        in 500..599 -> "На сервере неполадки, мы уже знаем"
+        else -> "Ошибка \${f.code}"
+    }
+    Failure.Unknown -> "Что-то пошло не так"
+}
+
+fun canRetry(f: Failure): Boolean = when (f) {
+    Failure.NoNetwork, Failure.Timeout -> true
+    is Failure.Server -> f.code >= 500
+    Failure.Unknown -> false
+}
+
+fun render(state: UiState<List<String>>) = when (state) {
+    UiState.Loading -> "  [крутилка]"
+    is UiState.Content -> "  список: \${state.data.size} шт. \${state.data}"
+    UiState.Empty -> "  Ничего не найдено. Измените запрос"
+    is UiState.Error -> "  \${message(state.failure)}" +
+        (if (canRetry(state.failure)) "  [Повторить]" else "")
+}
+
+fun main() {
+    val cases = listOf(
+        UiState.Loading,
+        UiState.Content(listOf("Nike Air Max 270", "Nike Air Force 1")),
+        UiState.Empty,
+        UiState.Error(Failure.NoNetwork),
+        UiState.Error(Failure.Timeout),
+        UiState.Error(Failure.Server(404)),
+        UiState.Error(Failure.Server(503)),
+        UiState.Error(Failure.Server(400)),
+    )
+    cases.forEach { s ->
+        println(s::class.simpleName + ":")
+        println(render(s))
+    }
+}`} />
+
+Настоящий вывод:
+
+```
+Loading:
+  [крутилка]
+Content:
+  список: 2 шт. [Nike Air Max 270, Nike Air Force 1]
+Empty:
+  Ничего не найдено. Измените запрос
+Error:
+  Нет соединения. Проверьте интернет и повторите  [Повторить]
+Error:
+  Сервер не ответил. Попробуйте ещё раз  [Повторить]
+Error:
+  Не найдено
+Error:
+  На сервере неполадки, мы уже знаем  [Повторить]
+Error:
+  Не получилось. Проверьте введённые данные
+```
+
+Обратите внимание на кнопку «Повторить»: она появляется не всегда. Под ошибкой 400 её нет — повторять бессмысленно, ничего не изменится.
+
+<Hint type="tip">
+`Empty` — отдельное состояние, а не `Content` с пустым списком. Если их не разделить, экран поиска после неудачного запроса покажет просто ничего: ни подписи, ни подсказки. Это самая частая потеря балла по критерию «поиск», причём сам поиск при этом работает правильно.
+</Hint>
+
+<Block kind="quiz">
+<SelfCheck chapterId="shop-failures" questions={[
+  { q: 'Почему catch (e: IOException) пропустит ошибки сервера?', options: ['IOException ловит только чтение файлов', 'HttpException не наследуется от IOException — он приходит из Retrofit, а не из сети', 'Нужен catch по Exception', 'Ошибки сервера не бросают исключений'], correct: 1, why: 'А UnknownHostException и SocketTimeoutException как раз наследуются от IOException.' },
+  { q: 'Ветку is IOException поставили первой в when. Что случится?', options: ['Ничего', 'Таймаут и отсутствие сети никогда не распознаются отдельно — сработает общая ветка, и компилятор не предупредит', 'Код не соберётся', 'Исключения перестанут ловиться'], correct: 1, why: 'Формально код корректен, поэтому ошибка обнаружится только на демонстрации.' },
+  { q: 'Зачем Empty — отдельное состояние, а не Content с пустым списком?', options: ['Так быстрее', 'Иначе экран после неудачного поиска покажет пустоту без подписи и подсказки', 'Этого требует Compose', 'Чтобы работал Loading'], correct: 1, why: '«Ничего не найдено» и «не смогли загрузить» — разные экраны с разными кнопками.' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="shop-failures" sectionId="sostoyaniya" />
+
+## Повторять или не повторять
+
+Повтор — самый дешёвый способ пережить моргнувшую сеть. И самый лёгкий способ оформить заказ дважды.
+
+<Figure scheme="sx-retry" caption="Повтор помогает при сетевых бедах и вредит при отказах по существу" />
+
+```kotlin
+private suspend fun <T> retrying(times: Int, block: suspend () -> T): T {
+    var wait = 300L
+    repeat(times - 1) { attempt ->
+        try { return block() } catch (e: Throwable) {
+            val f = classify(e)
+            val worthRetry = f is Failure.NoNetwork || f is Failure.Timeout ||
+                (f is Failure.Server && f.code >= 500)
+            if (!worthRetry) throw e
+            delay(wait)
+            wait *= 2
+        }
+    }
+    return block()
+}
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'suspend () -> T', label: 'приостанавливаемая функция', note: 'параметром принимается сам запрос. Так одну обёртку можно надеть на любой метод интерфейса' },
+  { text: 'repeat(times - 1)', label: 'попытки с паузой', note: 'минус один, потому что последняя попытка делается после цикла — уже без «поймать и подождать», чтобы её исключение ушло наверх' },
+  { text: 'if (!worthRetry) throw e', label: 'выход сразу', note: 'ошибка по существу не станет лучше от повторения. Три попытки лишь задержат сообщение на две секунды' },
+  { text: 'wait *= 2', label: 'растущая пауза', note: '300, 600, 1200 мс. Если сервер лежит под нагрузкой, дружный повтор всех клиентов через равные промежутки добьёт его окончательно' },
+]} />
+
+Живой прогон — сначала на недоступном хосте, потом на ошибке 404:
+
+```
+── повторы на недоступном хосте ──
+      попытка 1: NoNetwork, повторяем=true
+      попытка 2: NoNetwork, повторяем=true
+   сдались: NoNetwork
+── повторы на ошибке 404: повтора быть не должно ──
+      попытка 1: Server(code=404, message=Not Found), повторяем=false
+   сдались сразу: Server(code=404, message=Not Found)
+```
+
+<Hint type="important">
+Автоматически повторять можно только **чтение**. Повтор `POST` — это вторая корзина, второй заказ, второй зарегистрированный пользователь. Сервер задания не умеет распознавать дубли запросов, и защиты у него никакой.
+
+Для отправляющих запросов повтор отдают пользователю: кнопка «Повторить» на экране. Тогда решение принимает человек, и оно осознанное.
+</Hint>
+
+<SectionAnchor chapterId="shop-failures" sectionId="povtory" />
+
+## Таймауты
+
+По умолчанию OkHttp ждёт ответа **десять секунд**. На демонстрации это вечность: эксперт включил самолётный режим, нажал обновление и десять секунд смотрит на крутилку.
+
+```kotlin
+val client = OkHttpClient.Builder()
+    .connectTimeout(5, TimeUnit.SECONDS)
+    .readTimeout(8, TimeUnit.SECONDS)
+    .writeTimeout(8, TimeUnit.SECONDS)
+    .build()
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'connectTimeout', label: 'дозвониться', note: 'сколько ждать установки соединения. Если сети нет совсем, ошибка придёт раньше — по невозможности разрешить имя' },
+  { text: 'readTimeout', label: 'дождаться ответа', note: 'сколько ждать данных после отправки запроса. Именно он срабатывает, когда сервер задумался' },
+  { text: 'writeTimeout', label: 'отправить', note: 'важен при загрузке файлов: большая картинка по слабой сети уходит долго, и слишком короткий срок оборвёт загрузку' },
+]} />
+
+<Hint type="tip">
+Не делайте таймаут слишком коротким «для скорости». Загрузка картинки в несколько мегабайт по мобильной сети легко занимает больше восьми секунд — и оборвётся ровно в тот момент, когда эксперт проверяет загрузку фото. Разумно: короткий `connectTimeout` и разные `readTimeout` для обычных запросов и для загрузки файлов.
+</Hint>
+
+<Block kind="quiz">
+<SelfCheck chapterId="shop-failures" questions={[
+  { q: 'Сколько OkHttp ждёт ответа по умолчанию?', options: ['2 секунды', '10 секунд', '30 секунд', 'Бесконечно'], correct: 1, why: 'На демонстрации это десять секунд крутилки в самолётном режиме.' },
+  { q: 'Какой таймаут срабатывает, когда сервер получил запрос, но молчит?', options: ['connectTimeout', 'readTimeout', 'writeTimeout', 'callTimeout'], correct: 1, why: 'connectTimeout отвечает за установку соединения, writeTimeout — за отправку тела.' },
+  { q: 'Почему не стоит делать writeTimeout коротким?', options: ['Сервер не успеет ответить', 'Загрузка картинки по мобильной сети легко занимает больше восьми секунд и оборвётся на середине', 'Это запрещено OkHttp', 'Иначе не работает connectTimeout'], correct: 1, why: 'Разумно держать разные сроки для обычных запросов и для загрузки файлов.' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="shop-failures" sectionId="taymauty" />
+
+## Выход из аккаунта
+
+В спецификации задания есть два запроса про сессии:
+
+```
+GET    /api/collections/_authOrigins/records            — «Получение id токена»
+DELETE /api/collections/_authOrigins/records/{id_token} — «Удаление пользователя»
+```
+
+Названия сбивают с толку, поэтому разберёмся, что это на самом деле.
+
+`_authOrigins` — служебная коллекция PocketBase, где хранится **журнал устройств**, с которых входили. При входе создаётся запись с отпечатком устройства:
+
+```json
+{
+  "collectionRef": "_pb_users_auth_",
+  "created": "2026-09-13 07:34:11.249Z",
+  "fingerprint": "ccf6ba5952e8a1071787d1264e3e4626",
+  "id": "08vundvfa27btfm",
+  "recordRef": "ned6nzkcrtqip6s"
+}
+```
+
+Каждый видит только свои записи; попытка удалить чужую даёт 404 — знакомая маскировка запрета.
+
+А теперь главное. Удалим запись и попробуем тем же токеном сходить за профилем:
+
+```
+=== удаляем сессию jyzt8jc2m2lb3ww ===
+код 204
+=== работает ли токен после удаления сессии? ===
+код 200
+=== корзина тем же токеном ===
+код 200
+=== сессий осталось ===
+0
+```
+
+<Figure scheme="sx-logout" caption="Запись сессии удалена, список пуст — а токен продолжает работать" />
+
+<Hint type="important">
+Удаление записи `_authOrigins` **не отзывает токен**. Оно стирает отметку об устройстве — и всё. Токен остаётся годным до своего срока `exp`, то есть пять суток.
+
+Значит, «выход» в приложении — это **стереть токен со своего устройства**. Никакого серверного запроса для этого не нужно и не существует. Запрос из спецификации полезен для экрана «активные устройства», но выходом не является.
+</Hint>
+
+Правильный выход выглядит так:
+
+```kotlin
+suspend fun logout() {
+    store.clearToken()       // токен из DataStore
+    store.clearUserId()      // и идентификатор рядом с ним
+    cartCache.clear()        // локальная копия корзины — иначе её увидит следующий
+    navigateToLogin()
+}
+```
+
+<Hint type="fact">
+Пункт про локальную корзину — не теория. Вышли, вошли другим пользователем, увидели чужие товары — это замечают сразу, и выглядит это хуже, чем любая сетевая ошибка. Всё, что относилось к прежнему пользователю, чистится в одном месте вместе с токеном.
+</Hint>
+
+<Block kind="quiz">
+<SelfCheck chapterId="shop-failures" questions={[
+  { q: 'Что делает DELETE /_authOrigins/records/{id}?', options: ['Отзывает токен', 'Удаляет пользователя', 'Удаляет запись об устройстве в журнале; токен при этом продолжает работать', 'Завершает все сессии'], correct: 2, why: 'Проверено вживую: после удаления тот же токен отдаёт и профиль, и корзину с кодом 200.' },
+  { q: 'Как правильно сделать выход из аккаунта на этом сервере?', options: ['Запросом DELETE к _authOrigins', 'Стереть токен с устройства — серверного отзыва здесь нет', 'Сменить пароль', 'Дождаться истечения exp'], correct: 1, why: 'Токен годен до своего срока независимо от того, что происходит в журнале устройств.' },
+  { q: 'Какие запросы можно повторять автоматически?', options: ['Любые', 'Только чтение: повтор POST создаст второй заказ', 'Только POST', 'Только те, что вернули 400'], correct: 1, why: 'Сервер задания не распознаёт дубли запросов, поэтому повтор отправляющего запроса опасен.' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="shop-failures" sectionId="vyhod" />
+
+## Типичные ошибки
+
+**1. Один `catch (e: IOException)`.** Пропускает все ошибки сервера — самые частые.
+
+**2. Общая ветка `is IOException` выше частных.** Таймаут и отсутствие сети сливаются в одно, компилятор молчит.
+
+**3. Текст исключения показан пользователю.** `UnknownHostException: api.matule.ru` под списком товаров — это не сообщение об ошибке, а утечка внутренностей.
+
+**4. Нет состояния «пусто».** Поиск, который ничего не нашёл, выглядит сломанным.
+
+**5. Автоповтор на `POST`.** Два заказа вместо одного.
+
+**6. Таймаут по умолчанию.** Десять секунд крутилки в самолётном режиме.
+
+**7. Выход через запрос к `_authOrigins`.** Токен остаётся годным; при этом в интерфейсе всё выглядит как выход.
+
+**8. Локальные данные не очищены при выходе.** Следующий пользователь видит чужую корзину.
+
+<SectionAnchor chapterId="shop-failures" sectionId="oshibki" />
+
+## Что засчитывает эксперт
+
+Отдельные критерии задания про ошибки проверяются так:
+
+- в самолётном режиме приложение не падает, а показывает понятную подпись и кнопку повтора;
+- после возврата сети повтор работает, и данные появляются;
+- ошибка формы показана под нужным полем, а не общим сообщением;
+- поиск без результатов показывает «ничего не найдено», а не пустой экран;
+- выход из аккаунта уводит на экран входа, и после него не видно чужих данных.
+
+<Hint type="tip">
+Проверить всё это можно за минуту, не дожидаясь эксперта: включить самолётный режим и пройти по всем экранам подряд. Обычно первым падает экран, о котором забыли, — например, карточка товара, открытая из поиска.
+</Hint>
+
+<SectionAnchor chapterId="shop-failures" sectionId="kriterij" />
+
+## Куда углубиться
+
+- `ConnectivityManager` — узнать, есть ли сеть, **до** запроса и показать подсказку заранее.
+- Интерцептор-повторщик OkHttp: повторы на уровне клиента, а не в каждом вызове.
+- `Result` и `runCatching` — способ вернуть отказ значением, а не исключением.
+- Очередь отложенных действий: сохранить «добавить в корзину» и выполнить, когда сеть вернётся.
+- `WorkManager` — отправка, которая переживает закрытие приложения.
+
+<SectionAnchor chapterId="shop-failures" sectionId="uglubitsya" />
+
+<ChapterExam chapterId="shop-failures" questions={[
+  { q: 'Какое исключение приходит, когда сети нет совсем?', options: ['HttpException', 'UnknownHostException', 'SocketTimeoutException', 'NullPointerException'], correct: 1, why: 'Имя сервера не удалось разрешить — до соединения дело не дошло.' },
+  { q: 'HttpException наследуется от IOException?', options: ['Да', 'Нет: он приходит из Retrofit, а не из сети, и общим catch по IOException не ловится', 'Только при коде 5xx', 'Зависит от версии'], correct: 1, why: 'Поэтому один catch по IOException пропустит все ответы сервера с ошибкой.' },
+  { q: 'Зачем в повторах пауза удваивается?', options: ['Для красоты', 'Чтобы дружные повторы всех клиентов не добили сервер, которому и так плохо', 'Так требует OkHttp', 'Чтобы уложиться в таймаут'], correct: 1, why: '300, 600, 1200 мс — сервер получает передышку между попытками.' },
+  { q: 'На какие отказы повтор бессмысленен?', options: ['Таймаут', 'Нет сети', '400, 404, 403 — запрос не изменится и прав не прибавится', '503'], correct: 2, why: 'Повтор лишь задержит сообщение пользователю на пару секунд.' },
+  { q: 'Сколько ждёт ответа OkHttp по умолчанию?', options: ['2 секунды', '10 секунд', '30 секунд', 'Бесконечно'], correct: 1, why: 'На демонстрации это десять секунд крутилки в самолётном режиме.' },
+  { q: 'Что хранится в коллекции _authOrigins?', options: ['Токены', 'Пароли', 'Журнал устройств: отпечаток, ссылка на пользователя и время', 'История заказов'], correct: 2, why: 'Каждый видит только свои записи, чужая по идентификатору даёт 404.' },
+  { q: 'После DELETE записи _authOrigins тот же токен…', options: ['Перестаёт работать', 'Продолжает работать до своего exp', 'Работает только для чтения', 'Требует обновления'], correct: 1, why: 'Проверено вживую: профиль и корзина отвечают 200 тем же токеном.' },
+  { q: 'Что обязательно сделать при выходе из аккаунта, кроме удаления токена?', options: ['Ничего', 'Очистить локальные данные прежнего пользователя, включая копию корзины', 'Сменить пароль', 'Удалить запись в _authOrigins'], correct: 1, why: 'Иначе следующий вошедший увидит чужие товары — это замечают сразу.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [OkHttp — таймауты и повторы](https://lysine.dev/okhttp/features/calls/) — из чего состоит вызов и какие сроки на него действуют.
+- [Retrofit — аннотации запросов](https://lysine.dev/retrofit/) — `HttpException`, `Response` и работа с телом ошибки.
+- [Kotlin — sealed-классы и интерфейсы](https://kotlinlang.org/docs/sealed-classes.html) — закрытые иерархии и исчерпывающий `when`.
+- [Мониторинг состояния сети на Android](https://developer.android.com/training/monitoring-device-state/connectivity-status-type) — как узнать про сеть заранее.
