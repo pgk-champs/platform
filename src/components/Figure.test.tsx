@@ -36,6 +36,7 @@ import { shopFilesSchemes } from './figures/shopFiles';
 import { shopFailuresSchemes } from './figures/shopFailures';
 import { shopDaySchemes } from './figures/shopDay';
 import { consoleIoSchemes } from './figures/consoleIo';
+import { compositionSchemes } from './figures/composition';
 import { authSessionSchemes } from './figures/authSession';
 import { deviceFeaturesSchemes } from './figures/deviceFeatures';
 import { testingMobileSchemes } from './figures/testingMobile';
@@ -189,6 +190,7 @@ test('имена схем не повторяются между модулям�
     ...Object.keys(shopFailuresSchemes),
     ...Object.keys(shopDaySchemes),
     ...Object.keys(consoleIoSchemes),
+    ...Object.keys(compositionSchemes),
     ...Object.keys(authSessionSchemes),
     ...Object.keys(deviceFeaturesSchemes),
     ...Object.keys(testingMobileSchemes),

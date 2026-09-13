@@ -1,0 +1,386 @@
+---
+title: 'Картинки и загрузка файлов'
+audience: 'мобилка'
+level: 'углубление'
+order: 38
+sidebar_position: 38
+---
+
+import ChapterCover from '@site/src/components/ChapterCover';
+
+<ChapterCover chapterId="shop-files" />
+
+import SelfCheck from '@site/src/components/SelfCheck';
+import ChapterExam from '@site/src/components/ChapterExam';
+import Block from '@site/src/components/Block';
+import Hint from '@site/src/components/Hint';
+import CollapsibleToc from '@site/src/components/CollapsibleToc';
+import ChapterProgress from '@site/src/components/ChapterProgress';
+import SectionAnchor from '@site/src/components/SectionAnchor';
+import Figure from '@site/src/components/Figure';
+import SyntaxBreakdown from '@site/src/components/SyntaxBreakdown';
+import KotlinPlay from '@site/src/components/KotlinPlay';
+
+# Картинки и загрузка файлов
+
+<ChapterProgress chapterId="shop-files" totalSections={10} totalQuizzes={4} totalTrainers={0} />
+
+<CollapsibleToc toc={toc} chapterId="shop-files" />
+
+## Зачем это нужно
+
+Магазин без картинок не бывает. В спецификации задания есть два места, где живут файлы: акции (`news` с полем `newsImage`) и проекты (`project` с полем `image`). Первое — только читать, второе — ещё и **загружать**, причём загрузка описана как `multipart/form-data`, то есть не обычным JSON.
+
+Загрузка файла — отдельный навык. Она не похожа на остальные запросы ни телом, ни аннотациями, и обычный `@Body` здесь не работает. А про то, как показать картинку, у PocketBase своя особенность: в записи лежит **имя файла, а не ссылка**, и адрес нужно собрать самому.
+
+<SectionAnchor chapterId="shop-files" sectionId="zachem" />
+
+## Что приходит в записи
+
+Запросим акции — это тот самый запрос «Акции и новости» из спецификации:
+
+```
+GET /api/collections/news/records
+```
+
+```json
+{
+  "items": [
+    {
+      "collectionId": "pbc_987692768",
+      "collectionName": "news",
+      "id": "yzzw0qwd6b6bo0c",
+      "newsImage": "banner_y2zhtudxtd.png",
+      "title": "Скидка 20% на всё лето"
+    }
+  ],
+  "page": 1,
+  "perPage": 30,
+  "totalItems": 3,
+  "totalPages": 1
+}
+```
+
+В поле `newsImage` — не адрес, а **имя файла**. Подставить его в загрузчик картинок напрямую нельзя: получится запрос к `banner_y2zhtudxtd.png` относительно текущего адреса, и картинка не найдётся.
+
+<Figure scheme="sf-file-url" caption="Адрес файла собирается из трёх полей записи" />
+
+Правило сборки одно:
+
+```
+/api/files/{collectionId}/{id записи}/{имя файла}
+```
+
+Все три части лежат в самой записи — специально для этого PocketBase и присылает служебное поле `collectionId`, которое в прошлых главах мы игнорировали.
+
+<KotlinPlay code={`data class NewsDto(
+    val id: String,
+    val collectionId: String,
+    val title: String,
+    val newsImage: String = "",
+)
+
+const val BASE = "https://style-matule.apis.alspio.com/api"
+
+/** Собирает адрес файла или null, если файла нет. */
+fun fileUrl(collectionId: String, recordId: String, name: String, thumb: String? = null): String? {
+    if (name.isBlank()) return null
+    val suffix = if (thumb == null) "" else "?thumb=\$thumb"
+    return "\$BASE/files/\$collectionId/\$recordId/\$name\$suffix"
+}
+
+fun main() {
+    // то, что реально пришло со стенда
+    val news = listOf(
+        NewsDto("yzzw0qwd6b6bo0c", "pbc_987692768", "Скидка 20% на всё лето", "banner_y2zhtudxtd.png"),
+        NewsDto("33b2r4vv4rbabdr", "pbc_987692768", "Новая коллекция уже в продаже", "banner_o8i7lwqves.png"),
+        NewsDto("bez0kartinki0000", "pbc_987692768", "Акция без баннера", ""),
+    )
+
+    news.forEach { n ->
+        val url = fileUrl(n.collectionId, n.id, n.newsImage)
+        println(n.title)
+        println("  " + (url ?: "картинки нет — рисуем заглушку"))
+    }
+
+    println()
+    println("уменьшенная копия:")
+    println("  " + fileUrl(news[0].collectionId, news[0].id, news[0].newsImage, thumb = "300x120"))
+}`} />
+
+Настоящий вывод:
+
+```
+Скидка 20% на всё лето
+  https://style-matule.apis.alspio.com/api/files/pbc_987692768/yzzw0qwd6b6bo0c/banner_y2zhtudxtd.png
+Новая коллекция уже в продаже
+  https://style-matule.apis.alspio.com/api/files/pbc_987692768/33b2r4vv4rbabdr/banner_o8i7lwqves.png
+Акция без баннера
+  картинки нет — рисуем заглушку
+```
+
+<Hint type="important">
+Возвращать `null` при пустом имени — не педантизм. Поле файла **вполне может быть пустой строкой**: запись создана, файл не приложен. Если собрать адрес всё равно, получится ссылка, оканчивающаяся на слэш, загрузчик сходит за ней впустую и покажет ошибку. С `null` на этом месте ставится заглушка, и список выглядит целым.
+</Hint>
+
+<SectionAnchor chapterId="shop-files" sectionId="imya-fayla" />
+
+## Показать картинку
+
+Картинки в Compose показывают через `Coil` — библиотеку, которая сама сходит в сеть, закэширует и покажет:
+
+```kotlin
+implementation("io.coil-kt:coil-compose:2.7.0")
+```
+
+```kotlin
+AsyncImage(
+    model = fileUrl(news.collectionId, news.id, news.newsImage),
+    contentDescription = news.title,
+    contentScale = ContentScale.Crop,
+    modifier = Modifier.fillMaxWidth().height(160.dp),
+)
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'model = …', label: 'что показать', note: 'принимает строку-адрес, файл, ресурс или null. При null покажется то, что задано в placeholder или ничего' },
+  { text: 'contentDescription', label: 'описание для озвучки', note: 'обязательный параметр: экранный диктор прочитает его вслух. Для чисто декоративной картинки пишут null, а не пустую строку' },
+  { text: 'contentScale = ContentScale.Crop', label: 'как вписать', note: 'Crop заполняет всю область, обрезая лишнее. Fit вписывает целиком, оставляя поля. Для баннеров обычно Crop' },
+  { text: 'Modifier.height(160.dp)', label: 'высота', note: 'без заданного размера карточки в списке будут прыгать, пока картинки грузятся — высоту задают заранее' },
+]} />
+
+<Hint type="tip">
+Картинки акций и каталога отдаются **без токена** — они публичные. А вот файлы, лежащие в закрытых коллекциях, потребуют заголовок, и тогда `Coil` придётся отдать свой `OkHttpClient` — тот самый, с интерцептором. На сервере задания это не нужно, но знать полезно.
+</Hint>
+
+<Block kind="quiz">
+<SelfCheck chapterId="shop-files" questions={[
+  { q: 'Что лежит в поле newsImage записи акции?', options: ['Полный адрес картинки', 'Имя файла — адрес собирается из collectionId, id записи и этого имени', 'Двоичные данные в base64', 'Идентификатор файла в отдельной коллекции'], correct: 1, why: 'Именно для этого PocketBase присылает служебное поле collectionId.' },
+  { q: 'Поле файла пришло пустой строкой. Что делать?', options: ['Собрать адрес как обычно', 'Вернуть null и показать заглушку — иначе загрузчик сходит по битой ссылке', 'Повторить запрос', 'Считать это ошибкой сервера'], correct: 1, why: 'Запись без приложенного файла — обычное дело, и список не должен из-за этого выглядеть сломанным.' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="shop-files" sectionId="pokazat" />
+
+## Уменьшенные копии
+
+У PocketBase есть параметр `?thumb=ШИРИНАxВЫСОТА`, который отдаёт уменьшенную версию. Выглядит как бесплатная экономия трафика — но работает не всегда.
+
+<Figure scheme="sf-thumb" caption="Три запроса одного файла: два размера уменьшены, третий вернул оригинал" />
+
+Проверено на стенде, файл 600×240:
+
+| Запрос | Ответ |
+| --- | --- |
+| без параметра | 810 байт — оригинал |
+| `?thumb=100x100` | 226 байт |
+| `?thumb=300x120` | 633 байта |
+| `?thumb=50x50` | 810 байт — **оригинал** |
+
+<Hint type="important">
+Размеры уменьшенных копий объявляются **в настройках поля коллекции**. Запрос незаявленного размера не даёт ошибки — молча приходит файл целиком. То есть `?thumb=` может «работать» в том смысле, что картинка показывается, и при этом не экономить ни байта.
+
+На чужом сервере узнать список заявленных размеров нельзя. Поэтому надёжнее просить оригинал: `Coil` всё равно масштабирует картинку под размер области и кэширует уже уменьшенную.
+</Hint>
+
+<SectionAnchor chapterId="shop-files" sectionId="thumb" />
+
+## Загрузка: почему не @Body
+
+Создание проекта в спецификации описано как `multipart/form-data`. Это другой формат тела: вместо одного JSON — несколько частей, разделённых строкой-границей, и каждая со своим именем.
+
+<Figure scheme="sf-multipart" caption="Части multipart-запроса и аннотации, которые их описывают" />
+
+Причина проста: JSON — текстовый формат, а картинка двоичная. Засунуть её в JSON можно только закодировав в base64, что раздувает объём на треть и требует раскодирования на сервере. Multipart отправляет байты как есть.
+
+Retrofit описывает такой запрос двумя новыми аннотациями:
+
+```kotlin
+@Multipart
+@POST("collections/project/records")
+suspend fun createProject(
+    @Part("title") title: RequestBody,
+    @Part("user_id") userId: RequestBody,
+    @Part("category") category: RequestBody,
+    @Part("description_source") description: RequestBody,
+    @Part image: MultipartBody.Part,
+): ProjectDto
+```
+
+<SyntaxBreakdown parts={[
+  { text: '@Multipart', label: 'вид тела', note: 'ставится на метод. Без неё Retrofit откажется собирать запрос и сообщит, что @Part можно использовать только в multipart-методе' },
+  { text: '@Part("title") title: RequestBody', label: 'обычное поле', note: 'имя части — в скобках. Обычную строку нельзя передать напрямую: её оборачивают в RequestBody' },
+  { text: '@Part image: MultipartBody.Part', label: 'файл', note: 'у файла имя в скобках НЕ ставится — оно уже внутри самой части. Поставить его — частая ошибка: имя уедет дважды' },
+  { text: 'description_source', label: 'имя от сервера', note: 'со знаком подчёркивания, как в спецификации. Здесь имена частей задаются строкой, а не через @SerialName' },
+]} />
+
+Обернуть строку и файл помогают две функции-расширения из OkHttp:
+
+```kotlin
+private fun text(v: String) = v.toRequestBody("text/plain".toMediaType())
+
+val part = MultipartBody.Part.createFormData(
+    "image",                 // имя части — то, что ждёт сервер
+    "moy-proekt.png",        // имя файла
+    bytes.toRequestBody("image/png".toMediaType()),
+)
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'toRequestBody("text/plain".toMediaType())', label: 'строка в тело', note: 'расширение OkHttp: превращает строку или массив байтов в тело части с указанным типом содержимого' },
+  { text: 'createFormData(имя, имяФайла, тело)', label: 'часть с файлом', note: 'собирает часть с заголовком Content-Disposition: form-data; name="image"; filename="moy-proekt.png"' },
+  { text: '"image/png".toMediaType()', label: 'тип файла', note: 'сервер может проверять его. Указать text/plain для картинки — получить отказ по типу содержимого' },
+]} />
+
+Живой прогон загрузки:
+
+```
+── загружаем проект с картинкой ──
+   размер файла: 1290 байт
+   создан 0nluoj149pnafrh, поле image = moy_proekt_8sdyyvnieu.png
+   адрес: https://style-matule.apis.alspio.com/api/files/pbc_3202395908/0nluoj149pnafrh/moy_proekt_8sdyyvnieu.png
+```
+
+<Hint type="important">
+Мы отправили файл с именем `moy-proekt.png`, а в записи оказалось `moy_proekt_8sdyyvnieu.png`. Сервер **переименовывает файл**: заменяет дефисы подчёркиваниями и добавляет случайный суффикс, чтобы два файла с одним именем не затёрли друг друга.
+
+Отсюда правило: адрес картинки строится по имени **из ответа**, а не по тому, что отправляли. Приложение, которое «помнит», как назвало файл, покажет битую ссылку.
+</Hint>
+
+<Block kind="quiz">
+<SelfCheck chapterId="shop-files" questions={[
+  { q: 'Почему файл нельзя отправить обычным @Body с JSON?', options: ['Retrofit этого не умеет', 'JSON текстовый, а файл двоичный: пришлось бы кодировать в base64 с потерей трети объёма', 'Сервер запрещает JSON', 'Можно, но медленнее'], correct: 1, why: 'Multipart отправляет байты как есть, отдельной частью со своим типом содержимого.' },
+  { q: 'Чем @Part("image") отличается от @Part для файла?', options: ['Ничем', 'У части с файлом имя в скобках не ставится — оно уже внутри MultipartBody.Part', 'Файл требует @Body', '@Part("image") быстрее'], correct: 1, why: 'Указанное дважды имя — частая ошибка, из-за которой сервер не принимает часть.' },
+  { q: 'Отправили файл moy-proekt.png, в ответе пришло moy_proekt_8sdyyvnieu.png. Почему?', options: ['Ошибка сервера', 'PocketBase переименовывает файлы: заменяет дефисы и добавляет случайный суффикс против совпадений имён', 'Так сработал Retrofit', 'Файл был сжат'], correct: 1, why: 'Поэтому адрес строят по имени из ответа, а не по отправленному.' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="shop-files" sectionId="zagruzka" />
+
+## Когда файл не приняли
+
+Поле файла можно ограничить по размеру и типу. На стенде для `image` разрешены `image/png`, `image/jpeg` и `image/webp`, не больше 5 МБ. Попробуем отправить текстовый файл под видом картинки:
+
+```
+── чужой файл под видом картинки ──
+   код 400 · Failed to create record.
+      поле «image»: validation_invalid_mime_type — "vredonos_6d5majznwa.txt" mime type must be one of: image/png, image/jpeg, image/webp.
+```
+
+Ошибка приходит в том же виде, что и ошибки формы из главы про регистрацию: код `validation_invalid_mime_type` под ключом `image` в словаре `data`. Разбирается тем же классом `ApiError` — ничего нового писать не нужно.
+
+<Hint type="fact">
+Тип содержимого сервер определяет **по самим байтам**, а не по расширению и не по тому, что написано в `Content-Type` части. Переименовать `.txt` в `.png` не поможет: первые байты настоящего PNG — это подпись `89 50 4E 47`, и её отсутствие видно сразу.
+</Hint>
+
+Из этого следует, что проверять файл нужно и на устройстве — до отправки:
+
+- **размер**: сравнить с лимитом и сказать «Файл больше 5 МБ» сразу, а не после долгой загрузки по мобильной сети;
+- **тип**: у выбранного через системный выбор файла тип можно спросить у `ContentResolver`;
+- **сжатие**: снимок с камеры современного телефона легко весит 8–12 МБ, и его почти всегда нужно ужать перед отправкой.
+
+<SectionAnchor chapterId="shop-files" sectionId="otkaz" />
+
+## Откуда берётся файл на устройстве
+
+Выбор картинки из галереи делается системным экраном — без единого разрешения:
+
+```kotlin
+val picker = rememberLauncherForActivityResult(
+    ActivityResultContracts.PickVisualMedia(),
+) { uri -> chosen = uri }
+
+Button(onClick = {
+    picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+}) { Text("Выбрать фото") }
+```
+
+Приходит `Uri` — не файл и не путь. Чтобы отправить, содержимое надо прочитать:
+
+```kotlin
+val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+```
+
+<SyntaxBreakdown parts={[
+  { text: 'contentResolver.openInputStream(uri)', label: 'открыть поток', note: 'Uri может указывать куда угодно — в галерею, в облако, на другое приложение. Обычного пути к файлу за ним может не быть вовсе' },
+  { text: '?.use { … }', label: 'закрыть за собой', note: 'use закрывает поток в любом случае, даже при исключении. Без него поток останется открытым' },
+  { text: 'readBytes()', label: 'прочитать целиком', note: 'годится для картинки в несколько мегабайт. Для крупных файлов так делать нельзя — память кончится' },
+]} />
+
+<Hint type="tip">
+`PickVisualMedia` **не требует разрешения** на чтение хранилища: пользователь сам выбирает файл на системном экране, и приложение получает доступ только к нему. Запрашивать `READ_MEDIA_IMAGES` для выбора картинки — лишнее: диалог разрешения, который можно было не показывать, на оценке работает против вас.
+</Hint>
+
+<Block kind="quiz">
+<SelfCheck chapterId="shop-files" questions={[
+  { q: 'Что приходит из PickVisualMedia?', options: ['Путь к файлу на диске', 'Uri, содержимое которого читают через ContentResolver', 'Готовый Bitmap', 'Массив байтов'], correct: 1, why: 'Обычного пути за этим Uri может не быть: он способен указывать в облако или в другое приложение.' },
+  { q: 'Нужно ли разрешение READ_MEDIA_IMAGES для системного выбора картинки?', options: ['Да, обязательно', 'Нет: пользователь сам выбирает файл, и доступ даётся только к нему', 'Только на Android 13+', 'Только при съёмке камерой'], correct: 1, why: 'Лишний диалог разрешения на оценке работает против вас.' },
+  { q: 'Зачем поток оборачивают в use { … }?', options: ['Для краткости', 'use закрывает поток в любом случае, в том числе при исключении', 'Это ускоряет чтение', 'Иначе не работает readBytes'], correct: 1, why: 'Без use незакрытый поток останется висеть.' },
+]} />
+</Block>
+
+<SectionAnchor chapterId="shop-files" sectionId="otkuda-fayl" />
+
+## Типичные ошибки
+
+**1. Имя файла подставили как адрес.** Картинка не грузится, ошибки в коде нет. Адрес собирается из трёх частей.
+
+**2. Не проверили пустую строку.** Запись без файла даёт ссылку, оканчивающуюся слэшем, и в списке появляется битая картинка.
+
+**3. Адрес построили по отправленному имени.** Сервер переименовал файл; брать надо имя из ответа.
+
+**4. Забыли `@Multipart` на методе.** Retrofit скажет, что `@Part` можно применять только в multipart-запросе — при создании клиента, до всякой сети.
+
+**5. У файловой части указали имя в скобках.** Имя уедет дважды, и сервер часть не примет.
+
+**6. Понадеялись на `?thumb=`.** Незаявленный размер молча отдаёт оригинал — экономии нет, а кажется, что есть.
+
+**7. Отправили снимок с камеры как есть.** 10 МБ по мобильной сети — это десятки секунд и почти наверняка отказ по размеру.
+
+**8. Запросили разрешение на галерею.** `PickVisualMedia` работает без него.
+
+<SectionAnchor chapterId="shop-files" sectionId="oshibki" />
+
+## Что засчитывает эксперт
+
+Здесь закрыты три запроса: акции, список проектов и создание проекта с картинкой. Смотрят на это:
+
+- баннеры акций видны на главном экране и не «прыгают» при прокрутке;
+- у акции без картинки стоит заглушка, а не пустое место и не значок ошибки;
+- картинка выбирается из галереи и уходит на сервер;
+- после загрузки она сразу видна в списке — то есть адрес взят из ответа;
+- слишком большой или неверный файл отклоняется с понятным сообщением.
+
+<Hint type="fact">
+«Не прыгают при прокрутке» — это про заданную высоту у места под картинку. Без неё карточка сначала схлопывается до нуля, потом раздвигается, и список дёргается на каждой загруженной картинке. Замечают это сразу, а чинится одной строкой `Modifier.height(…)`.
+</Hint>
+
+<SectionAnchor chapterId="shop-files" sectionId="kriterij" />
+
+## Куда углубиться
+
+- `Coil`: `placeholder`, `error`, `crossfade` — заглушка, картинка ошибки и плавное появление.
+- Сжатие изображения перед отправкой: `BitmapFactory.Options.inSampleSize` и `Bitmap.compress`.
+- Показ прогресса загрузки: свой `RequestBody`, считающий отправленные байты.
+- `FileProvider` — как отдать своему же приложению файл, снятый камерой.
+- Кэш картинок `Coil`: где он лежит, сколько занимает и как его чистить.
+
+<SectionAnchor chapterId="shop-files" sectionId="uglubitsya" />
+
+<ChapterExam chapterId="shop-files" questions={[
+  { q: 'Как строится адрес файла в PocketBase?', options: ['/api/files/{имя файла}', '/api/files/{collectionId}/{id записи}/{имя файла}', '/api/collections/{коллекция}/files/{имя}', 'Адрес приходит готовым в записи'], correct: 1, why: 'Все три части лежат в самой записи, включая служебное collectionId.' },
+  { q: 'Какая аннотация обязательна на методе загрузки файла?', options: ['@Body', '@Multipart', '@FormUrlEncoded', '@Headers'], correct: 1, why: 'Без неё Retrofit откажется собирать запрос ещё при создании клиента.' },
+  { q: 'Как правильно объявить параметр с файлом?', options: ['@Part("image") image: MultipartBody.Part', '@Part image: MultipartBody.Part', '@Body image: File', '@Query("image") image: ByteArray'], correct: 1, why: 'Имя части уже задано внутри createFormData; указанное дважды, оно ломает запрос.' },
+  { q: '?thumb=50x50 вернул файл того же размера, что и оригинал. Почему?', options: ['Файл слишком мал', 'Этот размер не объявлен в настройках поля — незаявленные размеры молча отдают оригинал', 'Нужен токен', 'Параметр называется иначе'], correct: 1, why: 'Ошибки не будет: картинка покажется, но трафик не сэкономится.' },
+  { q: 'Сервер отказал с validation_invalid_mime_type. Где искать подробности?', options: ['В заголовках ответа', 'В словаре data под ключом поля файла — тем же классом ApiError, что и ошибки формы', 'В message', 'В коде ответа'], correct: 1, why: 'Формат ошибок у PocketBase один на все случаи.' },
+  { q: 'Что приходит из системного выбора картинки PickVisualMedia?', options: ['Путь к файлу', 'Uri, содержимое которого читают через ContentResolver', 'Готовый Bitmap', 'Массив байтов'], correct: 1, why: 'Обычного пути за этим Uri может не быть: он может указывать в облако или в другое приложение.' },
+  { q: 'Нужно ли разрешение READ_MEDIA_IMAGES для PickVisualMedia?', options: ['Да, обязательно', 'Нет: пользователь сам выбирает файл, и доступ даётся только к нему', 'Только на Android 13+', 'Только для камеры'], correct: 1, why: 'Лишний диалог разрешения на оценке работает против вас.' },
+  { q: 'Почему высоту места под картинку задают заранее?', options: ['Так требует Coil', 'Иначе карточки схлопываются и список дёргается по мере загрузки картинок', 'Для экономии трафика', 'Чтобы работал contentScale'], correct: 1, why: 'Чинится одной строкой Modifier.height(…), а замечается сразу.' },
+]} />
+
+## Куда дальше: проверенные ресурсы
+
+- [PocketBase — работа с файлами](https://pocketbase.io/docs/files-handling/) — адреса файлов, уменьшенные копии и защищённые файлы.
+- [Retrofit — аннотации запросов](https://lysine.dev/retrofit/) — `@Multipart`, `@Part` и правила их сочетания.
+- [Coil для Compose](https://coil-kt.github.io/coil/compose/) — `AsyncImage`, заглушки и настройка клиента.
+- [Выбор фото и видео на Android](https://developer.android.com/training/data-storage/shared/photopicker) — системный выбор без разрешений.

@@ -3598,5 +3598,32 @@
       "title": "Урок 10: Функции (методы), тип возвращаемого значения, return // Котлин курс с нуля",
       "channel": "Kotlin & Android с нуля – Иван Ветров"
     }
+  ],
+  "composition": [
+    {
+      "videoId": "oi8u-5Egcgk",
+      "title": "Composition over inheritance | Delegation design pattern | by keyword | Part 2: Kotlin",
+      "channel": "deCoded Programming"
+    },
+    {
+      "videoId": "qo-CrVZ8OwQ",
+      "title": "Kotlin - The 'by' keyword in 3 minutes",
+      "channel": "Konstantinos Reppas"
+    },
+    {
+      "videoId": "a6C9A5sLKTQ",
+      "title": "Composition Vs Inheritance (Seniors Must Know This)",
+      "channel": "Monsterlessons Academy"
+    },
+    {
+      "videoId": "baeHfmw1dis",
+      "title": "Kotlin Interfaces & Class Delegation | Kotlin Tutorial 2019",
+      "channel": "Cody Engel"
+    },
+    {
+      "videoId": "0Mri70Oi3qs",
+      "title": "Урок 10: Функции (методы), тип возвращаемого значения, return // Котлин курс с нуля",
+      "channel": "Kotlin & Android с нуля – Иван Ветров"
+    }
   ]
 }
