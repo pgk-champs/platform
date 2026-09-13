@@ -1887,6 +1887,25 @@ const ARTS: Record<string, () => React.ReactNode> = {
       <text x="100" y="180" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>21% глазами</text>
     </g>
   ),
+  /* конверт с числами снаружи и карточками внутри — арт «shop-catalog» */
+  'shop-catalog': () => (
+    <g strokeLinecap="round">
+      <rect x="18" y="34" width="164" height="104" rx="14" fill="rgba(0,0,0,0.3)" stroke={INK} strokeWidth={3} />
+      <text x="30" y="52" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>page 1 · perPage 5</text>
+      <text x="30" y="66" fontSize="8" fontWeight={800} fill={ACCENT} fontFamily={MONO}>totalItems 12 · totalPages 3</text>
+
+      <rect x="30" y="76" width="140" height="50" rx="9" fill={SOFT} stroke={ACCENT} strokeWidth={2} />
+      <text x="40" y="90" fontSize="7" fontWeight={800} fill="rgba(255,255,255,0.75)" fontFamily={MONO}>items</text>
+      <rect x="40" y="96" width="120" height="10" rx="4" fill="rgba(255,255,255,0.22)" />
+      <rect x="40" y="110" width="94" height="10" rx="4" fill="rgba(255,255,255,0.22)" />
+
+      <rect x="30" y="148" width="26" height="12" rx="4" fill={ACCENT} />
+      <rect x="62" y="148" width="26" height="12" rx="4" fill={ACCENT} />
+      <rect x="94" y="148" width="26" height="12" rx="4" fill={ACCENT} />
+      <rect x="126" y="148" width="26" height="12" rx="4" fill="none" stroke={SOFT} strokeWidth={2} />
+      <text x="100" y="182" textAnchor="middle" fontSize="12" fontWeight={800} fill={ACCENT} fontFamily={MONO}>конверт, не список</text>
+    </g>
+  ),
   /* три разрешения: два зелёных, одно перечёркнуто — арт «device-features» */
   'device-features': () => (
     <g strokeLinecap="round">
@@ -2321,10 +2340,11 @@ const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
   'cache-offline': { track: 'mobile', num: '30', title: 'Кэш и офлайн: база как источник истины' },
   'clean-code': { track: 'mobile', num: '31', title: 'Чистый код: комментарии и логирование, которые оценивают' },
   'auth-session': { track: 'mobile', num: '32', title: 'Авторизация: вход, живая сессия и биометрия' },
-  'device-features': { track: 'mobile', num: '33', title: 'Возможности устройства: камера, уведомления, виджет' },
-  'testing-mobile': { track: 'mobile', num: '34', title: 'Тестирование: MockWebServer, фейки и TDD' },
-  'kotlin-vs-java': { track: 'mobile', num: '35', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '36', title: 'История Java, Android и Kotlin' },
+  'shop-catalog': { track: 'mobile', num: '33', title: 'Каталог: конверт, страницы, поиск' },
+  'device-features': { track: 'mobile', num: '39', title: 'Возможности устройства: камера, уведомления, виджет' },
+  'testing-mobile': { track: 'mobile', num: '40', title: 'Тестирование: MockWebServer, фейки и TDD' },
+  'kotlin-vs-java': { track: 'mobile', num: '41', title: 'Kotlin и Java: в чём разница' },
+  'kotlin-history': { track: 'mobile', num: '42', title: 'История Java, Android и Kotlin' },
   'what-is-blockchain': { track: 'blockchain', num: '01', title: 'Что такое блокчейн' },
   'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
   'solidity-hello': { track: 'blockchain', num: '03', title: 'Первый контракт: из чего состоит код' },

@@ -416,11 +416,19 @@
     "path": "mobile/auth-session.mdx"
   },
   {
+    "id": "shop-catalog",
+    "title": "Каталог магазина: конверт, страницы, поиск",
+    "audience": "мобилка",
+    "level": "углубление",
+    "order": 33,
+    "path": "mobile/shop-catalog.mdx"
+  },
+  {
     "id": "device-features",
     "title": "Возможности устройства: камера, уведомления, виджет",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 33,
+    "order": 39,
     "path": "mobile/device-features.mdx"
   },
   {
@@ -428,7 +436,7 @@
     "title": "Тестирование: MockWebServer, фейки и TDD",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 34,
+    "order": 40,
     "path": "mobile/testing-mobile.mdx"
   },
   {
@@ -436,7 +444,7 @@
     "title": "Kotlin и Java: в чём разница",
     "audience": "мобилка",
     "level": "база",
-    "order": 35,
+    "order": 41,
     "path": "mobile/kotlin-vs-java.mdx"
   },
   {
@@ -444,7 +452,7 @@
     "title": "История Java, Android и Kotlin",
     "audience": "мобилка",
     "level": "углубление",
-    "order": 36,
+    "order": 42,
     "path": "mobile/kotlin-history.mdx"
   },
   {

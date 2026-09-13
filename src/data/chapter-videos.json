@@ -3409,5 +3409,32 @@
       "title": "SVG или иконочный шрифт ? (font awesome, icomoon)",
       "channel": "От 0 до 1"
     }
+  ],
+  "shop-catalog": [
+    {
+      "videoId": "Dy1i8anKZdM",
+      "title": "Курс по Retrofit в Android Studio + Kotlin | Урок 1",
+      "channel": "Neco Ru"
+    },
+    {
+      "videoId": "t6Sql3WMAnk",
+      "title": "The Ultimate Retrofit Crash Course",
+      "channel": "Philipp Lackner"
+    },
+    {
+      "videoId": "rediFff54JA",
+      "title": "PocketBase Tutorial #1 - Intro to PocketBase",
+      "channel": "James Yap Codes"
+    },
+    {
+      "videoId": "9zVmYVDTcEM",
+      "title": "Jetpack Paging 3. Пагинация на Android",
+      "channel": "Android Broadcast. Все об Андроид разработке"
+    },
+    {
+      "videoId": "ozh0U2vZsrQ",
+      "title": "How To Generate Types And Use API Rules In Pocketbase",
+      "channel": "Programonaut"
+    }
   ]
 }
