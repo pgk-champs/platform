@@ -2,6 +2,18 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { store } from '../lib/store';
 import WordsTrainer, { buildPool } from './WordsTrainer';
 import { VOCAB } from '../data/vocab';
+import knowledgeMap from '../data/knowledge-map.json';
+
+type Totals = { sections: number; quizzes: number; trainers: number };
+const totalsOf = (id: string) =>
+  (knowledgeMap as { id: string; totals: Totals }[]).find((e) => e.id === id)!.totals;
+
+/** Наполняет главу до крышки: все секции и все проверки без ошибок. */
+function fillChapter(id: string) {
+  const t = totalsOf(id);
+  for (let i = 0; i < t.sections; i += 1) store.setSectionRead(id, 's' + i);
+  for (let i = 0; i < t.quizzes; i += 1) store.markQuizDone(id, 'q' + i, { correct: 1, total: 1 });
+}
 
 beforeEach(() => {
   localStorage.clear();
@@ -37,12 +49,19 @@ test('favorite words are trained: reveal, grade, and the weight changes', async 
   expect(await screen.findByText('bug')).toBeTruthy();
 });
 
-test('buildPool includes the vocab of passed chapters (checkbox in pgk-progress)', () => {
-  localStorage.setItem('pgk-progress', JSON.stringify({ typing: true }));
+test('buildPool берёт словарь глав, наполненных до крышки', () => {
+  fillChapter('typing');
   const pool = buildPool();
   const typingWords = VOCAB.filter((v) => v.chapterId === 'typing');
   expect(typingWords.length).toBeGreaterThan(0);
   expect(pool.some((w) => w.term === typingWords[0].term)).toBe(true);
+});
+
+test('недочитанная глава в словарь не попадает', () => {
+  // прочитано всё, но ни одной проверки — сосуд не полон
+  const t = totalsOf('typing');
+  for (let i = 0; i < t.sections; i += 1) store.setSectionRead('typing', 's' + i);
+  expect(buildPool()).toEqual([]);
 });
 
 test('buildPool ignores chapters that are not passed', () => {

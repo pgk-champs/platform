@@ -2,6 +2,7 @@ import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import Link from '@docusaurus/Link';
 import { store } from '../lib/store';
 import Certificate from './Certificate';
+import { fullCount } from '../lib/chapterFill';
 import './trainers.css';
 
 export type Audience = 'все' | 'мобилка' | 'блокчейн';
@@ -202,7 +203,7 @@ export default function RouteList({
       <Certificate
         track={track}
         total={chapters.length}
-        passed={statuses.filter((s) => s === 'passed').length}
+        passed={fullCount(chapters.map((c) => c.id))}
       />
     </div>
   );

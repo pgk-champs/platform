@@ -2,7 +2,7 @@ import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import Link from '@docusaurus/Link';
 import { store } from '../lib/store';
 import { VOCAB } from '../data/vocab';
-import { loadProgress, statusOf, type Entry } from './RouteList';
+import { isFull } from '../lib/chapterFill';
 import knowledgeMap from '../data/knowledge-map.json';
 import './trainers.css';
 
@@ -13,12 +13,9 @@ import './trainers.css';
 type Word = { term: string; translation: string; note?: string };
 
 export function buildPool(): Word[] {
-  const progress = loadProgress();
-  const passed = new Set(
-    (knowledgeMap as Entry[])
-      .filter((e) => statusOf(e.id, !!progress[e.id]) === 'passed')
-      .map((e) => e.id),
-  );
+  // Словарь берётся из глав, наполненных до крышки. Раньше это была ручная
+  // галочка; теперь та же величина считается по прочитанному и решённому.
+  const passed = new Set((knowledgeMap as { id: string }[]).map((e) => e.id).filter(isFull));
 
   const byTerm = new Map<string, Word>();
   for (const f of store.favorites.list()) {
