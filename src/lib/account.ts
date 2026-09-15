@@ -552,7 +552,10 @@ export async function saveContentFile(input: {
       body: JSON.stringify(input),
     });
     const data = await r.json().catch(() => ({}));
-    if (!r.ok) return { ok: false, error: data.error || `ошибка ${r.status}` };
+    if (!r.ok) {
+      const base = data.error || `ошибка ${r.status}`;
+      return { ok: false, error: data.detail ? `${base} — ${data.detail}` : base };
+    }
     return { ok: true, commit: data.commit, sha: data.sha };
   } catch (e) {
     return { ok: false, error: 'сеть недоступна' };

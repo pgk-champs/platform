@@ -952,6 +952,17 @@ const server = http.createServer(async (req, res) => {
       const r = await gh(`contents/${encodeURI(file)}`, { method: 'PUT', body: payload });
       if (r.status === 409 || r.status === 422)
         return json(res, 409, { error: 'страницу успели изменить — откройте её заново' });
+      // 403 почти всегда означает права ключа, а не содержимое страницы. Но
+      // «почти» — поэтому ответ GitHub показываем дословно, а подсказку добавляем
+      // рядом: иначе при другой причине сообщение уверенно соврёт.
+      if (r.status === 403)
+        return json(res, 502, {
+          error: 'GitHub не разрешил запись',
+          detail:
+            (r.data?.message ? r.data.message + '. ' : '') +
+            'Обычно это значит, что ключу доступа не выдано право Contents: Read and write — ' +
+            'чинится в настройках ключа на GitHub, страница тут ни при чём',
+        });
       if (!r.ok) return json(res, 502, { error: 'github: ' + r.status, detail: r.data?.message });
       return json(res, 200, { ok: true, sha: r.data.content?.sha, commit: r.data.commit?.html_url });
     }
