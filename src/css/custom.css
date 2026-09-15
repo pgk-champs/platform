@@ -230,3 +230,12 @@ html {
     scroll-behavior: auto !important;
   }
 }
+
+/* Карточки раздела (DocCardList). Docusaurus вешает на заголовок и описание
+   text--truncate — одна строка с многоточием, и русские заголовки обрезаются
+   уже на 1280px («Регулярные выражения для grep» не влезает). Пусть переносятся. */
+.theme-doc-card-title.text--truncate,
+.theme-doc-card-description.text--truncate {
+  white-space: normal;
+  overflow: visible;
+}

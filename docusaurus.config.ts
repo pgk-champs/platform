@@ -1,8 +1,16 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import tracksData from './src/data/tracks.json';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
+
+// Треки перечислены ровно один раз — в src/data/tracks.json. Меню и подвал
+// строятся отсюда, поэтому новый раздел появляется в навигации сам: так это
+// и обещано в гайде «Как добавить страницу». Подпись `nav` необязательна.
+type TrackDef = {dir: string; label: string; position: number; nav?: string};
+const TRACKS = [...(tracksData as TrackDef[])].sort((a, b) => a.position - b.position);
+const trackLink = (t: TrackDef) => `/docs/${t.dir}`;
 
 const config: Config = {
   title: 'PGK Champs',
@@ -97,12 +105,10 @@ const config: Config = {
           type: 'dropdown',
           label: 'Учебник',
           position: 'left',
-          items: [
-            {to: '/docs/foundation', label: 'Фундамент — с нуля'},
-            {to: '/docs/mobile', label: 'Мобилка — Kotlin и Compose'},
-            {to: '/docs/blockchain', label: 'Блокчейн — смарт-контракты'},
-            {to: '/docs/advanced/git-rebase', label: 'Отдельные темы'},
-          ],
+          items: TRACKS.map((t) => ({
+            to: trackLink(t),
+            label: t.nav ? `${t.label} — ${t.nav}` : t.label,
+          })),
         },
         {
           to: '/route',
@@ -133,8 +139,9 @@ const config: Config = {
           items: [
             {to: '/account', label: 'Личный кабинет'},
             {to: '/achievements', label: 'Достижения и рекорды'},
-            {to: '/mentor', label: 'Дашборд наставника'},
             {to: '/favorites', label: 'Избранное'},
+            {to: '/mentor', label: 'Дашборд наставника'},
+            {to: '/edit', label: 'Править страницы'},
           ],
         },
         {
@@ -149,24 +156,15 @@ const config: Config = {
       links: [
         {
           title: 'Треки',
-          items: [
-            {
-              label: 'Фундамент',
-              to: '/docs/foundation',
-            },
-            {
-              label: 'Мобильная разработка',
-              to: '/docs/mobile',
-            },
-            {
-              label: 'Блокчейн',
-              to: '/docs/blockchain',
-            },
-          ],
+          items: TRACKS.map((t) => ({label: t.label, to: trackLink(t)})),
         },
         {
           title: 'Ресурсы',
           items: [
+            {
+              label: 'Как добавить страницу',
+              to: '/docs/advanced/kak-dobavit-stranicu',
+            },
             {
               label: 'GitHub',
               href: 'https://github.com/pgk-champs',
