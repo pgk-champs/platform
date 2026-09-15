@@ -1,8 +1,10 @@
 import { render } from '@testing-library/react';
 import ChapterCover, { CHAPTER_IDS, TrackBanner, coverFontSize } from './ChapterCover';
+import knowledgeMap from '../data/knowledge-map.json';
+import tracks from '../data/tracks.json';
 
 test('покрыты все главы', () => {
-  expect(CHAPTER_IDS).toHaveLength(137);
+  expect(CHAPTER_IDS.length).toBe(knowledgeMap.length);
 });
 
 test('заголовок обложки умещается в ширину 800', () => {
@@ -68,7 +70,7 @@ test('неизвестный chapterId не рендерит ничего', () =
 
 test('баннеры четырёх треков различаются, mini добавляет модификатор', () => {
   const markups = new Set<string>();
-  for (const track of ['foundation', 'mobile', 'blockchain', 'advanced'] as const) {
+  for (const track of tracks.map((t) => t.dir)) {
     const { container, unmount } = render(<TrackBanner track={track} />);
     expect(container.querySelector('svg')).toBeTruthy();
     markups.add(container.innerHTML);

@@ -1,13 +1,15 @@
 import React from 'react';
+import knowledgeMap from '../data/knowledge-map.json';
+import tracks from '../data/tracks.json';
 
-type Track = 'foundation' | 'mobile' | 'blockchain' | 'advanced';
+type MapEntry = { id: string; track: string; num: string; cover: string };
+type TrackDef = { dir: string; label: string; art: string };
 
-const TRACK_LABEL: Record<Track, string> = {
-  foundation: 'Фундамент',
-  mobile: 'Мобилка',
-  blockchain: 'Блокчейн',
-  advanced: 'Отдельные темы',
-};
+export type Track = string;
+
+const TRACK_LABEL: Record<string, string> = Object.fromEntries(
+  (tracks as TrackDef[]).map((t) => [t.dir, t.label]),
+);
 
 const ACCENT = 'var(--ifm-color-primary-lightest)';
 const DARK = 'var(--ifm-color-primary-darkest)';
@@ -2455,154 +2457,21 @@ const ARTS: Record<string, () => React.ReactNode> = {
   ),
 };
 
-const CHAPTERS: Record<string, { track: Track; num: string; title: string }> = {
-  'github-start': { track: 'foundation', num: '00', title: 'GitHub с нуля' },
-  typing: { track: 'foundation', num: '01', title: 'Печать и клавиатура' },
-  'it-english': { track: 'foundation', num: '02', title: 'IT-английский: стартовый словарь' },
-  '02b-english-practice': { track: 'foundation', num: '02', title: 'Английский на практике' },
-  'linux-terminal': { track: 'foundation', num: '03', title: 'Linux и терминал' },
-  'files-packages-ssh': { track: 'foundation', num: '04', title: 'Файлы, пакеты, SSH' },
-  'git-first-commit': { track: 'foundation', num: '05', title: 'Git: первый коммит' },
-  'git-branches': { track: 'foundation', num: '06', title: 'Git: ветки и merge' },
-  'git-remote': { track: 'foundation', num: '07', title: 'Git: push, PR и командная работа' },
-  'foundation-final': { track: 'foundation', num: '08', title: 'Финал Фундамента: английский, git, SSH, система, клавиатура' },
-  'android-studio': { track: 'mobile', num: '00', title: 'Android Studio: знакомство с IDE' },
-  'kotlin-vars': { track: 'mobile', num: '01', title: 'Переменные и типы' },
-  'kotlin-null': { track: 'mobile', num: '02', title: 'Null-безопасность: ошибка на миллиард долларов' },
-  'kotlin-flow': { track: 'mobile', num: '03', title: 'Условия и циклы на Kotlin' },
-  'functions-lambdas': { track: 'mobile', num: '04', title: 'Функции и лямбды' },
-  'classes-collections': { track: 'mobile', num: '05', title: 'Классы и коллекции' },
-  'kotlin-collections': { track: 'mobile', num: '06', title: 'Коллекции: список, словарь, множество' },
-  'composition': { track: 'mobile', num: '07', title: 'Композиция классов' },
-  'kotlin-oop': { track: 'mobile', num: '08', title: 'ООП на Kotlin: классы, наследование, интерфейсы' },
-  'console-io': { track: 'mobile', num: '09', title: 'Взаимодействие с консолью' },
-  'debug-skill': { track: 'mobile', num: '10', title: 'Поиск ошибок: след, сужение, причина' },
-  'first-compose-screen': { track: 'mobile', num: '11', title: 'Первый экран Compose' },
-  'state-events': { track: 'mobile', num: '12', title: 'Состояние и события' },
-  'layout-by-mockup': { track: 'mobile', num: '13', title: 'Вёрстка по макету' },
-  'layout-card': { track: 'mobile', num: '14', title: 'Карточка по макету: от картинки к коду' },
-  'ui-kit': { track: 'mobile', num: '15', title: 'Многомодульность и UI Kit' },
-  'lazy-lists': { track: 'mobile', num: '16', title: 'Списки: LazyColumn и всё, что не нарисовать циклом' },
-  'material-theme': { track: 'mobile', num: '17', title: 'Material 3: тема, которую вам уже сгенерировали' },
-  'scaffold-bars': { track: 'mobile', num: '18', title: 'Scaffold: каркас экрана, шапка и нижняя панель' },
-  'kit-buttons': { track: 'mobile', num: '19', title: 'Компонент библиотеки: кнопки, слоты и состояния' },
-  'kit-inputs': { track: 'mobile', num: '20', title: 'Поля ввода: подпись, ошибка и клавиатура' },
-  'kit-select': { track: 'mobile', num: '21', title: 'Селект и нижняя шторка: выбор одного из списка' },
-  'kit-search': { track: 'mobile', num: '22', title: 'Поиск: пауза в наборе и пять состояний выдачи' },
-  'kit-bars': { track: 'mobile', num: '23', title: 'Хэдер и TabBar: шапка и нижняя панель как компоненты' },
-  'kit-card': { track: 'mobile', num: '24', title: 'Карточка и адаптивность: компонент решает сам' },
-  'kit-icon-font': { track: 'mobile', num: '25', title: 'Иконочный шрифт: свои иконки одним файлом' },
-  'kotlin-coroutines': { track: 'mobile', num: '26', title: 'Корутины: как приложение не зависает' },
-  'flow-streams': { track: 'mobile', num: '27', title: 'Flow: поток значений во времени' },
-  'viewmodel-state': { track: 'mobile', num: '28', title: 'ViewModel: состояние, которое переживает поворот' },
-  'app-layers': { track: 'mobile', num: '29', title: 'Слои приложения: data, domain и репозиторий' },
-  'network-retrofit': { track: 'mobile', num: '30', title: 'Сеть: тот же экран, но с настоящими данными' },
-  'network-errors': { track: 'mobile', num: '31', title: 'Когда сети нет: ошибки, повторы и что видит пользователь' },
-  'data-storage': { track: 'mobile', num: '32', title: 'Хранение на устройстве: DataStore и Room' },
-  'cache-offline': { track: 'mobile', num: '33', title: 'Кэш и офлайн: база как источник истины' },
-  'clean-code': { track: 'mobile', num: '34', title: 'Чистый код: комментарии и логирование, которые оценивают' },
-  'auth-session': { track: 'mobile', num: '35', title: 'Авторизация: вход, живая сессия и биометрия' },
-  'shop-catalog': { track: 'mobile', num: '36', title: 'Каталог: конверт, страницы, поиск' },
-  'shop-auth': { track: 'mobile', num: '37', title: 'Регистрация и вход на сервере задания' },
-  'shop-cart': { track: 'mobile', num: '38', title: 'Корзина и заказ: сервер без проверок' },
-  'shop-files': { track: 'mobile', num: '39', title: 'Картинки и загрузка файлов' },
-  'shop-failures': { track: 'mobile', num: '40', title: 'Отказы, повторы и выход из аккаунта' },
-  'shop-day': { track: 'mobile', num: '41', title: 'Магазин за один конкурсный день' },
-  'device-features': { track: 'mobile', num: '42', title: 'Возможности устройства: камера, уведомления, виджет' },
-  'testing-mobile': { track: 'mobile', num: '43', title: 'Тестирование: MockWebServer, фейки и TDD' },
-  'kotlin-vs-java': { track: 'mobile', num: '44', title: 'Kotlin и Java: в чём разница' },
-  'kotlin-history': { track: 'mobile', num: '45', title: 'История Java, Android и Kotlin' },
-  'what-is-blockchain': { track: 'blockchain', num: '01', title: 'Что такое блокчейн' },
-  'code-editor': { track: 'blockchain', num: '02', title: 'Редактор кода: WebStorm и VS Code' },
-  'solidity-hello': { track: 'blockchain', num: '03', title: 'Первый контракт: из чего состоит код' },
-  'solidity-types': { track: 'blockchain', num: '04', title: 'Типы данных: uint, address, bool, string и деньги' },
-  'solidity-errors': { track: 'blockchain', num: '05', title: 'Ошибки и проверки: require, revert, assert' },
-  'solidity-flow': { track: 'blockchain', num: '06', title: 'Условия, циклы и время: как контракт принимает решения' },
-  'solidity-functions': { track: 'blockchain', num: '07', title: 'Функции: видимость, view, payable и модификаторы' },
-  'solidity-storage': { track: 'blockchain', num: '08', title: 'Хранение данных: mapping, struct, массивы и события' },
-  'sol-contracts-oop': { track: 'blockchain', num: '26', title: 'Контракт как объект: конструктор, enum и роли' },
-  'sol-inheritance': { track: 'blockchain', num: '10', title: 'Наследование: is, virtual, override и super' },
-  'sol-interfaces': { track: 'blockchain', num: '11', title: 'Интерфейсы: договор между контрактами' },
-  'sol-libraries': { track: 'blockchain', num: '12', title: 'Библиотеки, import и хеши: keccak256 и abi.encode' },
-  'sol-patterns': { track: 'blockchain', num: '13', title: 'Паттерны безопасности: владелец, реентерабельность, выплаты' },
-  'erc20-scratch': { track: 'blockchain', num: '14', title: 'ERC20 с нуля: как устроен токен' },
-  'erc20-oz': { track: 'blockchain', num: '15', title: 'Готовый ERC20: OpenZeppelin и что он делает за вас' },
-  'erc4626': { track: 'blockchain', num: '16', title: 'ERC4626: доли хранилища вместо баланса' },
-  'proxy-upgrade': { track: 'blockchain', num: '17', title: 'Прокси: обновление логики без смены адреса' },
-  'ts-vs-js': { track: 'blockchain', num: '18', title: 'TypeScript и JavaScript: в чём разница' },
-  'ts-run': { track: 'blockchain', num: '19', title: 'Как запустить код: Node, tsc и первая программа' },
-  'ts-values': { track: 'blockchain', num: '20', title: 'Значения и переменные: числа, строки, типы' },
-  'ts-null': { track: 'blockchain', num: '21', title: 'Пусто: null, undefined и строгие проверки' },
-  'ts-flow': { track: 'blockchain', num: '22', title: 'Условия и циклы: как программа принимает решения' },
-  'ts-functions': { track: 'blockchain', num: '23', title: 'Функции: как код перестаёт повторяться' },
-  'ts-collections': { track: 'blockchain', num: '24', title: 'Массивы и объекты: как хранят много данных сразу' },
-  'ts-types': { track: 'blockchain', num: '25', title: 'Свои типы: интерфейсы, объединения и обобщения' },
-  'ts-oop': { track: 'blockchain', num: '26', title: 'Классы на TypeScript: объекты, поля и инкапсуляция' },
-  'ts-inheritance': { track: 'blockchain', num: '27', title: 'Наследование и интерфейсы в TypeScript' },
-  'ts-errors': { track: 'blockchain', num: '28', title: 'Ошибки: throw, try/catch и результат вместо исключения' },
-  'ts-async': { track: 'blockchain', num: '29', title: 'Асинхронность: промисы, async/await и цикл событий' },
-  'ts-async-net': { track: 'blockchain', num: '30', title: 'Запросы к узлу: fetch, JSON-RPC и таймауты' },
-  'ts-modules': { track: 'blockchain', num: '31', title: 'Модули и проект: import, export и структура папок' },
-  'ts-history': { track: 'blockchain', num: '32', title: 'История JavaScript и TypeScript' },
-  'geth-network': { track: 'blockchain', num: '33', title: 'Свой узел: приватная сеть на geth' },
-  'hh-start': { track: 'blockchain', num: '34', title: 'Hardhat: пакет, npx и структура проекта' },
-  'hh-config': { track: 'blockchain', num: '35', title: 'hardhat.config.ts: настройки и сборка контрактов' },
-  'hh-test': { track: 'blockchain', num: '36', title: 'Тесты контрактов: Solidity и TypeScript рядом' },
-  'hh-deploy': { track: 'blockchain', num: '37', title: 'Развёртывание: скрипты, Ignition и своя сеть' },
-  'web-html': { track: 'blockchain', num: '38', title: 'HTML: из чего состоит страница' },
-  'web-css': { track: 'blockchain', num: '39', title: 'CSS: как страница получает вид' },
-  'web-layout': { track: 'blockchain', num: '40', title: 'Вёрстка: поток, flex и grid' },
-  'web-dom': { track: 'blockchain', num: '41', title: 'DOM и события: страница начинает отвечать' },
-  'web-react': { track: 'blockchain', num: '42', title: 'React: компоненты вместо ручного DOM' },
-  'web-state': { track: 'blockchain', num: '43', title: 'Состояние и эффекты: интерфейс с памятью' },
-  'web-vite': { track: 'blockchain', num: '44', title: 'Проект на Vite: от исходников к готовым файлам' },
-  'web-fetch': { track: 'blockchain', num: '45', title: 'Данные из сети: загрузка, отказ, гонка ответов' },
-  'web-forms': { track: 'blockchain', num: '46', title: 'Формы: ввод, проверка и суммы' },
-  'web-router': { track: 'blockchain', num: '47', title: 'Навигация: несколько экранов в одном приложении' },
-  'web-redux': { track: 'blockchain', num: '48', title: 'Redux: общее состояние приложения' },
-  'web-rtk': { track: 'blockchain', num: '49', title: 'Redux Toolkit: срезы, селекторы и связь с React' },
-  'web-rtk-async': { track: 'blockchain', num: '50', title: 'Асинхронность в Redux: запросы и состояние' },
-  'wallet-connect': { track: 'blockchain', num: '51', title: 'Кошелёк в браузере: подключение и сеть' },
-  'wallet-sign': { track: 'blockchain', num: '52', title: 'Подписи: доказать, не отправляя транзакцию' },
-  'dapp-full': { track: 'blockchain', num: '53', title: 'dApp целиком: чтение, транзакция, события' },
-  'audit-vulns': { track: 'blockchain', num: '54', title: 'Уязвимости: как из контрактов уходят деньги' },
-  'audit-tools': { track: 'blockchain', num: '55', title: 'Инструменты аудита: что находит машина' },
-  'audit-report': { track: 'blockchain', num: '56', title: 'Чек-лист и отчёт: как сдавать безопасность' },
-  'fabric-intro': { track: 'blockchain', num: '57', title: 'Приватный блокчейн: сеть, куда пускают по пропуску' },
-  'fabric-network': { track: 'blockchain', num: '58', title: 'Устройство сети: организации, политики, блоки' },
-  'fabric-chaincode': { track: 'blockchain', num: '59', title: 'Смарт-контракт для Fabric: зачётка на TypeScript' },
-  'fabric-lifecycle': { track: 'blockchain', num: '60', title: 'Жизненный цикл чейнкода: пять шагов' },
-  'fabric-tx': { track: 'blockchain', num: '61', title: 'Путь транзакции: почему «успешно» не значит «записано»' },
-  'fabric-vs-eth': { track: 'blockchain', num: '62', title: 'Fabric и Ethereum: одна задача, два решения' },
-  'sprint-format': { track: 'advanced', num: '09', title: 'Формат чемпионата: спринты, критерии и вопросы' },
-  'waves-first-network': { track: 'blockchain', num: '63', title: 'Первая сеть на Waves Enterprise' },
-  'waves-account': { track: 'blockchain', num: '64', title: 'Аккаунт в Waves: сид, ключи, адрес' },
-  'waves-tx': { track: 'blockchain', num: '65', title: 'Транзакции Waves: тип, комиссия, подпись' },
-  'waves-data': { track: 'blockchain', num: '66', title: 'Состояние аккаунта: словарь вместо переменных' },
-  'waves-assets': { track: 'blockchain', num: '67', title: 'Свои токены: выпуск, перевод, сжигание' },
-  'waves-ride': { track: 'blockchain', num: '68', title: 'Язык RIDE: выражение, которое отвечает да или нет' },
-  'waves-smart-account': { track: 'blockchain', num: '69', title: 'Смарт-аккаунт: скрипт вместо одной подписи' },
-  'waves-dapp': { track: 'blockchain', num: '70', title: 'dApp на RIDE: зачётка, которая живёт в сети' },
-  'waves-payments': { track: 'blockchain', num: '71', title: 'Платежи в dApp: банк вкладов на RIDE' },
-  'waves-client': { track: 'blockchain', num: '72', title: 'Клиент к Waves: приложение поверх сети' },
-  'grep-regex': { track: 'advanced', num: '01', title: 'Регулярные выражения для grep' },
-  'ssh-keys-deep': { track: 'advanced', num: '02', title: 'SSH-ключи глубоко' },
-  'git-rebase': { track: 'advanced', num: '03', title: 'Rebase мастерски' },
-  'repo-anatomy': { track: 'advanced', num: '04', title: 'Анатомия взрослого репозитория' },
-  'github-actions': { track: 'advanced', num: '05', title: 'CI: робот проверяет за тебя' },
-  'code-review-release': { track: 'advanced', num: '06', title: 'Ревью, коммиты, релизы' },
-  'sdacha-repo': { track: 'advanced', num: '07', title: 'Сдача работы: чистый клон и семь проверок' },
-  'demo-show': { track: 'advanced', num: '08', title: 'Демонстрация: показать решение за пять минут' },
-};
+/* Трек, номер и заголовок обложки НЕ дублируются здесь: всё это уже есть
+ * в самом файле главы — трек это папка, номер это префикс имени файла,
+ * заголовок это фронтматтер. Карта знаний собирает их на сборке, поэтому
+ * перенумеровать главы можно просто переименовав файлы. */
+type ChapterMeta = { track: string; num: string; title: string };
+
+const CHAPTERS: Record<string, ChapterMeta> = Object.fromEntries(
+  (knowledgeMap as MapEntry[]).map((e) => [e.id, { track: e.track, num: e.num, title: e.cover }]),
+);
 
 export const CHAPTER_IDS = Object.keys(CHAPTERS);
 
-const TRACK_ART: Record<Track, string> = {
-  foundation: 'track-foundation',
-  mobile: 'first-compose-screen',
-  blockchain: 'what-is-blockchain',
-  advanced: 'grep-regex',
-};
+const TRACK_ART: Record<string, string> = Object.fromEntries(
+  (tracks as TrackDef[]).map((t) => [t.dir, t.art]),
+);
 
 /* Заголовок на обложке — одна строка без переноса, а места до правого края 744 px.
  * Самая широкая кириллическая буква даёт около 0.59 от кегля, поэтому длинные
@@ -2660,7 +2529,7 @@ export default function ChapterCover({ chapterId }: { chapterId: string }) {
         label={`${TRACK_LABEL[ch.track]} · глава ${ch.num}`}
         num={ch.num}
         title={ch.title}
-        art={ARTS[chapterId]()}
+        art={(ARTS[chapterId] ?? ARTS[TRACK_ART[ch.track]] ?? (() => null))()}
         aria={`Обложка главы «${ch.title}»`}
       />
     </div>

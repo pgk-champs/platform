@@ -2,7 +2,24 @@ import { test } from 'node:test';
 import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
+import matter from 'gray-matter';
 import { buildMap, stripNumberPrefix } from './knowledge-map.mjs';
+
+const walkDocs = (d = 'docs') =>
+  fs.readdirSync(d, { withFileTypes: true }).flatMap((e) =>
+    e.isDirectory() ? walkDocs(path.join(d, e.name)) : /\.mdx?$/.test(e.name) ? [path.join(d, e.name)] : [],
+  );
+
+// Страницы бывают двух видов. «Глава» (kind по умолчанию) обязана держать
+// весь канон: экзамен, 2-5 схем, 4-5 видео. «Страница» (kind: 'page') — это
+// простой текст: объявление, памятка, разбор задания; от неё канон не требуют,
+// иначе завести короткую страницу было бы дороже, чем написать главу.
+const isChapter = (file) => {
+  if (/(^|\/)index\.mdx?$/.test(file)) return false;
+  const { data } = matter(fs.readFileSync(file, 'utf8'));
+  return (data.kind || 'chapter') === 'chapter';
+};
+const chapters = () => walkDocs().filter(isChapter);
 
 // Каждая глава пишет прогресс в store под chapterId; он обязан совпадать с id
 // из knowledge-map (тот же, что и у Docusaurus: числовой префикс «NN-» срезан,
@@ -33,26 +50,14 @@ test('every chapterId literal in docs matches the knowledge-map id of its file',
 // и чтобы дашборд наставника видел «экзамен сдан». Пробел раньше появлялся
 // незаметно (9 глав без экзамена), теперь он ловится тестом.
 test('every chapter has a final exam (ChapterExam)', () => {
-  const walk = d =>
-    fs.readdirSync(d, { withFileTypes: true }).flatMap(e =>
-      e.isDirectory() ? walk(path.join(d, e.name)) : /\.mdx?$/.test(e.name) ? [path.join(d, e.name)] : [],
-    );
-  // index.* — страницы-разделы трека, а не главы; экзамен им не нужен.
-  const missing = walk('docs')
-    .filter((f) => !/(^|\/)index\.mdx?$/.test(f))
-    .filter((f) => !fs.readFileSync(f, 'utf8').includes('<ChapterExam'));
+  const missing = chapters().filter((f) => !fs.readFileSync(f, 'utf8').includes('<ChapterExam'));
   assert.deepEqual(missing, []);
 });
 
 // 2-5 иллюстраций на главу — держит текст читаемым, но не голым (ночная
 // директива: «на статьи было 2-5 картинок»).
 test('every chapter has 2-5 <Figure> illustrations', () => {
-  const walk = d =>
-    fs.readdirSync(d, { withFileTypes: true }).flatMap(e =>
-      e.isDirectory() ? walk(path.join(d, e.name)) : /\.mdx?$/.test(e.name) ? [path.join(d, e.name)] : [],
-    );
-  const problems = walk('docs')
-    .filter((f) => !/(^|\/)index\.mdx?$/.test(f))
+  const problems = chapters()
     .map((f) => [f, (fs.readFileSync(f, 'utf8').match(/<Figure\b/g) ?? []).length])
     .filter(([, n]) => n < 2 || n > 5)
     .map(([f, n]) => `${f}: ${n}`);
@@ -65,13 +70,9 @@ test('every chapter has 2-5 <Figure> illustrations', () => {
 // build-е (advice/warning вместо tip/important/fact); страж — чтобы
 // не пришлось ловить снова на живой сборке.
 test('every <Hint type="..."> in docs uses a valid HintType', () => {
-  const walk = d =>
-    fs.readdirSync(d, { withFileTypes: true }).flatMap(e =>
-      e.isDirectory() ? walk(path.join(d, e.name)) : /\.mdx?$/.test(e.name) ? [path.join(d, e.name)] : [],
-    );
   const valid = new Set(['tip', 'important', 'fact']);
   const problems = [];
-  for (const file of walk('docs')) {
+  for (const file of walkDocs()) {
     for (const m of fs.readFileSync(file, 'utf8').matchAll(/<Hint\b[^>]*\btype="([^"]+)"/g)) {
       if (!valid.has(m[1])) problems.push(`${file}: type="${m[1]}"`);
     }
@@ -82,10 +83,15 @@ test('every <Hint type="..."> in docs uses a valid HintType', () => {
 // 4-5 куратор-видео на главу (src/data/chapter-videos.json, рендерятся
 // ChapterVideos в футере) — та же ночная директива, «по 4-5 видео».
 test('every chapter has 4-5 curated videos in chapter-videos.json', () => {
+  const chapterIds = new Set(
+    chapters().map((f) =>
+      path.relative('docs', f).replace(/\.mdx?$/, '').split(path.sep).map(stripNumberPrefix).join('/')),
+  );
   const byPath = new Map(buildMap('docs').map(e => [e.path.replace(/\.mdx?$/, ''), e.id]));
   const videos = JSON.parse(fs.readFileSync('src/data/chapter-videos.json', 'utf8'));
   const problems = [];
-  for (const id of new Set(byPath.values())) {
+  for (const [p, id] of byPath) {
+    if (!chapterIds.has(p)) continue;
     const n = (videos[id] ?? []).length;
     if (n < 4 || n > 5) problems.push(`${id}: ${n}`);
   }

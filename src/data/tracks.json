@@ -1,0 +1,34 @@
+[
+  {
+    "dir": "foundation",
+    "label": "Фундамент",
+    "audience": "все",
+    "position": 1,
+    "art": "track-foundation",
+    "blurb": "Общая база: аккаунт, терминал, git, английский. С этого начинают все."
+  },
+  {
+    "dir": "mobile",
+    "label": "Мобилка",
+    "audience": "мобилка",
+    "position": 2,
+    "art": "first-compose-screen",
+    "blurb": "Android на Kotlin и Jetpack Compose: от переменной до магазина с сервером."
+  },
+  {
+    "dir": "blockchain",
+    "label": "Блокчейн",
+    "audience": "блокчейн",
+    "position": 3,
+    "art": "what-is-blockchain",
+    "blurb": "Смарт-контракты и приложения поверх них: TypeScript, Solidity, Waves."
+  },
+  {
+    "dir": "advanced",
+    "label": "Отдельные темы",
+    "audience": "все",
+    "position": 4,
+    "art": "grep-regex",
+    "blurb": "Навыки, нужные обоим трекам: инструменты, сдача, демонстрация."
+  }
+]

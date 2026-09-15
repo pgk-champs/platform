@@ -1,21 +1,34 @@
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import { store } from '../lib/store';
+import knowledgeMap from '../data/knowledge-map.json';
 import { levelForXp } from '../lib/levels';
 import ChapterTour from './ChapterTour';
 import './trainers.css';
 
 export type ChapterProgressProps = {
   chapterId: string;
-  /** Знаменатели считает автор главы — store хранит только то, что уже сделано. */
-  totalSections: number;
-  totalQuizzes: number;
-  totalTrainers: number;
+  /** Знаменатели считаются на сборке по самому файлу главы. Передавать их
+   *  вручную больше не нужно — параметры оставлены только для тестов. */
+  totalSections?: number;
+  totalQuizzes?: number;
+  totalTrainers?: number;
 };
+
+type Totals = { sections: number; quizzes: number; trainers: number };
+const TOTALS: Record<string, Totals> = Object.fromEntries(
+  (knowledgeMap as { id: string; totals: Totals }[]).map((e) => [e.id, e.totals]),
+);
+const NO_TOTALS: Totals = { sections: 0, quizzes: 0, trainers: 0 };
 
 const EMPTY_PROGRESS = { sections: {}, quizzes: {}, trainers: {} } as ReturnType<typeof store.getProgress>;
 
 // Маленький живой виджет вверху главы: «Прочитано N% · Квизы x/y · Тренажёры x/y».
-export default function ChapterProgress({ chapterId, totalSections, totalQuizzes, totalTrainers }: ChapterProgressProps) {
+export default function ChapterProgress(props: ChapterProgressProps) {
+  const { chapterId } = props;
+  const counted = TOTALS[chapterId] ?? NO_TOTALS;
+  const totalSections = props.totalSections ?? counted.sections;
+  const totalQuizzes = props.totalQuizzes ?? counted.quizzes;
+  const totalTrainers = props.totalTrainers ?? counted.trainers;
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
   // store на клиенте читает localStorage ещё при импорте модуля, поэтому
   // первый клиентский рендер обязан повторить серверный (пустой прогресс) —

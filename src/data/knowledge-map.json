@@ -5,7 +5,15 @@
     "audience": "все",
     "level": "база",
     "order": 0.5,
-    "path": "foundation/github-start.mdx"
+    "path": "foundation/github-start.mdx",
+    "track": "foundation",
+    "num": "00",
+    "cover": "GitHub с нуля",
+    "totals": {
+      "sections": 15,
+      "quizzes": 6,
+      "trainers": 1
+    }
   },
   {
     "id": "grep-regex",
@@ -13,7 +21,15 @@
     "audience": "все",
     "level": "углубление",
     "order": 1,
-    "path": "advanced/grep-regex.mdx"
+    "path": "advanced/grep-regex.mdx",
+    "track": "advanced",
+    "num": "01",
+    "cover": "Регулярные выражения для grep",
+    "totals": {
+      "sections": 16,
+      "quizzes": 9,
+      "trainers": 2
+    }
   },
   {
     "id": "typing",
@@ -21,7 +37,15 @@
     "audience": "все",
     "level": "база",
     "order": 1,
-    "path": "foundation/typing.mdx"
+    "path": "foundation/typing.mdx",
+    "track": "foundation",
+    "num": "01",
+    "cover": "Печать и клавиатура",
+    "totals": {
+      "sections": 16,
+      "quizzes": 6,
+      "trainers": 8
+    }
   },
   {
     "id": "ssh-keys-deep",
@@ -29,7 +53,15 @@
     "audience": "все",
     "level": "углубление",
     "order": 2,
-    "path": "advanced/ssh-keys-deep.mdx"
+    "path": "advanced/ssh-keys-deep.mdx",
+    "track": "advanced",
+    "num": "02",
+    "cover": "SSH-ключи глубоко",
+    "totals": {
+      "sections": 15,
+      "quizzes": 6,
+      "trainers": 3
+    }
   },
   {
     "id": "it-english",
@@ -37,7 +69,15 @@
     "audience": "все",
     "level": "база",
     "order": 2,
-    "path": "foundation/it-english.mdx"
+    "path": "foundation/it-english.mdx",
+    "track": "foundation",
+    "num": "02",
+    "cover": "IT-английский: стартовый словарь",
+    "totals": {
+      "sections": 12,
+      "quizzes": 6,
+      "trainers": 10
+    }
   },
   {
     "id": "02b-english-practice",
@@ -45,7 +85,15 @@
     "audience": "все",
     "level": "база",
     "order": 2.5,
-    "path": "foundation/02b-english-practice.mdx"
+    "path": "foundation/02b-english-practice.mdx",
+    "track": "foundation",
+    "num": "02",
+    "cover": "Английский на практике",
+    "totals": {
+      "sections": 16,
+      "quizzes": 12,
+      "trainers": 5
+    }
   },
   {
     "id": "git-rebase",
@@ -53,7 +101,15 @@
     "audience": "все",
     "level": "углубление",
     "order": 3,
-    "path": "advanced/git-rebase.mdx"
+    "path": "advanced/git-rebase.mdx",
+    "track": "advanced",
+    "num": "03",
+    "cover": "Rebase мастерски",
+    "totals": {
+      "sections": 11,
+      "quizzes": 6,
+      "trainers": 3
+    }
   },
   {
     "id": "linux-terminal",
@@ -61,7 +117,15 @@
     "audience": "все",
     "level": "база",
     "order": 3,
-    "path": "foundation/linux-terminal.mdx"
+    "path": "foundation/linux-terminal.mdx",
+    "track": "foundation",
+    "num": "03",
+    "cover": "Linux и терминал",
+    "totals": {
+      "sections": 15,
+      "quizzes": 6,
+      "trainers": 6
+    }
   },
   {
     "id": "repo-anatomy",
@@ -69,7 +133,15 @@
     "audience": "все",
     "level": "углубление",
     "order": 4,
-    "path": "advanced/repo-anatomy.mdx"
+    "path": "advanced/repo-anatomy.mdx",
+    "track": "advanced",
+    "num": "04",
+    "cover": "Анатомия взрослого репозитория",
+    "totals": {
+      "sections": 16,
+      "quizzes": 6,
+      "trainers": 2
+    }
   },
   {
     "id": "files-packages-ssh",
@@ -77,7 +149,15 @@
     "audience": "все",
     "level": "база",
     "order": 4,
-    "path": "foundation/files-packages-ssh.mdx"
+    "path": "foundation/files-packages-ssh.mdx",
+    "track": "foundation",
+    "num": "04",
+    "cover": "Файлы, пакеты, SSH",
+    "totals": {
+      "sections": 15,
+      "quizzes": 7,
+      "trainers": 6
+    }
   },
   {
     "id": "github-actions",
@@ -85,7 +165,15 @@
     "audience": "все",
     "level": "углубление",
     "order": 5,
-    "path": "advanced/github-actions.mdx"
+    "path": "advanced/github-actions.mdx",
+    "track": "advanced",
+    "num": "05",
+    "cover": "CI: робот проверяет за тебя",
+    "totals": {
+      "sections": 17,
+      "quizzes": 5,
+      "trainers": 2
+    }
   },
   {
     "id": "git-first-commit",
@@ -93,7 +181,15 @@
     "audience": "все",
     "level": "база",
     "order": 5,
-    "path": "foundation/git-first-commit.mdx"
+    "path": "foundation/git-first-commit.mdx",
+    "track": "foundation",
+    "num": "05",
+    "cover": "Git: первый коммит",
+    "totals": {
+      "sections": 15,
+      "quizzes": 7,
+      "trainers": 6
+    }
   },
   {
     "id": "code-review-release",
@@ -101,7 +197,15 @@
     "audience": "все",
     "level": "углубление",
     "order": 6,
-    "path": "advanced/code-review-release.mdx"
+    "path": "advanced/code-review-release.mdx",
+    "track": "advanced",
+    "num": "06",
+    "cover": "Ревью, коммиты, релизы",
+    "totals": {
+      "sections": 17,
+      "quizzes": 6,
+      "trainers": 2
+    }
   },
   {
     "id": "git-branches",
@@ -109,7 +213,15 @@
     "audience": "все",
     "level": "база",
     "order": 6,
-    "path": "foundation/git-branches.mdx"
+    "path": "foundation/git-branches.mdx",
+    "track": "foundation",
+    "num": "06",
+    "cover": "Git: ветки и merge",
+    "totals": {
+      "sections": 14,
+      "quizzes": 6,
+      "trainers": 5
+    }
   },
   {
     "id": "sdacha-repo",
@@ -117,7 +229,15 @@
     "audience": "все",
     "level": "углубление",
     "order": 7,
-    "path": "advanced/sdacha-repo.mdx"
+    "path": "advanced/sdacha-repo.mdx",
+    "track": "advanced",
+    "num": "07",
+    "cover": "Сдача работы: чистый клон и семь проверок",
+    "totals": {
+      "sections": 12,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "git-remote",
@@ -125,7 +245,15 @@
     "audience": "все",
     "level": "база",
     "order": 7,
-    "path": "foundation/git-remote.mdx"
+    "path": "foundation/git-remote.mdx",
+    "track": "foundation",
+    "num": "07",
+    "cover": "Git: push, PR и командная работа",
+    "totals": {
+      "sections": 15,
+      "quizzes": 8,
+      "trainers": 5
+    }
   },
   {
     "id": "demo-show",
@@ -133,7 +261,15 @@
     "audience": "все",
     "level": "углубление",
     "order": 8,
-    "path": "advanced/demo-show.mdx"
+    "path": "advanced/demo-show.mdx",
+    "track": "advanced",
+    "num": "08",
+    "cover": "Демонстрация: показать решение за пять минут",
+    "totals": {
+      "sections": 11,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "foundation-final",
@@ -141,7 +277,15 @@
     "audience": "все",
     "level": "база",
     "order": 8,
-    "path": "foundation/foundation-final.mdx"
+    "path": "foundation/foundation-final.mdx",
+    "track": "foundation",
+    "num": "08",
+    "cover": "Финал Фундамента: английский, git, SSH, система, клавиатура",
+    "totals": {
+      "sections": 12,
+      "quizzes": 6,
+      "trainers": 0
+    }
   },
   {
     "id": "sprint-format",
@@ -149,7 +293,15 @@
     "audience": "все",
     "level": "углубление",
     "order": 9,
-    "path": "advanced/sprint-format.mdx"
+    "path": "advanced/sprint-format.mdx",
+    "track": "advanced",
+    "num": "09",
+    "cover": "Формат чемпионата: спринты, критерии и вопросы",
+    "totals": {
+      "sections": 10,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "android-studio",
@@ -157,7 +309,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 0,
-    "path": "mobile/android-studio.mdx"
+    "path": "mobile/android-studio.mdx",
+    "track": "mobile",
+    "num": "00",
+    "cover": "Android Studio: знакомство с IDE",
+    "totals": {
+      "sections": 14,
+      "quizzes": 6,
+      "trainers": 6
+    }
   },
   {
     "id": "kotlin-vars",
@@ -165,7 +325,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 1,
-    "path": "mobile/kotlin-vars.mdx"
+    "path": "mobile/kotlin-vars.mdx",
+    "track": "mobile",
+    "num": "01",
+    "cover": "Переменные и типы",
+    "totals": {
+      "sections": 13,
+      "quizzes": 4,
+      "trainers": 6
+    }
   },
   {
     "id": "kotlin-null",
@@ -173,7 +341,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 2,
-    "path": "mobile/kotlin-null.mdx"
+    "path": "mobile/kotlin-null.mdx",
+    "track": "mobile",
+    "num": "02",
+    "cover": "Null-безопасность: ошибка на миллиард долларов",
+    "totals": {
+      "sections": 28,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "kotlin-flow",
@@ -181,7 +357,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 3,
-    "path": "mobile/kotlin-flow.mdx"
+    "path": "mobile/kotlin-flow.mdx",
+    "track": "mobile",
+    "num": "03",
+    "cover": "Условия и циклы на Kotlin",
+    "totals": {
+      "sections": 21,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "functions-lambdas",
@@ -189,7 +373,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 4,
-    "path": "mobile/functions-lambdas.mdx"
+    "path": "mobile/functions-lambdas.mdx",
+    "track": "mobile",
+    "num": "04",
+    "cover": "Функции и лямбды",
+    "totals": {
+      "sections": 14,
+      "quizzes": 5,
+      "trainers": 6
+    }
   },
   {
     "id": "classes-collections",
@@ -197,7 +389,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 5,
-    "path": "mobile/classes-collections.mdx"
+    "path": "mobile/classes-collections.mdx",
+    "track": "mobile",
+    "num": "05",
+    "cover": "Классы и коллекции",
+    "totals": {
+      "sections": 10,
+      "quizzes": 4,
+      "trainers": 3
+    }
   },
   {
     "id": "kotlin-collections",
@@ -205,7 +405,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 6,
-    "path": "mobile/kotlin-collections.mdx"
+    "path": "mobile/kotlin-collections.mdx",
+    "track": "mobile",
+    "num": "06",
+    "cover": "Коллекции: список, словарь, множество",
+    "totals": {
+      "sections": 10,
+      "quizzes": 4,
+      "trainers": 3
+    }
   },
   {
     "id": "composition",
@@ -213,7 +421,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 7,
-    "path": "mobile/composition.mdx"
+    "path": "mobile/composition.mdx",
+    "track": "mobile",
+    "num": "07",
+    "cover": "Композиция классов",
+    "totals": {
+      "sections": 11,
+      "quizzes": 5,
+      "trainers": 0
+    }
   },
   {
     "id": "kotlin-oop",
@@ -221,7 +437,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 8,
-    "path": "mobile/kotlin-oop.mdx"
+    "path": "mobile/kotlin-oop.mdx",
+    "track": "mobile",
+    "num": "08",
+    "cover": "ООП на Kotlin: классы, наследование, интерфейсы",
+    "totals": {
+      "sections": 20,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "console-io",
@@ -229,7 +453,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 9,
-    "path": "mobile/console-io.mdx"
+    "path": "mobile/console-io.mdx",
+    "track": "mobile",
+    "num": "09",
+    "cover": "Взаимодействие с консолью",
+    "totals": {
+      "sections": 11,
+      "quizzes": 5,
+      "trainers": 0
+    }
   },
   {
     "id": "debug-skill",
@@ -237,7 +469,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 10,
-    "path": "mobile/debug-skill.mdx"
+    "path": "mobile/debug-skill.mdx",
+    "track": "mobile",
+    "num": "10",
+    "cover": "Поиск ошибок: след, сужение, причина",
+    "totals": {
+      "sections": 11,
+      "quizzes": 5,
+      "trainers": 0
+    }
   },
   {
     "id": "first-compose-screen",
@@ -245,7 +485,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 11,
-    "path": "mobile/first-compose-screen.mdx"
+    "path": "mobile/first-compose-screen.mdx",
+    "track": "mobile",
+    "num": "11",
+    "cover": "Первый экран Compose",
+    "totals": {
+      "sections": 15,
+      "quizzes": 6,
+      "trainers": 5
+    }
   },
   {
     "id": "state-events",
@@ -253,7 +501,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 12,
-    "path": "mobile/state-events.mdx"
+    "path": "mobile/state-events.mdx",
+    "track": "mobile",
+    "num": "12",
+    "cover": "Состояние и события",
+    "totals": {
+      "sections": 15,
+      "quizzes": 6,
+      "trainers": 6
+    }
   },
   {
     "id": "layout-by-mockup",
@@ -261,7 +517,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 13,
-    "path": "mobile/layout-by-mockup.mdx"
+    "path": "mobile/layout-by-mockup.mdx",
+    "track": "mobile",
+    "num": "13",
+    "cover": "Вёрстка по макету",
+    "totals": {
+      "sections": 11,
+      "quizzes": 6,
+      "trainers": 3
+    }
   },
   {
     "id": "layout-card",
@@ -269,7 +533,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 14,
-    "path": "mobile/layout-card.mdx"
+    "path": "mobile/layout-card.mdx",
+    "track": "mobile",
+    "num": "14",
+    "cover": "Карточка по макету: от картинки к коду",
+    "totals": {
+      "sections": 10,
+      "quizzes": 4,
+      "trainers": 3
+    }
   },
   {
     "id": "ui-kit",
@@ -277,7 +549,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 15,
-    "path": "mobile/ui-kit.mdx"
+    "path": "mobile/ui-kit.mdx",
+    "track": "mobile",
+    "num": "15",
+    "cover": "Многомодульность и UI Kit",
+    "totals": {
+      "sections": 14,
+      "quizzes": 7,
+      "trainers": 5
+    }
   },
   {
     "id": "lazy-lists",
@@ -285,7 +565,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 16,
-    "path": "mobile/lazy-lists.mdx"
+    "path": "mobile/lazy-lists.mdx",
+    "track": "mobile",
+    "num": "16",
+    "cover": "Списки: LazyColumn и всё, что не нарисовать циклом",
+    "totals": {
+      "sections": 15,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "material-theme",
@@ -293,7 +581,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 17,
-    "path": "mobile/material-theme.mdx"
+    "path": "mobile/material-theme.mdx",
+    "track": "mobile",
+    "num": "17",
+    "cover": "Material 3: тема, которую вам уже сгенерировали",
+    "totals": {
+      "sections": 14,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "scaffold-bars",
@@ -301,7 +597,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 18,
-    "path": "mobile/scaffold-bars.mdx"
+    "path": "mobile/scaffold-bars.mdx",
+    "track": "mobile",
+    "num": "18",
+    "cover": "Scaffold: каркас экрана, шапка и нижняя панель",
+    "totals": {
+      "sections": 14,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "kit-buttons",
@@ -309,7 +613,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 19,
-    "path": "mobile/kit-buttons.mdx"
+    "path": "mobile/kit-buttons.mdx",
+    "track": "mobile",
+    "num": "19",
+    "cover": "Компонент библиотеки: кнопки, слоты и состояния",
+    "totals": {
+      "sections": 11,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "kit-inputs",
@@ -317,7 +629,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 20,
-    "path": "mobile/kit-inputs.mdx"
+    "path": "mobile/kit-inputs.mdx",
+    "track": "mobile",
+    "num": "20",
+    "cover": "Поля ввода: подпись, ошибка и клавиатура",
+    "totals": {
+      "sections": 12,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "kit-select",
@@ -325,7 +645,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 21,
-    "path": "mobile/kit-select.mdx"
+    "path": "mobile/kit-select.mdx",
+    "track": "mobile",
+    "num": "21",
+    "cover": "Селект и нижняя шторка: выбор одного из списка",
+    "totals": {
+      "sections": 11,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "kit-search",
@@ -333,7 +661,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 22,
-    "path": "mobile/kit-search.mdx"
+    "path": "mobile/kit-search.mdx",
+    "track": "mobile",
+    "num": "22",
+    "cover": "Поиск: пауза в наборе и пять состояний выдачи",
+    "totals": {
+      "sections": 11,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "kit-bars",
@@ -341,7 +677,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 23,
-    "path": "mobile/kit-bars.mdx"
+    "path": "mobile/kit-bars.mdx",
+    "track": "mobile",
+    "num": "23",
+    "cover": "Хэдер и TabBar: шапка и нижняя панель как компоненты",
+    "totals": {
+      "sections": 11,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "kit-card",
@@ -349,7 +693,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 24,
-    "path": "mobile/kit-card.mdx"
+    "path": "mobile/kit-card.mdx",
+    "track": "mobile",
+    "num": "24",
+    "cover": "Карточка и адаптивность: компонент решает сам",
+    "totals": {
+      "sections": 10,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "kit-icon-font",
@@ -357,7 +709,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 25,
-    "path": "mobile/kit-icon-font.mdx"
+    "path": "mobile/kit-icon-font.mdx",
+    "track": "mobile",
+    "num": "25",
+    "cover": "Иконочный шрифт: свои иконки одним файлом",
+    "totals": {
+      "sections": 12,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "kotlin-coroutines",
@@ -365,7 +725,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 26,
-    "path": "mobile/kotlin-coroutines.mdx"
+    "path": "mobile/kotlin-coroutines.mdx",
+    "track": "mobile",
+    "num": "26",
+    "cover": "Корутины: как приложение не зависает",
+    "totals": {
+      "sections": 21,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "flow-streams",
@@ -373,7 +741,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 27,
-    "path": "mobile/flow-streams.mdx"
+    "path": "mobile/flow-streams.mdx",
+    "track": "mobile",
+    "num": "27",
+    "cover": "Flow: поток значений во времени",
+    "totals": {
+      "sections": 16,
+      "quizzes": 6,
+      "trainers": 1
+    }
   },
   {
     "id": "viewmodel-state",
@@ -381,7 +757,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 28,
-    "path": "mobile/viewmodel-state.mdx"
+    "path": "mobile/viewmodel-state.mdx",
+    "track": "mobile",
+    "num": "28",
+    "cover": "ViewModel: состояние, которое переживает поворот",
+    "totals": {
+      "sections": 14,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "app-layers",
@@ -389,7 +773,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 29,
-    "path": "mobile/app-layers.mdx"
+    "path": "mobile/app-layers.mdx",
+    "track": "mobile",
+    "num": "29",
+    "cover": "Слои приложения: data, domain и репозиторий",
+    "totals": {
+      "sections": 13,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "network-retrofit",
@@ -397,7 +789,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 30,
-    "path": "mobile/network-retrofit.mdx"
+    "path": "mobile/network-retrofit.mdx",
+    "track": "mobile",
+    "num": "30",
+    "cover": "Сеть: тот же экран, но с настоящими данными",
+    "totals": {
+      "sections": 15,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "network-errors",
@@ -405,7 +805,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 31,
-    "path": "mobile/network-errors.mdx"
+    "path": "mobile/network-errors.mdx",
+    "track": "mobile",
+    "num": "31",
+    "cover": "Когда сети нет: ошибки, повторы и что видит пользователь",
+    "totals": {
+      "sections": 14,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "data-storage",
@@ -413,7 +821,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 32,
-    "path": "mobile/data-storage.mdx"
+    "path": "mobile/data-storage.mdx",
+    "track": "mobile",
+    "num": "32",
+    "cover": "Хранение на устройстве: DataStore и Room",
+    "totals": {
+      "sections": 14,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "cache-offline",
@@ -421,7 +837,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 33,
-    "path": "mobile/cache-offline.mdx"
+    "path": "mobile/cache-offline.mdx",
+    "track": "mobile",
+    "num": "33",
+    "cover": "Кэш и офлайн: база как источник истины",
+    "totals": {
+      "sections": 17,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "clean-code",
@@ -429,7 +853,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 34,
-    "path": "mobile/clean-code.mdx"
+    "path": "mobile/clean-code.mdx",
+    "track": "mobile",
+    "num": "34",
+    "cover": "Чистый код: комментарии и логирование, которые оценивают",
+    "totals": {
+      "sections": 21,
+      "quizzes": 6,
+      "trainers": 1
+    }
   },
   {
     "id": "auth-session",
@@ -437,7 +869,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 35,
-    "path": "mobile/auth-session.mdx"
+    "path": "mobile/auth-session.mdx",
+    "track": "mobile",
+    "num": "35",
+    "cover": "Авторизация: вход, живая сессия и биометрия",
+    "totals": {
+      "sections": 21,
+      "quizzes": 6,
+      "trainers": 1
+    }
   },
   {
     "id": "shop-catalog",
@@ -445,7 +885,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 36,
-    "path": "mobile/shop-catalog.mdx"
+    "path": "mobile/shop-catalog.mdx",
+    "track": "mobile",
+    "num": "36",
+    "cover": "Каталог: конверт, страницы, поиск",
+    "totals": {
+      "sections": 14,
+      "quizzes": 5,
+      "trainers": 0
+    }
   },
   {
     "id": "shop-auth",
@@ -453,7 +901,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 37,
-    "path": "mobile/shop-auth.mdx"
+    "path": "mobile/shop-auth.mdx",
+    "track": "mobile",
+    "num": "37",
+    "cover": "Регистрация и вход на сервере задания",
+    "totals": {
+      "sections": 11,
+      "quizzes": 4,
+      "trainers": 0
+    }
   },
   {
     "id": "shop-cart",
@@ -461,7 +917,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 38,
-    "path": "mobile/shop-cart.mdx"
+    "path": "mobile/shop-cart.mdx",
+    "track": "mobile",
+    "num": "38",
+    "cover": "Корзина и заказ: сервер без проверок",
+    "totals": {
+      "sections": 10,
+      "quizzes": 4,
+      "trainers": 0
+    }
   },
   {
     "id": "shop-files",
@@ -469,7 +933,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 39,
-    "path": "mobile/shop-files.mdx"
+    "path": "mobile/shop-files.mdx",
+    "track": "mobile",
+    "num": "39",
+    "cover": "Картинки и загрузка файлов",
+    "totals": {
+      "sections": 10,
+      "quizzes": 4,
+      "trainers": 0
+    }
   },
   {
     "id": "shop-failures",
@@ -477,7 +949,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 40,
-    "path": "mobile/shop-failures.mdx"
+    "path": "mobile/shop-failures.mdx",
+    "track": "mobile",
+    "num": "40",
+    "cover": "Отказы, повторы и выход из аккаунта",
+    "totals": {
+      "sections": 10,
+      "quizzes": 4,
+      "trainers": 0
+    }
   },
   {
     "id": "shop-day",
@@ -485,7 +965,15 @@
     "audience": "мобилка",
     "level": "челлендж",
     "order": 41,
-    "path": "mobile/shop-day.mdx"
+    "path": "mobile/shop-day.mdx",
+    "track": "mobile",
+    "num": "41",
+    "cover": "Магазин за один конкурсный день",
+    "totals": {
+      "sections": 9,
+      "quizzes": 4,
+      "trainers": 0
+    }
   },
   {
     "id": "device-features",
@@ -493,7 +981,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 42,
-    "path": "mobile/device-features.mdx"
+    "path": "mobile/device-features.mdx",
+    "track": "mobile",
+    "num": "42",
+    "cover": "Возможности устройства: камера, уведомления, виджет",
+    "totals": {
+      "sections": 17,
+      "quizzes": 6,
+      "trainers": 1
+    }
   },
   {
     "id": "testing-mobile",
@@ -501,7 +997,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 43,
-    "path": "mobile/testing-mobile.mdx"
+    "path": "mobile/testing-mobile.mdx",
+    "track": "mobile",
+    "num": "43",
+    "cover": "Тестирование: MockWebServer, фейки и TDD",
+    "totals": {
+      "sections": 20,
+      "quizzes": 7,
+      "trainers": 1
+    }
   },
   {
     "id": "kotlin-vs-java",
@@ -509,7 +1013,15 @@
     "audience": "мобилка",
     "level": "база",
     "order": 44,
-    "path": "mobile/kotlin-vs-java.mdx"
+    "path": "mobile/kotlin-vs-java.mdx",
+    "track": "mobile",
+    "num": "44",
+    "cover": "Kotlin и Java: в чём разница",
+    "totals": {
+      "sections": 20,
+      "quizzes": 6,
+      "trainers": 1
+    }
   },
   {
     "id": "kotlin-history",
@@ -517,7 +1029,15 @@
     "audience": "мобилка",
     "level": "углубление",
     "order": 45,
-    "path": "mobile/kotlin-history.mdx"
+    "path": "mobile/kotlin-history.mdx",
+    "track": "mobile",
+    "num": "45",
+    "cover": "История Java, Android и Kotlin",
+    "totals": {
+      "sections": 19,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "what-is-blockchain",
@@ -525,7 +1045,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 1,
-    "path": "blockchain/what-is-blockchain.mdx"
+    "path": "blockchain/what-is-blockchain.mdx",
+    "track": "blockchain",
+    "num": "01",
+    "cover": "Что такое блокчейн",
+    "totals": {
+      "sections": 16,
+      "quizzes": 5,
+      "trainers": 7
+    }
   },
   {
     "id": "code-editor",
@@ -533,7 +1061,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 2,
-    "path": "blockchain/code-editor.mdx"
+    "path": "blockchain/code-editor.mdx",
+    "track": "blockchain",
+    "num": "02",
+    "cover": "Редактор кода: WebStorm и VS Code",
+    "totals": {
+      "sections": 15,
+      "quizzes": 6,
+      "trainers": 0
+    }
   },
   {
     "id": "solidity-hello",
@@ -541,7 +1077,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 3,
-    "path": "blockchain/solidity-hello.mdx"
+    "path": "blockchain/solidity-hello.mdx",
+    "track": "blockchain",
+    "num": "03",
+    "cover": "Первый контракт: из чего состоит код",
+    "totals": {
+      "sections": 20,
+      "quizzes": 6,
+      "trainers": 1
+    }
   },
   {
     "id": "solidity-types",
@@ -549,7 +1093,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 4,
-    "path": "blockchain/solidity-types.mdx"
+    "path": "blockchain/solidity-types.mdx",
+    "track": "blockchain",
+    "num": "04",
+    "cover": "Типы данных: uint, address, bool, string и деньги",
+    "totals": {
+      "sections": 19,
+      "quizzes": 6,
+      "trainers": 1
+    }
   },
   {
     "id": "solidity-errors",
@@ -557,7 +1109,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 5,
-    "path": "blockchain/solidity-errors.mdx"
+    "path": "blockchain/solidity-errors.mdx",
+    "track": "blockchain",
+    "num": "05",
+    "cover": "Ошибки и проверки: require, revert, assert",
+    "totals": {
+      "sections": 16,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "solidity-flow",
@@ -565,7 +1125,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 6,
-    "path": "blockchain/solidity-flow.mdx"
+    "path": "blockchain/solidity-flow.mdx",
+    "track": "blockchain",
+    "num": "06",
+    "cover": "Условия, циклы и время: как контракт принимает решения",
+    "totals": {
+      "sections": 16,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "solidity-functions",
@@ -573,7 +1141,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 7,
-    "path": "blockchain/solidity-functions.mdx"
+    "path": "blockchain/solidity-functions.mdx",
+    "track": "blockchain",
+    "num": "07",
+    "cover": "Функции: видимость, view, payable и модификаторы",
+    "totals": {
+      "sections": 14,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "solidity-storage",
@@ -581,7 +1157,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 8,
-    "path": "blockchain/solidity-storage.mdx"
+    "path": "blockchain/solidity-storage.mdx",
+    "track": "blockchain",
+    "num": "08",
+    "cover": "Хранение данных: mapping, struct, массивы и события",
+    "totals": {
+      "sections": 16,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "sol-contracts-oop",
@@ -589,7 +1173,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 9,
-    "path": "blockchain/sol-contracts-oop.mdx"
+    "path": "blockchain/sol-contracts-oop.mdx",
+    "track": "blockchain",
+    "num": "09",
+    "cover": "Контракт как объект: конструктор, enum и роли",
+    "totals": {
+      "sections": 14,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "sol-inheritance",
@@ -597,7 +1189,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 10,
-    "path": "blockchain/sol-inheritance.mdx"
+    "path": "blockchain/sol-inheritance.mdx",
+    "track": "blockchain",
+    "num": "10",
+    "cover": "Наследование: is, virtual, override и super",
+    "totals": {
+      "sections": 16,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "sol-interfaces",
@@ -605,7 +1205,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 11,
-    "path": "blockchain/sol-interfaces.mdx"
+    "path": "blockchain/sol-interfaces.mdx",
+    "track": "blockchain",
+    "num": "11",
+    "cover": "Интерфейсы: договор между контрактами",
+    "totals": {
+      "sections": 14,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "sol-libraries",
@@ -613,7 +1221,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 12,
-    "path": "blockchain/sol-libraries.mdx"
+    "path": "blockchain/sol-libraries.mdx",
+    "track": "blockchain",
+    "num": "12",
+    "cover": "Библиотеки, import и хеши: keccak256 и abi.encode",
+    "totals": {
+      "sections": 13,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "sol-patterns",
@@ -621,7 +1237,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 13,
-    "path": "blockchain/sol-patterns.mdx"
+    "path": "blockchain/sol-patterns.mdx",
+    "track": "blockchain",
+    "num": "13",
+    "cover": "Паттерны безопасности: владелец, реентерабельность, выплаты",
+    "totals": {
+      "sections": 16,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "erc20-scratch",
@@ -629,7 +1253,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 14,
-    "path": "blockchain/erc20-scratch.mdx"
+    "path": "blockchain/erc20-scratch.mdx",
+    "track": "blockchain",
+    "num": "14",
+    "cover": "ERC20 с нуля: как устроен токен",
+    "totals": {
+      "sections": 16,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "erc20-oz",
@@ -637,7 +1269,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 15,
-    "path": "blockchain/erc20-oz.mdx"
+    "path": "blockchain/erc20-oz.mdx",
+    "track": "blockchain",
+    "num": "15",
+    "cover": "Готовый ERC20: OpenZeppelin и что он делает за вас",
+    "totals": {
+      "sections": 14,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "erc4626",
@@ -645,7 +1285,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 16,
-    "path": "blockchain/erc4626.mdx"
+    "path": "blockchain/erc4626.mdx",
+    "track": "blockchain",
+    "num": "16",
+    "cover": "ERC4626: доли хранилища вместо баланса",
+    "totals": {
+      "sections": 15,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "proxy-upgrade",
@@ -653,7 +1301,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 17,
-    "path": "blockchain/proxy-upgrade.mdx"
+    "path": "blockchain/proxy-upgrade.mdx",
+    "track": "blockchain",
+    "num": "17",
+    "cover": "Прокси: обновление логики без смены адреса",
+    "totals": {
+      "sections": 15,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "ts-vs-js",
@@ -661,7 +1317,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 18,
-    "path": "blockchain/ts-vs-js.mdx"
+    "path": "blockchain/ts-vs-js.mdx",
+    "track": "blockchain",
+    "num": "18",
+    "cover": "TypeScript и JavaScript: в чём разница",
+    "totals": {
+      "sections": 20,
+      "quizzes": 6,
+      "trainers": 1
+    }
   },
   {
     "id": "ts-run",
@@ -669,7 +1333,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 19,
-    "path": "blockchain/ts-run.mdx"
+    "path": "blockchain/ts-run.mdx",
+    "track": "blockchain",
+    "num": "19",
+    "cover": "Как запустить код: Node, tsc и первая программа",
+    "totals": {
+      "sections": 16,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "ts-values",
@@ -677,7 +1349,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 20,
-    "path": "blockchain/ts-values.mdx"
+    "path": "blockchain/ts-values.mdx",
+    "track": "blockchain",
+    "num": "20",
+    "cover": "Значения и переменные: числа, строки, типы",
+    "totals": {
+      "sections": 20,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "ts-null",
@@ -685,7 +1365,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 21,
-    "path": "blockchain/ts-null.mdx"
+    "path": "blockchain/ts-null.mdx",
+    "track": "blockchain",
+    "num": "21",
+    "cover": "Пусто: null, undefined и строгие проверки",
+    "totals": {
+      "sections": 16,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "ts-flow",
@@ -693,7 +1381,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 22,
-    "path": "blockchain/ts-flow.mdx"
+    "path": "blockchain/ts-flow.mdx",
+    "track": "blockchain",
+    "num": "22",
+    "cover": "Условия и циклы: как программа принимает решения",
+    "totals": {
+      "sections": 20,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "ts-functions",
@@ -701,7 +1397,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 23,
-    "path": "blockchain/ts-functions.mdx"
+    "path": "blockchain/ts-functions.mdx",
+    "track": "blockchain",
+    "num": "23",
+    "cover": "Функции: как код перестаёт повторяться",
+    "totals": {
+      "sections": 22,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "ts-collections",
@@ -709,7 +1413,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 24,
-    "path": "blockchain/ts-collections.mdx"
+    "path": "blockchain/ts-collections.mdx",
+    "track": "blockchain",
+    "num": "24",
+    "cover": "Массивы и объекты: как хранят много данных сразу",
+    "totals": {
+      "sections": 23,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "ts-types",
@@ -717,7 +1429,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 25,
-    "path": "blockchain/ts-types.mdx"
+    "path": "blockchain/ts-types.mdx",
+    "track": "blockchain",
+    "num": "25",
+    "cover": "Свои типы: интерфейсы, объединения и обобщения",
+    "totals": {
+      "sections": 15,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "ts-oop",
@@ -725,7 +1445,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 26,
-    "path": "blockchain/ts-oop.mdx"
+    "path": "blockchain/ts-oop.mdx",
+    "track": "blockchain",
+    "num": "26",
+    "cover": "Классы на TypeScript: объекты, поля и инкапсуляция",
+    "totals": {
+      "sections": 17,
+      "quizzes": 3,
+      "trainers": 1
+    }
   },
   {
     "id": "ts-inheritance",
@@ -733,7 +1461,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 27,
-    "path": "blockchain/ts-inheritance.mdx"
+    "path": "blockchain/ts-inheritance.mdx",
+    "track": "blockchain",
+    "num": "27",
+    "cover": "Наследование и интерфейсы в TypeScript",
+    "totals": {
+      "sections": 17,
+      "quizzes": 3,
+      "trainers": 1
+    }
   },
   {
     "id": "ts-errors",
@@ -741,7 +1477,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 28,
-    "path": "blockchain/ts-errors.mdx"
+    "path": "blockchain/ts-errors.mdx",
+    "track": "blockchain",
+    "num": "28",
+    "cover": "Ошибки: throw, try/catch и результат вместо исключения",
+    "totals": {
+      "sections": 15,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "ts-async",
@@ -749,7 +1493,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 29,
-    "path": "blockchain/ts-async.mdx"
+    "path": "blockchain/ts-async.mdx",
+    "track": "blockchain",
+    "num": "29",
+    "cover": "Асинхронность: промисы, async/await и цикл событий",
+    "totals": {
+      "sections": 23,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "ts-async-net",
@@ -757,7 +1509,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 30,
-    "path": "blockchain/ts-async-net.mdx"
+    "path": "blockchain/ts-async-net.mdx",
+    "track": "blockchain",
+    "num": "30",
+    "cover": "Запросы к узлу: fetch, JSON-RPC и таймауты",
+    "totals": {
+      "sections": 14,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "ts-modules",
@@ -765,7 +1525,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 31,
-    "path": "blockchain/ts-modules.mdx"
+    "path": "blockchain/ts-modules.mdx",
+    "track": "blockchain",
+    "num": "31",
+    "cover": "Модули и проект: import, export и структура папок",
+    "totals": {
+      "sections": 15,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "ts-history",
@@ -773,7 +1541,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 32,
-    "path": "blockchain/ts-history.mdx"
+    "path": "blockchain/ts-history.mdx",
+    "track": "blockchain",
+    "num": "32",
+    "cover": "История JavaScript и TypeScript",
+    "totals": {
+      "sections": 26,
+      "quizzes": 5,
+      "trainers": 1
+    }
   },
   {
     "id": "geth-network",
@@ -781,7 +1557,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 33,
-    "path": "blockchain/geth-network.mdx"
+    "path": "blockchain/geth-network.mdx",
+    "track": "blockchain",
+    "num": "33",
+    "cover": "Свой узел: приватная сеть на geth",
+    "totals": {
+      "sections": 16,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "hh-start",
@@ -789,7 +1573,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 34,
-    "path": "blockchain/hh-start.mdx"
+    "path": "blockchain/hh-start.mdx",
+    "track": "blockchain",
+    "num": "34",
+    "cover": "Hardhat: пакет, npx и структура проекта",
+    "totals": {
+      "sections": 15,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "hh-config",
@@ -797,7 +1589,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 35,
-    "path": "blockchain/hh-config.mdx"
+    "path": "blockchain/hh-config.mdx",
+    "track": "blockchain",
+    "num": "35",
+    "cover": "hardhat.config.ts: настройки и сборка контрактов",
+    "totals": {
+      "sections": 16,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "hh-test",
@@ -805,7 +1605,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 36,
-    "path": "blockchain/hh-test.mdx"
+    "path": "blockchain/hh-test.mdx",
+    "track": "blockchain",
+    "num": "36",
+    "cover": "Тесты контрактов: Solidity и TypeScript рядом",
+    "totals": {
+      "sections": 16,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "hh-deploy",
@@ -813,7 +1621,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 37,
-    "path": "blockchain/hh-deploy.mdx"
+    "path": "blockchain/hh-deploy.mdx",
+    "track": "blockchain",
+    "num": "37",
+    "cover": "Развёртывание: скрипты, Ignition и своя сеть",
+    "totals": {
+      "sections": 14,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "web-html",
@@ -821,7 +1637,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 38,
-    "path": "blockchain/web-html.mdx"
+    "path": "blockchain/web-html.mdx",
+    "track": "blockchain",
+    "num": "38",
+    "cover": "HTML: из чего состоит страница",
+    "totals": {
+      "sections": 14,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "web-css",
@@ -829,7 +1653,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 39,
-    "path": "blockchain/web-css.mdx"
+    "path": "blockchain/web-css.mdx",
+    "track": "blockchain",
+    "num": "39",
+    "cover": "CSS: как страница получает вид",
+    "totals": {
+      "sections": 14,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "web-layout",
@@ -837,7 +1669,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 40,
-    "path": "blockchain/web-layout.mdx"
+    "path": "blockchain/web-layout.mdx",
+    "track": "blockchain",
+    "num": "40",
+    "cover": "Вёрстка: поток, flex и grid",
+    "totals": {
+      "sections": 15,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "web-dom",
@@ -845,7 +1685,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 41,
-    "path": "blockchain/web-dom.mdx"
+    "path": "blockchain/web-dom.mdx",
+    "track": "blockchain",
+    "num": "41",
+    "cover": "DOM и события: страница начинает отвечать",
+    "totals": {
+      "sections": 15,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "web-react",
@@ -853,7 +1701,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 42,
-    "path": "blockchain/web-react.mdx"
+    "path": "blockchain/web-react.mdx",
+    "track": "blockchain",
+    "num": "42",
+    "cover": "React: компоненты вместо ручного DOM",
+    "totals": {
+      "sections": 13,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "web-state",
@@ -861,7 +1717,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 43,
-    "path": "blockchain/web-state.mdx"
+    "path": "blockchain/web-state.mdx",
+    "track": "blockchain",
+    "num": "43",
+    "cover": "Состояние и эффекты: интерфейс с памятью",
+    "totals": {
+      "sections": 14,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "web-vite",
@@ -869,7 +1733,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 44,
-    "path": "blockchain/web-vite.mdx"
+    "path": "blockchain/web-vite.mdx",
+    "track": "blockchain",
+    "num": "44",
+    "cover": "Проект на Vite: от исходников к готовым файлам",
+    "totals": {
+      "sections": 13,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "web-fetch",
@@ -877,7 +1749,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 45,
-    "path": "blockchain/web-fetch.mdx"
+    "path": "blockchain/web-fetch.mdx",
+    "track": "blockchain",
+    "num": "45",
+    "cover": "Данные из сети: загрузка, отказ, гонка ответов",
+    "totals": {
+      "sections": 13,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "web-forms",
@@ -885,7 +1765,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 46,
-    "path": "blockchain/web-forms.mdx"
+    "path": "blockchain/web-forms.mdx",
+    "track": "blockchain",
+    "num": "46",
+    "cover": "Формы: ввод, проверка и суммы",
+    "totals": {
+      "sections": 14,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "web-router",
@@ -893,7 +1781,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 47,
-    "path": "blockchain/web-router.mdx"
+    "path": "blockchain/web-router.mdx",
+    "track": "blockchain",
+    "num": "47",
+    "cover": "Навигация: несколько экранов в одном приложении",
+    "totals": {
+      "sections": 11,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "web-redux",
@@ -901,7 +1797,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 48,
-    "path": "blockchain/web-redux.mdx"
+    "path": "blockchain/web-redux.mdx",
+    "track": "blockchain",
+    "num": "48",
+    "cover": "Redux: общее состояние приложения",
+    "totals": {
+      "sections": 14,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "web-rtk",
@@ -909,7 +1813,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 49,
-    "path": "blockchain/web-rtk.mdx"
+    "path": "blockchain/web-rtk.mdx",
+    "track": "blockchain",
+    "num": "49",
+    "cover": "Redux Toolkit: срезы, селекторы и связь с React",
+    "totals": {
+      "sections": 12,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "web-rtk-async",
@@ -917,7 +1829,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 50,
-    "path": "blockchain/web-rtk-async.mdx"
+    "path": "blockchain/web-rtk-async.mdx",
+    "track": "blockchain",
+    "num": "50",
+    "cover": "Асинхронность в Redux: запросы и состояние",
+    "totals": {
+      "sections": 13,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "wallet-connect",
@@ -925,7 +1845,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 51,
-    "path": "blockchain/wallet-connect.mdx"
+    "path": "blockchain/wallet-connect.mdx",
+    "track": "blockchain",
+    "num": "51",
+    "cover": "Кошелёк в браузере: подключение и сеть",
+    "totals": {
+      "sections": 13,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "wallet-sign",
@@ -933,7 +1861,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 52,
-    "path": "blockchain/wallet-sign.mdx"
+    "path": "blockchain/wallet-sign.mdx",
+    "track": "blockchain",
+    "num": "52",
+    "cover": "Подписи: доказать, не отправляя транзакцию",
+    "totals": {
+      "sections": 13,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "dapp-full",
@@ -941,7 +1877,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 53,
-    "path": "blockchain/dapp-full.mdx"
+    "path": "blockchain/dapp-full.mdx",
+    "track": "blockchain",
+    "num": "53",
+    "cover": "dApp целиком: чтение, транзакция, события",
+    "totals": {
+      "sections": 13,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "audit-vulns",
@@ -949,7 +1893,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 54,
-    "path": "blockchain/audit-vulns.mdx"
+    "path": "blockchain/audit-vulns.mdx",
+    "track": "blockchain",
+    "num": "54",
+    "cover": "Уязвимости: как из контрактов уходят деньги",
+    "totals": {
+      "sections": 12,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "audit-tools",
@@ -957,7 +1909,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 55,
-    "path": "blockchain/audit-tools.mdx"
+    "path": "blockchain/audit-tools.mdx",
+    "track": "blockchain",
+    "num": "55",
+    "cover": "Инструменты аудита: что находит машина",
+    "totals": {
+      "sections": 14,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "audit-report",
@@ -965,7 +1925,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 56,
-    "path": "blockchain/audit-report.mdx"
+    "path": "blockchain/audit-report.mdx",
+    "track": "blockchain",
+    "num": "56",
+    "cover": "Чек-лист и отчёт: как сдавать безопасность",
+    "totals": {
+      "sections": 13,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "fabric-intro",
@@ -973,7 +1941,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 57,
-    "path": "blockchain/fabric-intro.mdx"
+    "path": "blockchain/fabric-intro.mdx",
+    "track": "blockchain",
+    "num": "57",
+    "cover": "Приватный блокчейн: сеть, куда пускают по пропуску",
+    "totals": {
+      "sections": 14,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "fabric-network",
@@ -981,7 +1957,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 58,
-    "path": "blockchain/fabric-network.mdx"
+    "path": "blockchain/fabric-network.mdx",
+    "track": "blockchain",
+    "num": "58",
+    "cover": "Устройство сети: организации, политики, блоки",
+    "totals": {
+      "sections": 12,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "fabric-chaincode",
@@ -989,7 +1973,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 59,
-    "path": "blockchain/fabric-chaincode.mdx"
+    "path": "blockchain/fabric-chaincode.mdx",
+    "track": "blockchain",
+    "num": "59",
+    "cover": "Смарт-контракт для Fabric: зачётка на TypeScript",
+    "totals": {
+      "sections": 12,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "fabric-lifecycle",
@@ -997,7 +1989,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 60,
-    "path": "blockchain/fabric-lifecycle.mdx"
+    "path": "blockchain/fabric-lifecycle.mdx",
+    "track": "blockchain",
+    "num": "60",
+    "cover": "Жизненный цикл чейнкода: пять шагов",
+    "totals": {
+      "sections": 13,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "fabric-tx",
@@ -1005,7 +2005,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 61,
-    "path": "blockchain/fabric-tx.mdx"
+    "path": "blockchain/fabric-tx.mdx",
+    "track": "blockchain",
+    "num": "61",
+    "cover": "Путь транзакции: почему «успешно» не значит «записано»",
+    "totals": {
+      "sections": 12,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "fabric-vs-eth",
@@ -1013,7 +2021,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 62,
-    "path": "blockchain/fabric-vs-eth.mdx"
+    "path": "blockchain/fabric-vs-eth.mdx",
+    "track": "blockchain",
+    "num": "62",
+    "cover": "Fabric и Ethereum: одна задача, два решения",
+    "totals": {
+      "sections": 11,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "waves-first-network",
@@ -1021,7 +2037,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 63,
-    "path": "blockchain/waves-first-network.mdx"
+    "path": "blockchain/waves-first-network.mdx",
+    "track": "blockchain",
+    "num": "63",
+    "cover": "Первая сеть на Waves Enterprise",
+    "totals": {
+      "sections": 15,
+      "quizzes": 5,
+      "trainers": 10
+    }
   },
   {
     "id": "waves-account",
@@ -1029,7 +2053,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 64,
-    "path": "blockchain/waves-account.mdx"
+    "path": "blockchain/waves-account.mdx",
+    "track": "blockchain",
+    "num": "64",
+    "cover": "Аккаунт в Waves: сид, ключи, адрес",
+    "totals": {
+      "sections": 12,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "waves-tx",
@@ -1037,7 +2069,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 65,
-    "path": "blockchain/waves-tx.mdx"
+    "path": "blockchain/waves-tx.mdx",
+    "track": "blockchain",
+    "num": "65",
+    "cover": "Транзакции Waves: тип, комиссия, подпись",
+    "totals": {
+      "sections": 12,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "waves-data",
@@ -1045,7 +2085,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 66,
-    "path": "blockchain/waves-data.mdx"
+    "path": "blockchain/waves-data.mdx",
+    "track": "blockchain",
+    "num": "66",
+    "cover": "Состояние аккаунта: словарь вместо переменных",
+    "totals": {
+      "sections": 10,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "waves-assets",
@@ -1053,7 +2101,15 @@
     "audience": "блокчейн",
     "level": "база",
     "order": 67,
-    "path": "blockchain/waves-assets.mdx"
+    "path": "blockchain/waves-assets.mdx",
+    "track": "blockchain",
+    "num": "67",
+    "cover": "Свои токены: выпуск, перевод, сжигание",
+    "totals": {
+      "sections": 11,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "waves-ride",
@@ -1061,7 +2117,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 68,
-    "path": "blockchain/waves-ride.mdx"
+    "path": "blockchain/waves-ride.mdx",
+    "track": "blockchain",
+    "num": "68",
+    "cover": "Язык RIDE: выражение, которое отвечает да или нет",
+    "totals": {
+      "sections": 14,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "waves-smart-account",
@@ -1069,7 +2133,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 69,
-    "path": "blockchain/waves-smart-account.mdx"
+    "path": "blockchain/waves-smart-account.mdx",
+    "track": "blockchain",
+    "num": "69",
+    "cover": "Смарт-аккаунт: скрипт вместо одной подписи",
+    "totals": {
+      "sections": 11,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "waves-dapp",
@@ -1077,7 +2149,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 70,
-    "path": "blockchain/waves-dapp.mdx"
+    "path": "blockchain/waves-dapp.mdx",
+    "track": "blockchain",
+    "num": "70",
+    "cover": "dApp на RIDE: зачётка, которая живёт в сети",
+    "totals": {
+      "sections": 12,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "waves-payments",
@@ -1085,7 +2165,15 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 71,
-    "path": "blockchain/waves-payments.mdx"
+    "path": "blockchain/waves-payments.mdx",
+    "track": "blockchain",
+    "num": "71",
+    "cover": "Платежи в dApp: банк вкладов на RIDE",
+    "totals": {
+      "sections": 11,
+      "quizzes": 4,
+      "trainers": 1
+    }
   },
   {
     "id": "waves-client",
@@ -1093,6 +2181,14 @@
     "audience": "блокчейн",
     "level": "углубление",
     "order": 72,
-    "path": "blockchain/waves-client.mdx"
+    "path": "blockchain/waves-client.mdx",
+    "track": "blockchain",
+    "num": "72",
+    "cover": "Клиент к Waves: приложение поверх сети",
+    "totals": {
+      "sections": 11,
+      "quizzes": 4,
+      "trainers": 1
+    }
   }
 ]
