@@ -5,10 +5,10 @@ import tracksData from './src/data/tracks.json';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
-// Треки перечислены ровно один раз — в src/data/tracks.json. Меню и подвал
-// строятся отсюда, поэтому новый раздел появляется в навигации сам: так это
-// и обещано в гайде «Как добавить страницу». Подпись `nav` необязательна.
-type TrackDef = {dir: string; label: string; position: number; nav?: string};
+// Треки перечислены ровно один раз — в src/data/tracks.json. Подвал и баннеры
+// Маршрута строятся отсюда, поэтому новый раздел появляется в навигации сам:
+// так это и обещано в гайде «Как добавить материал».
+type TrackDef = {dir: string; label: string; position: number};
 const TRACKS = [...(tracksData as TrackDef[])].sort((a, b) => a.position - b.position);
 const trackLink = (t: TrackDef) => `/docs/${t.dir}`;
 
@@ -100,15 +100,6 @@ const config: Config = {
         height: 32,
       },
       items: [
-        {
-          type: 'dropdown',
-          label: 'Учебник',
-          position: 'left',
-          items: TRACKS.map((t) => ({
-            to: trackLink(t),
-            label: t.nav ? `${t.label} — ${t.nav}` : t.label,
-          })),
-        },
         {
           to: '/route',
           label: 'Маршрут',

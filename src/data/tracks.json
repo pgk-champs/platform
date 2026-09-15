@@ -5,8 +5,7 @@
     "audience": "все",
     "position": 1,
     "art": "track-foundation",
-    "blurb": "Общая база: аккаунт, терминал, git, английский. С этого начинают все.",
-    "nav": "с нуля"
+    "blurb": "Общая база: аккаунт, терминал, git, английский. С этого начинают все."
   },
   {
     "dir": "mobile",
@@ -14,8 +13,7 @@
     "audience": "мобилка",
     "position": 2,
     "art": "first-compose-screen",
-    "blurb": "Android на Kotlin и Jetpack Compose: от переменной до магазина с сервером.",
-    "nav": "Kotlin и Compose"
+    "blurb": "Android на Kotlin и Jetpack Compose: от переменной до магазина с сервером."
   },
   {
     "dir": "blockchain",
@@ -23,8 +21,7 @@
     "audience": "блокчейн",
     "position": 3,
     "art": "what-is-blockchain",
-    "blurb": "Смарт-контракты и приложения поверх них: TypeScript, Solidity, Waves.",
-    "nav": "смарт-контракты"
+    "blurb": "Смарт-контракты и приложения поверх них: TypeScript, Solidity, Waves."
   },
   {
     "dir": "advanced",
