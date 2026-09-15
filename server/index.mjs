@@ -23,6 +23,18 @@ const ORIGINS = (process.env.ALLOW_ORIGINS || BASE_URL)
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);
+// Правка страниц: токен с правом записи ТОЛЬКО в этот репозиторий. Лежит на
+// сервере, ученикам и авторам не показывается — у них OAuth просит лишь
+// read:user, и расширять это право нельзя.
+const CONTENT_TOKEN = process.env.CONTENT_TOKEN || '';
+const CONTENT_REPO = process.env.CONTENT_REPO || 'pgk-champs/platform';
+const CONTENT_BRANCH = process.env.CONTENT_BRANCH || 'main';
+// Корневые авторы — из .env, остальных добавляет наставник через кабинет.
+const CONTENT_AUTHORS = (process.env.CONTENT_AUTHORS || '')
+  .split(',')
+  .map((x) => x.trim().toLowerCase())
+  .filter(Boolean);
+
 // Наставники (по GitHub-логину) видят дашборд группы. Список — в .env.
 const MENTORS = (process.env.MENTORS || '')
   .split(',')
@@ -144,6 +156,19 @@ const allMentorRows = db.prepare('SELECT login, added_by, added_at FROM mentors 
 const addMentor = db.prepare('INSERT OR IGNORE INTO mentors (login, added_by, added_at) VALUES (?, ?, ?)');
 const removeMentorRow = db.prepare('DELETE FROM mentors WHERE login = ?');
 
+// Авторы страниц. Роль отдельная от наставника намеренно: вести группу и
+// писать в репозиторий — разные права, и раздавать второе всем со-наставникам
+// групп не стоит.
+db.exec(`CREATE TABLE IF NOT EXISTS authors (
+  login TEXT PRIMARY KEY, added_by TEXT, added_at INTEGER
+)`);
+const authorRow = db.prepare('SELECT login FROM authors WHERE login = ?');
+const allAuthorRows = db.prepare('SELECT login, added_by, added_at FROM authors ORDER BY added_at');
+const addAuthor = db.prepare('INSERT OR IGNORE INTO authors (login, added_by, added_at) VALUES (?, ?, ?)');
+const removeAuthorRow = db.prepare('DELETE FROM authors WHERE login = ?');
+const isAuthor = (u) =>
+  !!u && (CONTENT_AUTHORS.includes(String(u.login).toLowerCase()) || !!authorRow.get(String(u.login).toLowerCase()));
+
 // Каталог сообщества с модерацией: ученик присылает материал (pending),
 // наставник одобряет/отклоняет. Одобренные отдаются публично и ложатся в
 // каталог поверх статичного community.json.
@@ -247,6 +272,34 @@ function cors(req, res) {
     res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, OPTIONS');
   }
 }
+
+// ─── правка страниц через GitHub ──────────────────────────────────────────
+// Путь приходит от автора, поэтому его проверяем строго: править можно ТОЛЬКО
+// файлы глав. Без этой проверки автор мог бы переписать код сервера или CI
+// тем же самым запросом.
+const SAFE_DOC_PATH = /^docs\/[a-z0-9][a-z0-9-]*\/[A-Za-z0-9][A-Za-z0-9._-]*\.mdx$/;
+const safeDocPath = (p) => typeof p === 'string' && SAFE_DOC_PATH.test(p) && !p.includes('..');
+
+async function gh(path, { method = 'GET', body } = {}) {
+  const r = await fetch(`https://api.github.com/repos/${CONTENT_REPO}/${path}`, {
+    method,
+    headers: {
+      Authorization: `Bearer ${CONTENT_TOKEN}`,
+      Accept: 'application/vnd.github+json',
+      'User-Agent': 'edu-alspio',
+      ...(body ? { 'Content-Type': 'application/json' } : {}),
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const text = await r.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch { /* не json — отдадим как есть */ }
+  return { ok: r.ok, status: r.status, data, text };
+}
+
+const b64encode = (str) => Buffer.from(str, 'utf8').toString('base64');
+const b64decode = (str) => Buffer.from(String(str).replace(/\n/g, ''), 'base64').toString('utf8');
+
 const json = (res, code, obj) => {
   res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' });
   res.end(JSON.stringify(obj));
@@ -823,6 +876,118 @@ const server = http.createServer(async (req, res) => {
       const login = mmDel[1].toLowerCase();
       if (MENTORS.includes(login)) return json(res, 400, { error: 'корневого наставника нельзя снять здесь' });
       removeMentorRow.run(login);
+      return json(res, 200, { ok: true });
+    }
+
+    const mentorGuardTop = () => {
+      const sess = bearer(req);
+      if (!sess) return { err: [401, 'unauthorized'] };
+      const u = getUser.get(sess.id);
+      if (!isMentor(u)) return { err: [403, 'forbidden'] };
+      return { u };
+    };
+
+    // ─── роль «автор»: кто может править страницы ────────────────────────
+    const authorGuard = () => {
+      const sess = bearer(req);
+      if (!sess) return { err: [401, 'unauthorized'] };
+      const u = getUser.get(sess.id);
+      if (!isAuthor(u)) return { err: [403, 'нужна роль автора'] };
+      if (!CONTENT_TOKEN) return { err: [503, 'на сервере не настроен CONTENT_TOKEN'] };
+      return { u };
+    };
+
+    // Что умеет редактор: есть ли доступ, какие треки, какие страницы.
+    if (path === '/content/meta' && req.method === 'GET') {
+      const sess = bearer(req);
+      const u = sess ? getUser.get(sess.id) : null;
+      const can = isAuthor(u);
+      if (!can) return json(res, 200, { canEdit: false, configured: !!CONTENT_TOKEN });
+      const tree = await gh(`git/trees/${CONTENT_BRANCH}?recursive=1`);
+      if (!tree.ok) return json(res, 502, { error: 'github: ' + tree.status });
+      const files = (tree.data.tree || [])
+        .filter((n) => n.type === 'blob' && safeDocPath(n.path))
+        .map((n) => n.path)
+        .sort();
+      return json(res, 200, { canEdit: true, configured: !!CONTENT_TOKEN, repo: CONTENT_REPO, branch: CONTENT_BRANCH, files });
+    }
+
+    // Чтение исходника страницы.
+    if (path === '/content/file' && req.method === 'GET') {
+      const g = authorGuard();
+      if (g.err) return json(res, g.err[0], { error: g.err[1] });
+      const file = url.searchParams.get('path') || '';
+      if (!safeDocPath(file)) return json(res, 400, { error: 'править можно только docs/<трек>/файл.mdx' });
+      const r = await gh(`contents/${encodeURI(file)}?ref=${CONTENT_BRANCH}`);
+      if (r.status === 404) return json(res, 404, { error: 'нет такого файла' });
+      if (!r.ok) return json(res, 502, { error: 'github: ' + r.status });
+      return json(res, 200, { path: file, sha: r.data.sha, text: b64decode(r.data.content) });
+    }
+
+    // Сохранение: создаёт файл или обновляет существующий одним коммитом.
+    // sha обязателен при правке — это защита от «двое правили одну страницу»:
+    // если файл успели изменить, GitHub ответит 409 и мы честно об этом скажем.
+    if (path === '/content/file' && req.method === 'PUT') {
+      const g = authorGuard();
+      if (g.err) return json(res, g.err[0], { error: g.err[1] });
+      let body;
+      try {
+        body = JSON.parse(await readBody(req, 400_000));
+      } catch {
+        return json(res, 400, { error: 'bad json' });
+      }
+      const file = String(body.path || '');
+      if (!safeDocPath(file)) return json(res, 400, { error: 'править можно только docs/<трек>/файл.mdx' });
+      const text = String(body.text ?? '');
+      if (!text.trim()) return json(res, 400, { error: 'пустая страница' });
+      if (text.length > 300_000) return json(res, 400, { error: 'страница слишком большая' });
+      const message = String(body.message || '').trim() ||
+        `Страница ${file.split('/').pop()}: правка через кабинет`;
+      const payload = {
+        message,
+        content: b64encode(text),
+        branch: CONTENT_BRANCH,
+        ...(body.sha ? { sha: String(body.sha) } : {}),
+      };
+      const r = await gh(`contents/${encodeURI(file)}`, { method: 'PUT', body: payload });
+      if (r.status === 409 || r.status === 422)
+        return json(res, 409, { error: 'страницу успели изменить — откройте её заново' });
+      if (!r.ok) return json(res, 502, { error: 'github: ' + r.status, detail: r.data?.message });
+      return json(res, 200, { ok: true, sha: r.data.content?.sha, commit: r.data.commit?.html_url });
+    }
+
+    // Управление ролью автора — только наставник.
+    if (path === '/content/authors' && req.method === 'GET') {
+      const gm = mentorGuardTop();
+      if (gm.err) return json(res, gm.err[0], { error: gm.err[1] });
+      const roots = CONTENT_AUTHORS.map((login) => ({ login, root: true }));
+      const added = allAuthorRows.all().map((r) => ({ login: r.login, root: false, addedBy: r.added_by }));
+      return json(res, 200, { authors: [...roots, ...added] });
+    }
+
+    if (path === '/content/authors' && req.method === 'POST') {
+      const gm = mentorGuardTop();
+      if (gm.err) return json(res, gm.err[0], { error: gm.err[1] });
+      let body;
+      try {
+        body = JSON.parse(await readBody(req, 1000));
+      } catch {
+        return json(res, 400, { error: 'bad json' });
+      }
+      const login = String(body.login || '').trim().toLowerCase().replace(/^@/, '');
+      if (!/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i.test(login)) return json(res, 400, { error: 'нужен GitHub-логин' });
+      if (CONTENT_AUTHORS.includes(login)) return json(res, 200, { ok: true, already: true });
+      addAuthor.run(login, gm.u.login, Date.now());
+      return json(res, 200, { ok: true });
+    }
+
+    const authDel = path.match(/^\/content\/authors\/([A-Za-z\d-]+)$/);
+    if (authDel && req.method === 'DELETE') {
+      const gm = mentorGuardTop();
+      if (gm.err) return json(res, gm.err[0], { error: gm.err[1] });
+      const login = authDel[1].toLowerCase();
+      if (CONTENT_AUTHORS.includes(login)) return json(res, 400, { error: 'автора из .env здесь снять нельзя' });
+      removeAuthorRow.run(login);
       return json(res, 200, { ok: true });
     }
 

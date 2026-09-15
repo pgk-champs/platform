@@ -506,3 +506,75 @@ export function startAutoSync(): void {
     if (isLoggedIn()) void sync();
   });
 }
+
+// ─── правка страниц: роль автора и работа с файлами глав ──────────────────
+
+export type ContentMeta = {
+  canEdit: boolean;
+  configured: boolean;
+  repo?: string;
+  branch?: string;
+  files?: string[];
+};
+
+export type ContentFile = { path: string; sha: string; text: string };
+export type AuthorEntry = { login: string; root: boolean; addedBy?: string };
+
+/** Может ли текущий пользователь править страницы и какие они есть. */
+export async function fetchContentMeta(): Promise<ContentMeta> {
+  try {
+    const r = await api('/content/meta');
+    if (!r.ok) return { canEdit: false, configured: false };
+    return (await r.json()) as ContentMeta;
+  } catch {
+    return { canEdit: false, configured: false };
+  }
+}
+
+/** Исходник страницы вместе с sha — он нужен, чтобы сохранить поверх. */
+export async function fetchContentFile(path: string): Promise<ContentFile | null> {
+  const r = await api(`/content/file?path=${encodeURIComponent(path)}`);
+  if (!r.ok) return null;
+  return (await r.json()) as ContentFile;
+}
+
+/** Сохранить страницу одним коммитом. sha пустой — значит создаём новую. */
+export async function saveContentFile(input: {
+  path: string;
+  text: string;
+  sha?: string;
+  message?: string;
+}): Promise<{ ok: true; commit?: string; sha?: string } | { ok: false; error: string }> {
+  try {
+    const r = await api('/content/file', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) return { ok: false, error: data.error || `ошибка ${r.status}` };
+    return { ok: true, commit: data.commit, sha: data.sha };
+  } catch (e) {
+    return { ok: false, error: 'сеть недоступна' };
+  }
+}
+
+export async function listAuthors(): Promise<AuthorEntry[]> {
+  const r = await api('/content/authors');
+  if (!r.ok) return [];
+  return ((await r.json()).authors ?? []) as AuthorEntry[];
+}
+
+export async function addAuthor(login: string): Promise<boolean> {
+  const r = await api('/content/authors', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ login }),
+  });
+  return r.ok;
+}
+
+export async function removeAuthor(login: string): Promise<boolean> {
+  const r = await api(`/content/authors/${encodeURIComponent(login)}`, { method: 'DELETE' });
+  return r.ok;
+}

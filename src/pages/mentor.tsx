@@ -7,6 +7,7 @@ import { levelForXp } from '../lib/levels';
 import { ACHIEVEMENTS } from '../lib/achievements';
 import {
   addGroupComentor,
+  addAuthor,
   addMentor,
   createGroup,
   deleteGroup,
@@ -17,13 +18,16 @@ import {
   fetchStudentDetail,
   isLoggedIn,
   listGroups,
+  listAuthors,
   listMentors,
   login,
   markNotificationsSeen,
   removeGroupComentor,
+  removeAuthor,
   removeMentor,
   removeStudent,
   reviewCommunity,
+  type AuthorEntry,
   type MentorEntry,
   type MentorGroup,
   type MentorNotifications,
@@ -457,6 +461,7 @@ function Dashboard() {
       )}
 
       <ModerationQueue />
+      <AuthorsPanel canRemove={isRoot} />
       <MentorsPanel canRemove={isRoot} />
       {openStudent !== null && <StudentCard id={openStudent} onClose={() => setOpenStudent(null)} />}
     </div>
@@ -512,6 +517,75 @@ function ModerationQueue() {
           })}
         </div>
       )}
+    </section>
+  );
+}
+
+// Авторы страниц: кто может добавлять и править материалы учебника.
+function AuthorsPanel({ canRemove }: { canRemove: boolean }) {
+  const [authors, setAuthors] = useState<AuthorEntry[] | null>(null);
+  const [login, setLoginValue] = useState('');
+  const reload = () => listAuthors().then(setAuthors);
+  useEffect(() => {
+    reload();
+  }, []);
+  if (!authors) return null;
+  return (
+    <section className="mn-section">
+      <h2 className="mn-h">Авторы страниц</h2>
+      <p className="ac-muted">
+        Автор может добавлять и править страницы учебника прямо на сайте — раздел{' '}
+        <Link to="/edit">Правка страниц</Link>. Право отдельное от наставничества: вести группу и
+        писать в учебник — разные вещи.
+      </p>
+      <div className="mn-mentors">
+        {authors.map((a) => (
+          <span key={a.login} className="mn-mentor-chip">
+            @{a.login}
+            {a.root ? (
+              <span className="mn-mentor-root" title="Задан в настройках сервера">
+                ★
+              </span>
+            ) : canRemove ? (
+              <button
+                type="button"
+                className="mn-mentor-del"
+                title="Снять роль автора"
+                onClick={async () => {
+                  if (window.confirm(`Снять @${a.login} с авторов?`)) {
+                    await removeAuthor(a.login);
+                    reload();
+                  }
+                }}
+              >
+                ✕
+              </button>
+            ) : null}
+          </span>
+        ))}
+        {!authors.length && <span className="ac-muted">пока никого</span>}
+      </div>
+      <form
+        className="mn-mentor-add"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          if (!login.trim()) return;
+          await addAuthor(login.trim());
+          setLoginValue('');
+          reload();
+        }}
+      >
+        <input
+          value={login}
+          onChange={(e) => setLoginValue(e.target.value)}
+          placeholder="github-логин"
+          aria-label="GitHub-логин автора"
+          className="ac-join-input mn-mentor-input"
+        />
+        <button type="submit" className="button button--secondary" disabled={!login.trim()}>
+          Дать роль автора
+        </button>
+      </form>
     </section>
   );
 }

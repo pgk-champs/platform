@@ -304,6 +304,22 @@
     }
   },
   {
+    "id": "kak-dobavit-stranicu",
+    "title": "Как добавить страницу на платформу",
+    "audience": "все",
+    "level": "база",
+    "order": 10,
+    "path": "advanced/kak-dobavit-stranicu.mdx",
+    "track": "advanced",
+    "num": "10",
+    "cover": "Как добавить страницу",
+    "totals": {
+      "sections": 0,
+      "quizzes": 0,
+      "trainers": 0
+    }
+  },
+  {
     "id": "android-studio",
     "title": "Android Studio: знакомство с IDE",
     "audience": "мобилка",

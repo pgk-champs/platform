@@ -4,6 +4,7 @@ import BrowserOnly from '@docusaurus/BrowserOnly';
 import { store } from '../lib/store';
 import { levelForXp } from '../lib/levels';
 import Link from '@docusaurus/Link';
+import './edit.css';
 import {
   apiAvailable,
   fetchMyPlaces,
@@ -16,6 +17,7 @@ import {
   subscribe,
   sync,
   type MyPlaces,
+  fetchContentMeta,
 } from '../lib/account';
 
 function JoinGroup() {
@@ -134,6 +136,7 @@ function Cabinet() {
 
   return (
     <div className="ac-wrap">
+      <AuthorLink />
       <div className="ac-card ac-profile">
         {profile.avatar ? (
           <img className="ac-avatar" src={profile.avatar} alt="" width={72} height={72} />
@@ -218,6 +221,24 @@ function Cabinet() {
       <button type="button" className="ac-logout" onClick={logout}>
         Выйти из аккаунта
       </button>
+    </div>
+  );
+}
+
+/** Ссылка на правку страниц — показывается только тому, у кого есть роль автора. */
+function AuthorLink(): React.ReactElement | null {
+  const [canEdit, setCanEdit] = useState(false);
+  useEffect(() => {
+    void fetchContentMeta().then((m) => setCanEdit(!!m.canEdit));
+  }, []);
+  if (!canEdit) return null;
+  return (
+    <div className="ac-card ac-author-link">
+      <div>
+        <strong>Вы автор учебника</strong>
+        <p className="ac-muted">Можно добавлять и править страницы прямо на сайте.</p>
+      </div>
+      <Link to="/edit" className="button button--primary">Править страницы</Link>
     </div>
   );
 }
