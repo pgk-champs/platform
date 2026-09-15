@@ -30,7 +30,6 @@ function Editor() {
   const [creating, setCreating] = useState(false);
   const [nTrack, setNTrack] = useState(TRACKS[0]?.dir ?? 'mobile');
   const [nTitle, setNTitle] = useState('');
-  const [nKind, setNKind] = useState<'chapter' | 'page'>('page');
 
   useEffect(() => {
     void fetchContentMeta().then(setMeta);
@@ -64,7 +63,7 @@ function Editor() {
     if (files.includes(p)) return setNote({ kind: 'err', text: 'страница с таким адресом уже есть' });
     setPath(p);
     setSha('');
-    setText(template({ kind: nKind, title: nTitle, slug, track: nTrack, num, audience: track.audience }));
+    setText(template({ kind: 'page', title: nTitle, slug, track: nTrack, num, audience: track.audience }));
     setCreating(false);
     setNote({ kind: 'ok', text: `заготовка готова: ${p}` });
   }
@@ -105,7 +104,7 @@ function Editor() {
         </p>
         <p className="ac-muted">
           Как всё устроено и что можно добавить — в гайде{' '}
-          <a href="/docs/advanced/kak-dobavit-stranicu">«Как добавить страницу на платформу»</a>.
+          <a href="/docs/advanced/kak-dobavit-stranicu">«Как добавить материал»</a>.
         </p>
         {!meta.configured && (
           <p className="ac-muted">
@@ -142,20 +141,16 @@ function Editor() {
               />
             </label>
 
-            <label className="ed-label">
-              Что это
-              <select value={nKind} onChange={(e) => setNKind(e.target.value as 'chapter' | 'page')}>
-                <option value="page">Простая страница — текст и подсказки</option>
-                <option value="chapter">Глава — с обложкой, схемами и экзаменом</option>
-              </select>
-            </label>
-
             {nTitle && (
               <p className="ed-hint">
                 Адрес: <code>docs/{nTrack}/{nextNumber(files, nTrack)}-{slugify(nTitle)}.mdx</code>
               </p>
             )}
             <button className="button button--secondary button--block" onClick={startNew}>Создать заготовку</button>
+            <p className="ed-hint">
+              Получится страница: текст, подсказки и код. Глава — с обложкой, схемами, экзаменом
+              и видео — заводится в репозитории, попросите наставника.
+            </p>
           </div>
         )}
 
@@ -182,8 +177,12 @@ function Editor() {
           <div className="ed-empty">
             <h2>Выберите страницу слева или создайте новую</h2>
             <p className="ac-muted">
-              Простая страница — это текст с подсказками, её видно на сайте сразу.
-              Глава — полноценный материал с обложкой, схемами и экзаменом.
+              Страница — это текст с подсказками: памятка, объявление, разбор задания.
+              Она появляется в меню раздела и в маршруте сразу после сборки.
+            </p>
+            <p className="ac-muted">
+              Порядок целиком — в главе{' '}
+              <a href="/docs/advanced/kak-dobavit-stranicu">«Как добавить материал»</a>.
             </p>
           </div>
         ) : (

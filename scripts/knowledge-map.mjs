@@ -27,7 +27,11 @@ export function numberPrefix(segment) {
   return m ? m[1] : '';
 }
 
-export function buildMap(docsDir) {
+// Главы и простые страницы собираются одним обходом, но выгружаются в РАЗНЫЕ
+// файлы. Так потребителю не надо помнить про фильтр: knowledge-map.json — это
+// всегда главы, pages.json — всегда страницы. Когда они лежали вместе, про
+// фильтр забыли и упала сборка (15.09.2026).
+export function buildMap(docsDir, kind = 'chapter') {
   const out = [];
   const walk = d => fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
     const p = path.join(d, e.name);
@@ -48,10 +52,7 @@ export function buildMap(docsDir) {
       if (data[f] === undefined) throw new Error(`missing frontmatter: ${p}: ${f}`);
     if (!AUD.includes(data.audience) || !LVL.includes(data.level))
       throw new Error(`missing frontmatter: ${p}: bad value`);
-    // Карта знаний — это главы. Простая страница (памятка, объявление) фронтматтер
-    // проходит, но в карту не попадает: иначе её ждут в маршруте, в зале, в
-    // вопросах дня и в дашборде наставника — везде нулевой главой.
-    if ((data.kind || 'chapter') !== 'chapter') return;
+    if ((data.kind || 'chapter') !== kind) return;
     const base = e.name.replace(/\.mdx?$/, '');
     const ext = e.name.slice(base.length);
     const id = stripNumberPrefix(base);
@@ -97,6 +98,7 @@ export function writeCategories(docsDir) {
 if (process.argv[1].endsWith('knowledge-map.mjs')) {
   fs.mkdirSync('src/data', { recursive: true });
   fs.writeFileSync('src/data/knowledge-map.json', JSON.stringify(buildMap('docs'), null, 2));
+  fs.writeFileSync('src/data/pages.json', JSON.stringify(buildMap('docs', 'page'), null, 2));
   writeCategories('docs');
-  console.log('knowledge-map.json written');
+  console.log('knowledge-map.json и pages.json written');
 }

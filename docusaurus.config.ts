@@ -75,7 +75,6 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           // «Редактировать страницу» под каждой главой: GitHub сам предложит
           // форк и PR любому залогиненному. Подпись локализована в i18n/ru/code.json.
-          editUrl: 'https://github.com/pgk-champs/platform/edit/main/',
         },
         blog: false,
         theme: {
@@ -128,9 +127,14 @@ const config: Config = {
           ],
         },
         {
-          to: '/community',
+          type: 'dropdown',
           label: 'Сообщество',
           position: 'left',
+          items: [
+            {to: '/community', label: 'Каталог — видео, ссылки, пресеты'},
+            {to: '/docs/advanced/kak-dobavit-stranicu', label: 'Как добавить материал'},
+            {to: '/edit', label: 'Правка страниц — для авторов'},
+          ],
         },
         {
           type: 'dropdown',
@@ -141,7 +145,6 @@ const config: Config = {
             {to: '/achievements', label: 'Достижения и рекорды'},
             {to: '/favorites', label: 'Избранное'},
             {to: '/mentor', label: 'Дашборд наставника'},
-            {to: '/edit', label: 'Править страницы'},
           ],
         },
         {

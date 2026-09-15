@@ -289,6 +289,13 @@
   color: #fff;
 }
 
+/* Страница — не уровень сложности, а другой жанр: нейтральный, не цветной. */
+.rl-badge-страница {
+  background: transparent;
+  border: 1px solid var(--ifm-color-emphasis-400);
+  color: var(--ifm-color-emphasis-700);
+}
+
 .rl-matrix {
   width: 100%;
   border-collapse: collapse;

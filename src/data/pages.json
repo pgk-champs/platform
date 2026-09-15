@@ -1,0 +1,34 @@
+[
+  {
+    "id": "chto-takoe-dobrota",
+    "title": "Что такое доброта?",
+    "audience": "все",
+    "level": "база",
+    "order": 10,
+    "path": "advanced/chto-takoe-dobrota.mdx",
+    "track": "advanced",
+    "num": "10",
+    "cover": "Что такое доброта?",
+    "totals": {
+      "sections": 0,
+      "quizzes": 0,
+      "trainers": 0
+    }
+  },
+  {
+    "id": "kak-dobavit-stranicu",
+    "title": "Как добавить материал",
+    "audience": "все",
+    "level": "база",
+    "order": 10,
+    "path": "advanced/kak-dobavit-stranicu.mdx",
+    "track": "advanced",
+    "num": "",
+    "cover": "Как добавить материал",
+    "totals": {
+      "sections": 0,
+      "quizzes": 0,
+      "trainers": 0
+    }
+  }
+]

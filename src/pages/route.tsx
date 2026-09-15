@@ -6,6 +6,7 @@ import RouteList, { type Entry } from '../components/RouteList';
 import DailyChallenge from '../components/DailyChallenge';
 import TrainingSchedule from '../components/TrainingSchedule';
 import map from '../data/knowledge-map.json';
+import pages from '../data/pages.json';
 
 export default function Route() {
   const [track, setTrack] = useState<'мобилка' | 'блокчейн'>('мобилка');
@@ -36,7 +37,7 @@ export default function Route() {
             Блокчейн
           </button>
         </div>
-        <RouteList map={map as Entry[]} track={track} />
+        <RouteList map={map as Entry[]} pages={pages as Entry[]} track={track} />
         <TrainingSchedule />
       </main>
     </Layout>

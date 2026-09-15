@@ -57,12 +57,24 @@ export function statusOf(chapterId: string, checked: boolean): Status {
   return 'not-started';
 }
 
-export default function RouteList({ map, track }: { map: Entry[]; track: 'мобилка' | 'блокчейн' }) {
+export default function RouteList({
+  map,
+  pages = [],
+  track,
+}: {
+  map: Entry[];
+  // Простые страницы: памятки и разборы. Прогресса и экзамена у них нет, поэтому
+  // здесь они без галочки и без статуса — просто чтобы их было видно в маршруте.
+  pages?: Entry[];
+  track: 'мобилка' | 'блокчейн';
+}) {
   // Прогресс квизов/секций/тренажёров живёт в общем store — статус-чипы должны
   // перерисовываться при его изменениях (например после квиза на другой вкладке).
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
 
-  const visible = map.filter((e) => e.audience === 'все' || e.audience === track);
+  const forTrack = (e: Entry) => e.audience === 'все' || e.audience === track;
+  const visible = map.filter(forTrack);
+  const visiblePages = pages.filter(forTrack);
   // Углубления — необязательные отдельные темы: не участвуют в основном
   // маршруте (порядок/замки/сертификат), показываются своей секцией ниже.
   const chapters = visible.filter((e) => e.level !== 'углубление');
@@ -144,6 +156,23 @@ export default function RouteList({ map, track }: { map: Entry[]; track: 'моб
                 </li>
               );
             })}
+          </ul>
+        </>
+      )}
+
+      {visiblePages.length > 0 && (
+        <>
+          <h2>Страницы</h2>
+          <p className="rl-deep-note">
+            Памятки и разборы от наставников и студентов. Без прогресса и экзамена — читаются как есть.
+          </p>
+          <ul className="rl-list">
+            {visiblePages.map((pg) => (
+              <li key={pg.id}>
+                <Link to={`/docs/${pg.path.replace(/\.mdx?$/, '')}`}>{pg.title}</Link>
+                <span className="rl-badge rl-badge-страница">страница</span>
+              </li>
+            ))}
           </ul>
         </>
       )}
