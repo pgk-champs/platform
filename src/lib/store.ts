@@ -63,7 +63,7 @@ type State = {
   /** Уже оплаченные разовые начисления — reason из addXp (см. addXp). */
   xpAwarded: string[];
   achievementsUnlocked: string[];
-  prefs: { os?: OsId; name?: string; ide?: IdeId };
+  prefs: { os?: OsId; name?: string; ide?: IdeId; skin?: string };
   tocCollapsed: Record<string, boolean>;
   quizLog: QuizLogEntry[];
   blocksCollapsed: Record<string, boolean>;
@@ -334,6 +334,23 @@ function achIsUnlocked(id: string): boolean {
 }
 
 // --- prefs ---
+
+// Оформление сосудов Маршрута. Значение уходит в атрибут data-skin, поэтому на
+// ЧТЕНИИ проверяется по списку: тема, которой больше нет (или мусор из чужой
+// вкладки), не должна оставить сосуды без переменных — молча откатываемся.
+export const SKINS = ['classic', 'cola', 'energy'] as const;
+export type Skin = (typeof SKINS)[number];
+
+function setSkin(skin: Skin): void {
+  state.prefs = { ...state.prefs, skin };
+  persist();
+}
+
+function getSkin(): Skin {
+  const v = state.prefs.skin;
+  return (SKINS as readonly string[]).includes(v ?? '') ? (v as Skin) : 'classic';
+}
+
 function setOs(os: OsId): void {
   state.prefs = { ...state.prefs, os };
   persist();
@@ -594,7 +611,7 @@ export const store = {
   getXp,
   getXpMultiplier,
   achievements: { unlock: achUnlock, list: achList, isUnlocked: achIsUnlocked },
-  prefs: { setOs, getOs, setName, getName, setIde, getIde },
+  prefs: { setOs, getOs, setName, getName, setIde, getIde, setSkin, getSkin },
   words: { queue: wordsQueue, grade: gradeWord, weight: wordWeight },
   toc: { setCollapsed: setTocCollapsed, isCollapsed: isTocCollapsed },
   block: { setCollapsed: setBlockCollapsed, isCollapsed: isBlockCollapsed },

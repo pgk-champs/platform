@@ -292,3 +292,57 @@
   --lid-h: 9px;
   --v-radius: 6px;
 }
+
+/* ─────────── выбор темы в кабинете ─────────── */
+
+.ac-skins { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 10px; }
+
+.ac-skin {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 13px 7px 8px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 999px;
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-color-emphasis-700);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.ac-skin[aria-pressed='true'] {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-font-color-base);
+}
+
+.ac-skin-chip {
+  width: 15px;
+  height: 20px;
+  border-radius: 3px;
+  flex: none;
+  position: relative;
+  overflow: hidden;
+  background: var(--v-body);
+  box-shadow: inset 0 0 0 1px var(--v-edge);
+}
+
+.ac-skin-chip::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 62%;
+  background: var(--v-liquid);
+}
+
+.ac-skin-chip::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4px;
+  background: var(--v-lid);
+}

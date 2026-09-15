@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import Layout from '@theme/Layout';
 import BrowserOnly from '@docusaurus/BrowserOnly';
-import { store } from '../lib/store';
+import { store, SKINS, type Skin } from '../lib/store';
 import { levelForXp } from '../lib/levels';
 import Link from '@docusaurus/Link';
 import './edit.css';
+import '../components/vessels.css';
 import {
   apiAvailable,
   fetchMyPlaces,
@@ -243,12 +244,56 @@ function AuthorLink(): React.ReactElement | null {
   );
 }
 
+// Оформление сосудов Маршрута. Стоит на уровне страницы, а не внутри кабинета:
+// это местная настройка, она работает и без входа.
+const SKIN_LABELS: Record<Skin, string> = {
+  classic: 'Без темы',
+  cola: 'Кола',
+  energy: 'Энергетик',
+};
+
+function SkinPicker() {
+  useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
+  const active = store.prefs.getSkin();
+
+  return (
+    <div className="ac-card">
+      <h2>Оформление полосы</h2>
+      <p className="ac-muted">Как выглядят сосуды глав на Маршруте.</p>
+      <div className="ac-skins">
+        {SKINS.map((value) => (
+          <button
+            key={value}
+            type="button"
+            className="ac-skin"
+            // data-skin на самой кнопке обязателен: без него все образцы
+            // показали бы текущую тему вместо своей.
+            data-skin={value}
+            aria-pressed={active === value}
+            onClick={() => store.prefs.setSkin(value)}
+          >
+            <i className="ac-skin-chip" aria-hidden="true" />
+            {SKIN_LABELS[value]}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function AccountPage() {
   return (
     <Layout title="Личный кабинет" description="Вход через GitHub и синхронизация прогресса">
       <main className="container margin-vert--lg ac-page">
         <h1>Личный кабинет</h1>
-        <BrowserOnly fallback={<p className="ac-muted">Загрузка…</p>}>{() => <Cabinet />}</BrowserOnly>
+        <BrowserOnly fallback={<p className="ac-muted">Загрузка…</p>}>
+          {() => (
+            <>
+              <Cabinet />
+              <SkinPicker />
+            </>
+          )}
+        </BrowserOnly>
       </main>
     </Layout>
   );
