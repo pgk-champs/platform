@@ -48,6 +48,10 @@ export function buildMap(docsDir) {
       if (data[f] === undefined) throw new Error(`missing frontmatter: ${p}: ${f}`);
     if (!AUD.includes(data.audience) || !LVL.includes(data.level))
       throw new Error(`missing frontmatter: ${p}: bad value`);
+    // Карта знаний — это главы. Простая страница (памятка, объявление) фронтматтер
+    // проходит, но в карту не попадает: иначе её ждут в маршруте, в зале, в
+    // вопросах дня и в дашборде наставника — везде нулевой главой.
+    if ((data.kind || 'chapter') !== 'chapter') return;
     const base = e.name.replace(/\.mdx?$/, '');
     const ext = e.name.slice(base.length);
     const id = stripNumberPrefix(base);
