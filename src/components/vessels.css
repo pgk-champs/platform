@@ -1,0 +1,294 @@
+/* Сосуды Маршрута: глава наполняется снизу вверх, пока жидкость не дойдёт до
+   крышки. Оформление задаётся переменными на [data-skin] — разметка одна на все
+   темы, так что новая тема стоит девяти строк и не трогает ни компонент, ни логику. */
+
+/* ─────────── сосуд ─────────── */
+
+.vessel {
+  position: relative;
+  display: block;
+  height: 78px;
+  border-radius: var(--v-radius, 6px);
+  background: var(--v-body);
+  box-shadow: inset 0 0 0 1px var(--v-edge);
+  overflow: hidden;
+}
+
+.vessel:hover { box-shadow: inset 0 0 0 1px var(--v-edge), 0 0 0 2px var(--ifm-color-primary); }
+
+/* Крышка есть всегда, даже у пустого сосуда: это деталь предмета, а не отметка. */
+.vessel .lid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--lid-h, 11px);
+  background: var(--v-lid);
+  box-shadow: inset 0 -1px 0 var(--v-edge);
+}
+
+/* Язычок банки — только у тех тем, где заданы его размеры. */
+.vessel .lid::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--tab-w, 0);
+  height: var(--tab-h, 0);
+  border-radius: 999px;
+  border: 1.5px solid var(--v-tab, transparent);
+}
+
+.vessel .vat {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--lid-h, 11px);
+  bottom: 0;
+  overflow: hidden;
+}
+
+.vessel .liquid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0;
+  background: var(--v-liquid);
+  transition: height 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.vessel .foam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--foam-h, 0);
+  background: var(--v-foam, transparent);
+  border-radius: var(--foam-r, 0);
+}
+
+/* Пузырьки шипят только в той главе, которую читают сейчас: пять кипящих разом —
+   это «слишком много движения», взгляд не находит, куда смотреть. */
+.vessel.here .liquid::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  background-image:
+    radial-gradient(circle, var(--v-bubble, transparent) 1.4px, transparent 1.8px),
+    radial-gradient(circle, var(--v-bubble, transparent) 1px, transparent 1.4px);
+  background-size: 15px 23px, 21px 31px;
+  animation: vessel-rise 3.4s linear infinite;
+}
+
+@keyframes vessel-rise {
+  to { background-position: 0 -23px, 0 -31px; }
+}
+
+/* Полнота видна формой — жидкость достаёт до крышки. Подсветка крышки идёт
+   вдобавок: цветом одним смысл передавать нельзя. */
+.vessel.full .lid { filter: brightness(1.18); }
+
+.vs-pc {
+  position: absolute;
+  inset: auto 0 5px 0;
+  text-align: center;
+  font: 600 0.72rem var(--ifm-font-family-monospace);
+  color: var(--v-ink);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vessel .liquid { transition: none; }
+  .vessel.here .liquid::after { animation: none; }
+}
+
+/* ─────────── окно ближайших глав ─────────── */
+
+.vs { display: flex; flex-direction: column; gap: 14px; }
+
+.vs-win { display: flex; align-items: stretch; gap: 8px; }
+
+.vs-arrow {
+  flex: none;
+  width: 32px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-color-emphasis-700);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.vs-arrow:disabled { opacity: 0.35; cursor: default; }
+.vs-arrow:hover:not(:disabled) { border-color: var(--ifm-color-primary); color: var(--ifm-color-primary); }
+
+.vs-slots { flex: 1; display: flex; gap: 7px; min-width: 0; }
+.vs-slot { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+
+.vs-cap {
+  font-size: 0.72rem;
+  color: var(--ifm-color-emphasis-600);
+  text-align: center;
+  line-height: 1.25;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.vs-slot.here .vs-cap { color: var(--ifm-font-color-base); font-weight: 600; }
+
+/* На узком экране пять сосудов дают около тридцати пяти пикселей на каждый:
+   уровень и процент читаются, а название — уже нет. Подписана текущая глава. */
+@media (max-width: 560px) {
+  .vs-slot .vs-cap { display: none; }
+  .vs-slot.here .vs-cap { display: -webkit-box; }
+}
+
+/* ─────────── весь трек тонкой строкой ─────────── */
+
+.vs-minirow { display: flex; align-items: center; gap: 10px; }
+.vs-edge { font-size: 0.74rem; color: var(--ifm-color-emphasis-600); flex: none; }
+
+.vs-mini {
+  position: relative;
+  flex: 1;
+  display: flex;
+  gap: 1.5px;
+  height: 12px;
+  min-width: 0;
+  cursor: grab;
+  touch-action: none;
+}
+
+.vs-mini:active { cursor: grabbing; }
+.vs-mini i { flex: 1; min-width: 2px; background: var(--ifm-color-emphasis-300); border-radius: 2px; }
+.vs-mini i.part, .vs-mini i.full { background: var(--v-liquid); }
+.vs-mini i.part { opacity: 0.5; }
+
+.vs-view {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  border: 2px solid var(--ifm-font-color-base);
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--ifm-font-color-base) 8%, transparent);
+  pointer-events: none;
+  transition: left 0.3s cubic-bezier(0.22, 0.61, 0.36, 1), width 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) { .vs-view { transition: none; } }
+
+/* ─────────── карточка «Продолжить» ─────────── */
+
+.vs-now {
+  border: 1px solid var(--ifm-color-primary);
+  border-radius: 14px;
+  padding: 16px;
+  background: color-mix(in srgb, var(--ifm-color-primary) 10%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  margin-bottom: 18px;
+}
+
+.vs-now-k {
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ifm-color-primary);
+  font-weight: 700;
+}
+
+.vs-now-t { font-family: var(--ifm-heading-font-family); font-weight: 700; font-size: 1.18rem; }
+.vs-now-line { display: flex; align-items: center; gap: 11px; }
+
+.vs-now-track {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--ifm-background-surface-color);
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px var(--ifm-color-emphasis-300);
+}
+
+.vs-now-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--v-liquid);
+  transition: width 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.vs-now-pc {
+  font: 600 0.82rem var(--ifm-font-family-monospace);
+  font-variant-numeric: tabular-nums;
+  color: var(--ifm-color-emphasis-700);
+  flex: none;
+}
+
+.vs-now .button { align-self: flex-start; }
+
+@media (prefers-reduced-motion: reduce) { .vs-now-fill { transition: none; } }
+
+/* ─────────── темы ─────────── */
+
+[data-skin='classic'] {
+  --v-body: var(--ifm-color-emphasis-200);
+  --v-edge: var(--ifm-color-emphasis-300);
+  --v-liquid: var(--ifm-color-primary);
+  --v-lid: var(--ifm-color-emphasis-500);
+  --v-ink: #fff;
+  --v-bubble: rgba(255, 255, 255, 0.75);
+  --foam-h: 0;
+  --lid-h: 9px;
+  --v-radius: 6px;
+}
+
+[data-skin='cola'] {
+  --v-body: linear-gradient(180deg, #e7e7ec, #c9c9d2);
+  --v-edge: rgba(0, 0, 0, 0.25);
+  --v-liquid: linear-gradient(180deg, #5a2d14, #2b1206);
+  --v-lid: linear-gradient(180deg, #d8d8de, #a9a9b4);
+  --v-ink: #fff;
+  --v-bubble: rgba(255, 255, 255, 0.6);
+  --tab-w: 13px;
+  --tab-h: 7px;
+  --v-tab: rgba(0, 0, 0, 0.45);
+  --foam-h: 0;
+  --lid-h: 12px;
+  --v-radius: 3px;
+}
+
+[data-skin='energy'] {
+  --v-body: linear-gradient(180deg, #232334, #14141f);
+  --v-edge: rgba(182, 255, 46, 0.4);
+  --v-liquid: linear-gradient(180deg, #d4ff4f, #7ad900);
+  --v-lid: linear-gradient(180deg, #b6ff2e, #6fae00);
+  --v-ink: #14210a;
+  --v-bubble: rgba(255, 255, 255, 0.85);
+  --tab-w: 12px;
+  --tab-h: 6px;
+  --v-tab: rgba(0, 0, 0, 0.5);
+  --foam-h: 0;
+  --lid-h: 13px;
+  --v-radius: 3px;
+}
+
+/* Тема ещё не выбрана (первый заход, приватный режим) — сосуд всё равно должен
+   быть виден, а не остаться прозрачным прямоугольником без переменных. */
+:root:not([data-skin]) {
+  --v-body: var(--ifm-color-emphasis-200);
+  --v-edge: var(--ifm-color-emphasis-300);
+  --v-liquid: var(--ifm-color-primary);
+  --v-lid: var(--ifm-color-emphasis-500);
+  --v-ink: #fff;
+  --v-bubble: rgba(255, 255, 255, 0.75);
+  --foam-h: 0;
+  --lid-h: 9px;
+  --v-radius: 6px;
+}
