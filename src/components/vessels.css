@@ -91,14 +91,20 @@
    вдобавок: цветом одним смысл передавать нельзя. */
 .vessel.full .lid { filter: brightness(1.18); }
 
+/* Процент стоит у дна сосуда и при малом наполнении оказывается не на жидкости,
+   а на пустом корпусе. Поэтому он не берёт цвет темы, а несёт свою подложку:
+   читается и на светлом стекле, и на почти чёрной коле, и в обеих темах сайта. */
 .vs-pc {
   position: absolute;
-  inset: auto 0 5px 0;
-  text-align: center;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ifm-background-surface-color) 82%, transparent);
+  color: var(--ifm-font-color-base);
   font: 600 0.72rem var(--ifm-font-family-monospace);
-  color: var(--v-ink);
   font-variant-numeric: tabular-nums;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -242,7 +248,6 @@
   --v-edge: var(--ifm-color-emphasis-300);
   --v-liquid: var(--ifm-color-primary);
   --v-lid: var(--ifm-color-emphasis-500);
-  --v-ink: #fff;
   --v-bubble: rgba(255, 255, 255, 0.75);
   --foam-h: 0;
   --lid-h: 9px;
@@ -254,7 +259,6 @@
   --v-edge: rgba(0, 0, 0, 0.25);
   --v-liquid: linear-gradient(180deg, #5a2d14, #2b1206);
   --v-lid: linear-gradient(180deg, #d8d8de, #a9a9b4);
-  --v-ink: #fff;
   --v-bubble: rgba(255, 255, 255, 0.6);
   --tab-w: 13px;
   --tab-h: 7px;
@@ -269,7 +273,6 @@
   --v-edge: rgba(182, 255, 46, 0.4);
   --v-liquid: linear-gradient(180deg, #d4ff4f, #7ad900);
   --v-lid: linear-gradient(180deg, #b6ff2e, #6fae00);
-  --v-ink: #14210a;
   --v-bubble: rgba(255, 255, 255, 0.85);
   --tab-w: 12px;
   --tab-h: 6px;
@@ -286,7 +289,6 @@
   --v-edge: var(--ifm-color-emphasis-300);
   --v-liquid: var(--ifm-color-primary);
   --v-lid: var(--ifm-color-emphasis-500);
-  --v-ink: #fff;
   --v-bubble: rgba(255, 255, 255, 0.75);
   --foam-h: 0;
   --lid-h: 9px;
