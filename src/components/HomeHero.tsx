@@ -1,30 +1,29 @@
 import React from 'react';
 import Link from '@docusaurus/Link';
+import knowledgeMap from '../data/knowledge-map.json';
+import tracks from '../data/tracks.json';
+import { ACHIEVEMENTS } from '../lib/achievements';
+import { plural } from '../lib/plural';
 import './trainers.css';
 
+// Числа считаются из данных, а не вписываются руками: «22 главы с разбором»
+// дожили на первом экране до 137 настоящих и никого не смутили.
+const CHAPTERS = (knowledgeMap as { totals?: { trainers?: number } }[]).length;
+const TRAINERS = (knowledgeMap as { totals?: { trainers?: number } }[]).reduce(
+  (sum, e) => sum + (e.totals?.trainers ?? 0),
+  0,
+);
+
 const STATS = [
-  { num: '22', label: 'главы с разбором' },
-  { num: '40+', label: 'тренажёра' },
-  { num: '43', label: 'достижения' },
+  { num: String(CHAPTERS), label: `${plural(CHAPTERS, 'глава', 'главы', 'глав')} с разбором` },
+  { num: String(TRAINERS), label: plural(TRAINERS, 'тренажёр', 'тренажёра', 'тренажёров') },
+  { num: String(ACHIEVEMENTS.length), label: plural(ACHIEVEMENTS.length, 'достижение', 'достижения', 'достижений') },
 ];
 
-const TRACKS = [
-  {
-    to: '/docs/foundation',
-    title: 'Фундамент',
-    desc: 'Базовые знания для любого разработчика',
-  },
-  {
-    to: '/docs/mobile',
-    title: 'Мобилка',
-    desc: 'Разработка мобильных приложений на Kotlin и Android',
-  },
-  {
-    to: '/docs/blockchain',
-    title: 'Блокчейн',
-    desc: 'Создание децентрализованных приложений и смарт-контрактов',
-  },
-];
+// Треки — из того же единственного списка, что меню и подвал.
+const TRACKS = [...(tracks as { dir: string; label: string; position: number; blurb: string }[])]
+  .sort((a, b) => a.position - b.position)
+  .map((t) => ({ to: `/docs/${t.dir}`, title: t.label, desc: t.blurb }));
 
 const ACCENT = 'var(--ifm-color-primary-lightest)';
 const DARK = 'var(--ifm-color-primary-darkest)';

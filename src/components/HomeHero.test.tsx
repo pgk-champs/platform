@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import HomeHero from './HomeHero';
+import knowledgeMap from '../data/knowledge-map.json';
+import { ACHIEVEMENTS } from '../lib/achievements';
 
 test('первый экран: надзаголовок, заголовок, подзаголовок и числа', () => {
   render(<HomeHero />);
@@ -8,14 +10,15 @@ test('первый экран: надзаголовок, заголовок, п�
     screen.getByRole('heading', { level: 1, name: 'От нуля до чемпиона' }),
   ).toBeTruthy();
   expect(screen.getByText(/симулятор чемпионата/)).toBeTruthy();
-  for (const [num, label] of [
-    ['22', 'главы с разбором'],
-    ['40+', 'тренажёра'],
-    ['43', 'достижения'],
-  ]) {
-    expect(screen.getByText(num)).toBeTruthy();
-    expect(screen.getByText(label)).toBeTruthy();
-  }
+  // Числа сверяются с данными, а не с переписанной константой: закреплённые
+  // «22 главы» держались на первом экране, пока глав не стало 137.
+  const trainers = (knowledgeMap as { totals?: { trainers?: number } }[]).reduce(
+    (sum, e) => sum + (e.totals?.trainers ?? 0),
+    0,
+  );
+  for (const n of [knowledgeMap.length, trainers, ACHIEVEMENTS.length])
+    expect(screen.getByText(String(n))).toBeTruthy();
+  expect(screen.getByText(/с разбором/)).toBeTruthy();
 });
 
 test('первый экран: два действия и честная оговорка про регистрацию', () => {

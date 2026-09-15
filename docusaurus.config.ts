@@ -133,23 +133,15 @@ const config: Config = {
           items: [
             {to: '/community', label: 'Каталог — видео, ссылки, пресеты'},
             {to: '/docs/advanced/kak-dobavit-stranicu', label: 'Как добавить материал'},
-            {to: '/edit', label: 'Правка страниц — для авторов'},
-          ],
-        },
-        {
-          type: 'dropdown',
-          label: 'Мои успехи',
-          position: 'right',
-          items: [
-            {to: '/account', label: 'Личный кабинет'},
-            {to: '/achievements', label: 'Достижения и рекорды'},
-            {to: '/favorites', label: 'Избранное'},
-            {to: '/mentor', label: 'Дашборд наставника'},
           ],
         },
         {
           href: 'https://github.com/pgk-champs/platform',
           label: 'GitHub',
+          position: 'right',
+        },
+        {
+          type: 'custom-account',
           position: 'right',
         },
       ],

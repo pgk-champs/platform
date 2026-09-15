@@ -1,0 +1,93 @@
+/* Профиль в шапке: аватар с меню, у гостя — кнопка входа. */
+
+.an-login {
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+.an-role {
+  white-space: nowrap;
+}
+
+.an-wrap {
+  display: flex;
+  align-items: center;
+  padding: 0 0 0 8px;
+}
+
+.an-trigger {
+  display: flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 999px;
+  line-height: 0;
+}
+
+.an-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 2px solid var(--ifm-color-emphasis-300);
+  object-fit: cover;
+}
+
+.an-trigger:hover .an-avatar,
+.an-wrap:hover .an-avatar {
+  border-color: var(--ifm-color-primary);
+}
+
+/* Кто вошёл — шапка меню, не пункт: не кликается и не подсвечивается. */
+.an-who {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 16px 10px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  font-size: 0.85rem;
+  line-height: 1.25;
+}
+
+.an-who span {
+  color: var(--ifm-color-emphasis-600);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.78rem;
+}
+
+.an-logout {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  color: var(--ifm-color-danger);
+}
+
+/* Ниже 997px Docusaurus прячет навбар в «бургер», и его стили выпадающих меню
+   там не действуют: класс dropdown--show вешается, а меню остаётся невидимым.
+   Аватар при этом в шапке ОСТАЁТСЯ — значит меню ему надо показать самим. */
+@media (max-width: 996px) {
+  .an-wrap { padding-left: 0; position: relative; }
+  .an-login { margin-left: 0; }
+
+  .an-wrap.dropdown--show .dropdown__menu {
+    display: block;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    left: auto;
+    min-width: 15rem;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    pointer-events: auto;
+    background: var(--ifm-dropdown-background-color, var(--ifm-background-surface-color));
+    border-radius: var(--ifm-global-radius);
+    box-shadow: var(--ifm-global-shadow-md);
+    padding: 0.5rem 0;
+    z-index: calc(var(--ifm-z-index-dropdown) + 1);
+  }
+}
