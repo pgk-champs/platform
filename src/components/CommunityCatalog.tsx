@@ -14,8 +14,6 @@ import './trainers.css';
 
 export const COMMUNITY_JSON_URL =
   'https://raw.githubusercontent.com/pgk-champs/community/main/community.json';
-export const SUBMIT_URL =
-  'https://github.com/pgk-champs/leaderboard/issues/new?template=submit-content.yml';
 
 export type CommunityItem = {
   id: string;
