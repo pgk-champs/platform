@@ -7839,6 +7839,16 @@
   align-items: center;
   gap: 0.4rem;
   font-size: 0.9rem;
+  /* Без min-width: 0 подпись не сжимается, а список растягивается под самое
+     длинное название главы — на телефоне страница уезжала вбок. */
+  min-width: 0;
+  max-width: 100%;
+}
+
+.cc-filters select {
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 auto;
 }
 
 .cc-filters select {
@@ -9120,6 +9130,8 @@
 .cc-rtitle { font-weight: 600; font-size: 0.93rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cc-rsub { font-size: 0.78rem; color: var(--ifm-color-emphasis-600); }
 
+/* Тег главы не должен распирать строку: он nowrap, и при длинном названии
+   строка переставала сжиматься, а страница ехала вбок на телефоне. */
 .cc-tag {
   font-size: 0.74rem;
   padding: 2px 9px;
@@ -9127,6 +9139,10 @@
   background: var(--ifm-color-emphasis-200);
   color: var(--ifm-color-emphasis-700);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 45%;
+  min-width: 0;
 }
 
 .cc-empty {
