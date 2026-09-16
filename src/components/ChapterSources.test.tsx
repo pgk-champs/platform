@@ -1,7 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import ChapterSources, { pickSources } from './ChapterSources';
-import { COMMUNITY_JSON_URL } from './CommunityCatalog';
 
 const ITEMS = [
   {
@@ -69,6 +68,7 @@ function mockFetch(impl: () => Promise<unknown>) {
   return spy;
 }
 
+/** Сервер отдаёт материалы как {items: […]} — блок ходит к нему, не к файлу. */
 function okResponse(json: unknown) {
   return Promise.resolve({ ok: true, json: () => Promise.resolve(json) });
 }
@@ -78,11 +78,12 @@ afterEach(() => {
 });
 
 test('renders only video/source/link cards of its chapter', async () => {
-  const spy = mockFetch(() => okResponse(ITEMS));
+  const spy = mockFetch(() => okResponse({ items: ITEMS }));
   render(<ChapterSources chapterId="kotlin-vars" />);
 
-  expect(await screen.findByText('Материалы от сообщества')).toBeInTheDocument();
-  expect(spy).toHaveBeenCalledWith(COMMUNITY_JSON_URL);
+  expect(await screen.findByText('Принесли студенты')).toBeInTheDocument();
+  // ходим на сервер, а не в статический файл чужого репозитория
+  expect(String(spy.mock.calls[0][0])).toContain('/community');
   expect(screen.getByText('Kotlin с нуля — курс')).toBeInTheDocument();
   expect(screen.getByText('Официальная документация Kotlin')).toBeInTheDocument();
   expect(screen.getByText('Шпаргалка')).toBeInTheDocument();
@@ -93,7 +94,7 @@ test('renders only video/source/link cards of its chapter', async () => {
 });
 
 test('source/link cards carry type label, author and open the link in a new tab', async () => {
-  mockFetch(() => okResponse(ITEMS));
+  mockFetch(() => okResponse({ items: ITEMS }));
   render(<ChapterSources chapterId="kotlin-vars" />);
   const card = (await screen.findByText('Официальная документация Kotlin')).closest('a');
   expect(card).toHaveAttribute('href', 'https://kotlinlang.org/docs/basic-syntax.html');
@@ -104,7 +105,7 @@ test('source/link cards carry type label, author and open the link in a new tab'
 });
 
 test('video with a parseable youtube id renders the SSR-safe facade, not a plain link', async () => {
-  mockFetch(() => okResponse(ITEMS));
+  mockFetch(() => okResponse({ items: ITEMS }));
   render(<ChapterSources chapterId="kotlin-vars" />);
   expect(await screen.findByText('Kotlin с нуля — курс')).toBeInTheDocument();
   expect(document.querySelector('iframe')).not.toBeInTheDocument();
@@ -123,7 +124,7 @@ test('video without a parseable id (playlist link) falls back to a plain link ca
     data: 'https://www.youtube.com/playlist?list=PLgPRahgE-Gcu4s-I9mrHUrKUp9dY6QcJC',
     addedAt: '2026-09-01T16:00:00.000Z',
   };
-  mockFetch(() => okResponse([...ITEMS, playlist]));
+  mockFetch(() => okResponse({ items: [...ITEMS, playlist] }));
   render(<ChapterSources chapterId="kotlin-vars" />);
   const card = (await screen.findByText('Kotlin плейлист-курс')).closest('a');
   expect(card).toHaveAttribute('href', playlist.data);
@@ -131,7 +132,7 @@ test('video without a parseable id (playlist link) falls back to a plain link ca
 });
 
 test('renders nothing when the chapter has no sources', async () => {
-  mockFetch(() => okResponse(ITEMS));
+  mockFetch(() => okResponse({ items: ITEMS }));
   const { container } = render(<ChapterSources chapterId="typing" />);
   await vi.waitFor(() => expect(fetch).toHaveBeenCalled());
   expect(container).toBeEmptyDOMElement();
@@ -148,4 +149,18 @@ test('pickSources survives malformed payloads', () => {
   expect(pickSources('not-an-array', 'typing')).toEqual([]);
   expect(pickSources([null, 42, { id: 'x' }], 'typing')).toEqual([]);
   expect(pickSources(ITEMS, 'kotlin-vars').map((i) => i.id)).toEqual(['s1', 's2', 's3']);
+});
+
+
+test('материал, привязанный к странице, тоже попадает в её подвал', () => {
+  const raw = [
+    { id: '1', type: 'source', title: 'Шпаргалка', author: 'kto', chapterId: 'kak-dobavit-stranicu', data: 'https://a.ru' },
+    { id: '2', type: 'source', title: 'Чужое', author: 'kto', chapterId: 'typing', data: 'https://b.ru' },
+  ];
+  expect(pickSources(raw, 'kak-dobavit-stranicu').map((i) => i.title)).toEqual(['Шпаргалка']);
+});
+
+test('общий материал в подвал не попадает — ему место в каталоге', () => {
+  const raw = [{ id: '1', type: 'source', title: 'Общее', author: 'kto', data: 'https://a.ru' }];
+  expect(pickSources(raw, 'typing')).toEqual([]);
 });

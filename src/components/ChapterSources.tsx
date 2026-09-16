@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import {
-  COMMUNITY_JSON_URL,
   parseItems,
   TYPE_LABELS,
   type CommunityItem,
 } from './CommunityCatalog';
 import YoutubeFacade, { extractYoutubeVideoId } from './YoutubeFacade';
 import './trainers.css';
+import { fetchApprovedCommunity } from '../lib/account';
 
-// Авто-блок «Материалы от сообщества» в конце каждой главы (пакет sources,
-// волна 7): клиентский fetch того же community.json, что и /community, фильтр
+// Блок «Принесли студенты» в конце каждой главы и каждой страницы: материалы,
+// одобренные модератором, с сервера — фильтр
 // по chapterId и типам video/source/link. Пусто или сеть недоступна — блок не
 // рендерится вовсе, глава остаётся как была. Вставляется общим футером глав
 // (src/theme/DocItem/Footer), chapterId берётся из id документа.
@@ -44,9 +44,11 @@ export default function ChapterSources({ chapterId }: { chapterId: string }) {
   // Fetch только на клиенте: useEffect не выполняется при SSR-сборке.
   useEffect(() => {
     let alive = true;
-    fetch(COMMUNITY_JSON_URL)
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((json) => alive && setItems(pickSources(json, chapterId)))
+    // Материалы берутся с сервера, а не из статического файла в отдельном
+    // репозитории. Раньше одобренный материал попадал в каталог, но у главы не
+    // появлялся никогда — это и был молчаливый разрыв.
+    fetchApprovedCommunity()
+      .then((raw) => alive && setItems(pickSources(raw, chapterId)))
       .catch(() => {
         /* нет сети — блока просто нет */
       });
@@ -61,7 +63,7 @@ export default function ChapterSources({ chapterId }: { chapterId: string }) {
   // компонентом (эта секция клиентская и пуста при SSR, id тут не годится).
   return (
     <section className="chsrc">
-      <h2 className="chsrc-title">Материалы от сообщества</h2>
+      <h2 className="chsrc-title">Принесли студенты</h2>
       <div className="chsrc-grid">
         {items.map((item) => {
           const videoId = item.type === 'video' ? extractYoutubeVideoId(item.data as string) : null;
