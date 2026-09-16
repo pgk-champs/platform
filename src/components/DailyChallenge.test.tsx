@@ -10,7 +10,6 @@ import DailyChallenge, {
   dailyPool,
   eligibleChapters,
   pickDaily,
-  streakFire,
   todayKey,
 } from './DailyChallenge';
 
@@ -80,16 +79,6 @@ test('pickDaily даёт разные наборы в разные даты', ()
   expect(sets.size).toBeGreaterThan(20);
 });
 
-test('streakFire: пороги огоньков 1/3/7', () => {
-  expect(streakFire(0)).toBe('');
-  expect(streakFire(1)).toBe('🔥');
-  expect(streakFire(2)).toBe('🔥');
-  expect(streakFire(3)).toBe('🔥🔥');
-  expect(streakFire(6)).toBe('🔥🔥');
-  expect(streakFire(7)).toBe('🔥🔥🔥');
-  expect(streakFire(30)).toBe('🔥🔥🔥');
-});
-
 test('новичок в квизе: вопросы только из стартовых глав, честная строка и ссылки «по мотивам»', async () => {
   const { container } = render(<DailyChallenge />);
   fireEvent.click(await screen.findByText('Вызов дня'));
@@ -153,7 +142,7 @@ test('первый ответ фиксируется — перевыбрать 
   expect(screen.getByText(new RegExp(`Правильный ответ: `))).toBeTruthy();
 });
 
-test('активный стрик показывает XP-множитель рядом с огоньком', async () => {
+test('активный стрик показывает XP-множитель рядом с серией', async () => {
   const DAY_MS = 86400000;
   const today = todayKey();
   const daysAgo = (n: number) => new Date(new Date(`${today}T00:00:00Z`).getTime() - n * DAY_MS).toISOString().slice(0, 10);
@@ -174,6 +163,9 @@ test('если день уже пройден — квиз не открывае
   render(<DailyChallenge />);
   expect(await screen.findByText(/Вызов дня пройден: 3 из 5/)).toBeTruthy();
   expect(screen.queryByText('Вызов дня')).toBeNull();
-  expect(screen.getByText(/Серия: 1/)).toBeTruthy();
-  expect(screen.getByText('🔥')).toBeTruthy();
+  // Серия рисуется StreakBadge: число, склонённое слово и одна зажжённая ячейка
+  // недели. Эмодзи-огоньков больше нет — оформление теперь подхватывает тему.
+  const streak = screen.getByLabelText('Серия: 1');
+  expect(streak.textContent).toContain('день подряд');
+  expect(streak.querySelectorAll('.st-pip.on')).toHaveLength(1);
 });

@@ -6412,21 +6412,6 @@
   background: var(--ifm-background-surface-color);
 }
 
-.dc-streak {
-  font-weight: var(--ifm-font-weight-bold);
-  color: var(--ifm-font-color-base);
-}
-
-.dc-fire {
-  margin-right: 0.25rem;
-}
-
-.dc-multiplier {
-  margin-left: 0.4rem;
-  font-weight: var(--ifm-font-weight-bold);
-  color: var(--pgk-text-warning);
-}
-
 .dc-done {
   color: var(--pgk-text-success);
 }

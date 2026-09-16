@@ -252,6 +252,8 @@
   --foam-h: 0;
   --lid-h: 9px;
   --v-radius: 6px;
+  --st-glow: transparent;
+  --st-mult-ink: #fff;
 }
 
 [data-skin='cola'] {
@@ -266,6 +268,8 @@
   --foam-h: 0;
   --lid-h: 12px;
   --v-radius: 3px;
+  --st-glow: rgba(224, 31, 45, 0.45);
+  --st-mult-ink: #fff;
 }
 
 [data-skin='energy'] {
@@ -280,6 +284,8 @@
   --foam-h: 0;
   --lid-h: 13px;
   --v-radius: 3px;
+  --st-glow: rgba(182, 255, 46, 0.55);
+  --st-mult-ink: #14210a;
 }
 
 /* Тема ещё не выбрана (первый заход, приватный режим) — сосуд всё равно должен
@@ -347,4 +353,50 @@
   top: 0;
   height: 4px;
   background: var(--v-lid);
+}
+
+/* ─────────── серия вызовов дня ─────────── */
+
+/* Ячейки серии заполняются той же жидкостью, что и сосуды: одна тема красит всю
+   страницу. Скин при желании переопределяет --st-on и --st-off отдельно. */
+
+.st {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.st-pips { display: flex; gap: 3px; flex: none; }
+
+.st-pip {
+  width: 9px;
+  height: 18px;
+  border-radius: 3px;
+  background: var(--st-off, var(--ifm-color-emphasis-300));
+  box-shadow: inset 0 0 0 1px var(--v-edge);
+}
+
+.st-pip.on {
+  background: var(--st-on, var(--v-liquid));
+  box-shadow: inset 0 0 0 1px var(--v-edge), 0 0 6px var(--st-glow, transparent);
+}
+
+.st-count { font-size: 0.9rem; color: var(--ifm-color-emphasis-700); }
+.st-count b {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ifm-font-color-base);
+}
+
+.st-empty { color: var(--ifm-color-emphasis-600); }
+
+.st-mult {
+  font: 600 0.78rem var(--ifm-font-family-monospace);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--st-on, var(--v-liquid));
+  color: var(--st-mult-ink, #fff);
+  white-space: nowrap;
 }

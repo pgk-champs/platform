@@ -6,6 +6,7 @@
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import Link from '@docusaurus/Link';
 import { store } from '../lib/store';
+import StreakBadge from './StreakBadge';
 import type { Question } from './SelfCheck';
 import knowledgeMap from '../data/knowledge-map.json';
 import './trainers.css';
@@ -991,14 +992,6 @@ export function pickDaily(dateKey: string, bank: DailyQuestion[] = DAILY_BANK): 
   return idx.slice(0, DAILY_SIZE).map((i) => bank[i]);
 }
 
-/** Огонёк серии: 1+ 🔥, 3+ 🔥🔥, 7+ 🔥🔥🔥. */
-export function streakFire(streak: number): string {
-  if (streak >= 7) return '🔥🔥🔥';
-  if (streak >= 3) return '🔥🔥';
-  if (streak >= 1) return '🔥';
-  return '';
-}
-
 export default function DailyChallenge() {
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
   // Дата появляется только после маунта: на SSR и при гидрации рендерится
@@ -1033,21 +1026,12 @@ export default function DailyChallenge() {
   if (!today) return <div className="dc" aria-hidden="true" />;
 
   const ds = store.dailyState(today);
-  const fire = streakFire(ds.streak);
   const multiplier = store.getXpMultiplier();
 
   return (
     <div className="dc">
       <div className="dc-plaque">
-        <span className="dc-streak">
-          {fire ? <span className="dc-fire">{fire}</span> : null} Серия: {ds.streak}{' '}
-          {ds.streak === 1 ? 'день' : ds.streak >= 2 && ds.streak <= 4 ? 'дня' : 'дней'}
-          {multiplier > 1 ? (
-            <span className="dc-multiplier" title="Бонус к XP за серию вызовов дня — действует на любое начисление">
-              ×{multiplier.toFixed(2).replace(/\.?0+$/, '')} XP
-            </span>
-          ) : null}
-        </span>
+        <StreakBadge streak={ds.streak} multiplier={multiplier} />
         {ds.done ? (
           <span className="dc-done">
             Вызов дня пройден: {ds.today?.correct} из {ds.today?.total} — возвращайся завтра
