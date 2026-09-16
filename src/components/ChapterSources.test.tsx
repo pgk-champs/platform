@@ -83,7 +83,7 @@ test('renders only video/source/link cards of its chapter', async () => {
 
   expect(await screen.findByText('Принесли студенты')).toBeInTheDocument();
   // ходим на сервер, а не в статический файл чужого репозитория
-  expect(String(spy.mock.calls[0][0])).toContain('/community');
+  expect(String(spy.mock.calls.at(0)?.at(0) ?? '')).toContain('/community');
   expect(screen.getByText('Kotlin с нуля — курс')).toBeInTheDocument();
   expect(screen.getByText('Официальная документация Kotlin')).toBeInTheDocument();
   expect(screen.getByText('Шпаргалка')).toBeInTheDocument();

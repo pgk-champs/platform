@@ -562,6 +562,30 @@ export async function saveContentFile(input: {
   }
 }
 
+export type ChapterVideo = { videoId: string; title: string; channel: string };
+
+/** Сохранить кураторские видео главы. Название и канал сервер подставит сам. */
+export async function saveChapterVideos(
+  chapterId: string,
+  videos: ChapterVideo[],
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  try {
+    const r = await api('/content/videos', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chapterId, videos }),
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      const base = data.error || `ошибка ${r.status}`;
+      return { ok: false, error: data.detail ? `${base} — ${data.detail}` : base };
+    }
+    return { ok: true };
+  } catch {
+    return { ok: false, error: 'сервер недоступен' };
+  }
+}
+
 export type ModeratorEntry = { login: string; addedBy?: string };
 
 export async function listModerators(): Promise<ModeratorEntry[]> {

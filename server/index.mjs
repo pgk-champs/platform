@@ -290,6 +290,10 @@ function cors(req, res) {
 // Путь приходит от автора, поэтому его проверяем строго: править можно ТОЛЬКО
 // файлы глав. Без этой проверки автор мог бы переписать код сервера или CI
 // тем же самым запросом.
+// Единственный файл, который правит ручка видео. Лежит константой рядом с
+// защитой путей, чтобы обе было видно сразу.
+const VIDEOS_PATH = 'src/data/chapter-videos.json';
+const VIDEO_ID = /^[A-Za-z0-9_-]{11}$/;
 const SAFE_DOC_PATH = /^docs\/[a-z0-9][a-z0-9-]*\/[A-Za-z0-9][A-Za-z0-9._-]*\.mdx$/;
 const safeDocPath = (p) => typeof p === 'string' && SAFE_DOC_PATH.test(p) && !p.includes('..');
 
@@ -1063,6 +1067,70 @@ const server = http.createServer(async (req, res) => {
       if (!action) return json(res, 400, { error: 'action: approve|reject' });
       setCommunityStatus.run(action, g.u.login, Date.now(), Number(modDecide[1]));
       return json(res, 200, { ok: true, status: action });
+    }
+
+    // Кураторские видео главы. Путь ЗАХАРДКОЖЕН и в теле запроса не принимается:
+    // иначе этой же ручкой можно было бы переписать любой файл репозитория,
+    // включая workflow деплоя. SAFE_DOC_PATH тут ни при чём и не расширяется.
+    if (path === '/content/videos' && req.method === 'PUT') {
+      const g = authorGuard();
+      if (g.err) return json(res, g.err[0], { error: g.err[1] });
+      let body;
+      try {
+        body = JSON.parse(await readBody(req, 20_000));
+      } catch {
+        return json(res, 400, { error: 'bad json' });
+      }
+      const chapterId = String(body.chapterId || '').trim();
+      const videos = Array.isArray(body.videos) ? body.videos : null;
+      if (!chapterId || !videos) return json(res, 400, { error: 'нужны глава и список роликов' });
+      if (videos.length < 4 || videos.length > 5) {
+        return json(res, 400, { error: 'роликов должно быть от четырёх до пяти' });
+      }
+
+      // Название и канал берём из ответа oEmbed той же проверки: заполнять их
+      // руками незачем, а на клиенте это был бы лишний внешний запрос на каждую
+      // добавленную ссылку.
+      const checked = [];
+      for (const v of videos) {
+        if (!v || !VIDEO_ID.test(String(v.videoId || ''))) {
+          return json(res, 400, { error: 'у ролика неверный идентификатор' });
+        }
+        const check = await checkLink(`https://www.youtube.com/watch?v=${v.videoId}`);
+        if (!check.ok) return json(res, 400, { error: `ролик ${v.videoId}: ${check.reason}` });
+        checked.push({
+          videoId: String(v.videoId),
+          title: String(v.title || check.title || '').slice(0, 200),
+          channel: String(v.channel || check.channel || '').slice(0, 120),
+        });
+      }
+
+      const cur = await gh(`contents/${VIDEOS_PATH}`);
+      if (!cur.ok) return json(res, 502, { error: 'не удалось прочитать файл видео' });
+      const all = JSON.parse(b64decode(cur.data.content));
+      all[chapterId] = checked;
+
+      const put = await gh(`contents/${VIDEOS_PATH}`, {
+        method: 'PUT',
+        body: {
+          message: `Видео главы ${chapterId}: правка через кабинет`,
+          content: b64encode(JSON.stringify(all, null, 2) + '\n'),
+          branch: CONTENT_BRANCH,
+          sha: cur.data.sha,
+        },
+      });
+      if (put.status === 409 || put.status === 422) {
+        return json(res, 409, { error: 'файл успели изменить — откройте главу заново' });
+      }
+      if (!put.ok) {
+        return json(res, 502, {
+          error: 'GitHub не разрешил запись',
+          detail:
+            (put.data?.message ? put.data.message + '. ' : '') +
+            'Обычно это значит, что ключу доступа не выдано право Contents: Read and write',
+        });
+      }
+      return json(res, 200, { ok: true });
     }
 
     if (path === '/content/authors' && req.method === 'GET') {
