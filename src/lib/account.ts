@@ -562,6 +562,43 @@ export async function saveContentFile(input: {
   }
 }
 
+export type ModeratorEntry = { login: string; addedBy?: string };
+
+export async function listModerators(): Promise<ModeratorEntry[]> {
+  const r = await api('/moderate/people');
+  if (!r.ok) return [];
+  return ((await r.json()).moderators ?? []) as ModeratorEntry[];
+}
+
+export async function addModerator(login: string): Promise<boolean> {
+  const r = await api('/moderate/people', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ login }),
+  });
+  return r.ok;
+}
+
+export async function removeModerator(login: string): Promise<boolean> {
+  return (await api(`/moderate/people/${encodeURIComponent(login)}`, { method: 'DELETE' })).ok;
+}
+
+/** Очередь непроверенных материалов. Пускает и наставника, и модератора. */
+export async function fetchModerationQueue(): Promise<PendingItem[]> {
+  const r = await api('/moderate/queue');
+  if (!r.ok) return [];
+  return ((await r.json()).items ?? []) as PendingItem[];
+}
+
+export async function decideMaterial(id: number, action: 'approve' | 'reject'): Promise<boolean> {
+  const r = await api(`/moderate/${id}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action }),
+  });
+  return r.ok;
+}
+
 export async function listAuthors(): Promise<AuthorEntry[]> {
   const r = await api('/content/authors');
   if (!r.ok) return [];

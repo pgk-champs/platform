@@ -170,6 +170,18 @@ const removeAuthorRow = db.prepare('DELETE FROM authors WHERE login = ?');
 const isAuthor = (u) =>
   !!u && (CONTENT_AUTHORS.includes(String(u.login).toLowerCase()) || !!authorRow.get(String(u.login).toLowerCase()));
 
+// Модератор проверяет материалы сообщества. Отдельно от наставника: проверять
+// чужие ссылки и вести группу — разные занятия, и второе отдавать не обязательно.
+db.exec(`CREATE TABLE IF NOT EXISTS moderators (
+  login TEXT PRIMARY KEY, added_by TEXT, added_at INTEGER
+)`);
+const moderatorRow = db.prepare('SELECT login FROM moderators WHERE login = ?');
+const allModeratorRows = db.prepare('SELECT login, added_by, added_at FROM moderators ORDER BY added_at');
+const addModeratorRow = db.prepare('INSERT OR IGNORE INTO moderators (login, added_by, added_at) VALUES (?, ?, ?)');
+const removeModeratorRow = db.prepare('DELETE FROM moderators WHERE login = ?');
+// Наставник модерирует и без роли: она нужна, чтобы отдать проверку студенту.
+const isModerator = (u) => !!u && (isMentor(u) || !!moderatorRow.get(String(u.login).toLowerCase()));
+
 // Каталог сообщества с модерацией: ученик присылает материал (pending),
 // наставник одобряет/отклоняет. Одобренные отдаются публично и ложатся в
 // каталог поверх статичного community.json.
@@ -978,6 +990,81 @@ const server = http.createServer(async (req, res) => {
     }
 
     // Управление ролью автора — только наставник.
+    const moderatorGuard = () => {
+      const s2 = bearer(req);
+      if (!s2) return { err: [401, 'unauthorized'] };
+      const u = getUser.get(s2.id);
+      if (!isModerator(u)) return { err: [403, 'нужна роль модератора'] };
+      return { u };
+    };
+
+    // Выдача роли — раньше проверки очереди: '/moderate/people' не должен
+    // попасть под регулярку '/moderate/:id'.
+    if (path === '/moderate/people' && req.method === 'GET') {
+      const gm = mentorGuardTop();
+      if (gm.err) return json(res, gm.err[0], { error: gm.err[1] });
+      return json(res, 200, {
+        moderators: allModeratorRows.all().map((r) => ({ login: r.login, addedBy: r.added_by })),
+      });
+    }
+
+    if (path === '/moderate/people' && req.method === 'POST') {
+      const gm = mentorGuardTop();
+      if (gm.err) return json(res, gm.err[0], { error: gm.err[1] });
+      let body;
+      try {
+        body = JSON.parse(await readBody(req, 1000));
+      } catch {
+        return json(res, 400, { error: 'bad json' });
+      }
+      const login = String(body.login || '').trim().toLowerCase().replace(/^@/, '');
+      if (!/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i.test(login)) {
+        return json(res, 400, { error: 'нужен GitHub-логин' });
+      }
+      addModeratorRow.run(login, gm.u.login, Date.now());
+      return json(res, 200, { ok: true });
+    }
+
+    const modPeopleDel = path.match(/^\/moderate\/people\/([A-Za-z\d-]+)$/);
+    if (modPeopleDel && req.method === 'DELETE') {
+      const gm = mentorGuardTop();
+      if (gm.err) return json(res, gm.err[0], { error: gm.err[1] });
+      removeModeratorRow.run(modPeopleDel[1].toLowerCase());
+      return json(res, 200, { ok: true });
+    }
+
+    if (path === '/moderate/queue' && req.method === 'GET') {
+      const g = moderatorGuard();
+      if (g.err) return json(res, g.err[0], { error: g.err[1] });
+      const items = communityByStatus.all('pending').map((r) => ({
+        id: r.id,
+        type: r.type,
+        title: r.title,
+        author: r.author_login,
+        chapterId: r.chapter_id || undefined,
+        data: safeParse(r.data),
+        status: r.status,
+        addedAt: new Date(r.created_at).toISOString().slice(0, 10),
+      }));
+      return json(res, 200, { items });
+    }
+
+    const modDecide = path.match(/^\/moderate\/(\d+)$/);
+    if (modDecide && req.method === 'POST') {
+      const g = moderatorGuard();
+      if (g.err) return json(res, g.err[0], { error: g.err[1] });
+      let body;
+      try {
+        body = JSON.parse(await readBody(req, 1000));
+      } catch {
+        return json(res, 400, { error: 'bad json' });
+      }
+      const action = body.action === 'approve' ? 'approved' : body.action === 'reject' ? 'rejected' : null;
+      if (!action) return json(res, 400, { error: 'action: approve|reject' });
+      setCommunityStatus.run(action, g.u.login, Date.now(), Number(modDecide[1]));
+      return json(res, 200, { ok: true, status: action });
+    }
+
     if (path === '/content/authors' && req.method === 'GET') {
       const gm = mentorGuardTop();
       if (gm.err) return json(res, gm.err[0], { error: gm.err[1] });

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
+import ModerationQueue from '../components/ModerationQueue';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import knowledgeMap from '../data/knowledge-map.json';
 import { levelForXp } from '../lib/levels';
@@ -19,6 +20,10 @@ import {
   isLoggedIn,
   listGroups,
   listAuthors,
+  listModerators,
+  addModerator,
+  removeModerator,
+  type ModeratorEntry,
   listMentors,
   login,
   markNotificationsSeen,
@@ -462,61 +467,74 @@ function Dashboard() {
 
       <ModerationQueue />
       <AuthorsPanel canRemove={isRoot} />
+      <ModeratorsPanel canRemove={isRoot} />
       <MentorsPanel canRemove={isRoot} />
       {openStudent !== null && <StudentCard id={openStudent} onClose={() => setOpenStudent(null)} />}
     </div>
   );
 }
 
-// Очередь модерации присланных материалов.
-function ModerationQueue() {
-  const [items, setItems] = useState<PendingItem[] | null>(null);
-  const reload = () => fetchPendingCommunity('pending').then(setItems);
+// Модераторы материалов: кто разбирает очередь присланного.
+function ModeratorsPanel({ canRemove }: { canRemove: boolean }) {
+  const [people, setPeople] = useState<ModeratorEntry[] | null>(null);
+  const [login, setLoginValue] = useState('');
+  const reload = () => listModerators().then(setPeople);
   useEffect(() => {
     reload();
   }, []);
-  const act = async (id: number, action: 'approve' | 'reject') => {
-    await reviewCommunity(id, action);
-    reload();
-  };
-  if (!items) return null;
+  if (!people) return null;
   return (
     <section className="mn-section">
-      <h2 className="mn-h">Материалы на проверку {items.length > 0 && <span className="mn-badge">{items.length}</span>}</h2>
-      {items.length === 0 ? (
-        <p className="ac-muted">Новых материалов нет. Присланное учениками появляется здесь.</p>
-      ) : (
-        <div className="mn-queue">
-          {items.map((it) => {
-            const url = typeof it.data === 'string' ? it.data : null;
-            return (
-              <div key={it.id} className="ac-card mn-qcard">
-                <div className="mn-qmain">
-                  <span className="mn-qtype">{it.type}</span>
-                  <strong className="mn-qtitle">{it.title}</strong>
-                  {url && (
-                    <a href={url} target="_blank" rel="noopener noreferrer nofollow" className="mn-qurl">
-                      {url}
-                    </a>
-                  )}
-                  <span className="ac-muted mn-qmeta">
-                    от @{it.author}
-                    {it.chapterId ? ` · глава: ${it.chapterId}` : ''}
-                  </span>
-                </div>
-                <div className="mn-qactions">
-                  <button type="button" className="button button--primary button--sm" onClick={() => act(it.id, 'approve')}>
-                    Одобрить
-                  </button>
-                  <button type="button" className="mn-reject" onClick={() => act(it.id, 'reject')}>
-                    Отклонить
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <h2 className="mn-h">Модераторы материалов</h2>
+      <p className="ac-muted">
+        Модератор видит очередь на <Link to="/moderate">странице проверки</Link> и решает, принять
+        материал или отклонить. Наставник может это и без роли — она нужна, чтобы отдать проверку
+        студенту, не делая его наставником.
+      </p>
+      <div className="mn-mentors">
+        {people.map((m) => (
+          <span key={m.login} className="mn-mentor-chip">
+            @{m.login}
+            {canRemove ? (
+              <button
+                type="button"
+                className="mn-mentor-del"
+                title="Снять роль модератора"
+                onClick={async () => {
+                  if (window.confirm(`Снять @${m.login} с модераторов?`)) {
+                    await removeModerator(m.login);
+                    reload();
+                  }
+                }}
+              >
+                ✕
+              </button>
+            ) : null}
+          </span>
+        ))}
+        {!people.length && <span className="ac-muted">пока никого</span>}
+      </div>
+      <form
+        className="mn-mentor-add"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          if (!login.trim()) return;
+          await addModerator(login.trim());
+          setLoginValue('');
+          reload();
+        }}
+      >
+        <input
+          value={login}
+          onChange={(e) => setLoginValue(e.target.value)}
+          placeholder="github-логин"
+          aria-label="GitHub-логин модератора"
+          className="ac-join-input mn-mentor-input"
+        />
+        <button type="submit" className="button button--secondary" disabled={!login.trim()}>
+          Дать роль модератора
+        </button>
+      </form>
     </section>
   );
 }
