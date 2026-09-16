@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import CommunityCatalog, { COMMUNITY_JSON_URL, SUBMIT_URL, parseItems } from './CommunityCatalog';
+import CommunityCatalog, { COMMUNITY_JSON_URL, parseItems } from './CommunityCatalog';
 import { decodePreset } from './GymBuilder';
 
 const ITEMS = [
@@ -54,8 +54,9 @@ test('shows loader, then renders cards from fetched community.json', async () =>
   expect(spy).toHaveBeenCalledWith(COMMUNITY_JSON_URL);
   expect(screen.getByText('Мой первый Compose')).toBeInTheDocument();
   expect(screen.getByText('Шпаргалка по git')).toBeInTheDocument();
-  expect(screen.getByText(/автор: petya/)).toBeInTheDocument();
-  expect(screen.getByText(/глава: foundation\/02-it-english/)).toBeInTheDocument();
+  // автор теперь отдельной подписью, глава — тегом рядом с названием
+  expect(screen.getAllByText('petya').length).toBeGreaterThan(0);
+  expect(screen.getByText('foundation/02-it-english', { selector: '.cc-tag' })).toBeInTheDocument();
 });
 
 test('preset card links to the /gym constructor with a decodable hash', async () => {
@@ -72,16 +73,15 @@ test('preset card links to the /gym constructor with a decodable hash', async ()
   });
 });
 
-test('repo and link cards open externally, submit button leads to the issue form', async () => {
+test('репозитории и инструменты — строки-ссылки, открываются наружу', async () => {
   mockFetch(() => okResponse(ITEMS));
   render(<CommunityCatalog />);
-  const open = await screen.findAllByText('Открыть');
-  expect(open.map((a) => a.getAttribute('href'))).toEqual([
-    'https://github.com/petya/compose-app',
-    'https://example.com/git-cheatsheet',
-  ]);
-  open.forEach((a) => expect(a).toHaveAttribute('target', '_blank'));
-  expect(screen.getByText('Добавить своё')).toHaveAttribute('href', SUBMIT_URL);
+  // Сама строка и есть ссылка: отдельной кнопки «Открыть» больше нет.
+  const repo = (await screen.findByText('Мой первый Compose')).closest('a')!;
+  const tool = screen.getByText('Шпаргалка по git').closest('a')!;
+  expect(repo).toHaveAttribute('href', 'https://github.com/petya/compose-app');
+  expect(tool).toHaveAttribute('href', 'https://example.com/git-cheatsheet');
+  expect(repo).toHaveAttribute('target', '_blank');
 });
 
 test('filters by type and author', async () => {
@@ -89,27 +89,27 @@ test('filters by type and author', async () => {
   render(<CommunityCatalog />);
   await screen.findByText('Словарь недели');
 
-  fireEvent.change(screen.getByLabelText(/Тип:/), { target: { value: 'repo' } });
+  // Тип выбирается чипом, а не выпадающим списком: видно варианты и количества.
+  fireEvent.click(screen.getByRole('button', { name: /Репозитории/ }));
   expect(screen.getByText('Мой первый Compose')).toBeInTheDocument();
   expect(screen.queryByText('Словарь недели')).not.toBeInTheDocument();
 
-  fireEvent.change(screen.getByLabelText(/Тип:/), { target: { value: 'all' } });
+  fireEvent.click(screen.getByRole('button', { name: /Всё/ }));
   fireEvent.change(screen.getByLabelText(/Автор:/), { target: { value: 'masha' } });
   expect(screen.getByText('Словарь недели')).toBeInTheDocument();
   expect(screen.queryByText('Мой первый Compose')).not.toBeInTheDocument();
 });
 
-test('network error shows a friendly message and keeps the submit button', async () => {
+test('сеть упала — честная строка вместо пустоты', async () => {
   mockFetch(() => Promise.reject(new Error('offline')));
   render(<CommunityCatalog />);
   expect(await screen.findByText(/Каталог сейчас не открывается/)).toBeInTheDocument();
-  expect(screen.getByText('Добавить своё')).toBeInTheDocument();
 });
 
-test('empty catalog invites to be the first', async () => {
+test('пустой каталог зовёт принести первый материал', async () => {
   mockFetch(() => okResponse([]));
   render(<CommunityCatalog />);
-  expect(await screen.findByText(/стань первым/)).toBeInTheDocument();
+  expect(await screen.findByText(/Принеси первый материал/)).toBeInTheDocument();
 });
 
 test('parseItems drops malformed entries instead of crashing', () => {
@@ -144,16 +144,49 @@ test('глава показана названием и ведёт на саму
   );
   render(<CommunityCatalog />);
 
-  const link = await screen.findByText('«Переменные и типы»');
-  expect(link).toHaveAttribute('href', '/docs/mobile/kotlin-vars');
+  // Глава подписана названием — тегом у карточки видео, а не ссылкой в строке
+  // «автор: … · глава: …», которой больше нет.
+  expect(await screen.findByText('Переменные и типы', { selector: '.cc-tag' })).toBeInTheDocument();
   // Фильтр «Глава» — тоже названием, а не сырым id.
   expect(screen.getByRole('option', { name: 'Переменные и типы' })).toBeInTheDocument();
-  // Незнакомой главы в карте знаний нет — показываем id как есть, без ссылки.
-  expect(screen.getByText(/глава: foundation\/02-it-english/)).toBeInTheDocument();
+  // Незнакомой главы в карте знаний нет — показываем id как есть.
+  expect(screen.getByText('foundation/02-it-english', { selector: '.cc-tag' })).toBeInTheDocument();
 });
 
-test('вступление называет видео и источники — основной контент каталога', async () => {
+test('вступление говорит, чьи это материалы', async () => {
   mockFetch(() => okResponse(ITEMS));
   render(<CommunityCatalog />);
-  expect(await screen.findByText(/видео и источники по темам глав/)).toBeInTheDocument();
+  expect(await screen.findByText(/собрали кураторы и принесли студенты/)).toBeInTheDocument();
+});
+
+import { groupItems, thumbUrl, EMPTY_HINT } from './CommunityCatalog';
+
+const mk = (type: string, i: number, data = 'https://example.com/' + i) =>
+  ({ id: 'x' + i, type, title: 'Материал ' + i, author: 'kto', data, addedAt: '2026-09-16' }) as never;
+
+test('группы идут в постоянном порядке и несут свои записи', () => {
+  const groups = groupItems([mk('source', 1), mk('video', 2), mk('repo', 3)]);
+  expect(groups.map((g) => g.key)).toEqual(['video', 'read', 'repo', 'preset']);
+  expect(groups[0].items).toHaveLength(1);
+  expect(groups[1].items).toHaveLength(1);
+  expect(groups[2].items).toHaveLength(1);
+});
+
+test('статьи и инструменты попадают в одну группу', () => {
+  const read = groupItems([mk('source', 1), mk('link', 2)]).find((g) => g.key === 'read')!;
+  expect(read.items).toHaveLength(2);
+});
+
+test('пустая группа остаётся в списке — ей есть что сказать', () => {
+  const groups = groupItems([mk('video', 1)]);
+  expect(groups.find((g) => g.key === 'repo')!.items).toEqual([]);
+  expect(EMPTY_HINT.repo).toMatch(/проект/i);
+});
+
+test('обложка строится только для ссылок YouTube', () => {
+  expect(thumbUrl(mk('video', 1, 'https://youtu.be/TGVoOBmvTJs'))).toBe(
+    'https://i.ytimg.com/vi/TGVoOBmvTJs/mqdefault.jpg',
+  );
+  expect(thumbUrl(mk('video', 2, 'https://example.com/video'))).toBeNull();
+  expect(thumbUrl(mk('preset', 3, ''))).toBeNull();
 });

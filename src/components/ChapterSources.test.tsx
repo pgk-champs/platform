@@ -98,7 +98,8 @@ test('source/link cards carry type label, author and open the link in a new tab'
   const card = (await screen.findByText('Официальная документация Kotlin')).closest('a');
   expect(card).toHaveAttribute('href', 'https://kotlinlang.org/docs/basic-syntax.html');
   expect(card).toHaveAttribute('target', '_blank');
-  expect(screen.getByText('Источник')).toBeInTheDocument();
+  // «Источник» и «Ссылка» ничего не различали — стали «Статьёй» и «Инструментом»
+  expect(screen.getByText('Статья')).toBeInTheDocument();
   expect(screen.getByText('добавил: masha')).toBeInTheDocument();
 });
 

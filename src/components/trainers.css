@@ -9006,3 +9006,135 @@
 .sshq-inputrow { display: flex; align-items: center; gap: 0.5ch; padding: 0.5rem 0.9rem; background: #0b0e14; border-top: 1px solid rgba(255,255,255,0.08); }
 .sshq-input { flex: 1; min-width: 0; background: transparent; border: none; outline: none; color: #d6deeb; font-family: var(--ifm-font-family-monospace); font-size: 0.85rem; }
 .sshq-inputrow:has(.sshq-input:focus) { outline: 2px solid var(--ifm-color-primary); outline-offset: -2px; }
+
+/* ─────────── витрина сообщества ─────────── */
+/* Разные вещи выглядят по-разному: видео кадром, ссылки строкой. Иначе
+   непонятно, что за материал — в этом и была жалоба. */
+
+.cc-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
+
+.cc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 999px;
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-color-emphasis-700);
+  font: 600 0.86rem var(--ifm-font-family-base);
+  cursor: pointer;
+}
+
+.cc-chip.on {
+  background: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-button-color);
+}
+
+.cc-n {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+.cc-group { margin-bottom: 2rem; }
+.cc-ghead { display: flex; align-items: baseline; gap: 10px; margin-bottom: 0.75rem; }
+.cc-ghead h3 { margin: 0; font-size: 1.15rem; }
+
+.cc-vgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 16px; }
+.cc-vcard { display: flex; flex-direction: column; gap: 8px; text-decoration: none; color: inherit; }
+
+/* Место под кадр занято заранее: иначе сетка прыгает, когда картинки долетают */
+.cc-shot {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--ifm-color-emphasis-200);
+}
+
+.cc-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cc-vcard:hover .cc-shot { outline: 2px solid var(--ifm-color-primary); outline-offset: 2px; }
+
+.cc-vtitle {
+  font-family: var(--ifm-heading-font-family);
+  font-weight: 600;
+  font-size: 0.92rem;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cc-vmeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.76rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.cc-rows { display: flex; flex-direction: column; }
+
+.cc-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 2px;
+  min-height: 48px;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  text-decoration: none;
+  color: inherit;
+}
+
+.cc-row:last-child { border-bottom: 0; }
+.cc-row:hover .cc-rtitle { color: var(--ifm-color-primary); }
+
+.cc-glyph {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--ifm-color-emphasis-200);
+  display: grid;
+  place-items: center;
+}
+
+.cc-glyph svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: var(--ifm-color-emphasis-700);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cc-rmain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.cc-rtitle { font-weight: 600; font-size: 0.93rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cc-rsub { font-size: 0.78rem; color: var(--ifm-color-emphasis-600); }
+
+.cc-tag {
+  font-size: 0.74rem;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--ifm-color-emphasis-200);
+  color: var(--ifm-color-emphasis-700);
+  white-space: nowrap;
+}
+
+.cc-empty {
+  border: 1px dashed var(--ifm-color-emphasis-300);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.92rem;
+  margin: 0;
+}
