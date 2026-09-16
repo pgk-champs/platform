@@ -9,6 +9,7 @@ import http from 'node:http';
 import crypto from 'node:crypto';
 import Database from 'better-sqlite3';
 import { mergeProgress } from './merge.mjs';
+import { checkLink } from './linkcheck.mjs';
 
 const PORT = Number(process.env.PORT || 3000);
 const CLIENT_ID = process.env.GH_CLIENT_ID || '';
@@ -778,10 +779,19 @@ const server = http.createServer(async (req, res) => {
           return json(res, 400, { error: 'нужна https-ссылка' });
         }
       }
+      // Мёртвая ссылка не доходит до очереди: отказ виден отправителю сразу,
+      // а модератору не приходится ходить по чужим ссылкам руками.
+      let checkedTitle = title;
+      if (type !== 'preset') {
+        const check = await checkLink(data);
+        if (!check.ok) return json(res, 400, { error: check.reason });
+        if (check.title && !body.title) checkedTitle = String(check.title).slice(0, 200);
+      }
+
       insertCommunity.run({
         type,
         chapter_id: chapterId || null,
-        title,
+        title: checkedTitle,
         data: JSON.stringify(data),
         author_gh_id: s.id,
         author_login: u.login,
