@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import Link from '@docusaurus/Link';
 import BrowserOnly from '@docusaurus/BrowserOnly';
-import knowledgeMap from '../data/knowledge-map.json';
+import { TARGET_GROUPS } from '../lib/targets';
 import { isLoggedIn, login, submitCommunity } from '../lib/account';
 
-type Chapter = { id: string; title: string };
-const CHAPTERS = knowledgeMap as Chapter[];
 
 // Типы, которые ученик может прислать прямо с платформы (ссылочные). Пресеты
 // добавляются из конструктора /gym кнопкой «Поделиться», поэтому здесь их нет.
@@ -82,13 +80,16 @@ function Form() {
           <input value={urlValue} onChange={(e) => setUrlValue(e.target.value)} placeholder="https://…" inputMode="url" />
         </label>
         <label className="sc-field">
-          <span>Глава (необязательно)</span>
+          <span>К чему относится</span>
           <select value={chapterId} onChange={(e) => setChapterId(e.target.value)}>
-            <option value="">— без привязки —</option>
-            {CHAPTERS.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.title}
-              </option>
+            {TARGET_GROUPS.map((g) => (
+              <optgroup key={g.label} label={g.label}>
+                {g.options.map((o) => (
+                  <option key={o.value || 'none'} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </label>
