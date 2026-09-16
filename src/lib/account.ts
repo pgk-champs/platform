@@ -366,13 +366,15 @@ export type PendingItem = {
 };
 
 /** Одобренные материалы с сервера (ложатся в каталог поверх статичных). */
-export async function fetchApprovedCommunity(): Promise<unknown[]> {
+/** Одобренные материалы. `null` — сервер не ответил: это НЕ то же самое, что
+ *  пустой каталог, и говорить «стань первым» при упавшем сервере нельзя. */
+export async function fetchApprovedCommunity(): Promise<unknown[] | null> {
   try {
     const r = await api('/community');
-    if (!r.ok) return [];
+    if (!r.ok) return null;
     return ((await r.json()).items as unknown[]) ?? [];
   } catch {
-    return [];
+    return null;
   }
 }
 

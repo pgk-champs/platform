@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import CommunityCatalog, { COMMUNITY_JSON_URL, parseItems } from './CommunityCatalog';
+import CommunityCatalog, { parseItems } from './CommunityCatalog';
 import { decodePreset } from './GymBuilder';
 
 const ITEMS = [
@@ -46,12 +46,14 @@ afterEach(() => {
 });
 
 test('shows loader, then renders cards from fetched community.json', async () => {
-  const spy = mockFetch(() => okResponse(ITEMS));
+  const spy = mockFetch(() => okResponse({ items: ITEMS }));
   render(<CommunityCatalog />);
   expect(screen.getByText('Загружаем каталог…')).toBeInTheDocument();
 
   expect(await screen.findByText('Словарь недели')).toBeInTheDocument();
-  expect(spy).toHaveBeenCalledWith(COMMUNITY_JSON_URL);
+  // Источник один — сервер: статический файл из чужого репозитория выведен
+  // из обращения вместе с данными, которые в него писал бот.
+  expect(String(spy.mock.calls.at(0)?.at(0) ?? '')).toContain('/community');
   expect(screen.getByText('Мой первый Compose')).toBeInTheDocument();
   expect(screen.getByText('Шпаргалка по git')).toBeInTheDocument();
   // автор теперь отдельной подписью, глава — тегом рядом с названием
@@ -60,7 +62,7 @@ test('shows loader, then renders cards from fetched community.json', async () =>
 });
 
 test('preset card links to the /gym constructor with a decodable hash', async () => {
-  mockFetch(() => okResponse(ITEMS));
+  mockFetch(() => okResponse({ items: ITEMS }));
   render(<CommunityCatalog />);
   const launch = (await screen.findByText('Запустить')) as HTMLAnchorElement;
   const href = launch.getAttribute('href') ?? '';
@@ -74,7 +76,7 @@ test('preset card links to the /gym constructor with a decodable hash', async ()
 });
 
 test('репозитории и инструменты — строки-ссылки, открываются наружу', async () => {
-  mockFetch(() => okResponse(ITEMS));
+  mockFetch(() => okResponse({ items: ITEMS }));
   render(<CommunityCatalog />);
   // Сама строка и есть ссылка: отдельной кнопки «Открыть» больше нет.
   const repo = (await screen.findByText('Мой первый Compose')).closest('a')!;
@@ -85,7 +87,7 @@ test('репозитории и инструменты — строки-ссыл
 });
 
 test('filters by type and author', async () => {
-  mockFetch(() => okResponse(ITEMS));
+  mockFetch(() => okResponse({ items: ITEMS }));
   render(<CommunityCatalog />);
   await screen.findByText('Словарь недели');
 
@@ -107,7 +109,7 @@ test('сеть упала — честная строка вместо пуст�
 });
 
 test('пустой каталог зовёт принести первый материал', async () => {
-  mockFetch(() => okResponse([]));
+  mockFetch(() => okResponse({ items: [] }));
   render(<CommunityCatalog />);
   expect(await screen.findByText(/Принеси первый материал/)).toBeInTheDocument();
 });
@@ -120,7 +122,7 @@ test('parseItems drops malformed entries instead of crashing', () => {
 
 test('preset with unreadable data gets a note instead of a launch button', async () => {
   mockFetch(() =>
-    okResponse([{ ...ITEMS[0], id: 'i9', title: 'Битый', data: { engine: 'wordorder', phrase: 'one' } }]),
+    okResponse({ items: [{ ...ITEMS[0], id: 'i9', title: 'Битый', data: { engine: 'wordorder', phrase: 'one' } }] }),
   );
   render(<CommunityCatalog />);
   expect(await screen.findByText(/не читаются/)).toBeInTheDocument();
@@ -129,7 +131,8 @@ test('preset with unreadable data gets a note instead of a launch button', async
 
 test('глава показана названием и ведёт на саму главу, незнакомый id остаётся как есть', async () => {
   mockFetch(() =>
-    okResponse([
+    okResponse({
+      items: [
       {
         id: 'i4',
         type: 'video',
@@ -138,9 +141,10 @@ test('глава показана названием и ведёт на саму
         chapterId: 'kotlin-vars',
         data: 'https://youtu.be/abc',
         addedAt: '2026-09-02T10:00:00.000Z',
-      },
-      ITEMS[0],
-    ]),
+        },
+        ITEMS[0],
+      ],
+    }),
   );
   render(<CommunityCatalog />);
 
@@ -154,7 +158,7 @@ test('глава показана названием и ведёт на саму
 });
 
 test('вступление говорит, чьи это материалы', async () => {
-  mockFetch(() => okResponse(ITEMS));
+  mockFetch(() => okResponse({ items: ITEMS }));
   render(<CommunityCatalog />);
   expect(await screen.findByText(/собрали кураторы и принесли студенты/)).toBeInTheDocument();
 });

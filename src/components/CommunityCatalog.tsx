@@ -12,9 +12,6 @@ import './trainers.css';
 // открываются наружу. Никакого исполнения чужого кода — только данные для
 // наших движков и https-ссылки (это же проверяет бот при приёме).
 
-export const COMMUNITY_JSON_URL =
-  'https://raw.githubusercontent.com/pgk-champs/community/main/community.json';
-
 export type CommunityItem = {
   id: string;
   type: 'preset' | 'repo' | 'link' | 'video' | 'source';
@@ -133,19 +130,18 @@ export default function CommunityCatalog() {
   const [author, setAuthor] = useState(ALL);
 
   // Fetch только на клиенте: useEffect не выполняется при SSR-сборке.
-  // Каталог = статичный community.json (сид) + одобренные наставником материалы
-  // с сервера. Сервер может быть недоступен — тогда показываем только статику.
+  // Единственный источник — сервер. Статический community.json из отдельного
+  // репозитория выведен из обращения 16.09.2026: данные переехали в базу, и
+  // два источника одного и того же были причиной, по которой в каталоге было
+  // непонятно, что за материалы.
   useEffect(() => {
     let alive = true;
-    // Статичный community.json — базовый источник: если он не открылся, это
-    // реальная ошибка. Одобренные серверные материалы добавляются сверху и
-    // берутся best-effort — их недоступность не роняет каталог.
-    fetch(COMMUNITY_JSON_URL)
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then(async (staticJson) => {
-        const server = await fetchApprovedCommunity().catch(() => []);
+    fetchApprovedCommunity()
+      .then((server) => {
         if (!alive) return;
-        setState({ phase: 'ready', items: [...parseItems(server), ...parseItems(staticJson)] });
+        // null — сервер не ответил. Пустой каталог и недоступный каталог это
+        // разные вещи, и человеку надо сказать разное.
+        setState(server === null ? { phase: 'error' } : { phase: 'ready', items: parseItems(server) });
       })
       .catch(() => alive && setState({ phase: 'error' }));
     return () => {

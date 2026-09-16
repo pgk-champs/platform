@@ -48,7 +48,7 @@ export default function ChapterSources({ chapterId }: { chapterId: string }) {
     // репозитории. Раньше одобренный материал попадал в каталог, но у главы не
     // появлялся никогда — это и был молчаливый разрыв.
     fetchApprovedCommunity()
-      .then((raw) => alive && setItems(pickSources(raw, chapterId)))
+      .then((raw) => alive && raw !== null && setItems(pickSources(raw, chapterId)))
       .catch(() => {
         /* нет сети — блока просто нет */
       });
