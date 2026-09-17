@@ -48,6 +48,10 @@ export function buildMap(docsDir, kind = 'chapter') {
       quizzes: count(/<SelfCheck\b/g) + count(/<ChapterExam\b/g),
       trainers: count(/trainerId=/g),
     };
+    // Экзамен по блоку — веха трека: на ленте Маршрута он узел другой формы.
+    // В totals не идёт: BlockExam пишет в свой ключ и в знаменатель главы
+    // намеренно не входит (см. CLAUDE.md §4).
+    const blockExam = /<BlockExam\b/.test(content);
     for (const f of ['audience', 'level', 'order', 'title'])
       if (data[f] === undefined) throw new Error(`missing frontmatter: ${p}: ${f}`);
     if (!AUD.includes(data.audience) || !LVL.includes(data.level))
@@ -77,6 +81,7 @@ export function buildMap(docsDir, kind = 'chapter') {
       // короткий заголовок для обложки, если полный слишком длинный
       cover: data.cover || data.title,
       totals,
+      blockExam,
     });
   });
   walk(docsDir);

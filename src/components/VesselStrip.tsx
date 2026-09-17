@@ -9,7 +9,7 @@ import './vessels.css';
 // Масштаб возвращает тонкая полоса всего трека под окном.
 const WINDOW = 5;
 
-export type StripChapter = { id: string; title: string; path: string };
+export type StripChapter = { id: string; title: string; path: string; blockExam?: boolean };
 
 export default function VesselStrip({
   chapters,
@@ -134,9 +134,25 @@ export default function VesselStrip({
             moveTo(start + (e.key === 'ArrowRight' ? 1 : -1));
           }}
         >
-          {chapters.map((c) => {
+          {chapters.map((c, i) => {
             const f = fillOf(c.id);
-            return <i key={c.id} className={f >= 1 ? 'full' : f > 0 ? 'part' : ''} />;
+            // На ленте видно три вещи: сколько пройдено, где ты сейчас и где
+            // вехи. Раньше была только первая — положение показывала только
+            // рамка окна, а её можно утащить куда угодно.
+            const cls = [
+              f >= 1 ? 'full' : f > 0 ? 'part' : '',
+              i === currentIndex ? 'now' : '',
+              c.blockExam ? 'exam' : '',
+            ]
+              .filter(Boolean)
+              .join(' ');
+            return (
+              <i
+                key={c.id}
+                className={cls}
+                title={`${c.title}${c.blockExam ? ' · экзамен по блоку' : ''}`}
+              />
+            );
           })}
           <div
             className="vs-view"

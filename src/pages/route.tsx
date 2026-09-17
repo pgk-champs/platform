@@ -21,6 +21,8 @@ type Entry = {
   level: 'база' | 'углубление' | 'челлендж';
   order: number;
   path: string;
+  /** Есть ли в главе экзамен по блоку — на ленте он узел другой формы. */
+  blockExam?: boolean;
 };
 
 type TrackDef = { dir: string; label: string; position: number };

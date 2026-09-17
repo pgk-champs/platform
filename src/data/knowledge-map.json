@@ -13,7 +13,8 @@
       "sections": 15,
       "quizzes": 6,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "grep-regex",
@@ -29,7 +30,8 @@
       "sections": 16,
       "quizzes": 9,
       "trainers": 2
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "typing",
@@ -45,7 +47,8 @@
       "sections": 16,
       "quizzes": 6,
       "trainers": 8
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "ssh-keys-deep",
@@ -61,7 +64,8 @@
       "sections": 15,
       "quizzes": 6,
       "trainers": 3
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "it-english",
@@ -77,7 +81,8 @@
       "sections": 12,
       "quizzes": 6,
       "trainers": 10
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "02b-english-practice",
@@ -93,7 +98,8 @@
       "sections": 16,
       "quizzes": 12,
       "trainers": 5
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "git-rebase",
@@ -109,7 +115,8 @@
       "sections": 11,
       "quizzes": 6,
       "trainers": 3
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "linux-terminal",
@@ -125,7 +132,8 @@
       "sections": 15,
       "quizzes": 6,
       "trainers": 6
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "repo-anatomy",
@@ -141,7 +149,8 @@
       "sections": 16,
       "quizzes": 6,
       "trainers": 2
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "files-packages-ssh",
@@ -157,7 +166,8 @@
       "sections": 15,
       "quizzes": 7,
       "trainers": 6
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "github-actions",
@@ -173,7 +183,8 @@
       "sections": 17,
       "quizzes": 5,
       "trainers": 2
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "git-first-commit",
@@ -189,7 +200,8 @@
       "sections": 15,
       "quizzes": 7,
       "trainers": 6
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "code-review-release",
@@ -205,7 +217,8 @@
       "sections": 17,
       "quizzes": 6,
       "trainers": 2
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "git-branches",
@@ -221,7 +234,8 @@
       "sections": 14,
       "quizzes": 6,
       "trainers": 5
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "sdacha-repo",
@@ -237,7 +251,8 @@
       "sections": 12,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "git-remote",
@@ -253,7 +268,8 @@
       "sections": 15,
       "quizzes": 8,
       "trainers": 5
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "demo-show",
@@ -269,7 +285,8 @@
       "sections": 11,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": true
   },
   {
     "id": "foundation-final",
@@ -285,7 +302,8 @@
       "sections": 12,
       "quizzes": 6,
       "trainers": 0
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "sprint-format",
@@ -301,7 +319,8 @@
       "sections": 10,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "android-studio",
@@ -317,7 +336,8 @@
       "sections": 14,
       "quizzes": 6,
       "trainers": 6
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "kotlin-vars",
@@ -333,7 +353,8 @@
       "sections": 13,
       "quizzes": 4,
       "trainers": 6
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "kotlin-null",
@@ -349,7 +370,8 @@
       "sections": 28,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "kotlin-flow",
@@ -365,7 +387,8 @@
       "sections": 21,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "functions-lambdas",
@@ -381,7 +404,8 @@
       "sections": 14,
       "quizzes": 5,
       "trainers": 6
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "classes-collections",
@@ -397,7 +421,8 @@
       "sections": 10,
       "quizzes": 4,
       "trainers": 3
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "kotlin-collections",
@@ -413,7 +438,8 @@
       "sections": 10,
       "quizzes": 4,
       "trainers": 3
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "composition",
@@ -429,7 +455,8 @@
       "sections": 11,
       "quizzes": 5,
       "trainers": 0
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "kotlin-oop",
@@ -445,7 +472,8 @@
       "sections": 20,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "console-io",
@@ -461,7 +489,8 @@
       "sections": 11,
       "quizzes": 5,
       "trainers": 0
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "debug-skill",
@@ -477,7 +506,8 @@
       "sections": 11,
       "quizzes": 5,
       "trainers": 0
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "first-compose-screen",
@@ -493,7 +523,8 @@
       "sections": 15,
       "quizzes": 6,
       "trainers": 5
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "state-events",
@@ -509,7 +540,8 @@
       "sections": 15,
       "quizzes": 6,
       "trainers": 6
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "layout-by-mockup",
@@ -525,7 +557,8 @@
       "sections": 11,
       "quizzes": 6,
       "trainers": 3
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "layout-card",
@@ -541,7 +574,8 @@
       "sections": 10,
       "quizzes": 4,
       "trainers": 3
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "ui-kit",
@@ -557,7 +591,8 @@
       "sections": 14,
       "quizzes": 7,
       "trainers": 5
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "lazy-lists",
@@ -573,7 +608,8 @@
       "sections": 15,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "material-theme",
@@ -589,7 +625,8 @@
       "sections": 14,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "scaffold-bars",
@@ -605,7 +642,8 @@
       "sections": 14,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "kit-buttons",
@@ -621,7 +659,8 @@
       "sections": 11,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "kit-inputs",
@@ -637,7 +676,8 @@
       "sections": 12,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "kit-select",
@@ -653,7 +693,8 @@
       "sections": 11,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "kit-search",
@@ -669,7 +710,8 @@
       "sections": 11,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "kit-bars",
@@ -685,7 +727,8 @@
       "sections": 11,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "kit-card",
@@ -701,7 +744,8 @@
       "sections": 10,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "kit-icon-font",
@@ -717,7 +761,8 @@
       "sections": 12,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": true
   },
   {
     "id": "kotlin-coroutines",
@@ -733,7 +778,8 @@
       "sections": 21,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "flow-streams",
@@ -749,7 +795,8 @@
       "sections": 16,
       "quizzes": 6,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "viewmodel-state",
@@ -765,7 +812,8 @@
       "sections": 14,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "app-layers",
@@ -781,7 +829,8 @@
       "sections": 13,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "network-retrofit",
@@ -797,7 +846,8 @@
       "sections": 15,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "network-errors",
@@ -813,7 +863,8 @@
       "sections": 14,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "data-storage",
@@ -829,7 +880,8 @@
       "sections": 14,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "cache-offline",
@@ -845,7 +897,8 @@
       "sections": 17,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "clean-code",
@@ -861,7 +914,8 @@
       "sections": 21,
       "quizzes": 6,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "auth-session",
@@ -877,7 +931,8 @@
       "sections": 21,
       "quizzes": 6,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "shop-catalog",
@@ -893,7 +948,8 @@
       "sections": 14,
       "quizzes": 5,
       "trainers": 0
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "shop-auth",
@@ -909,7 +965,8 @@
       "sections": 11,
       "quizzes": 4,
       "trainers": 0
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "shop-cart",
@@ -925,7 +982,8 @@
       "sections": 10,
       "quizzes": 4,
       "trainers": 0
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "shop-files",
@@ -941,7 +999,8 @@
       "sections": 10,
       "quizzes": 4,
       "trainers": 0
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "shop-failures",
@@ -957,7 +1016,8 @@
       "sections": 10,
       "quizzes": 4,
       "trainers": 0
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "shop-day",
@@ -973,7 +1033,8 @@
       "sections": 9,
       "quizzes": 4,
       "trainers": 0
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "device-features",
@@ -989,7 +1050,8 @@
       "sections": 17,
       "quizzes": 6,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "testing-mobile",
@@ -1005,7 +1067,8 @@
       "sections": 20,
       "quizzes": 7,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "kotlin-vs-java",
@@ -1021,7 +1084,8 @@
       "sections": 20,
       "quizzes": 6,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "kotlin-history",
@@ -1037,7 +1101,8 @@
       "sections": 19,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "what-is-blockchain",
@@ -1053,7 +1118,8 @@
       "sections": 16,
       "quizzes": 5,
       "trainers": 7
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "code-editor",
@@ -1069,7 +1135,8 @@
       "sections": 15,
       "quizzes": 6,
       "trainers": 0
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "solidity-hello",
@@ -1085,7 +1152,8 @@
       "sections": 20,
       "quizzes": 6,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "solidity-types",
@@ -1101,7 +1169,8 @@
       "sections": 19,
       "quizzes": 6,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "solidity-errors",
@@ -1117,7 +1186,8 @@
       "sections": 16,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "solidity-flow",
@@ -1133,7 +1203,8 @@
       "sections": 16,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "solidity-functions",
@@ -1149,7 +1220,8 @@
       "sections": 14,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "solidity-storage",
@@ -1165,7 +1237,8 @@
       "sections": 16,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": true
   },
   {
     "id": "sol-contracts-oop",
@@ -1181,7 +1254,8 @@
       "sections": 14,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "sol-inheritance",
@@ -1197,7 +1271,8 @@
       "sections": 16,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "sol-interfaces",
@@ -1213,7 +1288,8 @@
       "sections": 14,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "sol-libraries",
@@ -1229,7 +1305,8 @@
       "sections": 13,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "sol-patterns",
@@ -1245,7 +1322,8 @@
       "sections": 16,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": true
   },
   {
     "id": "erc20-scratch",
@@ -1261,7 +1339,8 @@
       "sections": 16,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "erc20-oz",
@@ -1277,7 +1356,8 @@
       "sections": 14,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "erc4626",
@@ -1293,7 +1373,8 @@
       "sections": 15,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "proxy-upgrade",
@@ -1309,7 +1390,8 @@
       "sections": 15,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": true
   },
   {
     "id": "ts-vs-js",
@@ -1325,7 +1407,8 @@
       "sections": 20,
       "quizzes": 6,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "ts-run",
@@ -1341,7 +1424,8 @@
       "sections": 16,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "ts-values",
@@ -1357,7 +1441,8 @@
       "sections": 20,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "ts-null",
@@ -1373,7 +1458,8 @@
       "sections": 16,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "ts-flow",
@@ -1389,7 +1475,8 @@
       "sections": 20,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "ts-functions",
@@ -1405,7 +1492,8 @@
       "sections": 22,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "ts-collections",
@@ -1421,7 +1509,8 @@
       "sections": 23,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "ts-types",
@@ -1437,7 +1526,8 @@
       "sections": 15,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "ts-oop",
@@ -1453,7 +1543,8 @@
       "sections": 17,
       "quizzes": 3,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "ts-inheritance",
@@ -1469,7 +1560,8 @@
       "sections": 17,
       "quizzes": 3,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "ts-errors",
@@ -1485,7 +1577,8 @@
       "sections": 15,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "ts-async",
@@ -1501,7 +1594,8 @@
       "sections": 23,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "ts-async-net",
@@ -1517,7 +1611,8 @@
       "sections": 14,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "ts-modules",
@@ -1533,7 +1628,8 @@
       "sections": 15,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": true
   },
   {
     "id": "ts-history",
@@ -1549,7 +1645,8 @@
       "sections": 26,
       "quizzes": 5,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "geth-network",
@@ -1565,7 +1662,8 @@
       "sections": 16,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "hh-start",
@@ -1581,7 +1679,8 @@
       "sections": 15,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "hh-config",
@@ -1597,7 +1696,8 @@
       "sections": 16,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "hh-test",
@@ -1613,7 +1713,8 @@
       "sections": 16,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "hh-deploy",
@@ -1629,7 +1730,8 @@
       "sections": 14,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": true
   },
   {
     "id": "web-html",
@@ -1645,7 +1747,8 @@
       "sections": 14,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "web-css",
@@ -1661,7 +1764,8 @@
       "sections": 14,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "web-layout",
@@ -1677,7 +1781,8 @@
       "sections": 15,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "web-dom",
@@ -1693,7 +1798,8 @@
       "sections": 15,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "web-react",
@@ -1709,7 +1815,8 @@
       "sections": 13,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "web-state",
@@ -1725,7 +1832,8 @@
       "sections": 14,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "web-vite",
@@ -1741,7 +1849,8 @@
       "sections": 13,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "web-fetch",
@@ -1757,7 +1866,8 @@
       "sections": 13,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "web-forms",
@@ -1773,7 +1883,8 @@
       "sections": 14,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "web-router",
@@ -1789,7 +1900,8 @@
       "sections": 11,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "web-redux",
@@ -1805,7 +1917,8 @@
       "sections": 14,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "web-rtk",
@@ -1821,7 +1934,8 @@
       "sections": 12,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "web-rtk-async",
@@ -1837,7 +1951,8 @@
       "sections": 13,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": true
   },
   {
     "id": "wallet-connect",
@@ -1853,7 +1968,8 @@
       "sections": 13,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "wallet-sign",
@@ -1869,7 +1985,8 @@
       "sections": 13,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "dapp-full",
@@ -1885,7 +2002,8 @@
       "sections": 13,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": true
   },
   {
     "id": "audit-vulns",
@@ -1901,7 +2019,8 @@
       "sections": 12,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "audit-tools",
@@ -1917,7 +2036,8 @@
       "sections": 14,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "audit-report",
@@ -1933,7 +2053,8 @@
       "sections": 13,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": true
   },
   {
     "id": "fabric-intro",
@@ -1949,7 +2070,8 @@
       "sections": 14,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "fabric-network",
@@ -1965,7 +2087,8 @@
       "sections": 12,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "fabric-chaincode",
@@ -1981,7 +2104,8 @@
       "sections": 12,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "fabric-lifecycle",
@@ -1997,7 +2121,8 @@
       "sections": 13,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "fabric-tx",
@@ -2013,7 +2138,8 @@
       "sections": 12,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "fabric-vs-eth",
@@ -2029,7 +2155,8 @@
       "sections": 11,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": true
   },
   {
     "id": "waves-first-network",
@@ -2045,7 +2172,8 @@
       "sections": 15,
       "quizzes": 5,
       "trainers": 10
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "waves-account",
@@ -2061,7 +2189,8 @@
       "sections": 12,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "waves-tx",
@@ -2077,7 +2206,8 @@
       "sections": 12,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "waves-data",
@@ -2093,7 +2223,8 @@
       "sections": 10,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "waves-assets",
@@ -2109,7 +2240,8 @@
       "sections": 11,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "waves-ride",
@@ -2125,7 +2257,8 @@
       "sections": 14,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "waves-smart-account",
@@ -2141,7 +2274,8 @@
       "sections": 11,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "waves-dapp",
@@ -2157,7 +2291,8 @@
       "sections": 12,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "waves-payments",
@@ -2173,7 +2308,8 @@
       "sections": 11,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "waves-client",
@@ -2189,6 +2325,7 @@
       "sections": 11,
       "quizzes": 4,
       "trainers": 1
-    }
+    },
+    "blockExam": true
   }
 ]

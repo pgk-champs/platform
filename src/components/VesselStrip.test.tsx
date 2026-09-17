@@ -61,3 +61,19 @@ test('глав меньше пяти — показываются все, стр
   expect(screen.getByLabelText('Следующие главы')).toBeDisabled();
   expect(screen.getByLabelText('Предыдущие главы')).toBeDisabled();
 });
+
+test('на ленте видно, где ты сейчас', () => {
+  const { container } = render(<VesselStrip chapters={chapters} currentId="ch2" />);
+  const now = container.querySelectorAll('.vs-mini i.now');
+  expect(now).toHaveLength(1);
+  expect([...container.querySelectorAll('.vs-mini i')].indexOf(now[0])).toBe(2);
+});
+
+test('экзамен по блоку — узел другой формы', () => {
+  const withExam = chapters.map((c, i) => (i === 1 ? { ...c, blockExam: true } : c));
+  const { container } = render(<VesselStrip chapters={withExam} currentId="ch0" />);
+  expect(container.querySelectorAll('.vs-mini i.exam')).toHaveLength(1);
+  expect(container.querySelector('.vs-mini i.exam')?.getAttribute('title')).toContain(
+    'экзамен по блоку',
+  );
+});

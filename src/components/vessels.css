@@ -176,6 +176,23 @@
 .vs-mini i.part, .vs-mini i.full { background: var(--v-liquid); }
 .vs-mini i.part { opacity: 0.5; }
 
+/* Где ты сейчас — видно на всей ленте, а не только по рамке окна: рамку
+   можно утащить куда угодно, и место в треке терялось. */
+.vs-mini i.now {
+  background: var(--pgk-you);
+  min-width: 4px;
+}
+
+/* Экзамен по блоку — веха, поэтому узел другой формы: выше ленты и круглый.
+   Таких глав двенадцать. */
+.vs-mini i.exam {
+  align-self: center;
+  height: 18px;
+  min-width: 6px;
+  border-radius: 999px;
+  border: 2px solid var(--ifm-background-surface-color);
+}
+
 .vs-view {
   position: absolute;
   top: -5px;
