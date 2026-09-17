@@ -24,10 +24,32 @@ test('в реестре ровно те механики, что стоят в �
   assert.deepEqual(lost, [], `тренажёры потерялись: ${lost.join(', ')}`);
 });
 
-test('у каждого упражнения есть якорь и путь без расширения', () => {
+test('якорь не выдуман: он либо есть в главе, либо null', () => {
+  // Выдуманный якорь — ссылка в никуда. <Block> рендерит id ровно из blockId,
+  // и у 84 наборов печати этого атрибута нет: там честный null, а ссылка ведёт
+  // на главу. Раньше подставлялся trainerId, и 84 ссылки вели в пустоту.
+  const sources = new Map();
   for (const mech of REG)
     for (const ex of mech.exercises) {
-      assert.ok(ex.blockId, `${mech.component}: нет blockId`);
+      if (ex.blockId === null) continue;
+      if (!sources.has(ex.path)) {
+        const dir = path.dirname(path.join('docs', ex.path));
+        const want = path.basename(ex.path);
+        const hit = fs
+          .readdirSync(dir)
+          .find((n) => n.replace(/\.mdx?$/, '').replace(/^\d+[-_.]/, '') === want);
+        sources.set(ex.path, fs.readFileSync(path.join(dir, hit), 'utf8'));
+      }
+      assert.ok(
+        sources.get(ex.path).includes(`blockId="${ex.blockId}"`),
+        `${mech.component}: якорь ${ex.blockId} выдуман — в ${ex.path} его нет`,
+      );
+    }
+});
+
+test('у каждого упражнения есть путь без расширения', () => {
+  for (const mech of REG)
+    for (const ex of mech.exercises) {
       assert.ok(ex.chapterId, `${mech.component}: нет chapterId`);
       assert.doesNotMatch(ex.path, /\.mdx?$/, `${mech.component}: путь с расширением`);
       assert.doesNotMatch(ex.path, /\/\d+-/, `${mech.component}: числовой префикс в пути`);

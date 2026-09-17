@@ -7,7 +7,7 @@
         "chapterId": "sdacha-repo",
         "track": "advanced",
         "path": "advanced/sdacha-repo",
-        "blockId": "trainer-sdacha-repo",
+        "blockId": null,
         "trainerId": "trainer-sdacha-repo"
       },
       {
@@ -15,7 +15,7 @@
         "chapterId": "demo-show",
         "track": "advanced",
         "path": "advanced/demo-show",
-        "blockId": "trainer-demo-show",
+        "blockId": null,
         "trainerId": "trainer-demo-show"
       },
       {
@@ -23,7 +23,7 @@
         "chapterId": "sprint-format",
         "track": "advanced",
         "path": "advanced/sprint-format",
-        "blockId": "trainer-sprint-format",
+        "blockId": null,
         "trainerId": "trainer-sprint-format"
       },
       {
@@ -111,7 +111,7 @@
         "chapterId": "solidity-hello",
         "track": "blockchain",
         "path": "blockchain/solidity-hello",
-        "blockId": "trainer-solidity-hello",
+        "blockId": null,
         "trainerId": "trainer-solidity-hello"
       },
       {
@@ -119,7 +119,7 @@
         "chapterId": "solidity-types",
         "track": "blockchain",
         "path": "blockchain/solidity-types",
-        "blockId": "trainer-solidity-types",
+        "blockId": null,
         "trainerId": "trainer-solidity-types"
       },
       {
@@ -127,7 +127,7 @@
         "chapterId": "solidity-errors",
         "track": "blockchain",
         "path": "blockchain/solidity-errors",
-        "blockId": "trainer-solidity-errors",
+        "blockId": null,
         "trainerId": "trainer-solidity-errors"
       },
       {
@@ -135,7 +135,7 @@
         "chapterId": "solidity-flow",
         "track": "blockchain",
         "path": "blockchain/solidity-flow",
-        "blockId": "trainer-solidity-flow",
+        "blockId": null,
         "trainerId": "trainer-solidity-flow"
       },
       {
@@ -143,7 +143,7 @@
         "chapterId": "solidity-functions",
         "track": "blockchain",
         "path": "blockchain/solidity-functions",
-        "blockId": "trainer-solidity-functions",
+        "blockId": null,
         "trainerId": "trainer-solidity-functions"
       },
       {
@@ -151,7 +151,7 @@
         "chapterId": "solidity-storage",
         "track": "blockchain",
         "path": "blockchain/solidity-storage",
-        "blockId": "trainer-solidity-storage",
+        "blockId": null,
         "trainerId": "trainer-solidity-storage"
       },
       {
@@ -159,7 +159,7 @@
         "chapterId": "sol-contracts-oop",
         "track": "blockchain",
         "path": "blockchain/sol-contracts-oop",
-        "blockId": "trainer-sol-contracts-oop",
+        "blockId": null,
         "trainerId": "trainer-sol-contracts-oop"
       },
       {
@@ -167,7 +167,7 @@
         "chapterId": "sol-inheritance",
         "track": "blockchain",
         "path": "blockchain/sol-inheritance",
-        "blockId": "trainer-sol-inheritance",
+        "blockId": null,
         "trainerId": "trainer-sol-inheritance"
       },
       {
@@ -175,7 +175,7 @@
         "chapterId": "sol-interfaces",
         "track": "blockchain",
         "path": "blockchain/sol-interfaces",
-        "blockId": "trainer-sol-interfaces",
+        "blockId": null,
         "trainerId": "trainer-sol-interfaces"
       },
       {
@@ -183,7 +183,7 @@
         "chapterId": "sol-libraries",
         "track": "blockchain",
         "path": "blockchain/sol-libraries",
-        "blockId": "trainer-sol-libraries",
+        "blockId": null,
         "trainerId": "trainer-sol-libraries"
       },
       {
@@ -191,7 +191,7 @@
         "chapterId": "sol-patterns",
         "track": "blockchain",
         "path": "blockchain/sol-patterns",
-        "blockId": "trainer-sol-patterns",
+        "blockId": null,
         "trainerId": "trainer-sol-patterns"
       },
       {
@@ -199,7 +199,7 @@
         "chapterId": "erc20-scratch",
         "track": "blockchain",
         "path": "blockchain/erc20-scratch",
-        "blockId": "trainer-erc20-scratch",
+        "blockId": null,
         "trainerId": "trainer-erc20-scratch"
       },
       {
@@ -207,7 +207,7 @@
         "chapterId": "erc20-oz",
         "track": "blockchain",
         "path": "blockchain/erc20-oz",
-        "blockId": "trainer-erc20-oz",
+        "blockId": null,
         "trainerId": "trainer-erc20-oz"
       },
       {
@@ -215,7 +215,7 @@
         "chapterId": "erc4626",
         "track": "blockchain",
         "path": "blockchain/erc4626",
-        "blockId": "trainer-erc4626",
+        "blockId": null,
         "trainerId": "trainer-erc4626"
       },
       {
@@ -223,7 +223,7 @@
         "chapterId": "proxy-upgrade",
         "track": "blockchain",
         "path": "blockchain/proxy-upgrade",
-        "blockId": "trainer-proxy-upgrade",
+        "blockId": null,
         "trainerId": "trainer-proxy-upgrade"
       },
       {
@@ -239,7 +239,7 @@
         "chapterId": "ts-run",
         "track": "blockchain",
         "path": "blockchain/ts-run",
-        "blockId": "trainer-ts-run",
+        "blockId": null,
         "trainerId": "trainer-ts-run"
       },
       {
@@ -255,7 +255,7 @@
         "chapterId": "ts-null",
         "track": "blockchain",
         "path": "blockchain/ts-null",
-        "blockId": "trainer-ts-null",
+        "blockId": null,
         "trainerId": "trainer-ts-null"
       },
       {
@@ -287,7 +287,7 @@
         "chapterId": "ts-types",
         "track": "blockchain",
         "path": "blockchain/ts-types",
-        "blockId": "trainer-ts-types",
+        "blockId": null,
         "trainerId": "trainer-ts-types"
       },
       {
@@ -311,7 +311,7 @@
         "chapterId": "ts-errors",
         "track": "blockchain",
         "path": "blockchain/ts-errors",
-        "blockId": "trainer-ts-errors",
+        "blockId": null,
         "trainerId": "trainer-ts-errors"
       },
       {
@@ -327,7 +327,7 @@
         "chapterId": "ts-async-net",
         "track": "blockchain",
         "path": "blockchain/ts-async-net",
-        "blockId": "trainer-ts-async-net",
+        "blockId": null,
         "trainerId": "trainer-ts-async-net"
       },
       {
@@ -335,7 +335,7 @@
         "chapterId": "ts-modules",
         "track": "blockchain",
         "path": "blockchain/ts-modules",
-        "blockId": "trainer-ts-modules",
+        "blockId": null,
         "trainerId": "trainer-ts-modules"
       },
       {
@@ -351,7 +351,7 @@
         "chapterId": "geth-network",
         "track": "blockchain",
         "path": "blockchain/geth-network",
-        "blockId": "trainer-geth-network",
+        "blockId": null,
         "trainerId": "trainer-geth-network"
       },
       {
@@ -359,7 +359,7 @@
         "chapterId": "hh-start",
         "track": "blockchain",
         "path": "blockchain/hh-start",
-        "blockId": "trainer-hh-start",
+        "blockId": null,
         "trainerId": "trainer-hh-start"
       },
       {
@@ -367,7 +367,7 @@
         "chapterId": "hh-config",
         "track": "blockchain",
         "path": "blockchain/hh-config",
-        "blockId": "trainer-hh-config",
+        "blockId": null,
         "trainerId": "trainer-hh-config"
       },
       {
@@ -375,7 +375,7 @@
         "chapterId": "hh-test",
         "track": "blockchain",
         "path": "blockchain/hh-test",
-        "blockId": "trainer-hh-test",
+        "blockId": null,
         "trainerId": "trainer-hh-test"
       },
       {
@@ -383,7 +383,7 @@
         "chapterId": "hh-deploy",
         "track": "blockchain",
         "path": "blockchain/hh-deploy",
-        "blockId": "trainer-hh-deploy",
+        "blockId": null,
         "trainerId": "trainer-hh-deploy"
       },
       {
@@ -391,7 +391,7 @@
         "chapterId": "web-html",
         "track": "blockchain",
         "path": "blockchain/web-html",
-        "blockId": "trainer-web-html",
+        "blockId": null,
         "trainerId": "trainer-web-html"
       },
       {
@@ -399,7 +399,7 @@
         "chapterId": "web-css",
         "track": "blockchain",
         "path": "blockchain/web-css",
-        "blockId": "trainer-web-css",
+        "blockId": null,
         "trainerId": "trainer-web-css"
       },
       {
@@ -407,7 +407,7 @@
         "chapterId": "web-layout",
         "track": "blockchain",
         "path": "blockchain/web-layout",
-        "blockId": "trainer-web-layout",
+        "blockId": null,
         "trainerId": "trainer-web-layout"
       },
       {
@@ -415,7 +415,7 @@
         "chapterId": "web-dom",
         "track": "blockchain",
         "path": "blockchain/web-dom",
-        "blockId": "trainer-web-dom",
+        "blockId": null,
         "trainerId": "trainer-web-dom"
       },
       {
@@ -423,7 +423,7 @@
         "chapterId": "web-react",
         "track": "blockchain",
         "path": "blockchain/web-react",
-        "blockId": "trainer-web-react",
+        "blockId": null,
         "trainerId": "trainer-web-react"
       },
       {
@@ -431,7 +431,7 @@
         "chapterId": "web-state",
         "track": "blockchain",
         "path": "blockchain/web-state",
-        "blockId": "trainer-web-state",
+        "blockId": null,
         "trainerId": "trainer-web-state"
       },
       {
@@ -439,7 +439,7 @@
         "chapterId": "web-vite",
         "track": "blockchain",
         "path": "blockchain/web-vite",
-        "blockId": "trainer-web-vite",
+        "blockId": null,
         "trainerId": "trainer-web-vite"
       },
       {
@@ -447,7 +447,7 @@
         "chapterId": "web-fetch",
         "track": "blockchain",
         "path": "blockchain/web-fetch",
-        "blockId": "trainer-web-fetch",
+        "blockId": null,
         "trainerId": "trainer-web-fetch"
       },
       {
@@ -455,7 +455,7 @@
         "chapterId": "web-forms",
         "track": "blockchain",
         "path": "blockchain/web-forms",
-        "blockId": "trainer-web-forms",
+        "blockId": null,
         "trainerId": "trainer-web-forms"
       },
       {
@@ -463,7 +463,7 @@
         "chapterId": "web-router",
         "track": "blockchain",
         "path": "blockchain/web-router",
-        "blockId": "trainer-web-router",
+        "blockId": null,
         "trainerId": "trainer-web-router"
       },
       {
@@ -471,7 +471,7 @@
         "chapterId": "web-redux",
         "track": "blockchain",
         "path": "blockchain/web-redux",
-        "blockId": "trainer-web-redux",
+        "blockId": null,
         "trainerId": "trainer-web-redux"
       },
       {
@@ -479,7 +479,7 @@
         "chapterId": "web-rtk",
         "track": "blockchain",
         "path": "blockchain/web-rtk",
-        "blockId": "trainer-web-rtk",
+        "blockId": null,
         "trainerId": "trainer-web-rtk"
       },
       {
@@ -487,7 +487,7 @@
         "chapterId": "web-rtk-async",
         "track": "blockchain",
         "path": "blockchain/web-rtk-async",
-        "blockId": "trainer-web-rtk-async",
+        "blockId": null,
         "trainerId": "trainer-web-rtk-async"
       },
       {
@@ -495,7 +495,7 @@
         "chapterId": "wallet-connect",
         "track": "blockchain",
         "path": "blockchain/wallet-connect",
-        "blockId": "trainer-wallet-connect",
+        "blockId": null,
         "trainerId": "trainer-wallet-connect"
       },
       {
@@ -503,7 +503,7 @@
         "chapterId": "wallet-sign",
         "track": "blockchain",
         "path": "blockchain/wallet-sign",
-        "blockId": "trainer-wallet-sign",
+        "blockId": null,
         "trainerId": "trainer-wallet-sign"
       },
       {
@@ -511,7 +511,7 @@
         "chapterId": "dapp-full",
         "track": "blockchain",
         "path": "blockchain/dapp-full",
-        "blockId": "trainer-dapp-full",
+        "blockId": null,
         "trainerId": "trainer-dapp-full"
       },
       {
@@ -519,7 +519,7 @@
         "chapterId": "audit-vulns",
         "track": "blockchain",
         "path": "blockchain/audit-vulns",
-        "blockId": "trainer-audit-vulns",
+        "blockId": null,
         "trainerId": "trainer-audit-vulns"
       },
       {
@@ -527,7 +527,7 @@
         "chapterId": "audit-tools",
         "track": "blockchain",
         "path": "blockchain/audit-tools",
-        "blockId": "trainer-audit-tools",
+        "blockId": null,
         "trainerId": "trainer-audit-tools"
       },
       {
@@ -535,7 +535,7 @@
         "chapterId": "audit-report",
         "track": "blockchain",
         "path": "blockchain/audit-report",
-        "blockId": "trainer-audit-report",
+        "blockId": null,
         "trainerId": "trainer-audit-report"
       },
       {
@@ -543,7 +543,7 @@
         "chapterId": "fabric-intro",
         "track": "blockchain",
         "path": "blockchain/fabric-intro",
-        "blockId": "trainer-fabric-intro",
+        "blockId": null,
         "trainerId": "trainer-fabric-intro"
       },
       {
@@ -551,7 +551,7 @@
         "chapterId": "fabric-network",
         "track": "blockchain",
         "path": "blockchain/fabric-network",
-        "blockId": "trainer-fabric-network",
+        "blockId": null,
         "trainerId": "trainer-fabric-network"
       },
       {
@@ -559,7 +559,7 @@
         "chapterId": "fabric-chaincode",
         "track": "blockchain",
         "path": "blockchain/fabric-chaincode",
-        "blockId": "trainer-fabric-chaincode",
+        "blockId": null,
         "trainerId": "trainer-fabric-chaincode"
       },
       {
@@ -567,7 +567,7 @@
         "chapterId": "fabric-lifecycle",
         "track": "blockchain",
         "path": "blockchain/fabric-lifecycle",
-        "blockId": "trainer-fabric-lifecycle",
+        "blockId": null,
         "trainerId": "trainer-fabric-lifecycle"
       },
       {
@@ -575,7 +575,7 @@
         "chapterId": "fabric-tx",
         "track": "blockchain",
         "path": "blockchain/fabric-tx",
-        "blockId": "trainer-fabric-tx",
+        "blockId": null,
         "trainerId": "trainer-fabric-tx"
       },
       {
@@ -583,7 +583,7 @@
         "chapterId": "fabric-vs-eth",
         "track": "blockchain",
         "path": "blockchain/fabric-vs-eth",
-        "blockId": "trainer-fabric-vs-eth",
+        "blockId": null,
         "trainerId": "trainer-fabric-vs-eth"
       },
       {
@@ -631,7 +631,7 @@
         "chapterId": "waves-account",
         "track": "blockchain",
         "path": "blockchain/waves-account",
-        "blockId": "trainer-waves-account",
+        "blockId": null,
         "trainerId": "trainer-waves-account"
       },
       {
@@ -639,7 +639,7 @@
         "chapterId": "waves-tx",
         "track": "blockchain",
         "path": "blockchain/waves-tx",
-        "blockId": "trainer-waves-tx",
+        "blockId": null,
         "trainerId": "trainer-waves-tx"
       },
       {
@@ -647,7 +647,7 @@
         "chapterId": "waves-data",
         "track": "blockchain",
         "path": "blockchain/waves-data",
-        "blockId": "trainer-waves-data",
+        "blockId": null,
         "trainerId": "trainer-waves-data"
       },
       {
@@ -655,7 +655,7 @@
         "chapterId": "waves-assets",
         "track": "blockchain",
         "path": "blockchain/waves-assets",
-        "blockId": "trainer-waves-assets",
+        "blockId": null,
         "trainerId": "trainer-waves-assets"
       },
       {
@@ -663,7 +663,7 @@
         "chapterId": "waves-ride",
         "track": "blockchain",
         "path": "blockchain/waves-ride",
-        "blockId": "trainer-waves-ride",
+        "blockId": null,
         "trainerId": "trainer-waves-ride"
       },
       {
@@ -671,7 +671,7 @@
         "chapterId": "waves-smart-account",
         "track": "blockchain",
         "path": "blockchain/waves-smart-account",
-        "blockId": "trainer-waves-smart-account",
+        "blockId": null,
         "trainerId": "trainer-waves-smart-account"
       },
       {
@@ -679,7 +679,7 @@
         "chapterId": "waves-dapp",
         "track": "blockchain",
         "path": "blockchain/waves-dapp",
-        "blockId": "trainer-waves-dapp",
+        "blockId": null,
         "trainerId": "trainer-waves-dapp"
       },
       {
@@ -687,7 +687,7 @@
         "chapterId": "waves-payments",
         "track": "blockchain",
         "path": "blockchain/waves-payments",
-        "blockId": "trainer-waves-payments",
+        "blockId": null,
         "trainerId": "trainer-waves-payments"
       },
       {
@@ -695,7 +695,7 @@
         "chapterId": "waves-client",
         "track": "blockchain",
         "path": "blockchain/waves-client",
-        "blockId": "trainer-waves-client",
+        "blockId": null,
         "trainerId": "trainer-waves-client"
       },
       {
@@ -1015,7 +1015,7 @@
         "chapterId": "lazy-lists",
         "track": "mobile",
         "path": "mobile/lazy-lists",
-        "blockId": "trainer-lazy-lists",
+        "blockId": null,
         "trainerId": "trainer-lazy-lists"
       },
       {
@@ -1023,7 +1023,7 @@
         "chapterId": "material-theme",
         "track": "mobile",
         "path": "mobile/material-theme",
-        "blockId": "trainer-material-theme",
+        "blockId": null,
         "trainerId": "trainer-material-theme"
       },
       {
@@ -1031,7 +1031,7 @@
         "chapterId": "scaffold-bars",
         "track": "mobile",
         "path": "mobile/scaffold-bars",
-        "blockId": "trainer-scaffold",
+        "blockId": null,
         "trainerId": "trainer-scaffold"
       },
       {
@@ -1039,7 +1039,7 @@
         "chapterId": "kit-buttons",
         "track": "mobile",
         "path": "mobile/kit-buttons",
-        "blockId": "trainer-kit-buttons",
+        "blockId": null,
         "trainerId": "trainer-kit-buttons"
       },
       {
@@ -1047,7 +1047,7 @@
         "chapterId": "kit-inputs",
         "track": "mobile",
         "path": "mobile/kit-inputs",
-        "blockId": "trainer-kit-inputs",
+        "blockId": null,
         "trainerId": "trainer-kit-inputs"
       },
       {
@@ -1055,7 +1055,7 @@
         "chapterId": "kit-select",
         "track": "mobile",
         "path": "mobile/kit-select",
-        "blockId": "trainer-kit-select",
+        "blockId": null,
         "trainerId": "trainer-kit-select"
       },
       {
@@ -1063,7 +1063,7 @@
         "chapterId": "kit-search",
         "track": "mobile",
         "path": "mobile/kit-search",
-        "blockId": "trainer-kit-search",
+        "blockId": null,
         "trainerId": "trainer-kit-search"
       },
       {
@@ -1071,7 +1071,7 @@
         "chapterId": "kit-bars",
         "track": "mobile",
         "path": "mobile/kit-bars",
-        "blockId": "trainer-kit-bars",
+        "blockId": null,
         "trainerId": "trainer-kit-bars"
       },
       {
@@ -1079,7 +1079,7 @@
         "chapterId": "kit-card",
         "track": "mobile",
         "path": "mobile/kit-card",
-        "blockId": "trainer-kit-card",
+        "blockId": null,
         "trainerId": "trainer-kit-card"
       },
       {
@@ -1087,7 +1087,7 @@
         "chapterId": "kit-icon-font",
         "track": "mobile",
         "path": "mobile/kit-icon-font",
-        "blockId": "trainer-kit-icon-font",
+        "blockId": null,
         "trainerId": "trainer-kit-icon-font"
       },
       {
@@ -1103,7 +1103,7 @@
         "chapterId": "flow-streams",
         "track": "mobile",
         "path": "mobile/flow-streams",
-        "blockId": "trainer-flow-typing",
+        "blockId": null,
         "trainerId": "trainer-flow-typing"
       },
       {
@@ -1111,7 +1111,7 @@
         "chapterId": "viewmodel-state",
         "track": "mobile",
         "path": "mobile/viewmodel-state",
-        "blockId": "trainer-viewmodel",
+        "blockId": null,
         "trainerId": "trainer-viewmodel"
       },
       {
@@ -1119,7 +1119,7 @@
         "chapterId": "app-layers",
         "track": "mobile",
         "path": "mobile/app-layers",
-        "blockId": "trainer-app-layers",
+        "blockId": null,
         "trainerId": "trainer-app-layers"
       },
       {
@@ -1127,7 +1127,7 @@
         "chapterId": "network-retrofit",
         "track": "mobile",
         "path": "mobile/network-retrofit",
-        "blockId": "trainer-network",
+        "blockId": null,
         "trainerId": "trainer-network"
       },
       {
@@ -1135,7 +1135,7 @@
         "chapterId": "network-errors",
         "track": "mobile",
         "path": "mobile/network-errors",
-        "blockId": "trainer-network-errors",
+        "blockId": null,
         "trainerId": "trainer-network-errors"
       },
       {
@@ -1143,7 +1143,7 @@
         "chapterId": "data-storage",
         "track": "mobile",
         "path": "mobile/data-storage",
-        "blockId": "trainer-data-storage",
+        "blockId": null,
         "trainerId": "trainer-data-storage"
       },
       {
@@ -1151,7 +1151,7 @@
         "chapterId": "cache-offline",
         "track": "mobile",
         "path": "mobile/cache-offline",
-        "blockId": "trainer-cache-offline",
+        "blockId": null,
         "trainerId": "trainer-cache-offline"
       },
       {
@@ -1159,7 +1159,7 @@
         "chapterId": "clean-code",
         "track": "mobile",
         "path": "mobile/clean-code",
-        "blockId": "trainer-clean-code",
+        "blockId": null,
         "trainerId": "trainer-clean-code"
       },
       {
@@ -1167,7 +1167,7 @@
         "chapterId": "auth-session",
         "track": "mobile",
         "path": "mobile/auth-session",
-        "blockId": "trainer-auth-session",
+        "blockId": null,
         "trainerId": "trainer-auth-session"
       },
       {
@@ -1175,7 +1175,7 @@
         "chapterId": "device-features",
         "track": "mobile",
         "path": "mobile/device-features",
-        "blockId": "trainer-device-features",
+        "blockId": null,
         "trainerId": "trainer-device-features"
       },
       {
@@ -1183,7 +1183,7 @@
         "chapterId": "testing-mobile",
         "track": "mobile",
         "path": "mobile/testing-mobile",
-        "blockId": "trainer-testing-mobile",
+        "blockId": null,
         "trainerId": "trainer-testing-mobile"
       },
       {

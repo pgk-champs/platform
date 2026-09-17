@@ -11,7 +11,7 @@ type Exercise = {
   chapterId: string;
   track: string;
   path: string;
-  blockId: string;
+  blockId: string | null;
   trainerId: string;
 };
 type Mechanic = { component: string; exercises: Exercise[] };
@@ -63,7 +63,9 @@ export function buildCards(): GymCard[] {
         // У 85 упражнений из 228 своего title нет — почти все это наборы
         // слепой печати. Там подписываемся главой, а не пустой строкой.
         title: e.title || TITLE_BY_ID[e.chapterId] || e.chapterId,
-        href: `/docs/${e.path}#${e.blockId}`,
+        // Без blockId якоря в HTML нет — ведём на главу, а не на
+        // несуществующий #. Так у 84 наборов печати из 228.
+        href: e.blockId ? `/docs/${e.path}#${e.blockId}` : `/docs/${e.path}`,
         chapterTitle: TITLE_BY_ID[e.chapterId] ?? e.chapterId,
       })),
       done: m.exercises.filter((e) => progress.trainers[e.chapterId]?.[e.trainerId]).length,

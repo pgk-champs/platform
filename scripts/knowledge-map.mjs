@@ -148,7 +148,10 @@ export function buildTrainers(docsDir) {
           chapterId: attr('chapterId') || fileId,
           track,
           path: docPath,
-          blockId: attr('blockId') || t[1],
+          // Якорь НЕ выдумываем: у 84 блоков печати атрибута blockId нет, и
+          // подстановка trainerId давала ссылку в никуда — <Block> рендерит
+          // id ровно из blockId, а без него не рендерит вовсе.
+          blockId: attr('blockId') || null,
           trainerId: t[1],
         });
         byComponent.set(component, list);
