@@ -9,12 +9,24 @@ import {
   subscribe,
   type Profile,
 } from '../lib/account';
+import GameBadge from './GameBadge';
 import './accountNav.css';
 
 /** Пункт навбара: кнопка «Войти» для гостя, аватар с меню для вошедшего.
  *  Роли (наставник, автор) выносятся отдельными ссылками рядом — их видит
  *  только тот, у кого роль есть: ссылка, ведущая к «нет доступа», — мусор. */
-export default function AccountNav(): React.ReactElement | null {
+export default function AccountNav({
+  mobile,
+  onClick,
+}: {
+  /** Docusaurus рендерит пункты навбара дважды — в шапке и внутри бургера,
+   *  передавая второму экземпляру mobile и onClick (Navbar/MobileSidebar/
+   *  PrimaryMenu). Раньше оба пропа игнорировались: копия в бургере жила, но
+   *  была скрыта общим .navbar__item{display:none}. Теперь в бургере рисуем
+   *  пункт списка, а не плашку, и закрываем сайдбар по переходу. */
+  mobile?: boolean;
+  onClick?: () => void;
+} = {}): React.ReactElement | null {
   // 'wait' — пока не знаем: на сервере и до первого ответа /me. Показывать в
   // этот момент «Войти» нельзя, иначе у вошедшего кнопка мигает при каждом
   // переходе.
@@ -68,15 +80,27 @@ export default function AccountNav(): React.ReactElement | null {
 
   if (state === 'wait') return null;
 
+  // Плашка показывается и гостю: прогресс у него уже копится локально, а
+  // игровой слой до сих пор начинался только после входа.
   if (state === 'anon' || !profile)
     return (
-      <button type="button" className="an-login button button--primary button--sm" onClick={() => login()}>
-        Войти
-      </button>
+      <>
+        <GameBadge mobile={mobile} onClick={onClick} />
+        {!mobile && (
+          <button
+            type="button"
+            className="an-login button button--primary button--sm"
+            onClick={() => login()}
+          >
+            Войти
+          </button>
+        )}
+      </>
     );
 
   return (
     <>
+      <GameBadge mobile={mobile} onClick={onClick} />
       {profile.mentor && (
         <Link className="navbar__item navbar__link an-role" to="/mentor">
           Наставнику
@@ -87,6 +111,7 @@ export default function AccountNav(): React.ReactElement | null {
           Правка
         </Link>
       )}
+      {!mobile && (
       <div
         ref={wrap}
         className={`navbar__item dropdown dropdown--right an-wrap${open ? ' dropdown--show' : ''}`}
@@ -122,6 +147,7 @@ export default function AccountNav(): React.ReactElement | null {
           </li>
         </ul>
       </div>
+      )}
     </>
   );
 }

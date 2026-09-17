@@ -281,9 +281,10 @@ function isHintDismissed(hintId: string): boolean {
 const STREAK_MULTIPLIER_CAP_DAYS = 10;
 const STREAK_MULTIPLIER_STEP = 0.05;
 
-/** Дата по МЕСТНОМУ времени, как и ключ дня в DailyChallenge. По UTC день
- *  переключался бы в 04:00 самарского времени — см. там же. */
-function localDayKey(): string {
+/** Дата по МЕСТНОМУ времени, 'YYYY-MM-DD'. По UTC день переключался бы в
+ *  04:00 самарского времени: занятие в полночь падало бы во вчера и рвало
+ *  серию. Единственный источник даты на платформе — копий быть не должно. */
+export function localDayKey(): string {
   const d = new Date();
   const p = (n: number) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;

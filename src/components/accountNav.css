@@ -91,3 +91,59 @@
     z-index: calc(var(--ifm-z-index-dropdown) + 1);
   }
 }
+
+/* Постоянный след игрового слоя в шапке. Медь — «твоё»: серия и достижения
+   принадлежат студенту, а не структуре сайта. Уровня здесь намеренно нет —
+   он берётся за четыре главы из 137 и хвалил бы за первый вечер. */
+.gb {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.2rem 0.55rem;
+  margin-right: 0.5rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 999px;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.6;
+  color: var(--ifm-color-emphasis-800);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.gb:hover {
+  color: var(--ifm-color-emphasis-800);
+  text-decoration: none;
+  border-color: var(--pgk-you);
+}
+
+.gb-streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  color: var(--pgk-you);
+}
+
+/* Огонёк рисуется формой, а не эмодзи: эмодзи в шапке разъезжается по
+   платформам и не красится темой. */
+.gb-flame {
+  width: 7px;
+  height: 9px;
+  background: var(--pgk-you);
+  border-radius: 60% 0 55% 50% / 65% 0 50% 50%;
+  transform: rotate(-45deg);
+}
+
+.gb-slash {
+  opacity: 0.45;
+  margin: 0 1px;
+}
+
+/* На узком экране плашка едет в бургер отдельным пунктом (см. GameBadge),
+   поэтому в шапке её прячем вместе с остальными пунктами навбара. */
+@media (max-width: 996px) {
+  .gb {
+    display: none;
+  }
+}

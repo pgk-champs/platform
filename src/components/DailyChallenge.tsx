@@ -5,7 +5,7 @@
 // идущих дней отмечается огоньком, XP за верные ответы.
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import Link from '@docusaurus/Link';
-import { store } from '../lib/store';
+import { store, localDayKey } from '../lib/store';
 import StreakBadge from './StreakBadge';
 import type { Question } from './SelfCheck';
 import knowledgeMap from '../data/knowledge-map.json';
@@ -942,18 +942,10 @@ export const DAILY_BANK: DailyQuestion[] = [
   { chapterId: 'kit-icon-font', q: 'Когда иконочный шрифт НЕ подходит?', options: ['Когда иконок много', 'Когда они многоцветные, анимируются или их всего три', 'В тёмной теме', 'В больших приложениях'], correct: 1, why: 'Шрифт одноцветный по устройству и не умеет анимации.' },
 ];
 
-/** Ключ сегодняшнего дня по МЕСТНОМУ времени; вызывать в обработчиках и
- *  эффектах (SSR-safe).
- *
- *  Не toISOString(): он даёт дату по UTC, а колледж в Самаре — UTC+4. День
- *  серии переключался в 04:00 по местному времени, поэтому занятие в полночь
- *  засчитывалось во вчера (серия рвалась), а 03:55 и 04:05 давали два дня
- *  серии за двадцать минут. */
-export function todayKey(): string {
-  const d = new Date();
-  const p = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
-}
+/** Ключ сегодняшнего дня; вызывать в обработчиках и эффектах (SSR-safe).
+ *  Дату считает store — там же, где по ней строится серия: две копии одной
+ *  даты однажды разъедутся, и серия начнёт врать. */
+export const todayKey = localDayKey;
 
 // FNV-1a от строки даты — seed для перемешивания.
 export function hashDate(dateKey: string): number {
