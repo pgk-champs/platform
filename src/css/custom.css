@@ -288,6 +288,13 @@ html {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    /* Задержку гасить ОБЯЗАТЕЛЬНО, а не только длительность. .pgk-reveal
+       держит opacity:0 всё время animation-delay (fill-mode both), а на первом
+       экране задержка доходит до 5×90 = 450 мс. Без этой строки человек с
+       «уменьшить движение» полсекунды смотрит на пустой первый экран, и
+       ступенчатое появление никуда не девается — гасится только его скорость. */
+    animation-delay: 0s !important;
+    transition-delay: 0s !important;
     scroll-behavior: auto !important;
   }
 }
