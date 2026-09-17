@@ -49,11 +49,40 @@
      не прочитать (жёлтый с белым даёт 1.7:1). */
   --pgk-on-accent: #16161a;
 
-  /* Акцент для SVG-иллюстраций: заливки, а не текст. */
-  --pgk-art-accent: var(--ifm-color-primary-lightest);
-  --pgk-art-ink: var(--ifm-color-primary-darkest);
+  /* Серая шкала. Раньше её не переопределял никто, и 523 обращения по всему
+     сайту брали дефолт Infima — нейтральный тон, который не выбирали. Здесь
+     холодный графит с уклоном к индиго. -600 проверен на белом (5.04:1) и на
+     -100 (4.66:1): служебная подпись чаще стоит внутри карточки, поэтому
+     сверяемся с худшей поверхностью, а не с фоном страницы. */
+  --ifm-color-emphasis-0: #ffffff;
+  --ifm-color-emphasis-100: #f4f6fb;
+  --ifm-color-emphasis-200: #e9edf5;
+  --ifm-color-emphasis-300: #d8dfec;
+  --ifm-color-emphasis-400: #bcc5d8;
+  --ifm-color-emphasis-500: #98a2b8;
+  --ifm-color-emphasis-600: #666f83;
+  --ifm-color-emphasis-700: #525c72;
+  --ifm-color-emphasis-800: #2a3142;
+  --ifm-color-emphasis-900: #11151f;
+  --ifm-color-emphasis-1000: #000000;
+
+  /* Медь — единственный тёплый цвет платформы, и он означает «твоё»:
+     пройдено, текущая глава, рекорд, достижение. Индиго при этом остаётся
+     структурой — связь, ссылка, активный пункт. Если индиго начнёт хвалить,
+     роли сольются и прогресс перестанет читаться. */
+  --pgk-you: #b4550f;
+
+  /* Цвет трека: только в чипе и тонкой полосе. Заливкой не пользоваться —
+     четыре цветных плашки рядом читаются как реклама, а не как навигация. */
+  --pgk-track-foundation: #4a52d9;
+  --pgk-track-mobile: #0e7f76;
+  --pgk-track-blockchain: #7e3fbf;
+  --pgk-track-advanced: #5a6478;
 
   --ifm-card-border-radius: 14px;
+  /* Радиус мелочи мельче карточного: иначе плашка и карточка выглядят одним
+     элементом. 205 обращений брали дефолт Infima. */
+  --ifm-global-radius: 8px;
   --pgk-radius-sm: 8px;
   --pgk-radius-lg: 20px;
 
@@ -91,6 +120,38 @@
   --pgk-text-danger: #ff8a8f;
   --pgk-text-warning: #f0b429;
   --pgk-on-accent: #16161a;
+
+  /* В тёмной теме Infima разворачивает шкалу: emphasis-N берётся из
+     gray-(1000−N), поэтому -300 там был #606770 — СВЕТЛЕЕ подложки. На нём
+     висит 100 рамок в trainers.css плюс границы таблиц, цитат и оглавления.
+     Поэтому здесь не «своя шкала», а та же светлота в холодном тоне: каждая
+     ступень подобрана под яркость прежней и проверена тестом на то, что
+     не стала хуже. Первая попытка сделала низ вчетверо темнее, и рамки
+     почти исчезли бы — заметно это только на живой странице, сборка и
+     тесты проходили. */
+  --ifm-color-emphasis-0: #000000;
+  --ifm-color-emphasis-100: #181c23;
+  --ifm-color-emphasis-200: #40485c;
+  --ifm-color-emphasis-300: #5b6782;
+  --ifm-color-emphasis-400: #8993ad;
+  --ifm-color-emphasis-500: #bcc2d1;
+  --ifm-color-emphasis-600: #cbcfdb;
+  --ifm-color-emphasis-700: #d9dde5;
+  --ifm-color-emphasis-800: #ebecf1;
+  --ifm-color-emphasis-900: #f5f5f8;
+  --ifm-color-emphasis-1000: #ffffff;
+
+  /* Земля холоднее и глубже прежней: на ней не сереют подсветка кода и
+     объёмные схемы, которые рисуются на своей тёмной подложке. */
+  --ifm-background-color: #0b0d13;
+  --ifm-background-surface-color: #141826;
+
+  --pgk-you: #ffb05c;
+
+  --pgk-track-foundation: #7c8cf8;
+  --pgk-track-mobile: #4fd1c5;
+  --pgk-track-blockchain: #c084fc;
+  --pgk-track-advanced: #94a3b8;
 }
 
 /* ==========================================================================
@@ -105,7 +166,7 @@
   --ifm-heading-font-family: 'Onest', 'Golos Text', system-ui, -apple-system,
     'Segoe UI', Roboto, Arial, sans-serif;
   /* Витринный шрифт: только заголовок первого экрана и крупные числа. */
-  --pgk-font-display: 'Unbounded', 'Onest', system-ui, sans-serif;
+  --pgk-font-display: 'Onest', 'Golos Text', system-ui, sans-serif;
   --ifm-heading-font-weight: 700;
   --ifm-line-height-base: 1.65;
   --ifm-heading-line-height: 1.2;
