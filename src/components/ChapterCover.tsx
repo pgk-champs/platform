@@ -2526,7 +2526,7 @@ export default function ChapterCover({ chapterId }: { chapterId: string }) {
     <div className="chapter-cover">
       {/* Трек — цветным чипом, а не заливкой: четыре цветных плашки рядом
           читались бы как реклама. В подписи SVG он больше не повторяется. */}
-      <span className={`cov-track cov-track--${ch.track}`}>{TRACK_LABEL[ch.track]}</span>
+      <span className={`cov-track trk-${ch.track}`}>{TRACK_LABEL[ch.track]}</span>
       <Frame
         id={`ccg-${chapterId}`}
         label={`глава ${ch.num}`}

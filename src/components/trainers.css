@@ -7824,25 +7824,43 @@
   color: var(--ifm-color-emphasis-700);
 }
 
-.hh-stats {
+/* Числа — строкой через волосок, а не тремя одинаковыми плитками: плитки
+   делали их равнозначными пунктами меню, а это один факт из трёх частей. */
+.hh-nums {
   display: flex;
   flex-wrap: wrap;
-  gap: 2.2rem;
+  gap: 0;
   margin: 0;
   padding-top: 1.4rem;
   border-top: 1px solid var(--ifm-color-emphasis-200);
 }
 
-.hh-stat-num {
+.hh-num {
+  padding: 0 24px;
+  border-left: 1px solid var(--ifm-color-emphasis-300);
+}
+
+.hh-num:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.hh-num dt {
+  margin: 0;
+}
+
+.hh-num b {
+  display: block;
   font-family: var(--pgk-font-display);
-  font-size: 1.9rem;
+  font-size: 2.6rem;
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
   color: var(--ifm-font-color-base);
 }
 
-.hh-stat-label {
+.hh-num-label {
   margin: 0.35rem 0 0;
   font-size: 0.85rem;
   color: var(--ifm-color-emphasis-700);
@@ -7861,7 +7879,7 @@
 
 .hh-tracks-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
 }
 
@@ -7869,8 +7887,12 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  padding: 1.5rem;
+  padding: 1.25rem 1.5rem;
   border: 1px solid var(--ifm-color-emphasis-200);
+  /* Цвет трека — тонкой полосой сверху и в числе глав. Заливкой не берём:
+     четыре цветных плашки рядом читаются как реклама, а не как навигация.
+     Строго ПОСЛЕ шортката border — иначе он эту полосу затирает. */
+  border-top: 3px solid currentColor;
   border-radius: var(--ifm-card-border-radius);
   background: var(--ifm-background-surface-color);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
@@ -7886,11 +7908,38 @@
   text-decoration: none;
 }
 
+/* Крупные треки — там, где глав вчетверо больше: 72 и 46 против 10 и 9.
+   Вес карточки — единственный честный способ это показать. */
+.hh-track--big {
+  padding: 2rem 1.75rem;
+}
+
+.hh-track-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
 .hh-track-title {
   font-family: var(--ifm-heading-font-family);
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--ifm-color-primary);
+  color: var(--ifm-font-color-base);
+}
+
+.hh-track--big .hh-track-title {
+  font-family: var(--pgk-font-display);
+  font-size: 1.7rem;
+  letter-spacing: -0.02em;
+}
+
+.hh-track-n {
+  flex: none;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: currentColor;
 }
 
 .hh-track-desc {
@@ -7900,6 +7949,14 @@
 @media (max-width: 768px) {
   .hh-tracks-grid {
     grid-template-columns: 1fr;
+  }
+
+  .hh-num {
+    padding: 0 16px;
+  }
+
+  .hh-track--big {
+    padding: 1.5rem;
   }
 }
 
@@ -7923,19 +7980,21 @@
   border: 1px solid currentColor;
 }
 
-.cov-track--foundation {
+/* Цвет трека одним набором на всех потребителей: обложка главы, карточка на
+   главной. Дублировать четыре правила на каждого — тот самый второй список. */
+.trk-foundation {
   color: var(--pgk-track-foundation);
 }
 
-.cov-track--mobile {
+.trk-mobile {
   color: var(--pgk-track-mobile);
 }
 
-.cov-track--blockchain {
+.trk-blockchain {
   color: var(--pgk-track-blockchain);
 }
 
-.cov-track--advanced {
+.trk-advanced {
   color: var(--pgk-track-advanced);
 }
 

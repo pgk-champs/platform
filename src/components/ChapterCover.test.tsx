@@ -106,7 +106,7 @@ test('показывает чип трека его цветом', () => {
   const { container } = render(<ChapterCover chapterId="state-events" />);
   const chip = container.querySelector('.cov-track');
   expect(chip).toBeTruthy();
-  expect(chip?.className).toContain('cov-track--mobile');
+  expect(chip?.className).toContain('trk-mobile');
 });
 
 test('трек в подписи обложки не дублируется — он только в чипе', () => {

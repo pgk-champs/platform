@@ -8,11 +8,14 @@ import './trainers.css';
 
 // Числа считаются из данных, а не вписываются руками: «22 главы с разбором»
 // дожили на первом экране до 137 настоящих и никого не смутили.
-const CHAPTERS = (knowledgeMap as { totals?: { trainers?: number } }[]).length;
-const TRAINERS = (knowledgeMap as { totals?: { trainers?: number } }[]).reduce(
-  (sum, e) => sum + (e.totals?.trainers ?? 0),
-  0,
-);
+type MapEntry = { track: string; totals?: { trainers?: number } };
+const CHAPTERS = (knowledgeMap as MapEntry[]).length;
+const TRAINERS = (knowledgeMap as MapEntry[]).reduce((sum, e) => sum + (e.totals?.trainers ?? 0), 0);
+
+// Сколько глав в каждом треке — отсюда вес карточки на главной. Руками эти
+// числа не пишут: мобилка выросла с 12 до 46 за две недели.
+const BY_TRACK: Record<string, number> = {};
+for (const e of knowledgeMap as MapEntry[]) BY_TRACK[e.track] = (BY_TRACK[e.track] ?? 0) + 1;
 
 const STATS = [
   { num: String(CHAPTERS), label: `${plural(CHAPTERS, 'глава', 'главы', 'глав')} с разбором` },
@@ -20,10 +23,20 @@ const STATS = [
   { num: String(ACHIEVEMENTS.length), label: plural(ACHIEVEMENTS.length, 'достижение', 'достижения', 'достижений') },
 ];
 
-// Треки — из того же единственного списка, что меню и подвал.
+// Треки — из того же единственного списка, что меню и подвал. Порядок здесь
+// по объёму, а не по position: карточки разного веса, и ставить узкий трек из
+// девяти глав перед семидесятью двумя было бы враньём про размер.
 const TRACKS = [...(tracks as { dir: string; label: string; position: number; blurb: string }[])]
-  .sort((a, b) => a.position - b.position)
-  .map((t) => ({ to: `/docs/${t.dir}`, title: t.label, desc: t.blurb }));
+  .map((t) => ({ ...t, n: BY_TRACK[t.dir] ?? 0 }))
+  .sort((a, b) => b.n - a.n || a.position - b.position)
+  .map((t) => ({
+    to: `/docs/${t.dir}`,
+    dir: t.dir,
+    title: t.label,
+    desc: t.blurb,
+    n: t.n,
+    big: t.n >= 20,
+  }));
 
 const ACCENT = 'var(--ifm-color-primary-lightest)';
 const DARK = 'var(--ifm-color-primary-darkest)';
@@ -120,11 +133,13 @@ export default function HomeHero() {
             <p className="hh-note pgk-reveal" style={{ ['--i' as string]: 4 }}>
               Первый тренажёр открывается сразу, регистрация не нужна.
             </p>
-            <dl className="hh-stats pgk-reveal" style={{ ['--i' as string]: 5 }}>
+            <dl className="hh-nums pgk-reveal" style={{ ['--i' as string]: 5 }}>
               {STATS.map((s) => (
-                <div key={s.label} className="hh-stat">
-                  <dt className="hh-stat-num">{s.num}</dt>
-                  <dd className="hh-stat-label">{s.label}</dd>
+                <div key={s.label} className="hh-num">
+                  <dt>
+                    <b>{s.num}</b>
+                  </dt>
+                  <dd className="hh-num-label">{s.label}</dd>
                 </div>
               ))}
             </dl>
@@ -138,8 +153,17 @@ export default function HomeHero() {
         <h2 className="hh-tracks-title">Выберите свой трек обучения</h2>
         <div className="hh-tracks-grid">
           {TRACKS.map((t) => (
-            <Link key={t.to} className="hh-track" to={t.to}>
-              <span className="hh-track-title">{t.title}</span>
+            <Link
+              key={t.to}
+              className={`hh-track trk-${t.dir}${t.big ? ' hh-track--big' : ''}`}
+              to={t.to}
+            >
+              <span className="hh-track-head">
+                <span className="hh-track-title">{t.title}</span>
+                <span className="hh-track-n">
+                  {t.n} {plural(t.n, 'глава', 'главы', 'глав')}
+                </span>
+              </span>
               <span className="hh-track-desc">{t.desc}</span>
             </Link>
           ))}
