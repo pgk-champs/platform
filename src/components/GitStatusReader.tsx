@@ -74,6 +74,9 @@ export default function GitStatusReader({
   chapterId?: string;
   trainerId?: string;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<number[]>([]);
   const [checked, setChecked] = useState(false);
@@ -107,7 +110,7 @@ export default function GitStatusReader({
       store.markTrainerDone(chapterId, trainerId, { correct: correctCount, total });
       if (correctCount === total && !rewardedRef.current) {
         rewardedRef.current = true;
-        store.addXp(PERFECT_XP, `trainer:${chapterId}:${trainerId}`);
+        setXpGot(store.addXp(PERFECT_XP, `trainer:${chapterId}:${trainerId}`));
       }
     }
   };
@@ -143,7 +146,7 @@ export default function GitStatusReader({
         {perfect ? (
           <div className="gsr-final gsr-final-perfect">
             ✓ Выполнено! Все {total} вывода прочитаны верно.
-            {chapterId && trainerId ? ` +${PERFECT_XP} XP` : ''}
+            {xpGot ? ` +${xpGot} XP` : ''}
           </div>
         ) : (
           <>

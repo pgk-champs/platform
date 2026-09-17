@@ -40,7 +40,9 @@ export default function ComposeBuilder({
   const [bank] = useState(() => shuffledIndices(lines.length, lines.join('\n')));
   const [picked, setPicked] = useState<number[]>([]);
   const [solved, setSolved] = useState(false);
-  const [gotXp, setGotXp] = useState(false);
+  // Число, а не флаг: печатаем начисленное на самом деле — множитель
+  // серии поднимает базу до ×1.5, и константа расходилась бы с тостом.
+  const [gotXp, setGotXp] = useState(0);
 
   if (lines.length === 0) return null;
 
@@ -58,8 +60,7 @@ export default function ComposeBuilder({
         const first = !store.getProgress().trainers[chapterId]?.[trainerId];
         store.markTrainerDone(chapterId, trainerId, { solved: true });
         if (first) {
-          store.addXp(XP_SOLVE, `trainer:${chapterId}:${trainerId}`);
-          setGotXp(true);
+          setGotXp(store.addXp(XP_SOLVE, `trainer:${chapterId}:${trainerId}`));
         }
       }
     }
@@ -92,7 +93,7 @@ export default function ComposeBuilder({
         )}
       </div>
 
-      {solved ? <p className="cb-ok">Выполнено! Файл собран правильно.{gotXp ? ` +${XP_SOLVE} XP` : ''}</p> : null}
+      {solved ? <p className="cb-ok">Выполнено! Файл собран правильно.{gotXp ? ` +${gotXp} XP` : ''}</p> : null}
       {wrong ? (
         <p className="cb-no">
           Строка {firstWrong + 1} не на своём месте. Вспомни: вложенность в YAML задаётся

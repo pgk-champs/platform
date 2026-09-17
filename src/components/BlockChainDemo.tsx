@@ -49,6 +49,9 @@ export default function BlockChainDemo({
   chapterId?: string;
   trainerId?: string;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [data, setData] = useState(INITIAL_DATA);
   // sealed — хеши, «записанные в цепь» при последнем майнинге; live — живой
   // пересчёт hash от текущих данных. Расхождение sealed/live и есть разрыв.
@@ -117,7 +120,7 @@ export default function BlockChainDemo({
       if (!rewardedRef.current && chapterId && trainerId) {
         rewardedRef.current = true;
         store.markTrainerDone(chapterId, trainerId, { repaired: true });
-        store.addXp(XP, `trainer:${chapterId}:${trainerId}`);
+        setXpGot(store.addXp(XP, `trainer:${chapterId}:${trainerId}`));
         setRewarded(true);
       }
     }
@@ -198,7 +201,7 @@ export default function BlockChainDemo({
       ) : null}
 
       {rewarded ? (
-        <div className="hc-reward">✓ Готово! +{XP} XP — ты порвал цепь и починил её майнингом</div>
+        <div className="hc-reward">✓ Готово!{xpGot ? ` +${xpGot} XP` : ''} — ты порвал цепь и починил её майнингом</div>
       ) : null}
     </div>
   );

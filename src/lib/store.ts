@@ -310,12 +310,21 @@ function currentXpMultiplier(): number {
 // в useRef компонента и умирала вместе со страницей — квиз, экзамен и
 // симулятор фармились обычным F5. Уже накопленный XP не трогаем: список
 // оплаченных стартует пустым, так что ничего не сгорает.
-function addXp(amount: number, reason: string): void {
-  if (!amount) return;
-  if (state.xpAwarded.includes(reason)) return;
+/** Начисляет опыт и ВОЗВРАЩАЕТ фактически начисленное — с учётом множителя
+ *  серии (до ×1.5). Ноль означает «не начислено»: либо сумма нулевая, либо за
+ *  это уже платили.
+ *
+ *  Возврат нужен, чтобы тренажёры печатали настоящее число. Раньше они
+ *  показывали базовую константу, а тост — реальную дельту store: при серии
+ *  за одно действие карточка писала «+20 XP», а тост «+30 XP». */
+function addXp(amount: number, reason: string): number {
+  if (!amount) return 0;
+  if (state.xpAwarded.includes(reason)) return 0;
   state.xpAwarded = [...state.xpAwarded, reason];
-  state.xp += Math.round(amount * currentXpMultiplier());
+  const got = Math.round(amount * currentXpMultiplier());
+  state.xp += got;
   persist();
+  return got;
 }
 
 function getXp(): number {

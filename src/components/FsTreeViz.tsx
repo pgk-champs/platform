@@ -55,6 +55,9 @@ export default function FsTreeViz({
   chapterId?: string;
   trainerId?: string;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [cur, setCur] = useState<string[]>(START);
   const [info, setInfo] = useState<Info | null>(null);
   const [qVal, setQVal] = useState('');
@@ -110,7 +113,7 @@ export default function FsTreeViz({
       if (chapterId && trainerId) {
         const already = store.getProgress().trainers[chapterId]?.[trainerId];
         store.markTrainerDone(chapterId, trainerId, { solved: true });
-        if (!already) store.addXp(XP, `trainer:${chapterId}:${trainerId}`);
+        if (!already) setXpGot(store.addXp(XP, `trainer:${chapterId}:${trainerId}`));
       }
     } else if (norm === 'cd /home/student/project/docs') {
       setQFb('Сработает, но это длинный абсолютный путь. Есть короче: поднимись к родителю через .. и сразу спустись в docs.');
@@ -172,7 +175,7 @@ export default function FsTreeViz({
         {qDone ? (
           <div className="ftv-done">
             Выполнено! <code>cd ../docs</code> — вверх к project и сразу вниз в docs.
-            {chapterId && trainerId ? ` +${XP} XP` : ''}
+            {xpGot ? ` +${xpGot} XP` : ''}
           </div>
         ) : (
           <form className="ftv-form" onSubmit={checkQuest}>

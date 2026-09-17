@@ -108,7 +108,9 @@ export default function ErrorTranslator({ chapterId, trainerId }: ErrorTranslato
   const [tokens, setTokens] = useState<Token[] | null>(null);
   const [sel, setSel] = useState<number | null>(null);
   const [solved, setSolved] = useState(false);
-  const [gotXp, setGotXp] = useState(false);
+  // Число, а не флаг: печатаем то, что начислено на самом деле —
+  // множитель серии поднимает базу до ×1.5.
+  const [gotXp, setGotXp] = useState(0);
 
   const parse = (source: string) => {
     const next = source.split(/\s+/).filter(Boolean).map(classify);
@@ -122,8 +124,7 @@ export default function ErrorTranslator({ chapterId, trainerId }: ErrorTranslato
         const first = !store.getProgress().trainers[chapterId]?.[trainerId];
         store.markTrainerDone(chapterId, trainerId, { known, words });
         if (first) {
-          store.addXp(XP_SOLVE, `errortranslator:${chapterId}:${trainerId}`);
-          setGotXp(true);
+          setGotXp(store.addXp(XP_SOLVE, `errortranslator:${chapterId}:${trainerId}`));
         }
       }
     }
@@ -191,7 +192,7 @@ export default function ErrorTranslator({ chapterId, trainerId }: ErrorTranslato
           <p className="et-count">
             Знакомых слов: {known} из {words.length}
           </p>
-          {solved && <div className="et-done">{`Выполнено!${gotXp ? ' · +10 XP' : ''}`}</div>}
+          {solved && <div className="et-done">{`Выполнено!${gotXp ? ` · +${gotXp} XP` : ''}`}</div>}
         </>
       )}
     </div>

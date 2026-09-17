@@ -56,8 +56,7 @@ export default function SelfCheck({
     // XP — только за первое прохождение квиза, иначе перезагрузка страницы и
     // повтор давали бы +20 XP снова.
     if (perfect && firstRun) {
-      store.addXp(PERFECT_XP, `quiz:${chapterId}:${quizId}`);
-      setXpAwarded(PERFECT_XP);
+      setXpAwarded(store.addXp(PERFECT_XP, `quiz:${chapterId}:${quizId}`));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allAnswered]);

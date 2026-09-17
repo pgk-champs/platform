@@ -35,7 +35,9 @@ export default function PredictOutput({
   const [answer, setAnswer] = useState('');
   const [attempts, setAttempts] = useState(0);
   const [status, setStatus] = useState<'idle' | 'wrong' | 'right' | 'revealed'>('idle');
-  const [gotXp, setGotXp] = useState(false);
+  // Число, а не флаг: печатаем то, что начислено на самом деле —
+  // множитель серии поднимает базу до ×1.5.
+  const [gotXp, setGotXp] = useState(0);
 
   const norm = (s: string) => (normalizeWhitespace ? s.trim().replace(/\s+/g, ' ') : s.trim());
   const resolved = status === 'right' || status === 'revealed';
@@ -50,8 +52,7 @@ export default function PredictOutput({
         const first = !store.getProgress().trainers[chapterId]?.[trainerId];
         store.markTrainerDone(chapterId, trainerId, { attempts: n });
         if (first && n === 1) {
-          store.addXp(XP_FIRST_TRY, `predict:${chapterId}:${trainerId}`);
-          setGotXp(true);
+          setGotXp(store.addXp(XP_FIRST_TRY, `predict:${chapterId}:${trainerId}`));
         }
       }
     } else {
@@ -85,7 +86,7 @@ export default function PredictOutput({
       ) : null}
       {status === 'right' ? (
         <p className="po-feedback po-right">
-          {attempts === 1 ? `Верно — с первой попытки!${gotXp ? ' +10 XP' : ''}` : 'Верно!'}
+          {attempts === 1 ? `Верно — с первой попытки!${gotXp ? ` +${gotXp} XP` : ''}` : 'Верно!'}
         </p>
       ) : null}
       {status === 'wrong' ? (

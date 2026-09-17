@@ -282,6 +282,9 @@ function unit(param: ComposeControlParam): string {
 }
 
 export default function ComposePreview({ tree, editable, controls, chapterId, trainerId }: ComposePreviewProps) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [current, setCurrent] = useState(tree);
   const [changes, setChanges] = useState(0);
   const [done, setDone] = useState(false);
@@ -305,7 +308,7 @@ export default function ComposePreview({ tree, editable, controls, chapterId, tr
     setChanges(next);
     if (next >= GOAL && chapterId && trainerId && !done) {
       store.markTrainerDone(chapterId, trainerId, { changes: next });
-      store.addXp(XP, `trainer:${chapterId}:${trainerId}`);
+      setXpGot(store.addXp(XP, `trainer:${chapterId}:${trainerId}`));
       setDone(true);
       setAwarded(true);
     }
@@ -406,7 +409,7 @@ export default function ComposePreview({ tree, editable, controls, chapterId, tr
       {hasGoal && (
         <div className={'cpv-goal' + (done ? ' cpv-goal-done' : '')} aria-live="polite">
           {done
-            ? `✓ Цель выполнена — ты увидел связь кода и вёрстки!${awarded ? ` +${XP} XP` : ''}`
+            ? `✓ Цель выполнена — ты увидел связь кода и вёрстки!${xpGot ? ` +${xpGot} XP` : ''}`
             : `Измени параметры ${GOAL} раза и посмотри, как меняется код: ${Math.min(changes, GOAL)} из ${GOAL}`}
         </div>
       )}

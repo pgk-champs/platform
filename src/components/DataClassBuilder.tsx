@@ -60,6 +60,9 @@ export default function DataClassBuilder({
   chapterId?: string;
   trainerId?: string;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [className, setClassName] = useState('');
   const [fields, setFields] = useState<Field[]>([
     { name: '', type: 'String' },
@@ -106,7 +109,7 @@ export default function DataClassBuilder({
     if (chapterId && trainerId && !rewardedRef.current) {
       rewardedRef.current = true;
       store.markTrainerDone(chapterId, trainerId, { className, fields: fields.length });
-      store.addXp(XP, `trainer:${chapterId}:${trainerId}`);
+      setXpGot(store.addXp(XP, `trainer:${chapterId}:${trainerId}`));
     }
   };
 
@@ -215,7 +218,7 @@ export default function DataClassBuilder({
 
       {done ? (
         <div className="dcb-done">
-          ✓ Выполнено! Класс собран{chapterId && trainerId ? ` +${XP} XP` : ''}
+          ✓ Выполнено! Класс собран{xpGot ? ` +${xpGot} XP` : ''}
         </div>
       ) : (
         <button type="button" className="dcb-check" disabled={!valid} onClick={check}>

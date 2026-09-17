@@ -74,6 +74,9 @@ export default function MapFilterViz({
   chapterId?: string;
   trainerId?: string;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [scen, setScen] = useState(0);
   const [stepByScen, setStepByScen] = useState<number[]>(SCENARIOS.map(() => 0));
   const [doneByScen, setDoneByScen] = useState<boolean[]>(SCENARIOS.map(() => false));
@@ -119,7 +122,7 @@ export default function MapFilterViz({
         setAllDone(true);
         if (chapterId && trainerId) {
           store.markTrainerDone(chapterId, trainerId, { scenarios: SCENARIOS.length });
-          store.addXp(XP, `trainer:${chapterId}:${trainerId}`);
+          setXpGot(store.addXp(XP, `trainer:${chapterId}:${trainerId}`));
         }
       }
     }
@@ -221,7 +224,7 @@ export default function MapFilterViz({
 
       {allDone ? (
         <div className="mfv-done">
-          ✓ Выполнено! Оба сценария пройдены{chapterId && trainerId ? ` +${XP} XP` : ''}
+          ✓ Выполнено! Оба сценария пройдены{xpGot ? ` +${xpGot} XP` : ''}
         </div>
       ) : null}
     </div>

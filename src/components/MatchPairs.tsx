@@ -50,7 +50,9 @@ export default function MatchPairs({ pairs, chapterId, trainerId }: MatchPairsPr
   const [moves, setMoves] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [started, setStarted] = useState(false);
-  const [gotXp, setGotXp] = useState(false);
+  // Число, а не флаг: печатаем то, что начислено на самом деле —
+  // множитель серии поднимает базу до ×1.5.
+  const [gotXp, setGotXp] = useState(0);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const done = pairs.length > 0 && matched.length === cards.length;
@@ -95,8 +97,7 @@ export default function MatchPairs({ pairs, chapterId, trainerId }: MatchPairsPr
         const firstSolve = !store.getProgress().trainers[chapterId]?.[trainerId];
         store.markTrainerDone(chapterId, trainerId, { moves: moves + 1, seconds });
         if (firstSolve) {
-          store.addXp(XP_SOLVE, `matchpairs:${chapterId}:${trainerId}`);
-          setGotXp(true);
+          setGotXp(store.addXp(XP_SOLVE, `matchpairs:${chapterId}:${trainerId}`));
         }
       }
     } else {
@@ -139,7 +140,7 @@ export default function MatchPairs({ pairs, chapterId, trainerId }: MatchPairsPr
       </div>
       {done ? (
         <p className="mp-ok">
-          {`Все пары найдены! 🎉 ${fmt(seconds)}, ходов: ${moves}${gotXp ? ' · +10 XP' : ''}`}
+          {`Все пары найдены! 🎉 ${fmt(seconds)}, ходов: ${moves}${gotXp ? ` · +${gotXp} XP` : ''}`}
         </p>
       ) : null}
     </div>

@@ -31,7 +31,9 @@ export default function SignatureBuilder({
   const [checked, setChecked] = useState(false);
   const [taskSolved, setTaskSolved] = useState(false);
   const [allDone, setAllDone] = useState(false);
-  const [gotXp, setGotXp] = useState(false);
+  // Число, а не флаг: печатаем начисленное на самом деле — множитель
+  // серии поднимает базу до ×1.5, и константа расходилась бы с тостом.
+  const [gotXp, setGotXp] = useState(0);
 
   const task = tasks[taskIdx];
   const bank = useMemo(
@@ -68,8 +70,7 @@ export default function SignatureBuilder({
         const first = !store.getProgress().trainers[chapterId]?.[trainerId];
         store.markTrainerDone(chapterId, trainerId, { solved: true, tasks: tasks.length });
         if (first) {
-          store.addXp(XP_SOLVE, `trainer:${chapterId}:${trainerId}`);
-          setGotXp(true);
+          setGotXp(store.addXp(XP_SOLVE, `trainer:${chapterId}:${trainerId}`));
         }
       }
     }
@@ -86,7 +87,7 @@ export default function SignatureBuilder({
     return (
       <div className="sgb">
         <div className="sgb-done">
-          Выполнено! Все сигнатуры собраны.{gotXp ? ` +${XP_SOLVE} XP` : ''}
+          Выполнено! Все сигнатуры собраны.{gotXp ? ` +${gotXp} XP` : ''}
         </div>
         <ol className="sgb-explain">
           {tasks.map((t) => (

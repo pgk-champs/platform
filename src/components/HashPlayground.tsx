@@ -21,6 +21,9 @@ export default function HashPlayground({
   trainerId?: string;
 }) {
   const inputId = useId();
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [text, setText] = useState(DEFAULT_TEXT);
   const [hash, setHash] = useState('');
   const [prevHash, setPrevHash] = useState('');
@@ -47,7 +50,7 @@ export default function HashPlayground({
     if (diff === 0 || rewardedRef.current || !chapterId || !trainerId) return;
     rewardedRef.current = true;
     store.markTrainerDone(chapterId, trainerId, { diff });
-    store.addXp(XP, `trainer:${chapterId}:${trainerId}`);
+    setXpGot(store.addXp(XP, `trainer:${chapterId}:${trainerId}`));
     setRewarded(true);
   }, [diff, chapterId, trainerId]);
 
@@ -89,7 +92,7 @@ export default function HashPlayground({
       ) : null}
 
       {rewarded ? (
-        <div className="hc-reward">✓ Готово! +{XP} XP — ты увидел лавинный эффект своими глазами</div>
+        <div className="hc-reward">✓ Готово!{xpGot ? ` +${xpGot} XP` : ''} — ты увидел лавинный эффект своими глазами</div>
       ) : null}
 
       <UnderHood>

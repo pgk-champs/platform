@@ -27,6 +27,9 @@ export default function NodeNetSim({
   chapterId?: string;
   trainerId?: string;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [alive, setAlive] = useState([true, true, true]);
   const [sending, setSending] = useState(false);
   const [confirms, setConfirms] = useState<number | null>(null);
@@ -60,7 +63,7 @@ export default function NodeNetSim({
           if (chapterId && trainerId) {
             const first = !store.getProgress().trainers[chapterId]?.[trainerId];
             store.markTrainerDone(chapterId, trainerId, { solved: true });
-            if (first) store.addXp(XP_QUEST, `trainer:${chapterId}:${trainerId}`);
+            if (first) setXpGot(store.addXp(XP_QUEST, `trainer:${chapterId}:${trainerId}`));
           }
         }
       }, STEP_MS * count + 200),
@@ -129,7 +132,7 @@ export default function NodeNetSim({
         </div>
       )}
 
-      {questDone ? <div className="nns-done">Выполнено! +{XP_QUEST} XP</div> : null}
+      {questDone ? <div className="nns-done">Выполнено!{xpGot ? ` +${xpGot} XP` : ''}</div> : null}
     </div>
   );
 }

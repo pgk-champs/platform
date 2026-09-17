@@ -79,6 +79,9 @@ export default function NanoQuest({
   chapterId?: string;
   trainerId?: string;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [scenIdx, setScenIdx] = useState(0);
   const [stepIdx, setStepIdx] = useState(0);
   const [between, setBetween] = useState(false);
@@ -104,7 +107,7 @@ export default function NanoQuest({
     if (chapterId && trainerId && !rewardedRef.current) {
       rewardedRef.current = true;
       store.markTrainerDone(chapterId, trainerId, { scenarios: SCENARIOS.length });
-      store.addXp(XP, `trainer:${chapterId}:${trainerId}`);
+      setXpGot(store.addXp(XP, `trainer:${chapterId}:${trainerId}`));
     }
   };
 
@@ -154,7 +157,7 @@ export default function NanoQuest({
       <div className="nq">
         <div className="nq-done">
           ✓ Выполнено! Оба сценария пройдены: сохранение через Ctrl+O и выход без
-          сохранения через Ctrl+X → N.{chapterId && trainerId ? ` +${XP} XP` : ''}
+          сохранения через Ctrl+X → N.{xpGot ? ` +${xpGot} XP` : ''}
         </div>
         <button type="button" className="nq-btn" onClick={reset}>
           Ещё раз

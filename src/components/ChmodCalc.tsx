@@ -48,6 +48,9 @@ export default function ChmodCalc({
   chapterId?: string;
   trainerId?: string;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [bits, setBits] = useState(0o644);
   // Черновик поля ввода: пока число не собралось в валидные 3 цифры,
   // держим строку как есть, чтобы можно было печатать посимвольно.
@@ -62,7 +65,7 @@ export default function ChmodCalc({
     if (!goalDone || !chapterId || !trainerId || rewardedRef.current) return;
     rewardedRef.current = true;
     store.markTrainerDone(chapterId, trainerId, { octal: toOctal(bits) });
-    store.addXp(DONE_XP, `trainer:${chapterId}:${trainerId}`);
+    setXpGot(store.addXp(DONE_XP, `trainer:${chapterId}:${trainerId}`));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goalDone, chapterId, trainerId]);
 
@@ -158,7 +161,7 @@ export default function ChmodCalc({
       {chapterId && trainerId ? (
         <div className={`cc-goal ${goalDone ? 'cc-goal-done' : ''}`.trim()}>
           {goalDone
-            ? `✓ Разобрался: связь работает в обе стороны! +${DONE_XP} XP`
+            ? `✓ Разобрался: связь работает в обе стороны!${xpGot ? ` +${xpGot} XP` : ''}`
             : 'Задание: щёлкни любую галочку и введи число (например, 640) — увидишь связь в обе стороны'}
         </div>
       ) : null}

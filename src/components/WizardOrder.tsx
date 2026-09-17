@@ -30,7 +30,9 @@ export default function WizardOrder({
   const [picked, setPicked] = useState<number[]>([]);
   const [checked, setChecked] = useState(false);
   const [solved, setSolved] = useState(false);
-  const [gotXp, setGotXp] = useState(false);
+  // Число, а не флаг: печатаем начисленное на самом деле — множитель
+  // серии поднимает базу до ×1.5, и константа расходилась бы с тостом.
+  const [gotXp, setGotXp] = useState(0);
 
   if (steps.length === 0) return null;
 
@@ -60,8 +62,7 @@ export default function WizardOrder({
         const first = !store.getProgress().trainers[chapterId]?.[trainerId];
         store.markTrainerDone(chapterId, trainerId, { solved: true, total: steps.length });
         if (first) {
-          store.addXp(XP_SOLVE, `trainer:${chapterId}:${trainerId}`);
-          setGotXp(true);
+          setGotXp(store.addXp(XP_SOLVE, `trainer:${chapterId}:${trainerId}`));
         }
       }
     }
@@ -72,7 +73,7 @@ export default function WizardOrder({
       <div className="wzo">
         <div className="wzo-done">
           Выполнено! Все {steps.length} шагов мастера в правильном порядке.
-          {gotXp ? ` +${XP_SOLVE} XP` : ''}
+          {gotXp ? ` +${gotXp} XP` : ''}
         </div>
         <p className="wzo-why-head">Почему такой порядок:</p>
         <ol className="wzo-explain">

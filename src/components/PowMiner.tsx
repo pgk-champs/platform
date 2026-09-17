@@ -18,6 +18,9 @@ const DIFFICULTIES = [1, 2, 3, 4] as const;
 export default function PowMiner({ chapterId, trainerId }: { chapterId?: string; trainerId?: string }) {
   const dataId = useId();
   const nonceId = useId();
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [data, setData] = useState(DEFAULT_DATA);
   const [nonce, setNonce] = useState(0);
   const [difficulty, setDifficulty] = useState<number>(1);
@@ -83,7 +86,7 @@ export default function PowMiner({ chapterId, trainerId }: { chapterId?: string;
             });
             if (!rewardedRef.current) {
               rewardedRef.current = true;
-              store.addXp(XP, `trainer:${chapterId}:${trainerId}`);
+              setXpGot(store.addXp(XP, `trainer:${chapterId}:${trainerId}`));
               setRewarded(true);
             }
           }
@@ -189,7 +192,7 @@ export default function PowMiner({ chapterId, trainerId }: { chapterId?: string;
         <div className="pm-done" aria-live="polite">
           ✓ Выполнено! nonce = {nonce} найден за {attempts.toLocaleString('ru-RU')}{' '}
           {attempts % 10 === 1 && attempts % 100 !== 11 ? 'попытку' : 'попыток'}
-          {rewarded ? ` +${XP} XP` : ''}. Каждый следующий ноль — примерно в 16 раз дольше: попробуй поднять сложность.
+          {xpGot ? ` +${xpGot} XP` : ''}. Каждый следующий ноль — примерно в 16 раз дольше: попробуй поднять сложность.
         </div>
       )}
 

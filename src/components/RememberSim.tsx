@@ -16,6 +16,9 @@ export default function RememberSim({
   chapterId?: string;
   trainerId?: string;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [withRemember, setWithRemember] = useState(false);
   const [count, setCount] = useState(0);
   const [recomps, setRecomps] = useState(0);
@@ -28,7 +31,7 @@ export default function RememberSim({
     if (!done || !chapterId || !trainerId) return;
     const already = store.getProgress().trainers[chapterId]?.[trainerId];
     store.markTrainerDone(chapterId, trainerId, { seenReset: true, seenKept: true });
-    if (!already) store.addXp(FIRST_XP, `trainer:${chapterId}:${trainerId}`);
+    if (!already) setXpGot(store.addXp(FIRST_XP, `trainer:${chapterId}:${trainerId}`));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [done]);
 
@@ -113,7 +116,7 @@ export default function RememberSim({
       {done ? (
         <div className="rms-done">
           Выполнено! Ты увидел обе судьбы значения: без remember рекомпозиция сбрасывает счёт в 0, с
-          remember — сохраняет.{chapterId && trainerId ? ` +${FIRST_XP} XP` : ''}
+          remember — сохраняет.{xpGot ? ` +${xpGot} XP` : ''}
         </div>
       ) : (
         <div className="rms-hint">

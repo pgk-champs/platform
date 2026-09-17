@@ -36,6 +36,9 @@ const MARKERS: Record<string, { cx: number; cy: number }> = {
 };
 
 export default function EyeDp({ chapterId, trainerId }: { chapterId?: string; trainerId?: string }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [active, setActive] = useState<string | null>(null);
   const [value, setValue] = useState('');
   const [answered, setAnswered] = useState<Answered>({});
@@ -63,7 +66,7 @@ export default function EyeDp({ chapterId, trainerId }: { chapterId?: string; tr
       store.markTrainerDone(chapterId, trainerId, { correct, total });
       if (correct === total && !rewardedRef.current) {
         rewardedRef.current = true;
-        store.addXp(PERFECT_XP, `trainer:${chapterId}:${trainerId}`);
+        setXpGot(store.addXp(PERFECT_XP, `trainer:${chapterId}:${trainerId}`));
       }
     }
   };
@@ -172,7 +175,7 @@ export default function EyeDp({ chapterId, trainerId }: { chapterId?: string; tr
       {finished ? (
         perfect ? (
           <div className="edp-done">
-            Выполнено! Глазомер {correctCount} из {total}.{chapterId && trainerId ? ` +${PERFECT_XP} XP` : ''}
+            Выполнено! Глазомер {correctCount} из {total}.{xpGot ? ` +${xpGot} XP` : ''}
           </div>
         ) : (
           <div className="edp-final">

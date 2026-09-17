@@ -36,6 +36,9 @@ export default function ModuleSort({
   chapterId?: string;
   trainerId?: string;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [placed, setPlaced] = useState<Record<string, SortCol>>({});
   const [selected, setSelected] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
@@ -76,7 +79,7 @@ export default function ModuleSort({
       store.markTrainerDone(chapterId, trainerId, { correct, total: cards.length });
       if (wrong.length === 0 && !rewardedRef.current) {
         rewardedRef.current = true;
-        store.addXp(PERFECT_XP, `trainer:${chapterId}:${trainerId}`);
+        setXpGot(store.addXp(PERFECT_XP, `trainer:${chapterId}:${trainerId}`));
       }
     }
   };
@@ -162,7 +165,7 @@ export default function ModuleSort({
       {perfect && (
         <div className="msort-done">
           Выполнено! Все {cards.length} сущностей по своим модулям.
-          {chapterId && trainerId ? ` +${PERFECT_XP} XP` : ''}
+          {xpGot ? ` +${xpGot} XP` : ''}
         </div>
       )}
 

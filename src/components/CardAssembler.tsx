@@ -25,6 +25,9 @@ const XP = 25;
 const byId = (id: string): Line => LINES.find((l) => l.id === id)!;
 
 export default function CardAssembler({ chapterId, trainerId }: { chapterId?: string; trainerId?: string }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [placed, setPlaced] = useState<string[]>([]);
   const [wrongIdx, setWrongIdx] = useState<number[]>([]);
   const [attempts, setAttempts] = useState(0);
@@ -57,7 +60,7 @@ export default function CardAssembler({ chapterId, trainerId }: { chapterId?: st
         store.markTrainerDone(chapterId, trainerId, { attempts: nextAttempts });
         if (!rewardedRef.current) {
           rewardedRef.current = true;
-          store.addXp(XP, `trainer:${chapterId}:${trainerId}`);
+          setXpGot(store.addXp(XP, `trainer:${chapterId}:${trainerId}`));
         }
       }
     }
@@ -112,7 +115,7 @@ export default function CardAssembler({ chapterId, trainerId }: { chapterId?: st
       {solved ? (
         <div className="casm-done">
           Выполнено! Структура карточки собрана верно.
-          {chapterId && trainerId ? ` +${XP} XP` : ''}
+          {xpGot ? ` +${xpGot} XP` : ''}
         </div>
       ) : (
         <div className="casm-actions">

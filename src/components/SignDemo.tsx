@@ -30,6 +30,9 @@ export default function SignDemo({
   trainerId?: string;
 }) {
   const inputId = useId();
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [pubHex, setPubHex] = useState('');
   const [message, setMessage] = useState(DEFAULT_MSG);
   const [sigHex, setSigHex] = useState('');
@@ -73,7 +76,7 @@ export default function SignDemo({
     if (seen.ok && seen.fail && !seen.rewarded && chapterId && trainerId) {
       seen.rewarded = true;
       store.markTrainerDone(chapterId, trainerId, { ok: true, fail: true });
-      store.addXp(XP, `trainer:${chapterId}:${trainerId}`);
+      setXpGot(store.addXp(XP, `trainer:${chapterId}:${trainerId}`));
       setDone(true);
     }
   }
@@ -128,7 +131,7 @@ export default function SignDemo({
         </div>
       ) : null}
 
-      {done ? <div className="hc-reward">Выполнено! +{XP} XP — ты увидел и подлинную подпись, и её провал после правки</div> : null}
+      {done ? <div className="hc-reward">Выполнено!{xpGot ? ` +${xpGot} XP` : ''} — ты увидел и подлинную подпись, и её провал после правки</div> : null}
     </div>
   );
 }

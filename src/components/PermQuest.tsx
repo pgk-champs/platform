@@ -47,6 +47,9 @@ export default function PermQuest({
   chapterId?: string;
   trainerId?: string;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<PermAnswer | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
@@ -76,7 +79,7 @@ export default function PermQuest({
       store.markTrainerDone(chapterId, trainerId, { correct: correctCount, total });
       if (correctCount === total && !rewardedRef.current) {
         rewardedRef.current = true;
-        store.addXp(PERFECT_XP, `trainer:${chapterId}:${trainerId}`);
+        setXpGot(store.addXp(PERFECT_XP, `trainer:${chapterId}:${trainerId}`));
       }
     }
   };
@@ -95,7 +98,7 @@ export default function PermQuest({
         {perfect ? (
           <div className="pq-final pq-final-perfect">
             ✓ Все сценарии пройдены: {correctCount} из {total}!
-            {chapterId && trainerId ? ` +${PERFECT_XP} XP` : ''}
+            {xpGot ? ` +${xpGot} XP` : ''}
           </div>
         ) : (
           <>

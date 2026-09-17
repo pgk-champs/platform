@@ -43,6 +43,9 @@ export default function ModifierChain({
   chapterId?: string;
   trainerId?: string;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [order, setOrder] = useState<ModId[]>(START_ORDER);
   const [taskIdx, setTaskIdx] = useState(0);
   const rewardedRef = useRef(false);
@@ -62,7 +65,7 @@ export default function ModifierChain({
         rewardedRef.current = true;
         if (chapterId && trainerId) {
           store.markTrainerDone(chapterId, trainerId, { tasks: TASKS.length });
-          store.addXp(DONE_XP, `trainer:${chapterId}:${trainerId}`);
+          setXpGot(store.addXp(DONE_XP, `trainer:${chapterId}:${trainerId}`));
         }
       }
     }
@@ -147,7 +150,7 @@ export default function ModifierChain({
       {done && (
         <div className="mchain-done">
           Выполнено! Оба порядка собраны — теперь видно, почему цепочка читается слева направо.
-          {chapterId && trainerId ? ` +${DONE_XP} XP` : ''}
+          {xpGot ? ` +${xpGot} XP` : ''}
         </div>
       )}
     </div>

@@ -43,7 +43,9 @@ export default function ReverseQuiz({ cards, chapterId, trainerId }: ReverseQuiz
   const [picked, setPicked] = useState<string | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
   const [done, setDone] = useState(false);
-  const [gotXp, setGotXp] = useState(false);
+  // Число, а не флаг: печатаем то, что начислено на самом деле —
+  // множитель серии поднимает базу до ×1.5.
+  const [gotXp, setGotXp] = useState(0);
 
   if (cards.length < OPTIONS) return <div className="rq">Нужно минимум 4 слова</div>;
 
@@ -71,8 +73,7 @@ export default function ReverseQuiz({ cards, chapterId, trainerId }: ReverseQuiz
       const first = !store.getProgress().trainers[chapterId]?.[trainerId];
       store.markTrainerDone(chapterId, trainerId, { correct: finalCorrect, total });
       if (first && finalCorrect === total) {
-        store.addXp(XP_PERFECT, `reversequiz:${chapterId}:${trainerId}`);
-        setGotXp(true);
+        setGotXp(store.addXp(XP_PERFECT, `reversequiz:${chapterId}:${trainerId}`));
       }
     }
   };
@@ -82,16 +83,16 @@ export default function ReverseQuiz({ cards, chapterId, trainerId }: ReverseQuiz
     setPicked(null);
     setCorrectCount(0);
     setDone(false);
-    // Без сброса «+10 XP» осталась бы висеть на каждом следующем итоге,
+    // Без сброса «+N XP» осталась бы висеть на каждом следующем итоге,
     // хотя XP даётся только за первый безошибочный круг.
-    setGotXp(false);
+    setGotXp(0);
   };
 
   if (done) {
     return (
       <div className="rq">
         <p className="rq-result" role="status">
-          {`Верно ${correctCount} из ${cards.length}${gotXp ? ' · +10 XP' : ''}`}
+          {`Верно ${correctCount} из ${cards.length}${gotXp ? ` · +${gotXp} XP` : ''}`}
         </p>
         <button type="button" className="rq-restart" onClick={restart}>
           Пройти ещё раз

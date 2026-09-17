@@ -67,6 +67,9 @@ export default function CodeSketchMatch({
   trainerId?: string;
 }) {
   // matches: id пары кода -> id пары, чей скетч выбран
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [matches, setMatches] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
@@ -116,7 +119,7 @@ export default function CodeSketchMatch({
       store.markTrainerDone(chapterId, trainerId, { correct, total: pairs.length });
       if (wrong.length === 0 && !rewardedRef.current) {
         rewardedRef.current = true;
-        store.addXp(PERFECT_XP, `trainer:${chapterId}:${trainerId}`);
+        setXpGot(store.addXp(PERFECT_XP, `trainer:${chapterId}:${trainerId}`));
       }
     }
   };
@@ -175,7 +178,7 @@ export default function CodeSketchMatch({
       {perfect && (
         <div className="csm-done">
           Выполнено! Все {pairs.length} фрагмента узнаны по их экранному результату.
-          {chapterId && trainerId ? ` +${PERFECT_XP} XP` : ''}
+          {xpGot ? ` +${xpGot} XP` : ''}
         </div>
       )}
 

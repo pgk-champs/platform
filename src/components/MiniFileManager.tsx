@@ -35,6 +35,9 @@ function fileIcon(name: string): string {
 }
 
 export default function MiniFileManager({ chapterId, trainerId }: { chapterId?: string; trainerId?: string }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [files, setFiles] = useState<FileItem[]>(INITIAL);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [anchorIdx, setAnchorIdx] = useState<number | null>(null);
@@ -59,7 +62,7 @@ export default function MiniFileManager({ chapterId, trainerId }: { chapterId?: 
     if (!isDone || !chapterId || !trainerId || rewardedRef.current) return;
     rewardedRef.current = true;
     store.markTrainerDone(chapterId, trainerId, { rename: true, move: true, copy: true });
-    store.addXp(XP, `trainer:${chapterId}:${trainerId}`);
+    setXpGot(store.addXp(XP, `trainer:${chapterId}:${trainerId}`));
   }, [isDone, chapterId, trainerId]);
 
   // Закрыть контекстное меню по клику вне его — только на клиенте.
@@ -278,7 +281,7 @@ export default function MiniFileManager({ chapterId, trainerId }: { chapterId?: 
       {isDone ? (
         <div className="mfm-done">
           Готово! Переименование, перемещение и копирование опробованы — теперь видно, что за каждым из них стоит
-          {' '}<code>mv</code> или <code>cp</code>.{chapterId && trainerId ? ` +${XP} XP` : ''}
+          {' '}<code>mv</code> или <code>cp</code>.{xpGot ? ` +${xpGot} XP` : ''}
         </div>
       ) : null}
     </div>

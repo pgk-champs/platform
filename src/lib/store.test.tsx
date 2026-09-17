@@ -480,3 +480,13 @@ test('ключ дня берётся по местному времени, а н
   const p = (n: number) => String(n).padStart(2, '0');
   expect(todayKey()).toBe(`${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`);
 });
+
+test('addXp возвращает фактически начисленное, а не запрошенное', () => {
+  store.__resetForTests();
+  // без серии множитель 1
+  expect(store.addXp(20, 'первый')).toBe(20);
+  // за то же самое второй раз не платят
+  expect(store.addXp(20, 'первый')).toBe(0);
+  expect(store.addXp(0, 'пусто')).toBe(0);
+  expect(store.getXp()).toBe(20);
+});

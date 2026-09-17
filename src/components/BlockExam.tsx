@@ -36,6 +36,9 @@ export default function BlockExam({
   questions: Question[];
   timeLimitSec?: number;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [phase, setPhase] = useState<Phase>('intro');
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
@@ -55,7 +58,7 @@ export default function BlockExam({
     const pct = questions.length > 0 ? (correct / questions.length) * 100 : 0;
     if (pct >= PASS_PCT && !rewardedRef.current) {
       rewardedRef.current = true;
-      store.addXp(BLOCK_EXAM_XP, `block-exam:${blockId}`);
+      setXpGot(store.addXp(BLOCK_EXAM_XP, `block-exam:${blockId}`));
     }
     setPhase('done');
   };
@@ -151,7 +154,7 @@ export default function BlockExam({
         Верно: {correct} из {questions.length} ({pct}%)
       </div>
       {pct >= PASS_PCT ? (
-        <div className="sc-result-perfect">+{BLOCK_EXAM_XP} XP за сданный блок</div>
+        <div className="sc-result-perfect">+{xpGot || BLOCK_EXAM_XP} XP за сданный блок</div>
       ) : null}
       <div className="sc-history">
         <div className="sc-history-title">Мои пересдачи блока</div>

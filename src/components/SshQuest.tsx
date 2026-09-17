@@ -31,6 +31,9 @@ export type SshQuestProps = { chapterId?: string; trainerId?: string };
 
 export default function SshQuest({ chapterId, trainerId }: SshQuestProps) {
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [lines, setLines] = useState<Line[]>([
     { text: 'Ключ id_ed25519 ты скопировал с флешки в ~/.ssh. Подключись к island@server.', kind: 'out' },
     { text: 'Не выходит? Смотри, ЧТО именно отвечает ssh, и почини причину. Команда help — список команд.', kind: 'out' },
@@ -60,7 +63,7 @@ export default function SshQuest({ chapterId, trainerId }: SshQuestProps) {
     if (!rewardedRef.current && chapterId && trainerId) {
       rewardedRef.current = true;
       store.markTrainerDone(chapterId, trainerId, { connected: true });
-      store.addXp(XP, `trainer:${chapterId}:${trainerId}`);
+      setXpGot(store.addXp(XP, `trainer:${chapterId}:${trainerId}`));
     }
   };
 
@@ -139,7 +142,7 @@ export default function SshQuest({ chapterId, trainerId }: SshQuestProps) {
             {l.text}
           </div>
         ))}
-        {done && <div className="sshq-done">Готово! Ты подключился по ключу. +{XP} XP</div>}
+        {done && <div className="sshq-done">Готово! Ты подключился по ключу.{xpGot ? ` +${xpGot} XP` : ''}</div>}
       </div>
       {!done && (
         <form

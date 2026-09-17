@@ -47,6 +47,9 @@ export default function ModuleGraph({
   chapterId?: string;
   trainerId?: string;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -58,7 +61,7 @@ export default function ModuleGraph({
     if (!done || !chapterId || !trainerId) return;
     const already = store.getProgress().trainers[chapterId]?.[trainerId];
     store.markTrainerDone(chapterId, trainerId, { edges: edges.length });
-    if (!already) store.addXp(FIRST_XP, `trainer:${chapterId}:${trainerId}`);
+    if (!already) setXpGot(store.addXp(FIRST_XP, `trainer:${chapterId}:${trainerId}`));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [done]);
 
@@ -144,7 +147,7 @@ export default function ModuleGraph({
       ) : done ? (
         <div className="mg-done">
           Выполнено! :app зависит от :ui-kit и :net, циклов нет — Gradle соберёт такой проект.
-          {chapterId && trainerId ? ` +${FIRST_XP} XP` : ''}
+          {xpGot ? ` +${xpGot} XP` : ''}
         </div>
       ) : (
         <div className="mg-hint">

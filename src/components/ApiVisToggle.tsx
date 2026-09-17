@@ -17,6 +17,9 @@ export default function ApiVisToggle({
   chapterId?: string;
   trainerId?: string;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [mode, setMode] = useState<Mode>('api');
   const [seenBoth, setSeenBoth] = useState(false);
 
@@ -26,7 +29,7 @@ export default function ApiVisToggle({
     if (!seenBoth || !chapterId || !trainerId) return;
     const already = store.getProgress().trainers[chapterId]?.[trainerId];
     store.markTrainerDone(chapterId, trainerId, { seen: ['api', 'implementation'] });
-    if (!already) store.addXp(FIRST_XP, `trainer:${chapterId}:${trainerId}`);
+    if (!already) setXpGot(store.addXp(FIRST_XP, `trainer:${chapterId}:${trainerId}`));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seenBoth]);
 
@@ -78,7 +81,7 @@ export default function ApiVisToggle({
       {seenBoth ? (
         <div className="avt-done">
           Выполнено! Ты увидел оба режима: api раскрывает :lib потребителям :ui-kit, implementation —
-          прячет.{chapterId && trainerId ? ` +${FIRST_XP} XP` : ''}
+          прячет.{xpGot ? ` +${xpGot} XP` : ''}
         </div>
       ) : (
         <div className="avt-hint">

@@ -29,6 +29,9 @@ export default function ChapterExam({
   questions: Question[];
   timeLimitSec?: number;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [phase, setPhase] = useState<Phase>('intro');
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
@@ -49,7 +52,7 @@ export default function ChapterExam({
     if (pct >= PASS_PCT && timeLeft * 2 > timeLimitSec) store.easter.markSpeedrun();
     if (pct >= PASS_PCT && !rewardedRef.current) {
       rewardedRef.current = true;
-      store.addXp(EXAM_XP, `exam:${chapterId}`);
+      setXpGot(store.addXp(EXAM_XP, `exam:${chapterId}`));
     }
     setPhase('done');
   };
@@ -141,7 +144,7 @@ export default function ChapterExam({
       <div className="ce-score">
         Верно: {correct} из {questions.length} ({pct}%)
       </div>
-      {pct >= PASS_PCT ? <div className="sc-result-perfect">+{EXAM_XP} XP за сданный экзамен</div> : null}
+      {pct >= PASS_PCT ? <div className="sc-result-perfect">+{xpGot || EXAM_XP} XP за сданный экзамен</div> : null}
       <div className="sc-history">
         <div className="sc-history-title">Мои пересдачи</div>
         <div className="sc-history-row">

@@ -57,6 +57,9 @@ export default function CommitMsgBuilder({
   chapterId?: string;
   trainerId?: string;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [idx, setIdx] = useState(0);
   const [msg, setMsg] = useState('');
   const [finished, setFinished] = useState(false);
@@ -79,7 +82,7 @@ export default function CommitMsgBuilder({
       store.markTrainerDone(chapterId, trainerId, { done: total, total });
       if (!rewardedRef.current) {
         rewardedRef.current = true;
-        store.addXp(DONE_XP, `trainer:${chapterId}:${trainerId}`);
+        setXpGot(store.addXp(DONE_XP, `trainer:${chapterId}:${trainerId}`));
       }
     }
   };
@@ -89,7 +92,7 @@ export default function CommitMsgBuilder({
       <div className="cmb">
         <div className="cmb-final">
           ✓ Выполнено! Три сообщения — по всем правилам главы.
-          {chapterId && trainerId ? ` +${DONE_XP} XP` : ''}
+          {xpGot ? ` +${xpGot} XP` : ''}
         </div>
       </div>
     );

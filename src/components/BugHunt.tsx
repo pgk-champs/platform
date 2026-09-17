@@ -66,8 +66,7 @@ export default function BugHunt({
       const first = !store.getProgress().trainers[chapterId]?.[trainerId];
       store.markTrainerDone(chapterId, trainerId, { firstTry, total });
       if (first && firstTry === total) {
-        store.addXp(PERFECT_XP, `trainer:${chapterId}:${trainerId}`);
-        setXpAwarded(PERFECT_XP);
+        setXpAwarded(store.addXp(PERFECT_XP, `trainer:${chapterId}:${trainerId}`));
       }
     }
   };

@@ -21,6 +21,9 @@ export default function MemoryViz({
   chapterId?: string;
   trainerId?: string;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [yClicks, setYClicks] = useState(0);
   const [valTries, setValTries] = useState(0);
   const [hasNewVal, setHasNewVal] = useState(false);
@@ -48,7 +51,7 @@ export default function MemoryViz({
           valError: true,
           newVal: true,
         });
-        store.addXp(XP, `trainer:${chapterId}:${trainerId}`);
+        setXpGot(store.addXp(XP, `trainer:${chapterId}:${trainerId}`));
       }
     }
   }, [done, chapterId, trainerId]);
@@ -108,7 +111,7 @@ export default function MemoryViz({
       {done ? (
         <div className="mv-done">
           ✓ Выполнено! var меняется, val — нет, а новое значение живёт в новой val.
-          {chapterId && trainerId ? ` +${XP} XP` : ''}
+          {xpGot ? ` +${xpGot} XP` : ''}
         </div>
       ) : null}
 

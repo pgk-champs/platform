@@ -62,6 +62,9 @@ export default function RecompositionCounter({
   chapterId?: string;
   trainerId?: string;
 }) {
+  // Фактически начисленное: множитель серии поднимает базу до ×1.5,
+  // и печатать константу значило бы расходиться с тостом.
+  const [xpGot, setXpGot] = useState(0);
   const [count, setCount] = useState(0);
   const renders = useRef(0);
   renders.current += 1;
@@ -71,7 +74,7 @@ export default function RecompositionCounter({
     if (!done || !chapterId || !trainerId) return;
     const already = store.getProgress().trainers[chapterId]?.[trainerId];
     store.markTrainerDone(chapterId, trainerId, { clicks: count });
-    if (!already) store.addXp(FIRST_XP, `trainer:${chapterId}:${trainerId}`);
+    if (!already) setXpGot(store.addXp(FIRST_XP, `trainer:${chapterId}:${trainerId}`));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [done]);
 
@@ -113,7 +116,7 @@ export default function RecompositionCounter({
         <div className="rcc-done">
           Выполнено! После {GOAL_CLICKS} нажатий «Имя» так и осталось с одной отрисовкой —
           перерисовывается только то, что читало изменившееся состояние.
-          {chapterId && trainerId ? ` +${FIRST_XP} XP` : ''}
+          {xpGot ? ` +${xpGot} XP` : ''}
         </div>
       )}
     </div>
