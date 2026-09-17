@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import Link from '@docusaurus/Link';
 import { store } from '../lib/store';
 import { evaluate, type Achievement } from '../lib/achievements';
 import { levelForXp } from '../lib/levels';
@@ -46,7 +47,11 @@ export default function AchievementsWatcher() {
 
   useEffect(() => {
     if (toasts.length === 0) return;
-    const timer = setTimeout(() => setToasts((prev) => prev.slice(1)), 4000);
+    // Достижение висит дольше прочего: это единственная обратная связь по нему,
+    // и пропустив тост, догнать его было негде — ссылки на страницу достижений
+    // на платформе не было вовсе.
+    const ms = toasts[0].kind === 'achievement' ? 7000 : 4000;
+    const timer = setTimeout(() => setToasts((prev) => prev.slice(1)), ms);
     return () => clearTimeout(timer);
   }, [toasts]);
 
@@ -76,12 +81,12 @@ export default function AchievementsWatcher() {
           );
         }
         return (
-          <div key={t.key} className="ach-toast">
+          <Link key={t.key} className="ach-toast ach-toast-link" to="/achievements">
             <span className="ach-toast-icon" aria-hidden="true">
               {t.icon}
             </span>
             Достижение: {t.title}
-          </div>
+          </Link>
         );
       })}
     </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
+import Link from '@docusaurus/Link';
 import { store } from '../lib/store';
 import knowledgeMap from '../data/knowledge-map.json';
 import { levelForXp } from '../lib/levels';
@@ -101,15 +102,19 @@ export default function ChapterProgress(props: ChapterProgressProps) {
         </div>
         <Row kind="quizzes" label="Квизы" done={quizzesDone} total={totalQuizzes} />
         <Row kind="trainers" label="Тренажёры" done={trainersDone} total={totalTrainers} />
-        <div
+        {/* Уровень ведёт на страницу достижений: он висит на всех 137 главах и
+            до сих пор был тупиком — показывал, но никуда не вёл, а попасть к
+            43 достижениям можно было только через дропдаун аватара. */}
+        <Link
           className="cp-level"
+          to="/achievements"
           title={lvl.maxLevel ? 'Максимальный уровень' : `До уровня ${lvl.level + 1}: ${lvl.xpToNext} XP`}
         >
           Уровень {lvl.level} · {lvl.title}
           <span className="cp-level-bar">
             <span className="cp-level-fill" style={{ width: `${Math.round(lvl.progress * 100)}%` }} />
           </span>
-        </div>
+        </Link>
       </div>
       <ChapterTour />
     </>

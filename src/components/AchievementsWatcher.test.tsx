@@ -17,7 +17,8 @@ test('shows a toast when a store change unlocks a new achievement', () => {
   expect(screen.getByText(/Достижение: Первая прочитанная глава/)).toBeTruthy();
 });
 
-test('toast auto-hides after 4 seconds', () => {
+test('тост достижения висит 7 секунд, а не 4', () => {
+  // Дольше прочих намеренно: это единственная обратная связь по достижению.
   vi.useFakeTimers();
   render(<AchievementsWatcher />);
   act(() => {
@@ -28,8 +29,23 @@ test('toast auto-hides after 4 seconds', () => {
   act(() => {
     vi.advanceTimersByTime(4000);
   });
+  expect(screen.queryByText(/Достижение:/)).toBeTruthy();
+
+  act(() => {
+    vi.advanceTimersByTime(3000);
+  });
   expect(screen.queryByText(/Достижение:/)).toBeNull();
   vi.useRealTimers();
+});
+
+test('тост достижения ведёт на страницу достижений', () => {
+  render(<AchievementsWatcher />);
+  act(() => {
+    store.setSectionRead('typing', 'intro');
+  });
+  const link = screen.getByText(/Достижение:/).closest('a');
+  expect(link).toBeTruthy();
+  expect(link).toHaveAttribute('href', '/achievements');
 });
 
 test('shows a +N XP toast on every XP gain, but not for XP already stored before mount', () => {

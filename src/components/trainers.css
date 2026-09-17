@@ -964,6 +964,19 @@
   animation: ach-toast-in 0.25s ease-out;
 }
 
+/* Тост достижения кликается: раньше он был единственной обратной связью и
+   пропав, не оставлял следа — идти было некуда. */
+.ach-toast-link,
+.ach-toast-link:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ach-toast-link:hover {
+  filter: brightness(1.08);
+}
+
+
 .ach-toast-icon {
   font-size: 1.2rem;
 }
