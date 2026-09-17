@@ -2,8 +2,10 @@ import knowledgeMap from '../data/knowledge-map.json';
 import { store } from './store';
 
 // Наполнение главы считается по делам, а не по отметкам: ручной галочки «пройдено»
-// на платформе больше нет. Тренажёры в знаменатель НЕ входят — trainerId
-// необязателен, и глава без тренажёров иначе не наполнилась бы никогда.
+// на платформе больше нет. Тренажёры входят в счёт с 17.09.2026 — до этого в
+// шапке главы висело «Тренажёры 0/6», а сосуд наливался до крышки, ни одного
+// тренажёра не спросив, и одно слово значило две разные вещи. Глава без
+// тренажёров не страдает: у неё totals.trainers = 0, знаменатель тот же.
 
 type Totals = { sections: number; quizzes: number; trainers: number };
 
@@ -15,7 +17,7 @@ const TOTALS: Record<string, Totals> = Object.fromEntries(
 export function fillOf(chapterId: string): number {
   const t = TOTALS[chapterId];
   if (!t) return 0;
-  const denom = t.sections + t.quizzes;
+  const denom = t.sections + t.quizzes + t.trainers;
   if (denom === 0) return 0;
 
   const progress = store.getProgress();
@@ -26,7 +28,11 @@ export function fillOf(chapterId: string): number {
     (q) => q.correct === q.total,
   ).length;
 
-  return Math.min(1, (sections + quizzes) / denom);
+  // Тренажёр засчитывается фактом прохождения: общей шкалы «верно» у сорока
+  // шести разных механик нет, и требовать её значило бы переписать их все.
+  const trainers = Math.min(Object.keys(progress.trainers[chapterId] ?? {}).length, t.trainers);
+
+  return Math.min(1, (sections + quizzes + trainers) / denom);
 }
 
 export function isFull(chapterId: string): boolean {

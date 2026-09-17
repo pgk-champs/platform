@@ -19,7 +19,8 @@ test('показывает главу, её процент и ссылку бе�
   for (let i = 0; i < t.sections; i += 1) store.setSectionRead('typing', 's' + i);
   render(<ContinueCard chapter={ch} />);
 
-  const pct = Math.round((t.sections / (t.sections + t.quizzes)) * 100);
+  // Знаменатель — секции + проверки + тренажёры (с 17.09.2026).
+  const pct = Math.round((t.sections / (t.sections + t.quizzes + t.trainers)) * 100);
   expect(screen.getByText('Печать и клавиатура')).toBeTruthy();
   expect(screen.getByText(pct + '%')).toBeTruthy();
   expect(screen.getByRole('link')).toHaveAttribute('href', '/docs/foundation/typing');

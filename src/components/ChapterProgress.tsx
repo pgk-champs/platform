@@ -28,7 +28,9 @@ export default function ChapterProgress(props: ChapterProgressProps) {
   const counted = TOTALS[chapterId] ?? NO_TOTALS;
   const totalSections = props.totalSections ?? counted.sections;
   const totalQuizzes = props.totalQuizzes ?? counted.quizzes;
-  const totalTrainers = props.totalTrainers ?? counted.trainers;
+  // Отдельного счётчика тренажёров в шапке больше нет: с 17.09.2026 они входят
+  // в общий счёт наполнения (src/lib/chapterFill.ts). Проп totalTrainers
+  // оставлен — он перекрывает расчёт карты знаний там, где посчитанное врёт.
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
   // store на клиенте читает localStorage ещё при импорте модуля, поэтому
   // первый клиентский рендер обязан повторить серверный (пустой прогресс) —
@@ -44,7 +46,6 @@ export default function ChapterProgress(props: ChapterProgressProps) {
   // забудут поднять totalQuizzes/totalTrainers при добавлении квиза или
   // тренажёра, счётчик не покажет «5 из 4», а честно упрётся в знаменатель.
   const quizzesDone = Math.min(Object.keys(progress.quizzes[chapterId] ?? {}).length, totalQuizzes);
-  const trainersDone = Math.min(Object.keys(progress.trainers[chapterId] ?? {}).length, totalTrainers);
   const pct = totalSections > 0 ? Math.round((100 * readSections) / totalSections) : 0;
   const lvl = levelForXp(mounted ? store.getXp() : 0);
 
@@ -57,12 +58,6 @@ export default function ChapterProgress(props: ChapterProgressProps) {
         </span>
         <span className="cp-item">
           Квизы {quizzesDone}/{totalQuizzes}
-        </span>
-        <span className="cp-sep" aria-hidden="true">
-          ·
-        </span>
-        <span className="cp-item">
-          Тренажёры {trainersDone}/{totalTrainers}
         </span>
         <span className="cp-sep" aria-hidden="true">
           ·
