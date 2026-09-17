@@ -44,7 +44,9 @@ test('новые главы стоят в своих треках', () => {
   ] as const;
   for (const [id, track, num] of cases) {
     const { container, unmount } = render(<ChapterCover chapterId={id} />);
-    expect(container.textContent).toContain(track);
+    // Трек уехал из подписи SVG в цветной чип — он в обычном регистре,
+    // заглавные делает CSS. В подписи остался только номер главы.
+    expect(container.querySelector('.cov-track')?.textContent?.toUpperCase()).toBe(track);
     expect(container.textContent).toContain(num);
     unmount();
   }
@@ -93,9 +95,24 @@ test('обложки advanced-глав показывают трек «Отде�
   ] as const;
   for (const [id, num, title] of cases) {
     const { container, unmount } = render(<ChapterCover chapterId={id} />);
-    expect(container.textContent).toContain('ОТДЕЛЬНЫЕ ТЕМЫ');
+    expect(container.querySelector('.cov-track')?.textContent).toBe('Отдельные темы');
     expect(container.textContent).toContain(num);
     expect(container.textContent).toContain(title);
     unmount();
   }
+});
+
+test('показывает чип трека его цветом', () => {
+  const { container } = render(<ChapterCover chapterId="state-events" />);
+  const chip = container.querySelector('.cov-track');
+  expect(chip).toBeTruthy();
+  expect(chip?.className).toContain('cov-track--mobile');
+});
+
+test('трек в подписи обложки не дублируется — он только в чипе', () => {
+  const { container } = render(<ChapterCover chapterId="state-events" />);
+  // Первый <text> — крупный номер на фоне, подпись идёт следом: берём все.
+  const texts = [...container.querySelectorAll('svg text')].map((t) => t.textContent ?? '');
+  expect(texts.some((t) => t.includes('ГЛАВА'))).toBe(true);
+  expect(texts.some((t) => t.includes('МОБИЛКА'))).toBe(false);
 });
