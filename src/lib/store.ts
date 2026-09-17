@@ -281,8 +281,16 @@ function isHintDismissed(hintId: string): boolean {
 const STREAK_MULTIPLIER_CAP_DAYS = 10;
 const STREAK_MULTIPLIER_STEP = 0.05;
 
+/** Дата по МЕСТНОМУ времени, как и ключ дня в DailyChallenge. По UTC день
+ *  переключался бы в 04:00 самарского времени — см. там же. */
+function localDayKey(): string {
+  const d = new Date();
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
 function streakDaysBeforeToday(): number {
-  let key = prevDayKey(new Date().toISOString().slice(0, 10));
+  let key = prevDayKey(localDayKey());
   let streak = 0;
   while (state.daily[key]) {
     streak += 1;
@@ -460,7 +468,7 @@ function getExamStats(chapterId: string) {
 }
 
 // --- daily challenge ---
-// dateKey — 'YYYY-MM-DD' (new Date().toISOString().slice(0, 10)); дату считает
+// dateKey — 'YYYY-MM-DD' по МЕСТНОМУ времени (localDayKey); дату считает
 // вызывающий код в обработчике/эффекте, поэтому store остаётся SSR-safe.
 const DAY_MS = 86400000;
 

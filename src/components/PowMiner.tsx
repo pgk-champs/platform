@@ -65,11 +65,27 @@ export default function PowMiner({ chapterId, trainerId }: { chapterId?: string;
           setHps(Math.round(tries / Math.max((Date.now() - t0) / 1000, 0.001)));
           setFound(true);
           setMining(false);
-          if (chapterId && trainerId && !rewardedRef.current) {
-            rewardedRef.current = true;
-            store.markTrainerDone(chapterId, trainerId, { nonce: n, difficulty, attempts: tries });
-            store.addXp(XP, `trainer:${chapterId}:${trainerId}`);
-            setRewarded(true);
+          if (chapterId && trainerId) {
+            // Рекорд пишется ВСЕГДА и по максимуму сложности, а гард — только
+            // на XP. Раньше запись стояла под тем же гардом, и в хранилище
+            // навсегда оставалась сложность первой находки. А тренажёр сам
+            // предлагает поднять сложность уже ПОСЛЕ неё, то есть достижение
+            // «PoW: сложность 3» не выдавалось при том порядке действий, на
+            // который он же и толкает. Так же устроен CodeTyping: рекорд по
+            // каждой оси хранится максимумом.
+            const prev = store.getProgress().trainers[chapterId]?.[trainerId]?.result as
+              | { difficulty?: number }
+              | undefined;
+            store.markTrainerDone(chapterId, trainerId, {
+              nonce: n,
+              difficulty: Math.max(difficulty, prev?.difficulty ?? 0),
+              attempts: tries,
+            });
+            if (!rewardedRef.current) {
+              rewardedRef.current = true;
+              store.addXp(XP, `trainer:${chapterId}:${trainerId}`);
+              setRewarded(true);
+            }
           }
           return;
         }

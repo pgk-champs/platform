@@ -471,3 +471,12 @@ test('a payload that is valid JSON but not an object falls back to the empty sta
   expect(store.getXp()).toBe(0);
   expect(store.snapshot().favorites).toEqual([]);
 });
+
+test('ключ дня берётся по местному времени, а не по UTC', async () => {
+  // Колледж в Самаре, UTC+4: по UTC день переключался бы в 04:00 местного
+  // времени — занятие в полночь падало во вчера и рвало серию.
+  const { todayKey } = await import('../components/DailyChallenge');
+  const d = new Date();
+  const p = (n: number) => String(n).padStart(2, '0');
+  expect(todayKey()).toBe(`${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`);
+});

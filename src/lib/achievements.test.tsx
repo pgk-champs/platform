@@ -250,3 +250,31 @@ test('достижения не ссылаются на несуществующ
 
   expect(broken).toEqual([]);
 });
+
+test('PoW: рекорд сложности не затирается первой находкой', () => {
+  // Тренажёр предлагает поднять сложность ПОСЛЕ первой находки, поэтому
+  // запись обязана хранить максимум. Раньше она стояла под тем же гардом, что
+  // и XP, и в хранилище навсегда оставалась сложность 1.
+  store.__resetForTests();
+  const snap = () =>
+    (store.getProgress().trainers['what-is-blockchain']?.['trainer-pow-miner']?.result ?? {}) as {
+      difficulty?: number;
+    };
+
+  store.markTrainerDone('what-is-blockchain', 'trainer-pow-miner', { difficulty: 1 });
+  expect(snap().difficulty).toBe(1);
+
+  // вторая находка на сложности 3 — так пишет PowMiner после правки
+  const prev = snap();
+  store.markTrainerDone('what-is-blockchain', 'trainer-pow-miner', {
+    difficulty: Math.max(3, prev.difficulty ?? 0),
+  });
+  expect(snap().difficulty).toBe(3);
+
+  // и назад рекорд не откатывается
+  const prev2 = snap();
+  store.markTrainerDone('what-is-blockchain', 'trainer-pow-miner', {
+    difficulty: Math.max(1, prev2.difficulty ?? 0),
+  });
+  expect(snap().difficulty).toBe(3);
+});
