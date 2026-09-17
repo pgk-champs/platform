@@ -4,6 +4,7 @@ import knowledgeMap from '../data/knowledge-map.json';
 import tracks from '../data/tracks.json';
 import { ACHIEVEMENTS } from '../lib/achievements';
 import { plural } from '../lib/plural';
+import ComposeLayers from './ComposeLayers';
 import './trainers.css';
 
 // Числа считаются из данных, а не вписываются руками: «22 главы с разбором»
@@ -148,6 +149,26 @@ export default function HomeHero() {
             <HeroScene />
           </div>
         </div>
+      </section>
+      {/* Разбор экрана Compose — отдельной секцией, а НЕ вместо сцены первого
+          экрана, как предлагал план переоформления. Причина продуктовая:
+          сцена в первом экране показывает всю платформу (клавиатура, коммиты,
+          телефон, блоки), а разбор Compose — только мобилку. В блокчейне 72
+          главы против 46 в мобилке, и первый экран, говорящий только про
+          Compose, отсекает больший трек. Здесь разбору есть место и он никого
+          не отсекает. Вернуть в первый экран — перенести <ComposeLayers /> в
+          .hh-art вместо <HeroScene />. */}
+      <section className="hh-explain" aria-label="Как устроен экран Compose">
+        <div className="hh-explain-copy">
+          <h2 className="hh-explain-title">Экран — это не картинка</h2>
+          <p className="hh-explain-text">
+            В Compose экран собирается из вложенных функций. Разложите стопку взглядом: снизу
+            собранный результат, выше — каркасы, и чем глубже узел в дереве, тем ближе его
+            плоскость. Шапка и список лежат на одной глубине — они братья, а не один внутри
+            другого.
+          </p>
+        </div>
+        <ComposeLayers />
       </section>
       <section className="hh-tracks" aria-label="Треки обучения">
         <h2 className="hh-tracks-title">Выберите свой трек обучения</h2>

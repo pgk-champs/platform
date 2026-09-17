@@ -9448,3 +9448,244 @@
   font-size: 0.92rem;
   margin: 0;
 }
+
+.hh-explain {
+  max-width: var(--ifm-container-width);
+  margin: 0 auto;
+  padding: 1rem 1rem 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 2rem;
+}
+
+.hh-explain-title {
+  font-family: var(--pgk-font-display);
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+}
+
+.hh-explain-text {
+  color: var(--ifm-color-emphasis-700);
+  margin: 0;
+}
+
+@media (max-width: 996px) {
+  .hh-explain {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* === ComposeLayers: объёмный разбор экрана Compose ===
+   Глубина плоскости = глубина узла в дереве; братья лежат на одной глубине.
+   Три технические вещи, на которых легко обжечься:
+   1) overflow и preserve-3d НЕЛЬЗЯ вешать на один элемент — браузер молча
+      понижает сцену до flat. Поэтому .cl-stage только держит размер, а
+      preserve-3d живёт на .cl-deck.
+   2) filter: blur() внутри 3D-контекста расплющивает элемент. Тень под
+      стопкой — радиальный градиент, а не blur.
+   3) Стопка растёт ВВЕРХ: при наклоне каждый шаг по Z уходит в экранный Y.
+      Компенсируется отступом .cl-layer сверху, иначе срезает верхние
+      плоскости — ровно те, ради которых разбор и делается. */
+
+.cl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+  /* Клип живёт ЗДЕСЬ, а не на .cl-stage и не на .cl-deck: overflow рядом с
+     preserve-3d браузер молча понижает до flat, и объём пропадает. Клип нужен
+     потому, что повёрнутый бокс колоды шире сцены (на 375px вылезал на 25px
+     и давал горизонтальную прокрутку всей странице). Сами плоскости в
+     границы укладываются — режется только пустой угол бокса. */
+  overflow: hidden;
+}
+
+.cl-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 5 / 4;
+  perspective: 1100px;
+  perspective-origin: 50% 45%;
+}
+
+.cl-deck {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  /* Компенсация подъёма живёт в РАСКЛАДКЕ (.cl-layer top), а не в
+     translateY на этом элементе. Причина прикладная: стопка растёт вверх,
+     каждый шаг по Z уходит в экранный Y, и без компенсации срезает верхние
+     плоскости — те самые, ради которых разбор и делается. Раскладкой это
+     задаётся надёжнее и проверяется замером. */
+  transform: rotateX(var(--cl-tilt, 42deg)) rotateZ(var(--cl-spin, -20deg));
+}
+
+/* Геометрия подобрана замером от всех четырёх краёв сцены, а не на глаз:
+   в покое запас 18/25/105/61 px, при наведении 30/30/116/80. Шаг 44 px даёт
+   между соседними плоскостями 29-35 px при высоте плоскости 258 — при
+   прежних 56%x72% зазор был 20 px на 309, и стопка читалась сплошной сеткой.
+   У братьев (TopAppBar и LazyColumn) зазор 0: они на одной глубине. */
+.cl-layer {
+  position: absolute;
+  left: 27%;
+  top: 35%;
+  width: 46%;
+  height: 58%;
+  border: 1px solid var(--ifm-color-primary-light);
+  border-radius: var(--pgk-radius-sm);
+  transform: translateZ(calc(var(--d, 0) * var(--cl-step, 44px)));
+  transform-style: preserve-3d;
+}
+
+/* Нижняя плоскость — собранный экран: единственная с заливкой, остальные
+   обводкой, чтобы результат был виден сквозь каркасы. */
+.cl-layer--solid {
+  background: var(--ifm-background-surface-color);
+  border-color: var(--ifm-color-emphasis-400);
+  box-shadow: 0 0 0 1px var(--ifm-color-emphasis-200);
+}
+
+.cl-num {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.6rem;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 3px;
+  background: var(--ifm-color-primary);
+  color: #fff;
+}
+
+.cl-layer span[class^='cl-'],
+.cl-layer span[class*=' cl-'] {
+  position: absolute;
+}
+
+.cl-bar,
+.cl-view,
+.cl-card,
+.cl-avatar,
+.cl-line {
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  color: var(--ifm-color-primary-light);
+}
+
+.cl-avatar {
+  border-radius: 50%;
+}
+
+.cl-slot {
+  border: 1px dashed var(--ifm-color-emphasis-500);
+  border-radius: 3px;
+}
+
+/* У собранного экрана части залиты — он читается как результат, а не каркас. */
+.cl-layer--solid .cl-bar {
+  background: var(--ifm-color-primary);
+  border-color: transparent;
+}
+
+.cl-layer--solid .cl-card {
+  background: var(--ifm-color-emphasis-200);
+  border-color: var(--ifm-color-emphasis-300);
+}
+
+.cl-layer--solid .cl-avatar {
+  background: var(--ifm-color-primary-lighter);
+  border-color: transparent;
+}
+
+.cl-layer--solid .cl-line {
+  background: var(--ifm-color-emphasis-400);
+  border-color: transparent;
+}
+
+.cl-layer--solid .cl-view {
+  border-color: var(--ifm-color-emphasis-300);
+}
+
+.cl-tree {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+}
+
+.cl-tree-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  padding: 2px 0;
+  /* Отступ по глубине: словами показывает ровно то же, что стопка глубиной.
+     У братьев отступ одинаковый — это и есть проверка, что мы не врём. */
+  padding-left: calc(var(--d, 0) * 0.9rem);
+}
+
+.cl-tree-num {
+  flex: none;
+  width: 1.1rem;
+  text-align: center;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.65rem;
+  border-radius: 3px;
+  background: var(--ifm-color-emphasis-200);
+  color: var(--ifm-color-emphasis-800);
+}
+
+.cl-tree-name {
+  font-size: 0.78rem;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--ifm-color-primary);
+}
+
+.cl-tree-note {
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.74rem;
+}
+
+/* Покой по умолчанию, оживание при наведении — и только там, где наведение
+   вообще бывает. На тач-экране качать сцену незачем. */
+@media (hover: hover) {
+  .cl-deck {
+    transition: transform var(--pgk-dur) var(--pgk-ease);
+  }
+
+  /* При наведении стопка выпрямляется, а НЕ растягивается: рост шага поднял
+     бы верх за край сцены (замер: step 50 даёт t = -1). Разворот и наклон
+     вертикальный габарит почти не меняют. */
+  .cl:hover .cl-deck {
+    --cl-spin: -11deg;
+    --cl-tilt: 38deg;
+  }
+}
+
+/* Разложено и неподвижно — самый информативный кадр. Ничего не прячется за
+   opacity:0 в ожидании прокрутки, поэтому гасить тут нечего, кроме перехода. */
+@media (prefers-reduced-motion: reduce) {
+  .cl-deck {
+    transition: none;
+  }
+}
+
+@media (max-width: 996px) {
+  .cl-stage {
+    aspect-ratio: 4 / 3;
+  }
+
+  .cl-deck {
+    --cl-step: 30px;
+    --cl-tilt: 40deg;
+  }
+
+  /* На узкой сцене стопка занимает относительно больше — запас сверху больше. */
+  .cl-layer {
+    top: 38%;
+  }
+}

@@ -13,7 +13,8 @@
       "sections": 0,
       "quizzes": 0,
       "trainers": 0
-    }
+    },
+    "blockExam": false
   },
   {
     "id": "kak-dobavit-stranicu",
@@ -29,6 +30,7 @@
       "sections": 0,
       "quizzes": 0,
       "trainers": 0
-    }
+    },
+    "blockExam": false
   }
 ]
