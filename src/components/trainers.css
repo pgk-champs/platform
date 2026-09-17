@@ -1268,9 +1268,10 @@
 
 .cp {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
+  /* Ряды друг под другом: разбивка по квизам и тренажёрам показывается
+     делениями, и в строку они больше не встают. */
+  flex-direction: column;
+  gap: 0.35rem;
   margin-bottom: var(--ifm-leading);
   padding: 0.5rem 0.9rem;
   border-radius: var(--ifm-card-border-radius);
@@ -1286,39 +1287,81 @@
   z-index: 2;
 }
 
-/* Доля прочитанного — тонкой полосой по низу плашки, чтобы рост был виден
-   боковым зрением, без чтения цифр. */
+/* Доля прочитанного — полоса в своём ряду, вровень с делениями квизов:
+   раньше она лежала абсолютом по низу плашки и с рядами не сочеталась. */
 .cp-read-bar {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 3px;
-  border-radius: 0 0 var(--ifm-card-border-radius) var(--ifm-card-border-radius);
-  background: var(--ifm-color-emphasis-200);
+  flex: 1;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--ifm-color-emphasis-300);
   overflow: hidden;
 }
 
 .cp-read-fill {
   display: block;
   height: 100%;
-  background: var(--ifm-color-primary);
+  /* Медь, а не индиго: прочитанное — это твой прогресс. Индиго в системе
+     отвечает за структуру, и если он начнёт хвалить, роли сольются. */
+  background: var(--pgk-you);
   transition: width var(--pgk-dur) var(--pgk-ease);
 }
 
-.cp-item {
-  font-weight: var(--ifm-font-weight-bold);
-  color: var(--ifm-font-color-base);
+.cp-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.cp-sep {
+.cp-row-label {
+  font-size: 0.82rem;
   color: var(--ifm-color-emphasis-700);
+  min-width: 8ch;
+}
+
+.cp-row-num {
+  font-family: var(--ifm-font-family-monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.82rem;
+  color: var(--ifm-color-emphasis-600);
+  min-width: 4ch;
+  text-align: right;
+}
+
+.cp-grid {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+}
+
+.cp-cell {
+  flex: 1 1 0;
+  min-width: 6px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--ifm-color-emphasis-300);
+  transition: background var(--pgk-dur-fast) var(--pgk-ease);
+}
+
+.cp-cell--on {
+  background: var(--pgk-you);
+}
+
+.cp-state {
+  flex: 1;
+  font-size: 0.82rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.cp-state--on {
+  color: var(--pgk-you);
 }
 
 .cp-level {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--ifm-font-color-base);
 }
 
 .cp-level-bar {
@@ -1331,7 +1374,8 @@
 
 .cp-level-fill {
   height: 100%;
-  background: var(--ifm-color-primary);
+  /* Уровень — тоже «твоё», а не структура. */
+  background: var(--pgk-you);
   border-radius: 999px;
 }
 

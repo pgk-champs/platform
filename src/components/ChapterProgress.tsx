@@ -22,15 +22,54 @@ const NO_TOTALS: Totals = { sections: 0, quizzes: 0, trainers: 0 };
 
 const EMPTY_PROGRESS = { sections: {}, quizzes: {}, trainers: {} } as ReturnType<typeof store.getProgress>;
 
-// Маленький живой виджет вверху главы: «Прочитано N% · Квизы x/y · Тренажёры x/y».
+// Живой виджет вверху главы: доля прочитанного полосой, квизы и тренажёры —
+// делениями. Строкой «Прочитано 0% · Квизы 0/6 · Тренажёры 0/6» не было видно,
+// сколько осталось. Закрашенное деление — медь: это твой прогресс, а не
+// структура. Модель прогресса тут не считается, она одна — chapterFill.ts.
+
+/** Ряд разбивки. Форма продиктована данными: тренажёр ровно один у 100 глав из
+ *  137 и отсутствует у 11, поэтому у ряда три поведения, а не одно. */
+function Row({
+  kind,
+  label,
+  done,
+  total,
+}: {
+  kind: 'quizzes' | 'trainers';
+  label: string;
+  done: number;
+  total: number;
+}) {
+  if (total === 0) return null; // 11 глав без тренажёров
+  return (
+    <div className={`cp-row cp-row--${kind}`}>
+      <span className="cp-row-label">{label}</span>
+      {kind === 'trainers' && total <= 2 ? (
+        // Сетка из одной ячейки читается как поломка — здесь состояние словом.
+        // Только для тренажёров: у квизов минимум три на главу, а «пройден»
+        // про них ещё и звучало бы неверно.
+        <span className={`cp-state${done >= total ? ' cp-state--on' : ''}`}>
+          {done >= total ? 'пройден' : 'не пройден'}
+        </span>
+      ) : (
+        <span className="cp-grid" role="img" aria-label={`${done} из ${total}`}>
+          {Array.from({ length: total }, (_, i) => (
+            <span key={i} className={`cp-cell${i < done ? ' cp-cell--on' : ''}`} />
+          ))}
+        </span>
+      )}
+      <span className="cp-row-num">
+        {done}/{total}
+      </span>
+    </div>
+  );
+}
 export default function ChapterProgress(props: ChapterProgressProps) {
   const { chapterId } = props;
   const counted = TOTALS[chapterId] ?? NO_TOTALS;
   const totalSections = props.totalSections ?? counted.sections;
   const totalQuizzes = props.totalQuizzes ?? counted.quizzes;
-  // Отдельного счётчика тренажёров в шапке больше нет: с 17.09.2026 они входят
-  // в общий счёт наполнения (src/lib/chapterFill.ts). Проп totalTrainers
-  // оставлен — он перекрывает расчёт карты знаний там, где посчитанное врёт.
+  const totalTrainers = props.totalTrainers ?? counted.trainers;
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
   // store на клиенте читает localStorage ещё при импорте модуля, поэтому
   // первый клиентский рендер обязан повторить серверный (пустой прогресс) —
@@ -46,34 +85,31 @@ export default function ChapterProgress(props: ChapterProgressProps) {
   // забудут поднять totalQuizzes/totalTrainers при добавлении квиза или
   // тренажёра, счётчик не покажет «5 из 4», а честно упрётся в знаменатель.
   const quizzesDone = Math.min(Object.keys(progress.quizzes[chapterId] ?? {}).length, totalQuizzes);
+  const trainersDone = Math.min(Object.keys(progress.trainers[chapterId] ?? {}).length, totalTrainers);
   const pct = totalSections > 0 ? Math.round((100 * readSections) / totalSections) : 0;
   const lvl = levelForXp(mounted ? store.getXp() : 0);
 
   return (
     <>
       <div className="cp" role="status">
-        <span className="cp-item">Прочитано {pct}%</span>
-        <span className="cp-sep" aria-hidden="true">
-          ·
-        </span>
-        <span className="cp-item">
-          Квизы {quizzesDone}/{totalQuizzes}
-        </span>
-        <span className="cp-sep" aria-hidden="true">
-          ·
-        </span>
-        <span
-          className="cp-item cp-level"
+        <div className="cp-row cp-row--read">
+          <span className="cp-row-label">Прочитано</span>
+          <span className="cp-read-bar" aria-hidden="true">
+            <span className="cp-read-fill" style={{ width: `${pct}%` }} />
+          </span>
+          <span className="cp-row-num">{pct}%</span>
+        </div>
+        <Row kind="quizzes" label="Квизы" done={quizzesDone} total={totalQuizzes} />
+        <Row kind="trainers" label="Тренажёры" done={trainersDone} total={totalTrainers} />
+        <div
+          className="cp-level"
           title={lvl.maxLevel ? 'Максимальный уровень' : `До уровня ${lvl.level + 1}: ${lvl.xpToNext} XP`}
         >
           Уровень {lvl.level} · {lvl.title}
           <span className="cp-level-bar">
             <span className="cp-level-fill" style={{ width: `${Math.round(lvl.progress * 100)}%` }} />
           </span>
-        </span>
-        <span className="cp-read-bar" aria-hidden="true">
-          <span className="cp-read-fill" style={{ width: `${pct}%` }} />
-        </span>
+        </div>
       </div>
       <ChapterTour />
     </>
