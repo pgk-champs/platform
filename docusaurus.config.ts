@@ -52,7 +52,7 @@ const config: Config = {
       tagName: 'link',
       attributes: {
         rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700&family=Onest:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap',
+        href: 'https://fonts.googleapis.com/css2?family=Onest:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap',
       },
     },
   ],
@@ -86,7 +86,7 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    image: 'img/docusaurus-social-card.jpg',
+    image: 'img/og-edu.png',
     colorMode: {
       respectPrefersColorScheme: true,
     },
@@ -158,7 +158,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} PGK Champs. Built with Docusaurus.`,
+      copyright: `© ${new Date().getFullYear()} Поволжский колледж · 137 глав · 228 тренажёров`,
     },
     prism: {
       additionalLanguages: ['solidity'],

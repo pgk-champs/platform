@@ -8164,6 +8164,7 @@
 }
 
 .fig-media svg,
+.fig-media canvas,
 .fig-media img {
   display: block;
   width: 100%;
