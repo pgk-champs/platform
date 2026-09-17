@@ -302,7 +302,7 @@ Initializer type mismatch: expected 'Int', actual 'Int?'.
 <Figure scheme="nullable-box" caption="Обращение к Map по ключу возвращает Int?, а не Int: значение может быть, а может — не быть, и тип честно об этом предупреждает." />
 
 <Block kind="quiz" title="Типичные ошибки" chapterId="kotlin-collections" blockId="quiz-typical-errors">
-<SelfCheck chapterId="kotlin-collections" quizId="q3" questions={[
+<SelfCheck chapterId="kotlin-collections" quizId="q5" questions={[
   { q: 'Компилятор сказал: Unresolved reference \'add\'. Что произошло?', options: ['Метод называется иначе', 'Список создан через listOf — у типа List нет методов изменения; нужен mutableListOf', 'Не хватает импорта', 'Список пуст'], correct: 1, why: 'List — интерфейс только для чтения; add и remove живут в MutableList.' },
   { q: 'val score: Int = scores["Богдан"] не компилируется. Почему?', options: ['Такого ключа нет', 'Обращение к Map по ключу возвращает Int?, а не Int: значение теоретически могло отсутствовать', 'Map нельзя читать по ключу', 'Нужен mutableMapOf'], correct: 1, why: 'Лечится через getOrDefault, ?: или явную проверку на null.' },
 ]} />
