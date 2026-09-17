@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Link from '@docusaurus/Link';
-import knowledgeMap from '../data/knowledge-map.json';
-import Fold from './Fold';
+import { buildCards, filterCards, chipCounts, type GymCard } from '../lib/gym';
+import { plural } from '../lib/plural';
 import CodeTyping, { PRESET_POOLS } from './CodeTyping';
 import TerminalSim, { type JsonTree } from './TerminalSim';
 import GitSim, { type GitSimScenario } from './GitSim';
@@ -15,37 +15,13 @@ import WordOrder from './WordOrder';
 import PredictOutput from './PredictOutput';
 import './trainers.css';
 
-// Каталог всех механик платформы, запускаемых отдельно от глав.
-// Результаты standalone-запусков живут в store под chapterId='gym',
-// поэтому прогресс глав они не трогают.
+// Зал. Карточки строятся из src/data/trainers.json — руками список больше не
+// ведётся. Одиннадцать механик запускаются здесь (для них ниже лежат
+// демо-данные), остальные тридцать пять ведут на якорь в своей главе.
+// Результаты зала пишутся под chapterId='gym' и прогресс глав не трогают.
 const GYM = 'gym';
 
-type MapEntry = { id: string; title: string; path: string };
-const CHAPTERS = new Map((knowledgeMap as MapEntry[]).map((e) => [e.id, e]));
-
-function ChapterRef({ id }: { id: string }) {
-  const ch = CHAPTERS.get(id);
-  if (!ch) return null;
-  return (
-    <span className="gym-chapter">
-      встречается в главе <Link to={`/docs/${ch.path.replace(/\.mdx?$/, '')}`}>«{ch.title}»</Link>
-    </span>
-  );
-}
-
-function Card({ name, chapter, children }: { name: string; chapter: string; children: React.ReactNode }) {
-  return (
-    <div className="gym-card">
-      <div className="gym-card-head">
-        <span className="gym-card-name">{name}</span>
-        <ChapterRef id={chapter} />
-      </div>
-      <Fold title="Открыть тренажёр">{children}</Fold>
-    </div>
-  );
-}
-
-// --- демо-данные для standalone-запусков ---
+// --- демо-данные для запускаемых механик: перенесены без изменений ---
 
 const GYM_FS: JsonTree = {
   projects: { 'hello.txt': 'Привет из тренажёрного зала!' },
@@ -109,78 +85,153 @@ function GymGit() {
   );
 }
 
-export default function GymCatalog() {
+// Парный список к RUNNABLE в src/lib/gym.ts: там его читает чип, здесь лежат
+// демо-данные. Что они не разошлись, стережёт тест этого компонента.
+// Partial, а не Record: искомой механики в словаре может не быть, и тип
+// должен это говорить — иначе tsc считает проверку «Runner ?» бессмысленной.
+const RUNNERS: Partial<Record<string, () => React.ReactElement>> = {
+  CodeTyping: () => (
+    <CodeTyping
+      pools={[PRESET_POOLS.latin, PRESET_POOLS.symbols, PRESET_POOLS.code, PRESET_POOLS.git]}
+      keyboard
+      chapterId={GYM}
+      trainerId="gym-typing"
+    />
+  ),
+  TerminalSim: () => <TerminalSim initialFs={GYM_FS} chapterId={GYM} trainerId="gym-terminal" />,
+  GitSim: () => <GymGit />,
+  HashPlayground: () => <HashPlayground chapterId={GYM} trainerId="gym-hash" />,
+  BlockChainDemo: () => <BlockChainDemo chapterId={GYM} trainerId="gym-chain" />,
+  SignDemo: () => <SignDemo chapterId={GYM} trainerId="gym-sign" />,
+  ComposePreview: () => (
+    <ComposePreview editable tree={GYM_TREE} chapterId={GYM} trainerId="gym-compose" />
+  ),
+  ChmodCalc: () => <ChmodCalc chapterId={GYM} trainerId="gym-chmod" />,
+  HotkeyTrainer: () => <HotkeyTrainer items={HOTKEYS} chapterId={GYM} trainerId="gym-hotkeys" />,
+  WordOrder: () => (
+    <WordOrder phrase="please review my pull request" chapterId={GYM} trainerId="gym-wordorder" />
+  ),
+  PredictOutput: () => (
+    <PredictOutput expected="14" code={PREDICT_CODE} chapterId={GYM} trainerId="gym-predict" />
+  ),
+};
+
+function Card({ card }: { card: GymCard }) {
+  const [open, setOpen] = useState(false);
+  const Runner = RUNNERS[card.component];
+  const pct = card.count > 0 ? Math.round((100 * card.done) / card.count) : 0;
+
   return (
-    <div className="gym-catalog">
-      <section className="gym-section">
-        <h2>Печать</h2>
-        <Card name="Слепая печать" chapter="typing">
-          <CodeTyping
-            pools={[PRESET_POOLS.latin, PRESET_POOLS.symbols, PRESET_POOLS.code, PRESET_POOLS.git]}
-            keyboard
-            chapterId={GYM}
-            trainerId="gym-typing"
-          />
-        </Card>
-      </section>
+    <div className="gc-card">
+      <div className="gc-head">
+        <span className="gc-name">{card.name}</span>
+        <span className={`gc-tag ${Runner ? 'gc-tag-run' : ''}`}>
+          {Runner ? 'запускается' : 'в главе'}
+        </span>
+      </div>
+      <p className="gc-blurb">{card.blurb}</p>
 
-      <section className="gym-section">
-        <h2>Терминал</h2>
-        <Card name="Терминал Linux" chapter="linux-terminal">
-          <TerminalSim initialFs={GYM_FS} chapterId={GYM} trainerId="gym-terminal" />
-        </Card>
-      </section>
+      {card.count > 1 && (
+        <p className="gc-count">
+          {card.count} {plural(card.count, 'упражнение', 'упражнения', 'упражнений')}
+        </p>
+      )}
 
-      <section className="gym-section">
-        <h2>Git</h2>
-        <Card name="Git-тренажёр" chapter="git-first-commit">
-          <GymGit />
-        </Card>
-      </section>
+      {card.done > 0 && (
+        <>
+          <div className="gc-bar" aria-hidden="true">
+            <span className="gc-fill" style={{ width: `${pct}%` }} />
+          </div>
+          <p className="gc-done">
+            {card.done === card.count ? 'пройдено' : `${card.done} из ${card.count}`}
+          </p>
+        </>
+      )}
 
-      <section className="gym-section">
-        <h2>Крипто</h2>
-        <Card name="Хеш-площадка" chapter="what-is-blockchain">
-          <HashPlayground chapterId={GYM} trainerId="gym-hash" />
-        </Card>
-        <Card name="Цепочка блоков" chapter="what-is-blockchain">
-          <BlockChainDemo chapterId={GYM} trainerId="gym-chain" />
-        </Card>
-        <Card name="Цифровая подпись" chapter="what-is-blockchain">
-          <SignDemo chapterId={GYM} trainerId="gym-sign" />
-        </Card>
-      </section>
+      {Runner ? (
+        <>
+          <button
+            type="button"
+            className="button button--sm button--primary gc-run"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? 'Свернуть' : 'Запустить'}
+          </button>
+          {open && <div className="gc-runner">{Runner()}</div>}
+        </>
+      ) : card.count === 1 ? (
+        <Link className="gc-link" to={card.exercises[0].href}>
+          Открыть в главе «{card.exercises[0].chapterTitle}» →
+        </Link>
+      ) : (
+        <>
+          <button type="button" className="gc-link gc-link-btn" onClick={() => setOpen(!open)}>
+            {open ? 'Свернуть список' : 'Где встречается →'}
+          </button>
+          {open && (
+            <ul className="gc-list">
+              {card.exercises.map((e) => (
+                <li key={e.href}>
+                  <Link to={e.href}>{e.title}</Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
 
-      <section className="gym-section">
-        <h2>Compose</h2>
-        <Card name="Конструктор Compose-экрана" chapter="first-compose-screen">
-          <ComposePreview editable tree={GYM_TREE} chapterId={GYM} trainerId="gym-compose" />
-        </Card>
-      </section>
+export default function GymCatalog(): React.ReactElement {
+  const cards = useMemo(() => buildCards(), []);
+  const chips = useMemo(() => chipCounts(cards), [cards]);
+  const [q, setQ] = useState('');
+  const [chip, setChip] = useState('all');
+  const shown = filterCards(cards, q, chip);
+  const total = cards.reduce((s, c) => s + c.count, 0);
 
-      <section className="gym-section">
-        <h2>Права</h2>
-        <Card name="Калькулятор chmod" chapter="files-packages-ssh">
-          <ChmodCalc chapterId={GYM} trainerId="gym-chmod" />
-        </Card>
-      </section>
+  return (
+    <div className="gc">
+      <p className="gc-note">
+        Механики платформы целиком: {cards.length} штук на {total}{' '}
+        {plural(total, 'упражнение', 'упражнения', 'упражнений')}. Результаты зала не идут в
+        прогресс глав — это чистая тренировка.
+      </p>
 
-      <section className="gym-section">
-        <h2>Клавиши</h2>
-        <Card name="Горячие клавиши IDE" chapter="android-studio">
-          <HotkeyTrainer items={HOTKEYS} chapterId={GYM} trainerId="gym-hotkeys" />
-        </Card>
-      </section>
+      <input
+        type="search"
+        className="gc-search"
+        placeholder="терминал, git, dp…"
+        aria-label="Поиск тренажёра"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+      />
 
-      <section className="gym-section">
-        <h2>Разное</h2>
-        <Card name="Собери фразу" chapter="it-english">
-          <WordOrder phrase="please review my pull request" chapterId={GYM} trainerId="gym-wordorder" />
-        </Card>
-        <Card name="Предскажи вывод" chapter="kotlin-vars">
-          <PredictOutput expected="14" code={PREDICT_CODE} chapterId={GYM} trainerId="gym-predict" />
-        </Card>
-      </section>
+      <div className="gc-chips">
+        {chips.map((c) => (
+          <button
+            key={c.id}
+            type="button"
+            className={`gc-chip ${chip === c.id ? 'gc-chip-on' : ''}`}
+            onClick={() => setChip(c.id)}
+          >
+            {c.label} {c.n}
+          </button>
+        ))}
+      </div>
+
+      {shown.length === 0 ? (
+        <p className="gc-empty">
+          По запросу «{q}» ничего не нашлось. Попробуй короче — поиск смотрит название и описание.
+        </p>
+      ) : (
+        <div className="gc-grid">
+          {shown.map((c) => (
+            <Card key={c.component} card={c} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

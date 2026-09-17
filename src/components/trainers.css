@@ -6596,35 +6596,195 @@
   color: var(--ifm-color-emphasis-700);
 }
 
-/* gym-catalog: страница /gym «Тренажёрный зал» */
+/* gym-catalog: страница /gym «Зал» — все механики платформы сеткой.
+   Прогресс красится медью (--pgk-you «это твоё»), структура индиго: если
+   индиго начнёт хвалить, разделение ролей переоформления обесценится. */
 
-.gym-section {
-  margin-top: 2rem;
+.gc-venues {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0 1.6rem;
 }
 
-.gym-card {
-  border: 1px solid var(--ifm-color-emphasis-300);
-  border-radius: var(--ifm-global-radius);
-  background: var(--ifm-background-surface-color);
+.gc-venue {
+  min-width: 0;
+  display: block;
   padding: 1rem;
-  margin-top: 1rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-card-border-radius);
+  background: var(--ifm-card-background-color);
+  color: inherit;
+  text-decoration: none;
 }
 
-.gym-card-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.25rem 1rem;
-  margin-bottom: 0.75rem;
+.gc-venue:hover {
+  border-color: var(--ifm-color-primary);
+  color: inherit;
+  text-decoration: none;
 }
 
-.gym-card-name {
+.gc-venue-name {
+  display: block;
+  font-family: var(--pgk-font-display);
+  font-size: 1.1rem;
   font-weight: var(--ifm-font-weight-bold);
 }
 
-.gym-chapter {
+.gc-venue-blurb {
+  display: block;
+  margin-top: 0.3rem;
   font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.gc-note {
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.92rem;
+}
+
+.gc-search {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--pgk-radius-sm);
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+}
+
+.gc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.8rem 0 1.2rem;
+}
+
+.gc-chip {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: transparent;
+  color: var(--ifm-color-emphasis-700);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+/* Активный чип — структура, не похвала: индиго, а не медь. */
+.gc-chip-on {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+}
+
+.gc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
+  gap: 0.8rem;
+}
+
+.gc-card {
+  min-width: 0;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-card-border-radius);
+  padding: 0.9rem 1rem;
+  background: var(--ifm-card-background-color);
+}
+
+.gc-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.gc-name {
+  font-family: var(--pgk-font-display);
+  font-weight: var(--ifm-font-weight-bold);
+  line-height: 1.25;
+}
+
+.gc-tag {
+  flex: none;
+  font-size: 0.72rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  color: var(--ifm-color-emphasis-600);
+  white-space: nowrap;
+}
+
+.gc-tag-run {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+}
+
+.gc-blurb {
+  margin: 0.45rem 0 0;
+  font-size: 0.88rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.gc-count {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+/* Прогресс — медь: это «твоё». Отдельного токена под подложку в системе нет,
+   поэтому она мешается из самой меди, а не заводится пятым цветом. */
+.gc-bar {
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pgk-you) 18%, transparent);
+  margin-top: 0.6rem;
+  overflow: hidden;
+}
+
+.gc-fill {
+  display: block;
+  height: 100%;
+  background: var(--pgk-you);
+}
+
+.gc-done {
+  margin: 0.3rem 0 0;
+  font-size: 0.78rem;
+  color: var(--pgk-you);
+}
+
+.gc-run {
+  margin-top: 0.7rem;
+}
+
+.gc-link {
+  display: inline-block;
+  margin-top: 0.7rem;
+  font-size: 0.85rem;
+}
+
+.gc-link-btn {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--ifm-link-color);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.gc-list {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
+}
+
+.gc-runner {
+  margin-top: 0.8rem;
+}
+
+.gc-empty {
   color: var(--ifm-color-emphasis-700);
 }
 
