@@ -57,3 +57,16 @@ test('механик 46, упражнений 228', () => {
   assert.equal(REG.length, 46);
   assert.equal(REG.reduce((s, m) => s + m.exercises.length, 0), 228);
 });
+
+test('у каждой механики есть подпись', () => {
+  // Подпись — редакторский текст, генерировать её нельзя. Зато можно не дать
+  // списку отстать: новая механика без записи роняет тесты. Так же устроен
+  // Figure.test.tsx, и за всё время ни одна схема мимо него не проехала.
+  const src = fs.readFileSync('src/data/trainer-names.ts', 'utf8');
+  const named = new Set([...src.matchAll(/^\s{2}(\w+):\s*\{/gm)].map((m) => m[1]));
+  const missing = REG.map((r) => r.component).filter((c) => !named.has(c));
+  assert.deepEqual(missing, [], `нет подписи: ${missing.join(', ')}`);
+
+  const extra = [...named].filter((c) => !REG.some((r) => r.component === c));
+  assert.deepEqual(extra, [], `подпись есть, а тренажёра нет: ${extra.join(', ')}`);
+});
