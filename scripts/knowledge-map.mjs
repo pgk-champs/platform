@@ -95,10 +95,76 @@ export function writeCategories(docsDir) {
   }
 }
 
+
+// Реестр тренажёров для Зала. Собирается по блокам <Block kind="trainer">:
+// проверено по всем главам — ВСЕ 228 trainerId лежат внутри такого блока.
+//
+// Тег компонента регэкспом НЕ разбирается, и это принципиально: в пропсах
+// сплошь и рядом живёт «>» — 'Alice -> Bob', '(Int) -> Int', 'it > 50',
+// 'List<Int>', "echo '.env' >> .gitignore". Любой разбор вида <Тег[^>]*> на
+// них спотыкается и молча теряет тренажёр: так первый замер недосчитал 18 из
+// 228. Поэтому trainerId ищется подстрокой, а всё остальное берётся из
+// однострочного тега <Block> рядом — у него атрибуты простые.
+//
+// Подпись механики здесь не выводится (резать title по двоеточию дало бы трём
+// разным механикам имя «Квест») — она лежит руками в src/data/trainer-names.ts.
+export function buildTrainers(docsDir) {
+  const byComponent = new Map();
+  const walk = (d) =>
+    fs.readdirSync(d, { withFileTypes: true }).forEach((e) => {
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) return walk(p);
+      if (!/\.mdx?$/.test(e.name) || /^index\.mdx?$/.test(e.name)) return;
+      const { data, content } = matter(fs.readFileSync(p, 'utf8'));
+      if ((data.kind || 'chapter') !== 'chapter') return;
+
+      const base = e.name.replace(/\.mdx?$/, '');
+      const fileId = stripNumberPrefix(base);
+      const rel = path.relative(docsDir, d).split(path.sep).filter(Boolean);
+      const track = rel[0] || '';
+      const docPath = [...rel.map(stripNumberPrefix), fileId].join('/');
+
+      // Открывающие теги <Block …> — по строкам: многострочные <Block> в
+      // репозитории есть, но только у шпаргалок, у тренажёров их нет.
+      const opens = [...content.matchAll(/<Block\b[^\n]*/g)].map((m) => ({
+        at: m.index,
+        line: m[0],
+      }));
+
+      for (const t of content.matchAll(/trainerId="([^"]+)"/g)) {
+        const open = opens.filter((o) => o.at < t.index).pop();
+        if (!open || !/kind="trainer"/.test(open.line)) continue;
+        // Компонент — последний настоящий JSX-тег перед trainerId внутри
+        // блока. За именем требуем пробел, перенос или «/»: иначе <Int> из
+        // List<Int> сойдёт за компонент.
+        const between = content.slice(open.at + open.line.length, t.index);
+        const tags = [...between.matchAll(/<([A-Z]\w*)(?=[\s\n/])/g)];
+        if (tags.length === 0) continue;
+        const component = tags[tags.length - 1][1];
+        const attr = (name) => new RegExp(name + '="([^"]*)"').exec(open.line)?.[1];
+        const list = byComponent.get(component) ?? [];
+        list.push({
+          title: attr('title') ?? '',
+          chapterId: attr('chapterId') || fileId,
+          track,
+          path: docPath,
+          blockId: attr('blockId') || t[1],
+          trainerId: t[1],
+        });
+        byComponent.set(component, list);
+      }
+    });
+  walk(docsDir);
+  return [...byComponent]
+    .map(([component, exercises]) => ({ component, exercises }))
+    .sort((a, b) => b.exercises.length - a.exercises.length || a.component.localeCompare(b.component));
+}
+
 if (process.argv[1].endsWith('knowledge-map.mjs')) {
   fs.mkdirSync('src/data', { recursive: true });
   fs.writeFileSync('src/data/knowledge-map.json', JSON.stringify(buildMap('docs'), null, 2));
   fs.writeFileSync('src/data/pages.json', JSON.stringify(buildMap('docs', 'page'), null, 2));
+  fs.writeFileSync('src/data/trainers.json', JSON.stringify(buildTrainers('docs'), null, 2));
   writeCategories('docs');
-  console.log('knowledge-map.json и pages.json written');
+  console.log('knowledge-map.json, pages.json и trainers.json written');
 }

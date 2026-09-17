@@ -1,0 +1,2056 @@
+[
+  {
+    "component": "CodeTyping",
+    "exercises": [
+      {
+        "title": "",
+        "chapterId": "sdacha-repo",
+        "track": "advanced",
+        "path": "advanced/sdacha-repo",
+        "blockId": "trainer-sdacha-repo",
+        "trainerId": "trainer-sdacha-repo"
+      },
+      {
+        "title": "",
+        "chapterId": "demo-show",
+        "track": "advanced",
+        "path": "advanced/demo-show",
+        "blockId": "trainer-demo-show",
+        "trainerId": "trainer-demo-show"
+      },
+      {
+        "title": "",
+        "chapterId": "sprint-format",
+        "track": "advanced",
+        "path": "advanced/sprint-format",
+        "blockId": "trainer-sprint-format",
+        "trainerId": "trainer-sprint-format"
+      },
+      {
+        "title": "Набор команд ревью и релиза",
+        "chapterId": "code-review-release",
+        "track": "advanced",
+        "path": "advanced/code-review-release",
+        "blockId": "trainer-release-typing",
+        "trainerId": "trainer-release-typing"
+      },
+      {
+        "title": "Набор команд rebase вслепую",
+        "chapterId": "git-rebase",
+        "track": "advanced",
+        "path": "advanced/git-rebase",
+        "blockId": "trainer-rebase-typing",
+        "trainerId": "trainer-rebase-typing"
+      },
+      {
+        "title": "Набор команд: конфликт, --onto, autosquash",
+        "chapterId": "git-rebase",
+        "track": "advanced",
+        "path": "advanced/git-rebase",
+        "blockId": "trainer-rebase-advanced",
+        "trainerId": "trainer-rebase-advanced"
+      },
+      {
+        "title": "Набор строк workflow",
+        "chapterId": "github-actions",
+        "track": "advanced",
+        "path": "advanced/github-actions",
+        "blockId": "trainer-ci-typing",
+        "trainerId": "trainer-ci-typing"
+      },
+      {
+        "title": "Набор шаблонов вслепую",
+        "chapterId": "grep-regex",
+        "track": "advanced",
+        "path": "advanced/grep-regex",
+        "blockId": "trainer-grep-typing",
+        "trainerId": "trainer-grep-typing"
+      },
+      {
+        "title": "Набор команд наведения порядка",
+        "chapterId": "repo-anatomy",
+        "track": "advanced",
+        "path": "advanced/repo-anatomy",
+        "blockId": "trainer-repo-typing",
+        "trainerId": "trainer-repo-typing"
+      },
+      {
+        "title": "Набор ssh-команд вслепую",
+        "chapterId": "ssh-keys-deep",
+        "track": "advanced",
+        "path": "advanced/ssh-keys-deep",
+        "blockId": "trainer-ssh-typing",
+        "trainerId": "trainer-ssh-typing"
+      },
+      {
+        "title": "Запись транзакции",
+        "chapterId": "what-is-blockchain",
+        "track": "blockchain",
+        "path": "blockchain/what-is-blockchain",
+        "blockId": "trainer-transaction",
+        "trainerId": "trainer-transaction"
+      },
+      {
+        "title": "Транзакция до автоматизма",
+        "chapterId": "what-is-blockchain",
+        "track": "blockchain",
+        "path": "blockchain/what-is-blockchain",
+        "blockId": "trainer-tx-recall",
+        "trainerId": "trainer-tx-recall"
+      },
+      {
+        "title": "Формула связи блоков",
+        "chapterId": "what-is-blockchain",
+        "track": "blockchain",
+        "path": "blockchain/what-is-blockchain",
+        "blockId": "trainer-block-formula",
+        "trainerId": "trainer-block-formula"
+      },
+      {
+        "title": "",
+        "chapterId": "solidity-hello",
+        "track": "blockchain",
+        "path": "blockchain/solidity-hello",
+        "blockId": "trainer-solidity-hello",
+        "trainerId": "trainer-solidity-hello"
+      },
+      {
+        "title": "",
+        "chapterId": "solidity-types",
+        "track": "blockchain",
+        "path": "blockchain/solidity-types",
+        "blockId": "trainer-solidity-types",
+        "trainerId": "trainer-solidity-types"
+      },
+      {
+        "title": "",
+        "chapterId": "solidity-errors",
+        "track": "blockchain",
+        "path": "blockchain/solidity-errors",
+        "blockId": "trainer-solidity-errors",
+        "trainerId": "trainer-solidity-errors"
+      },
+      {
+        "title": "",
+        "chapterId": "solidity-flow",
+        "track": "blockchain",
+        "path": "blockchain/solidity-flow",
+        "blockId": "trainer-solidity-flow",
+        "trainerId": "trainer-solidity-flow"
+      },
+      {
+        "title": "",
+        "chapterId": "solidity-functions",
+        "track": "blockchain",
+        "path": "blockchain/solidity-functions",
+        "blockId": "trainer-solidity-functions",
+        "trainerId": "trainer-solidity-functions"
+      },
+      {
+        "title": "",
+        "chapterId": "solidity-storage",
+        "track": "blockchain",
+        "path": "blockchain/solidity-storage",
+        "blockId": "trainer-solidity-storage",
+        "trainerId": "trainer-solidity-storage"
+      },
+      {
+        "title": "",
+        "chapterId": "sol-contracts-oop",
+        "track": "blockchain",
+        "path": "blockchain/sol-contracts-oop",
+        "blockId": "trainer-sol-contracts-oop",
+        "trainerId": "trainer-sol-contracts-oop"
+      },
+      {
+        "title": "",
+        "chapterId": "sol-inheritance",
+        "track": "blockchain",
+        "path": "blockchain/sol-inheritance",
+        "blockId": "trainer-sol-inheritance",
+        "trainerId": "trainer-sol-inheritance"
+      },
+      {
+        "title": "",
+        "chapterId": "sol-interfaces",
+        "track": "blockchain",
+        "path": "blockchain/sol-interfaces",
+        "blockId": "trainer-sol-interfaces",
+        "trainerId": "trainer-sol-interfaces"
+      },
+      {
+        "title": "",
+        "chapterId": "sol-libraries",
+        "track": "blockchain",
+        "path": "blockchain/sol-libraries",
+        "blockId": "trainer-sol-libraries",
+        "trainerId": "trainer-sol-libraries"
+      },
+      {
+        "title": "",
+        "chapterId": "sol-patterns",
+        "track": "blockchain",
+        "path": "blockchain/sol-patterns",
+        "blockId": "trainer-sol-patterns",
+        "trainerId": "trainer-sol-patterns"
+      },
+      {
+        "title": "",
+        "chapterId": "erc20-scratch",
+        "track": "blockchain",
+        "path": "blockchain/erc20-scratch",
+        "blockId": "trainer-erc20-scratch",
+        "trainerId": "trainer-erc20-scratch"
+      },
+      {
+        "title": "",
+        "chapterId": "erc20-oz",
+        "track": "blockchain",
+        "path": "blockchain/erc20-oz",
+        "blockId": "trainer-erc20-oz",
+        "trainerId": "trainer-erc20-oz"
+      },
+      {
+        "title": "",
+        "chapterId": "erc4626",
+        "track": "blockchain",
+        "path": "blockchain/erc4626",
+        "blockId": "trainer-erc4626",
+        "trainerId": "trainer-erc4626"
+      },
+      {
+        "title": "",
+        "chapterId": "proxy-upgrade",
+        "track": "blockchain",
+        "path": "blockchain/proxy-upgrade",
+        "blockId": "trainer-proxy-upgrade",
+        "trainerId": "trainer-proxy-upgrade"
+      },
+      {
+        "title": "JavaScript и TypeScript: строки главы",
+        "chapterId": "ts-vs-js",
+        "track": "blockchain",
+        "path": "blockchain/ts-vs-js",
+        "blockId": "trainer-tsjs-typing",
+        "trainerId": "trainer-tsjs-typing"
+      },
+      {
+        "title": "",
+        "chapterId": "ts-run",
+        "track": "blockchain",
+        "path": "blockchain/ts-run",
+        "blockId": "trainer-ts-run",
+        "trainerId": "trainer-ts-run"
+      },
+      {
+        "title": "Значения и типы: набери вслепую",
+        "chapterId": "ts-values",
+        "track": "blockchain",
+        "path": "blockchain/ts-values",
+        "blockId": "trainer-values-typing",
+        "trainerId": "trainer-values-typing"
+      },
+      {
+        "title": "",
+        "chapterId": "ts-null",
+        "track": "blockchain",
+        "path": "blockchain/ts-null",
+        "blockId": "trainer-ts-null",
+        "trainerId": "trainer-ts-null"
+      },
+      {
+        "title": "Условия и циклы: набери вслепую",
+        "chapterId": "ts-flow",
+        "track": "blockchain",
+        "path": "blockchain/ts-flow",
+        "blockId": "trainer-flow-typing",
+        "trainerId": "trainer-flow-typing"
+      },
+      {
+        "title": "Функции: набери вслепую",
+        "chapterId": "ts-functions",
+        "track": "blockchain",
+        "path": "blockchain/ts-functions",
+        "blockId": "trainer-fn-typing",
+        "trainerId": "trainer-fn-typing"
+      },
+      {
+        "title": "Массивы и объекты: набери вслепую",
+        "chapterId": "ts-collections",
+        "track": "blockchain",
+        "path": "blockchain/ts-collections",
+        "blockId": "trainer-col-typing",
+        "trainerId": "trainer-col-typing"
+      },
+      {
+        "title": "",
+        "chapterId": "ts-types",
+        "track": "blockchain",
+        "path": "blockchain/ts-types",
+        "blockId": "trainer-ts-types",
+        "trainerId": "trainer-ts-types"
+      },
+      {
+        "title": "Классы: набери вслепую",
+        "chapterId": "ts-oop",
+        "track": "blockchain",
+        "path": "blockchain/ts-oop",
+        "blockId": "trainer-oop-typing",
+        "trainerId": "trainer-oop-typing"
+      },
+      {
+        "title": "Наследование и контракты: набери вслепую",
+        "chapterId": "ts-inheritance",
+        "track": "blockchain",
+        "path": "blockchain/ts-inheritance",
+        "blockId": "trainer-inherit-typing",
+        "trainerId": "trainer-inherit-typing"
+      },
+      {
+        "title": "",
+        "chapterId": "ts-errors",
+        "track": "blockchain",
+        "path": "blockchain/ts-errors",
+        "blockId": "trainer-ts-errors",
+        "trainerId": "trainer-ts-errors"
+      },
+      {
+        "title": "Синтаксис асинхронности на пальцах",
+        "chapterId": "ts-async",
+        "track": "blockchain",
+        "path": "blockchain/ts-async",
+        "blockId": "trainer-async-typing",
+        "trainerId": "trainer-async-typing"
+      },
+      {
+        "title": "",
+        "chapterId": "ts-async-net",
+        "track": "blockchain",
+        "path": "blockchain/ts-async-net",
+        "blockId": "trainer-ts-async-net",
+        "trainerId": "trainer-ts-async-net"
+      },
+      {
+        "title": "",
+        "chapterId": "ts-modules",
+        "track": "blockchain",
+        "path": "blockchain/ts-modules",
+        "blockId": "trainer-ts-modules",
+        "trainerId": "trainer-ts-modules"
+      },
+      {
+        "title": "История языка: набери вслепую",
+        "chapterId": "ts-history",
+        "track": "blockchain",
+        "path": "blockchain/ts-history",
+        "blockId": "trainer-history-typing",
+        "trainerId": "trainer-history-typing"
+      },
+      {
+        "title": "",
+        "chapterId": "geth-network",
+        "track": "blockchain",
+        "path": "blockchain/geth-network",
+        "blockId": "trainer-geth-network",
+        "trainerId": "trainer-geth-network"
+      },
+      {
+        "title": "",
+        "chapterId": "hh-start",
+        "track": "blockchain",
+        "path": "blockchain/hh-start",
+        "blockId": "trainer-hh-start",
+        "trainerId": "trainer-hh-start"
+      },
+      {
+        "title": "",
+        "chapterId": "hh-config",
+        "track": "blockchain",
+        "path": "blockchain/hh-config",
+        "blockId": "trainer-hh-config",
+        "trainerId": "trainer-hh-config"
+      },
+      {
+        "title": "",
+        "chapterId": "hh-test",
+        "track": "blockchain",
+        "path": "blockchain/hh-test",
+        "blockId": "trainer-hh-test",
+        "trainerId": "trainer-hh-test"
+      },
+      {
+        "title": "",
+        "chapterId": "hh-deploy",
+        "track": "blockchain",
+        "path": "blockchain/hh-deploy",
+        "blockId": "trainer-hh-deploy",
+        "trainerId": "trainer-hh-deploy"
+      },
+      {
+        "title": "",
+        "chapterId": "web-html",
+        "track": "blockchain",
+        "path": "blockchain/web-html",
+        "blockId": "trainer-web-html",
+        "trainerId": "trainer-web-html"
+      },
+      {
+        "title": "",
+        "chapterId": "web-css",
+        "track": "blockchain",
+        "path": "blockchain/web-css",
+        "blockId": "trainer-web-css",
+        "trainerId": "trainer-web-css"
+      },
+      {
+        "title": "",
+        "chapterId": "web-layout",
+        "track": "blockchain",
+        "path": "blockchain/web-layout",
+        "blockId": "trainer-web-layout",
+        "trainerId": "trainer-web-layout"
+      },
+      {
+        "title": "",
+        "chapterId": "web-dom",
+        "track": "blockchain",
+        "path": "blockchain/web-dom",
+        "blockId": "trainer-web-dom",
+        "trainerId": "trainer-web-dom"
+      },
+      {
+        "title": "",
+        "chapterId": "web-react",
+        "track": "blockchain",
+        "path": "blockchain/web-react",
+        "blockId": "trainer-web-react",
+        "trainerId": "trainer-web-react"
+      },
+      {
+        "title": "",
+        "chapterId": "web-state",
+        "track": "blockchain",
+        "path": "blockchain/web-state",
+        "blockId": "trainer-web-state",
+        "trainerId": "trainer-web-state"
+      },
+      {
+        "title": "",
+        "chapterId": "web-vite",
+        "track": "blockchain",
+        "path": "blockchain/web-vite",
+        "blockId": "trainer-web-vite",
+        "trainerId": "trainer-web-vite"
+      },
+      {
+        "title": "",
+        "chapterId": "web-fetch",
+        "track": "blockchain",
+        "path": "blockchain/web-fetch",
+        "blockId": "trainer-web-fetch",
+        "trainerId": "trainer-web-fetch"
+      },
+      {
+        "title": "",
+        "chapterId": "web-forms",
+        "track": "blockchain",
+        "path": "blockchain/web-forms",
+        "blockId": "trainer-web-forms",
+        "trainerId": "trainer-web-forms"
+      },
+      {
+        "title": "",
+        "chapterId": "web-router",
+        "track": "blockchain",
+        "path": "blockchain/web-router",
+        "blockId": "trainer-web-router",
+        "trainerId": "trainer-web-router"
+      },
+      {
+        "title": "",
+        "chapterId": "web-redux",
+        "track": "blockchain",
+        "path": "blockchain/web-redux",
+        "blockId": "trainer-web-redux",
+        "trainerId": "trainer-web-redux"
+      },
+      {
+        "title": "",
+        "chapterId": "web-rtk",
+        "track": "blockchain",
+        "path": "blockchain/web-rtk",
+        "blockId": "trainer-web-rtk",
+        "trainerId": "trainer-web-rtk"
+      },
+      {
+        "title": "",
+        "chapterId": "web-rtk-async",
+        "track": "blockchain",
+        "path": "blockchain/web-rtk-async",
+        "blockId": "trainer-web-rtk-async",
+        "trainerId": "trainer-web-rtk-async"
+      },
+      {
+        "title": "",
+        "chapterId": "wallet-connect",
+        "track": "blockchain",
+        "path": "blockchain/wallet-connect",
+        "blockId": "trainer-wallet-connect",
+        "trainerId": "trainer-wallet-connect"
+      },
+      {
+        "title": "",
+        "chapterId": "wallet-sign",
+        "track": "blockchain",
+        "path": "blockchain/wallet-sign",
+        "blockId": "trainer-wallet-sign",
+        "trainerId": "trainer-wallet-sign"
+      },
+      {
+        "title": "",
+        "chapterId": "dapp-full",
+        "track": "blockchain",
+        "path": "blockchain/dapp-full",
+        "blockId": "trainer-dapp-full",
+        "trainerId": "trainer-dapp-full"
+      },
+      {
+        "title": "",
+        "chapterId": "audit-vulns",
+        "track": "blockchain",
+        "path": "blockchain/audit-vulns",
+        "blockId": "trainer-audit-vulns",
+        "trainerId": "trainer-audit-vulns"
+      },
+      {
+        "title": "",
+        "chapterId": "audit-tools",
+        "track": "blockchain",
+        "path": "blockchain/audit-tools",
+        "blockId": "trainer-audit-tools",
+        "trainerId": "trainer-audit-tools"
+      },
+      {
+        "title": "",
+        "chapterId": "audit-report",
+        "track": "blockchain",
+        "path": "blockchain/audit-report",
+        "blockId": "trainer-audit-report",
+        "trainerId": "trainer-audit-report"
+      },
+      {
+        "title": "",
+        "chapterId": "fabric-intro",
+        "track": "blockchain",
+        "path": "blockchain/fabric-intro",
+        "blockId": "trainer-fabric-intro",
+        "trainerId": "trainer-fabric-intro"
+      },
+      {
+        "title": "",
+        "chapterId": "fabric-network",
+        "track": "blockchain",
+        "path": "blockchain/fabric-network",
+        "blockId": "trainer-fabric-network",
+        "trainerId": "trainer-fabric-network"
+      },
+      {
+        "title": "",
+        "chapterId": "fabric-chaincode",
+        "track": "blockchain",
+        "path": "blockchain/fabric-chaincode",
+        "blockId": "trainer-fabric-chaincode",
+        "trainerId": "trainer-fabric-chaincode"
+      },
+      {
+        "title": "",
+        "chapterId": "fabric-lifecycle",
+        "track": "blockchain",
+        "path": "blockchain/fabric-lifecycle",
+        "blockId": "trainer-fabric-lifecycle",
+        "trainerId": "trainer-fabric-lifecycle"
+      },
+      {
+        "title": "",
+        "chapterId": "fabric-tx",
+        "track": "blockchain",
+        "path": "blockchain/fabric-tx",
+        "blockId": "trainer-fabric-tx",
+        "trainerId": "trainer-fabric-tx"
+      },
+      {
+        "title": "",
+        "chapterId": "fabric-vs-eth",
+        "track": "blockchain",
+        "path": "blockchain/fabric-vs-eth",
+        "blockId": "trainer-fabric-vs-eth",
+        "trainerId": "trainer-fabric-vs-eth"
+      },
+      {
+        "title": "Команда запуска сети",
+        "chapterId": "waves-first-network",
+        "track": "blockchain",
+        "path": "blockchain/waves-first-network",
+        "blockId": "trainer-compose-up",
+        "trainerId": "trainer-compose-up"
+      },
+      {
+        "title": "Команда остановки с очисткой",
+        "chapterId": "waves-first-network",
+        "track": "blockchain",
+        "path": "blockchain/waves-first-network",
+        "blockId": "trainer-compose-down",
+        "trainerId": "trainer-compose-down"
+      },
+      {
+        "title": "Запуск сети до автоматизма",
+        "chapterId": "waves-first-network",
+        "track": "blockchain",
+        "path": "blockchain/waves-first-network",
+        "blockId": "trainer-practice-up",
+        "trainerId": "trainer-practice-up"
+      },
+      {
+        "title": "Полная очистка сети",
+        "chapterId": "waves-first-network",
+        "track": "blockchain",
+        "path": "blockchain/waves-first-network",
+        "blockId": "trainer-practice-down",
+        "trainerId": "trainer-practice-down"
+      },
+      {
+        "title": "Команды главы вперемешку",
+        "chapterId": "waves-first-network",
+        "track": "blockchain",
+        "path": "blockchain/waves-first-network",
+        "blockId": "trainer-practice-pool",
+        "trainerId": "trainer-practice-pool"
+      },
+      {
+        "title": "",
+        "chapterId": "waves-account",
+        "track": "blockchain",
+        "path": "blockchain/waves-account",
+        "blockId": "trainer-waves-account",
+        "trainerId": "trainer-waves-account"
+      },
+      {
+        "title": "",
+        "chapterId": "waves-tx",
+        "track": "blockchain",
+        "path": "blockchain/waves-tx",
+        "blockId": "trainer-waves-tx",
+        "trainerId": "trainer-waves-tx"
+      },
+      {
+        "title": "",
+        "chapterId": "waves-data",
+        "track": "blockchain",
+        "path": "blockchain/waves-data",
+        "blockId": "trainer-waves-data",
+        "trainerId": "trainer-waves-data"
+      },
+      {
+        "title": "",
+        "chapterId": "waves-assets",
+        "track": "blockchain",
+        "path": "blockchain/waves-assets",
+        "blockId": "trainer-waves-assets",
+        "trainerId": "trainer-waves-assets"
+      },
+      {
+        "title": "",
+        "chapterId": "waves-ride",
+        "track": "blockchain",
+        "path": "blockchain/waves-ride",
+        "blockId": "trainer-waves-ride",
+        "trainerId": "trainer-waves-ride"
+      },
+      {
+        "title": "",
+        "chapterId": "waves-smart-account",
+        "track": "blockchain",
+        "path": "blockchain/waves-smart-account",
+        "blockId": "trainer-waves-smart-account",
+        "trainerId": "trainer-waves-smart-account"
+      },
+      {
+        "title": "",
+        "chapterId": "waves-dapp",
+        "track": "blockchain",
+        "path": "blockchain/waves-dapp",
+        "blockId": "trainer-waves-dapp",
+        "trainerId": "trainer-waves-dapp"
+      },
+      {
+        "title": "",
+        "chapterId": "waves-payments",
+        "track": "blockchain",
+        "path": "blockchain/waves-payments",
+        "blockId": "trainer-waves-payments",
+        "trainerId": "trainer-waves-payments"
+      },
+      {
+        "title": "",
+        "chapterId": "waves-client",
+        "track": "blockchain",
+        "path": "blockchain/waves-client",
+        "blockId": "trainer-waves-client",
+        "trainerId": "trainer-waves-client"
+      },
+      {
+        "title": "Разминка: классическая фраза",
+        "chapterId": "typing",
+        "track": "foundation",
+        "path": "foundation/typing",
+        "blockId": "trainer-warmup-latin",
+        "trainerId": "trainer-warmup-latin"
+      },
+      {
+        "title": "Спецсимволы связками",
+        "chapterId": "typing",
+        "track": "foundation",
+        "path": "foundation/typing",
+        "blockId": "trainer-symbols-combo",
+        "trainerId": "trainer-symbols-combo"
+      },
+      {
+        "title": "Строка с лямбдой",
+        "chapterId": "typing",
+        "track": "foundation",
+        "path": "foundation/typing",
+        "blockId": "trainer-symbols-lambda",
+        "trainerId": "trainer-symbols-lambda"
+      },
+      {
+        "title": "Цикл for с условием",
+        "chapterId": "typing",
+        "track": "foundation",
+        "path": "foundation/typing",
+        "blockId": "trainer-code-for-loop",
+        "trainerId": "trainer-code-for-loop"
+      },
+      {
+        "title": "Команда git commit",
+        "chapterId": "typing",
+        "track": "foundation",
+        "path": "foundation/typing",
+        "blockId": "trainer-code-git-commit",
+        "trainerId": "trainer-code-git-commit"
+      },
+      {
+        "title": "Финальная строка без единой ошибки",
+        "chapterId": "typing",
+        "track": "foundation",
+        "path": "foundation/typing",
+        "blockId": "trainer-challenge-line",
+        "trainerId": "trainer-challenge-line"
+      },
+      {
+        "title": "Поисковый запрос с site:",
+        "chapterId": "it-english",
+        "track": "foundation",
+        "path": "foundation/it-english",
+        "blockId": "trainer-search-query",
+        "trainerId": "trainer-search-query"
+      },
+      {
+        "title": "Фраза об ошибке целиком",
+        "chapterId": "it-english",
+        "track": "foundation",
+        "path": "foundation/it-english",
+        "blockId": "trainer-error-phrase",
+        "trainerId": "trainer-error-phrase"
+      },
+      {
+        "title": "Команды главы",
+        "chapterId": "linux-terminal",
+        "track": "foundation",
+        "path": "foundation/linux-terminal",
+        "blockId": "trainer-chapter-commands",
+        "trainerId": "trainer-chapter-commands"
+      },
+      {
+        "title": "",
+        "chapterId": "linux-terminal",
+        "track": "foundation",
+        "path": "foundation/linux-terminal",
+        "blockId": "trainer-chain",
+        "trainerId": "trainer-chain"
+      },
+      {
+        "title": "Права и пакеты: команды главы",
+        "chapterId": "files-packages-ssh",
+        "track": "foundation",
+        "path": "foundation/files-packages-ssh",
+        "blockId": "trainer-permissions-apt",
+        "trainerId": "trainer-permissions-apt"
+      },
+      {
+        "title": "SSH и scp: команды главы",
+        "chapterId": "files-packages-ssh",
+        "track": "foundation",
+        "path": "foundation/files-packages-ssh",
+        "blockId": "trainer-ssh-scp",
+        "trainerId": "trainer-ssh-scp"
+      },
+      {
+        "title": "Команда git add",
+        "chapterId": "git-first-commit",
+        "track": "foundation",
+        "path": "foundation/git-first-commit",
+        "blockId": "trainer-add-command",
+        "trainerId": "trainer-add-command"
+      },
+      {
+        "title": "Команды главы связками",
+        "chapterId": "git-first-commit",
+        "track": "foundation",
+        "path": "foundation/git-first-commit",
+        "blockId": "trainer-git-cycle",
+        "trainerId": "trainer-git-cycle"
+      },
+      {
+        "title": "Связка add и commit",
+        "chapterId": "git-first-commit",
+        "track": "foundation",
+        "path": "foundation/git-first-commit",
+        "blockId": "trainer-add-commit-combo",
+        "trainerId": "trainer-add-commit-combo"
+      },
+      {
+        "title": "Команды главы",
+        "chapterId": "git-branches",
+        "track": "foundation",
+        "path": "foundation/git-branches",
+        "blockId": "trainer-git-commands",
+        "trainerId": "trainer-git-commands"
+      },
+      {
+        "title": "Полный цикл слияния",
+        "chapterId": "git-branches",
+        "track": "foundation",
+        "path": "foundation/git-branches",
+        "blockId": "trainer-merge-cycle",
+        "trainerId": "trainer-merge-cycle"
+      },
+      {
+        "title": "Команды удалённой работы",
+        "chapterId": "git-remote",
+        "track": "foundation",
+        "path": "foundation/git-remote",
+        "blockId": "trainer-git-commands",
+        "trainerId": "trainer-git-commands"
+      },
+      {
+        "title": "Связка: rebase и push",
+        "chapterId": "git-remote",
+        "track": "foundation",
+        "path": "foundation/git-remote",
+        "blockId": "trainer-rebase-push",
+        "trainerId": "trainer-rebase-push"
+      },
+      {
+        "title": "Команды главы",
+        "chapterId": "android-studio",
+        "track": "mobile",
+        "path": "mobile/android-studio",
+        "blockId": "trainer-chapter-commands",
+        "trainerId": "trainer-chapter-commands"
+      },
+      {
+        "title": "Команда sdkmanager --licenses",
+        "chapterId": "android-studio",
+        "track": "mobile",
+        "path": "mobile/android-studio",
+        "blockId": "trainer-sdk-licenses",
+        "trainerId": "trainer-sdk-licenses"
+      },
+      {
+        "title": "Объявления из этой главы",
+        "chapterId": "kotlin-vars",
+        "track": "mobile",
+        "path": "mobile/kotlin-vars",
+        "blockId": "trainer-declarations",
+        "trainerId": "trainer-declarations"
+      },
+      {
+        "title": "Цепочка с лямбдой",
+        "chapterId": "kotlin-vars",
+        "track": "mobile",
+        "path": "mobile/kotlin-vars",
+        "blockId": "trainer-lambda-chain",
+        "trainerId": "trainer-lambda-chain"
+      },
+      {
+        "title": "Печать конструкций null-безопасности",
+        "chapterId": "kotlin-null",
+        "track": "mobile",
+        "path": "mobile/kotlin-null",
+        "blockId": "trainer-null-typing",
+        "trainerId": "trainer-null-typing"
+      },
+      {
+        "title": "Условия и циклы на Kotlin: набери вслепую",
+        "chapterId": "kotlin-flow",
+        "track": "mobile",
+        "path": "mobile/kotlin-flow",
+        "blockId": "trainer-kflow-typing",
+        "trainerId": "trainer-kflow-typing"
+      },
+      {
+        "title": "Сигнатуры и однострочные функции",
+        "chapterId": "functions-lambdas",
+        "track": "mobile",
+        "path": "mobile/functions-lambdas",
+        "blockId": "trainer-functions",
+        "trainerId": "trainer-functions"
+      },
+      {
+        "title": "Лямбды и цепочки вызовов",
+        "chapterId": "functions-lambdas",
+        "track": "mobile",
+        "path": "mobile/functions-lambdas",
+        "blockId": "trainer-lambdas",
+        "trainerId": "trainer-lambdas"
+      },
+      {
+        "title": "Классы: объявления и методы",
+        "chapterId": "classes-collections",
+        "track": "mobile",
+        "path": "mobile/classes-collections",
+        "blockId": "trainer-classes",
+        "trainerId": "trainer-classes"
+      },
+      {
+        "title": "Коллекции: списки, карты, множества",
+        "chapterId": "kotlin-collections",
+        "track": "mobile",
+        "path": "mobile/kotlin-collections",
+        "blockId": "trainer-collections",
+        "trainerId": "trainer-collections"
+      },
+      {
+        "title": "ООП на Kotlin: набери вслепую",
+        "chapterId": "kotlin-oop",
+        "track": "mobile",
+        "path": "mobile/kotlin-oop",
+        "blockId": "trainer-koop-typing",
+        "trainerId": "trainer-koop-typing"
+      },
+      {
+        "title": "Сигнатура composable-функции",
+        "chapterId": "first-compose-screen",
+        "track": "mobile",
+        "path": "mobile/first-compose-screen",
+        "blockId": "trainer-composable-signature",
+        "trainerId": "trainer-composable-signature"
+      },
+      {
+        "title": "Цепочки Modifier",
+        "chapterId": "first-compose-screen",
+        "track": "mobile",
+        "path": "mobile/first-compose-screen",
+        "blockId": "trainer-modifier-chain",
+        "trainerId": "trainer-modifier-chain"
+      },
+      {
+        "title": "Строки состояния этой главы",
+        "chapterId": "state-events",
+        "track": "mobile",
+        "path": "mobile/state-events",
+        "blockId": "trainer-state-lines",
+        "trainerId": "trainer-state-lines"
+      },
+      {
+        "title": "TextField с обработчиком",
+        "chapterId": "state-events",
+        "track": "mobile",
+        "path": "mobile/state-events",
+        "blockId": "trainer-textfield-line",
+        "trainerId": "trainer-textfield-line"
+      },
+      {
+        "title": "Строки вёрстки этой главы",
+        "chapterId": "layout-by-mockup",
+        "track": "mobile",
+        "path": "mobile/layout-by-mockup",
+        "blockId": "trainer-layout-lines",
+        "trainerId": "trainer-layout-lines"
+      },
+      {
+        "title": "Строка позиционирования Row",
+        "chapterId": "layout-by-mockup",
+        "track": "mobile",
+        "path": "mobile/layout-by-mockup",
+        "blockId": "trainer-row-arrangement",
+        "trainerId": "trainer-row-arrangement"
+      },
+      {
+        "title": "Строки карточки",
+        "chapterId": "layout-card",
+        "track": "mobile",
+        "path": "mobile/layout-card",
+        "blockId": "trainer-card-lines",
+        "trainerId": "trainer-card-lines"
+      },
+      {
+        "title": "Строки Gradle этой главы",
+        "chapterId": "ui-kit",
+        "track": "mobile",
+        "path": "mobile/ui-kit",
+        "blockId": "trainer-gradle-lines",
+        "trainerId": "trainer-gradle-lines"
+      },
+      {
+        "title": "Зависимость только для себя",
+        "chapterId": "ui-kit",
+        "track": "mobile",
+        "path": "mobile/ui-kit",
+        "blockId": "trainer-implementation-line",
+        "trainerId": "trainer-implementation-line"
+      },
+      {
+        "title": "",
+        "chapterId": "lazy-lists",
+        "track": "mobile",
+        "path": "mobile/lazy-lists",
+        "blockId": "trainer-lazy-lists",
+        "trainerId": "trainer-lazy-lists"
+      },
+      {
+        "title": "",
+        "chapterId": "material-theme",
+        "track": "mobile",
+        "path": "mobile/material-theme",
+        "blockId": "trainer-material-theme",
+        "trainerId": "trainer-material-theme"
+      },
+      {
+        "title": "",
+        "chapterId": "scaffold-bars",
+        "track": "mobile",
+        "path": "mobile/scaffold-bars",
+        "blockId": "trainer-scaffold",
+        "trainerId": "trainer-scaffold"
+      },
+      {
+        "title": "",
+        "chapterId": "kit-buttons",
+        "track": "mobile",
+        "path": "mobile/kit-buttons",
+        "blockId": "trainer-kit-buttons",
+        "trainerId": "trainer-kit-buttons"
+      },
+      {
+        "title": "",
+        "chapterId": "kit-inputs",
+        "track": "mobile",
+        "path": "mobile/kit-inputs",
+        "blockId": "trainer-kit-inputs",
+        "trainerId": "trainer-kit-inputs"
+      },
+      {
+        "title": "",
+        "chapterId": "kit-select",
+        "track": "mobile",
+        "path": "mobile/kit-select",
+        "blockId": "trainer-kit-select",
+        "trainerId": "trainer-kit-select"
+      },
+      {
+        "title": "",
+        "chapterId": "kit-search",
+        "track": "mobile",
+        "path": "mobile/kit-search",
+        "blockId": "trainer-kit-search",
+        "trainerId": "trainer-kit-search"
+      },
+      {
+        "title": "",
+        "chapterId": "kit-bars",
+        "track": "mobile",
+        "path": "mobile/kit-bars",
+        "blockId": "trainer-kit-bars",
+        "trainerId": "trainer-kit-bars"
+      },
+      {
+        "title": "",
+        "chapterId": "kit-card",
+        "track": "mobile",
+        "path": "mobile/kit-card",
+        "blockId": "trainer-kit-card",
+        "trainerId": "trainer-kit-card"
+      },
+      {
+        "title": "",
+        "chapterId": "kit-icon-font",
+        "track": "mobile",
+        "path": "mobile/kit-icon-font",
+        "blockId": "trainer-kit-icon-font",
+        "trainerId": "trainer-kit-icon-font"
+      },
+      {
+        "title": "Печать конструкций корутин",
+        "chapterId": "kotlin-coroutines",
+        "track": "mobile",
+        "path": "mobile/kotlin-coroutines",
+        "blockId": "trainer-coroutines-typing",
+        "trainerId": "trainer-coroutines-typing"
+      },
+      {
+        "title": "",
+        "chapterId": "flow-streams",
+        "track": "mobile",
+        "path": "mobile/flow-streams",
+        "blockId": "trainer-flow-typing",
+        "trainerId": "trainer-flow-typing"
+      },
+      {
+        "title": "",
+        "chapterId": "viewmodel-state",
+        "track": "mobile",
+        "path": "mobile/viewmodel-state",
+        "blockId": "trainer-viewmodel",
+        "trainerId": "trainer-viewmodel"
+      },
+      {
+        "title": "",
+        "chapterId": "app-layers",
+        "track": "mobile",
+        "path": "mobile/app-layers",
+        "blockId": "trainer-app-layers",
+        "trainerId": "trainer-app-layers"
+      },
+      {
+        "title": "",
+        "chapterId": "network-retrofit",
+        "track": "mobile",
+        "path": "mobile/network-retrofit",
+        "blockId": "trainer-network",
+        "trainerId": "trainer-network"
+      },
+      {
+        "title": "",
+        "chapterId": "network-errors",
+        "track": "mobile",
+        "path": "mobile/network-errors",
+        "blockId": "trainer-network-errors",
+        "trainerId": "trainer-network-errors"
+      },
+      {
+        "title": "",
+        "chapterId": "data-storage",
+        "track": "mobile",
+        "path": "mobile/data-storage",
+        "blockId": "trainer-data-storage",
+        "trainerId": "trainer-data-storage"
+      },
+      {
+        "title": "",
+        "chapterId": "cache-offline",
+        "track": "mobile",
+        "path": "mobile/cache-offline",
+        "blockId": "trainer-cache-offline",
+        "trainerId": "trainer-cache-offline"
+      },
+      {
+        "title": "",
+        "chapterId": "clean-code",
+        "track": "mobile",
+        "path": "mobile/clean-code",
+        "blockId": "trainer-clean-code",
+        "trainerId": "trainer-clean-code"
+      },
+      {
+        "title": "",
+        "chapterId": "auth-session",
+        "track": "mobile",
+        "path": "mobile/auth-session",
+        "blockId": "trainer-auth-session",
+        "trainerId": "trainer-auth-session"
+      },
+      {
+        "title": "",
+        "chapterId": "device-features",
+        "track": "mobile",
+        "path": "mobile/device-features",
+        "blockId": "trainer-device-features",
+        "trainerId": "trainer-device-features"
+      },
+      {
+        "title": "",
+        "chapterId": "testing-mobile",
+        "track": "mobile",
+        "path": "mobile/testing-mobile",
+        "blockId": "trainer-testing-mobile",
+        "trainerId": "trainer-testing-mobile"
+      },
+      {
+        "title": "Java и Kotlin: одни и те же мысли разными словами",
+        "chapterId": "kotlin-vs-java",
+        "track": "mobile",
+        "path": "mobile/kotlin-vs-java",
+        "blockId": "trainer-kj-typing",
+        "trainerId": "trainer-kj-typing"
+      },
+      {
+        "title": "История платформы: набери вслепую",
+        "chapterId": "kotlin-history",
+        "track": "mobile",
+        "path": "mobile/kotlin-history",
+        "blockId": "trainer-khist-typing",
+        "trainerId": "trainer-khist-typing"
+      }
+    ]
+  },
+  {
+    "component": "PredictOutput",
+    "exercises": [
+      {
+        "title": "Предскажи вывод: val, var и +=",
+        "chapterId": "kotlin-vars",
+        "track": "mobile",
+        "path": "mobile/kotlin-vars",
+        "blockId": "trainer-predict-val-var",
+        "trainerId": "trainer-predict-val-var"
+      },
+      {
+        "title": "Предскажи вывод: лямбда со стрелкой",
+        "chapterId": "kotlin-vars",
+        "track": "mobile",
+        "path": "mobile/kotlin-vars",
+        "blockId": "trainer-predict-lambda-bonus",
+        "trainerId": "trainer-predict-lambda-bonus"
+      },
+      {
+        "title": "Предскажи вывод: default и именованные аргументы",
+        "chapterId": "functions-lambdas",
+        "track": "mobile",
+        "path": "mobile/functions-lambdas",
+        "blockId": "trainer-predict-default-named",
+        "trainerId": "trainer-predict-default-named"
+      },
+      {
+        "title": "Предскажи вывод: calculate с новой лямбдой",
+        "chapterId": "functions-lambdas",
+        "track": "mobile",
+        "path": "mobile/functions-lambdas",
+        "blockId": "trainer-predict-calculate",
+        "trainerId": "trainer-predict-calculate"
+      },
+      {
+        "title": "Предскажи вывод: toString и copy",
+        "chapterId": "classes-collections",
+        "track": "mobile",
+        "path": "mobile/classes-collections",
+        "blockId": "trainer-predict-data-copy",
+        "trainerId": "trainer-predict-data-copy"
+      },
+      {
+        "title": "Предскажи вывод: filter и map по команде",
+        "chapterId": "kotlin-collections",
+        "track": "mobile",
+        "path": "mobile/kotlin-collections",
+        "blockId": "trainer-predict-filter-map",
+        "trainerId": "trainer-predict-filter-map"
+      },
+      {
+        "title": "Предскажи вывод: var внутри функции",
+        "chapterId": "state-events",
+        "track": "mobile",
+        "path": "mobile/state-events",
+        "blockId": "trainer-predict-var-lifetime",
+        "trainerId": "trainer-predict-var-lifetime"
+      },
+      {
+        "title": "Предскажи вывод: делегат Loud",
+        "chapterId": "state-events",
+        "track": "mobile",
+        "path": "mobile/state-events",
+        "blockId": "trainer-predict-loud-delegate",
+        "trainerId": "trainer-predict-loud-delegate"
+      }
+    ]
+  },
+  {
+    "component": "TerminalSim",
+    "exercises": [
+      {
+        "title": "Квест: оформи выпуск версии",
+        "chapterId": "code-review-release",
+        "track": "advanced",
+        "path": "advanced/code-review-release",
+        "blockId": "trainer-release-prep",
+        "trainerId": "trainer-release-prep"
+      },
+      {
+        "title": "Квест: положи workflow в правильное место",
+        "chapterId": "github-actions",
+        "track": "advanced",
+        "path": "advanced/github-actions",
+        "blockId": "trainer-ci-place",
+        "trainerId": "trainer-ci-place"
+      },
+      {
+        "title": "Квест: найди код в логе",
+        "chapterId": "grep-regex",
+        "track": "advanced",
+        "path": "advanced/grep-regex",
+        "blockId": "trainer-grep-quest",
+        "trainerId": "trainer-grep-quest"
+      },
+      {
+        "title": "Квест: собери корень репозитория",
+        "chapterId": "repo-anatomy",
+        "track": "advanced",
+        "path": "advanced/repo-anatomy",
+        "blockId": "trainer-repo-root",
+        "trainerId": "trainer-repo-root"
+      },
+      {
+        "title": "Квест: раскладка ~/.ssh",
+        "chapterId": "ssh-keys-deep",
+        "track": "advanced",
+        "path": "advanced/ssh-keys-deep",
+        "blockId": "trainer-ssh-quest",
+        "trainerId": "trainer-ssh-quest"
+      },
+      {
+        "title": "Квест: построй дерево проекта",
+        "chapterId": "linux-terminal",
+        "track": "foundation",
+        "path": "foundation/linux-terminal",
+        "blockId": "trainer-terminal-quest",
+        "trainerId": "trainer-terminal-quest"
+      },
+      {
+        "title": "Квест: наведи порядок",
+        "chapterId": "linux-terminal",
+        "track": "foundation",
+        "path": "foundation/linux-terminal",
+        "blockId": "trainer-tidy-quest",
+        "trainerId": "trainer-tidy-quest"
+      },
+      {
+        "title": "Квест: собери папку ~/.ssh",
+        "chapterId": "files-packages-ssh",
+        "track": "foundation",
+        "path": "foundation/files-packages-ssh",
+        "blockId": "trainer-ssh-setup",
+        "trainerId": "trainer-ssh-setup"
+      }
+    ]
+  },
+  {
+    "component": "GitSim",
+    "exercises": [
+      {
+        "title": "Квест: прямая история против развилки",
+        "chapterId": "git-rebase",
+        "track": "advanced",
+        "path": "advanced/git-rebase",
+        "blockId": "trainer-rebase-sim",
+        "trainerId": "trainer-rebase-sim"
+      },
+      {
+        "title": "Git-симулятор: от init до трёх коммитов",
+        "chapterId": "git-first-commit",
+        "track": "foundation",
+        "path": "foundation/git-first-commit",
+        "blockId": "trainer-gitsim-first-commit",
+        "trainerId": "trainer-gitsim-first-commit"
+      },
+      {
+        "title": "Git-симулятор: слей ветку сам",
+        "chapterId": "git-branches",
+        "track": "foundation",
+        "path": "foundation/git-branches",
+        "blockId": "trainer-gitsim-merge",
+        "trainerId": "trainer-gitsim-merge"
+      },
+      {
+        "title": "Git-симулятор: fast-forward против merge-коммита",
+        "chapterId": "git-branches",
+        "track": "foundation",
+        "path": "foundation/git-branches",
+        "blockId": "trainer-gitsim-ff-vs-merge",
+        "trainerId": "trainer-gitsim-ff-vs-merge"
+      },
+      {
+        "title": "Git-симулятор: устрой конфликт и разреши его",
+        "chapterId": "git-branches",
+        "track": "foundation",
+        "path": "foundation/git-branches",
+        "blockId": "trainer-gitsim-conflict",
+        "trainerId": "trainer-gitsim-conflict"
+      },
+      {
+        "title": "Git-симулятор: два репозитория, push и pull",
+        "chapterId": "git-remote",
+        "track": "foundation",
+        "path": "foundation/git-remote",
+        "blockId": "trainer-gitsim-remote",
+        "trainerId": "trainer-gitsim-remote"
+      }
+    ]
+  },
+  {
+    "component": "MatchPairs",
+    "exercises": [
+      {
+        "title": "Мини-повторение: действия программ",
+        "chapterId": "it-english",
+        "track": "foundation",
+        "path": "foundation/it-english",
+        "blockId": "trainer-recall-actions",
+        "trainerId": "trainer-recall-actions"
+      },
+      {
+        "title": "Мини-повторение: файлы и система",
+        "chapterId": "it-english",
+        "track": "foundation",
+        "path": "foundation/it-english",
+        "blockId": "trainer-recall-files",
+        "trainerId": "trainer-recall-files"
+      },
+      {
+        "title": "Мини-повторение: слова из кода",
+        "chapterId": "it-english",
+        "track": "foundation",
+        "path": "foundation/it-english",
+        "blockId": "trainer-recall-code-words",
+        "trainerId": "trainer-recall-code-words"
+      },
+      {
+        "title": "Мини-повторение: глаголы git",
+        "chapterId": "it-english",
+        "track": "foundation",
+        "path": "foundation/it-english",
+        "blockId": "trainer-recall-git-verbs",
+        "trainerId": "trainer-recall-git-verbs"
+      },
+      {
+        "title": "Найди пары: слово и перевод",
+        "chapterId": "02b-english-practice",
+        "track": "foundation",
+        "path": "foundation/02b-english-practice",
+        "blockId": "trainer-match-pairs",
+        "trainerId": "trainer-match-pairs"
+      }
+    ]
+  },
+  {
+    "component": "WordOrder",
+    "exercises": [
+      {
+        "title": "Собери перевод: No such file or directory",
+        "chapterId": "it-english",
+        "track": "foundation",
+        "path": "foundation/it-english",
+        "blockId": "trainer-wordorder-no-such-file",
+        "trainerId": "trainer-wordorder-no-such-file"
+      },
+      {
+        "title": "Собери перевод: Permission denied",
+        "chapterId": "it-english",
+        "track": "foundation",
+        "path": "foundation/it-english",
+        "blockId": "trainer-wordorder-permission-denied",
+        "trainerId": "trainer-wordorder-permission-denied"
+      },
+      {
+        "title": "Собери по-английски: создай новую ветку",
+        "chapterId": "02b-english-practice",
+        "track": "foundation",
+        "path": "foundation/02b-english-practice",
+        "blockId": "trainer-wordorder-branch",
+        "trainerId": "trainer-wordorder-branch"
+      },
+      {
+        "title": "Собери по-английски: запусти тесты ещё раз",
+        "chapterId": "02b-english-practice",
+        "track": "foundation",
+        "path": "foundation/02b-english-practice",
+        "blockId": "trainer-wordorder-tests",
+        "trainerId": "trainer-wordorder-tests"
+      }
+    ]
+  },
+  {
+    "component": "HotkeyTrainer",
+    "exercises": [
+      {
+        "title": "Хоткеи WebStorm",
+        "chapterId": "waves-first-network",
+        "track": "blockchain",
+        "path": "blockchain/waves-first-network",
+        "blockId": "trainer-webstorm-hotkeys",
+        "trainerId": "trainer-webstorm-hotkeys"
+      },
+      {
+        "title": "Тренажёр горячих клавиш",
+        "chapterId": "typing",
+        "track": "foundation",
+        "path": "foundation/typing",
+        "blockId": "trainer-hotkeys",
+        "trainerId": "trainer-hotkeys"
+      },
+      {
+        "title": "Тренажёр горячих клавиш",
+        "chapterId": "android-studio",
+        "track": "mobile",
+        "path": "mobile/android-studio",
+        "blockId": "trainer-hotkeys",
+        "trainerId": "trainer-hotkeys"
+      }
+    ]
+  },
+  {
+    "component": "WizardOrder",
+    "exercises": [
+      {
+        "title": "Порядок первого запуска проекта",
+        "chapterId": "waves-first-network",
+        "track": "blockchain",
+        "path": "blockchain/waves-first-network",
+        "blockId": "trainer-webstorm-first-run",
+        "trainerId": "trainer-webstorm-first-run"
+      },
+      {
+        "title": "Порядок шагов мастера",
+        "chapterId": "android-studio",
+        "track": "mobile",
+        "path": "mobile/android-studio",
+        "blockId": "trainer-wizard-order",
+        "trainerId": "trainer-wizard-order"
+      },
+      {
+        "title": "Порядок шагов мастера AVD",
+        "chapterId": "android-studio",
+        "track": "mobile",
+        "path": "mobile/android-studio",
+        "blockId": "trainer-avd-wizard-order",
+        "trainerId": "trainer-avd-wizard-order"
+      }
+    ]
+  },
+  {
+    "component": "ComposePreview",
+    "exercises": [
+      {
+        "title": "Живой мокап: покрути WelcomeScreen",
+        "chapterId": "first-compose-screen",
+        "track": "mobile",
+        "path": "mobile/first-compose-screen",
+        "blockId": "trainer-compose-preview",
+        "trainerId": "trainer-compose-preview"
+      },
+      {
+        "title": "Живой мокап: покрути карточку товара",
+        "chapterId": "layout-card",
+        "track": "mobile",
+        "path": "mobile/layout-card",
+        "blockId": "trainer-card-preview",
+        "trainerId": "trainer-card-preview"
+      }
+    ]
+  },
+  {
+    "component": "SelectionSandbox",
+    "exercises": [
+      {
+        "title": "Тренажёр: выдели и скопируй ссылку",
+        "chapterId": "github-start",
+        "track": "foundation",
+        "path": "foundation/github-start",
+        "blockId": "trainer-copy-link",
+        "trainerId": "trainer-copy-link"
+      },
+      {
+        "title": "Тренажёр выделения текста",
+        "chapterId": "typing",
+        "track": "foundation",
+        "path": "foundation/typing",
+        "blockId": "trainer-selection",
+        "trainerId": "trainer-selection"
+      }
+    ]
+  },
+  {
+    "component": "TranslatorBox",
+    "exercises": [
+      {
+        "title": "Открыть в переводчике",
+        "chapterId": "it-english",
+        "track": "foundation",
+        "path": "foundation/it-english",
+        "blockId": "trainer-translator-box",
+        "trainerId": "trainer-translator-box"
+      },
+      {
+        "title": "Попробуй сам: фраза в переводчиках",
+        "chapterId": "02b-english-practice",
+        "track": "foundation",
+        "path": "foundation/02b-english-practice",
+        "blockId": "trainer-translator-box",
+        "trainerId": "trainer-translator-box"
+      }
+    ]
+  },
+  {
+    "component": "ApiVisToggle",
+    "exercises": [
+      {
+        "title": "api или implementation: что видит :app",
+        "chapterId": "ui-kit",
+        "track": "mobile",
+        "path": "mobile/ui-kit",
+        "blockId": "trainer-api-vis",
+        "trainerId": "trainer-api-vis"
+      }
+    ]
+  },
+  {
+    "component": "BlockChainDemo",
+    "exercises": [
+      {
+        "title": "Цепочка блоков: испорти и почини",
+        "chapterId": "what-is-blockchain",
+        "track": "blockchain",
+        "path": "blockchain/what-is-blockchain",
+        "blockId": "trainer-blockchain-demo",
+        "trainerId": "trainer-blockchain-demo"
+      }
+    ]
+  },
+  {
+    "component": "BugHunt",
+    "exercises": [
+      {
+        "title": "Охота на ошибки: кликни строку",
+        "chapterId": "kotlin-vars",
+        "track": "mobile",
+        "path": "mobile/kotlin-vars",
+        "blockId": "trainer-bug-hunt",
+        "trainerId": "trainer-bug-hunt"
+      }
+    ]
+  },
+  {
+    "component": "CallTracer",
+    "exercises": [
+      {
+        "title": "Трассировка вызова: функция + map с лямбдой",
+        "chapterId": "functions-lambdas",
+        "track": "mobile",
+        "path": "mobile/functions-lambdas",
+        "blockId": "trainer-call-tracer",
+        "trainerId": "trainer-call-tracer"
+      }
+    ]
+  },
+  {
+    "component": "CardAssembler",
+    "exercises": [
+      {
+        "title": "Собери структуру карточки",
+        "chapterId": "layout-card",
+        "track": "mobile",
+        "path": "mobile/layout-card",
+        "blockId": "trainer-card-assembler",
+        "trainerId": "trainer-card-assembler"
+      }
+    ]
+  },
+  {
+    "component": "ChmodCalc",
+    "exercises": [
+      {
+        "title": "Калькулятор прав chmod",
+        "chapterId": "files-packages-ssh",
+        "track": "foundation",
+        "path": "foundation/files-packages-ssh",
+        "blockId": "trainer-chmod-calc",
+        "trainerId": "trainer-chmod-calc"
+      }
+    ]
+  },
+  {
+    "component": "CodeSketchMatch",
+    "exercises": [
+      {
+        "title": "Код ↔ скетч: что нарисует этот фрагмент",
+        "chapterId": "first-compose-screen",
+        "track": "mobile",
+        "path": "mobile/first-compose-screen",
+        "blockId": "trainer-code-sketch",
+        "trainerId": "trainer-code-sketch"
+      }
+    ]
+  },
+  {
+    "component": "CommitMsgBuilder",
+    "exercises": [
+      {
+        "title": "Конструктор сообщения коммита",
+        "chapterId": "git-first-commit",
+        "track": "foundation",
+        "path": "foundation/git-first-commit",
+        "blockId": "trainer-msg-builder",
+        "trainerId": "trainer-msg-builder"
+      }
+    ]
+  },
+  {
+    "component": "ComposeBuilder",
+    "exercises": [
+      {
+        "title": "Собери docker-compose.yml",
+        "chapterId": "waves-first-network",
+        "track": "blockchain",
+        "path": "blockchain/waves-first-network",
+        "blockId": "trainer-compose-builder",
+        "trainerId": "trainer-compose-builder"
+      }
+    ]
+  },
+  {
+    "component": "DataClassBuilder",
+    "exercises": [
+      {
+        "title": "Собери свой data class",
+        "chapterId": "classes-collections",
+        "track": "mobile",
+        "path": "mobile/classes-collections",
+        "blockId": "trainer-data-class-builder",
+        "trainerId": "trainer-data-class-builder"
+      }
+    ]
+  },
+  {
+    "component": "DockerCmdQuest",
+    "exercises": [
+      {
+        "title": "Порядок команд: от конфигов до остановки",
+        "chapterId": "waves-first-network",
+        "track": "blockchain",
+        "path": "blockchain/waves-first-network",
+        "blockId": "trainer-cmd-order",
+        "trainerId": "trainer-cmd-order"
+      }
+    ]
+  },
+  {
+    "component": "ErrorTranslator",
+    "exercises": [
+      {
+        "title": "Переводчик ошибок",
+        "chapterId": "it-english",
+        "track": "foundation",
+        "path": "foundation/it-english",
+        "blockId": "trainer-error-translator",
+        "trainerId": "trainer-error-translator"
+      }
+    ]
+  },
+  {
+    "component": "EyeDp",
+    "exercises": [
+      {
+        "title": "Глазомер: сколько тут dp?",
+        "chapterId": "layout-by-mockup",
+        "track": "mobile",
+        "path": "mobile/layout-by-mockup",
+        "blockId": "trainer-eye-dp",
+        "trainerId": "trainer-eye-dp"
+      }
+    ]
+  },
+  {
+    "component": "FetchPullViz",
+    "exercises": [
+      {
+        "title": "Схема по шагам: fetch, merge и pull",
+        "chapterId": "git-remote",
+        "track": "foundation",
+        "path": "foundation/git-remote",
+        "blockId": "trainer-fetch-pull-viz",
+        "trainerId": "trainer-fetch-pull-viz"
+      }
+    ]
+  },
+  {
+    "component": "FsTreeViz",
+    "exercises": [
+      {
+        "title": "Дерево файловой системы: куда ведёт cd",
+        "chapterId": "linux-terminal",
+        "track": "foundation",
+        "path": "foundation/linux-terminal",
+        "blockId": "trainer-fstree",
+        "trainerId": "trainer-fstree"
+      }
+    ]
+  },
+  {
+    "component": "GitStatusReader",
+    "exercises": [
+      {
+        "title": "Что попадёт в коммит?",
+        "chapterId": "git-first-commit",
+        "track": "foundation",
+        "path": "foundation/git-first-commit",
+        "blockId": "trainer-status-reader",
+        "trainerId": "trainer-status-reader"
+      }
+    ]
+  },
+  {
+    "component": "HashPlayground",
+    "exercises": [
+      {
+        "title": "Живой SHA-256: лавинный эффект",
+        "chapterId": "what-is-blockchain",
+        "track": "blockchain",
+        "path": "blockchain/what-is-blockchain",
+        "blockId": "trainer-hash-playground",
+        "trainerId": "trainer-hash-playground"
+      }
+    ]
+  },
+  {
+    "component": "IdeTour",
+    "exercises": [
+      {
+        "title": "Схема окна: найди панель",
+        "chapterId": "android-studio",
+        "track": "mobile",
+        "path": "mobile/android-studio",
+        "blockId": "trainer-ide-tour",
+        "trainerId": "trainer-ide-tour"
+      }
+    ]
+  },
+  {
+    "component": "MapFilterViz",
+    "exercises": [
+      {
+        "title": "Конвейер map и filter",
+        "chapterId": "kotlin-collections",
+        "track": "mobile",
+        "path": "mobile/kotlin-collections",
+        "blockId": "trainer-map-filter-viz",
+        "trainerId": "trainer-map-filter-viz"
+      }
+    ]
+  },
+  {
+    "component": "MemoryViz",
+    "exercises": [
+      {
+        "title": "Ячейки памяти: val против var",
+        "chapterId": "kotlin-vars",
+        "track": "mobile",
+        "path": "mobile/kotlin-vars",
+        "blockId": "trainer-memory-viz",
+        "trainerId": "trainer-memory-viz"
+      }
+    ]
+  },
+  {
+    "component": "MiniFileManager",
+    "exercises": [
+      {
+        "title": "Мини-файловый менеджер",
+        "chapterId": "linux-terminal",
+        "track": "foundation",
+        "path": "foundation/linux-terminal",
+        "blockId": "trainer-file-manager",
+        "trainerId": "trainer-file-manager"
+      }
+    ]
+  },
+  {
+    "component": "ModifierChain",
+    "exercises": [
+      {
+        "title": "Собери цепочку Modifier в нужном порядке",
+        "chapterId": "first-compose-screen",
+        "track": "mobile",
+        "path": "mobile/first-compose-screen",
+        "blockId": "trainer-modifier-order",
+        "trainerId": "trainer-modifier-order"
+      }
+    ]
+  },
+  {
+    "component": "ModuleGraph",
+    "exercises": [
+      {
+        "title": "Собери граф зависимостей",
+        "chapterId": "ui-kit",
+        "track": "mobile",
+        "path": "mobile/ui-kit",
+        "blockId": "trainer-module-graph",
+        "trainerId": "trainer-module-graph"
+      }
+    ]
+  },
+  {
+    "component": "ModuleSort",
+    "exercises": [
+      {
+        "title": "Разложи по модулям",
+        "chapterId": "ui-kit",
+        "track": "mobile",
+        "path": "mobile/ui-kit",
+        "blockId": "trainer-module-sort",
+        "trainerId": "trainer-module-sort"
+      }
+    ]
+  },
+  {
+    "component": "NanoQuest",
+    "exercises": [
+      {
+        "title": "Тренажёр nano: сохранить и выйти",
+        "chapterId": "files-packages-ssh",
+        "track": "foundation",
+        "path": "foundation/files-packages-ssh",
+        "blockId": "trainer-nano-quest",
+        "trainerId": "trainer-nano-quest"
+      }
+    ]
+  },
+  {
+    "component": "NodeNetSim",
+    "exercises": [
+      {
+        "title": "Симулятор сети из трёх нод",
+        "chapterId": "waves-first-network",
+        "track": "blockchain",
+        "path": "blockchain/waves-first-network",
+        "blockId": "trainer-node-net",
+        "trainerId": "trainer-node-net"
+      }
+    ]
+  },
+  {
+    "component": "PermQuest",
+    "exercises": [
+      {
+        "title": "Квест: кто и что может с файлом",
+        "chapterId": "files-packages-ssh",
+        "track": "foundation",
+        "path": "foundation/files-packages-ssh",
+        "blockId": "trainer-perm-quest",
+        "trainerId": "trainer-perm-quest"
+      }
+    ]
+  },
+  {
+    "component": "PowMiner",
+    "exercises": [
+      {
+        "title": "PoW-майнер: подбери nonce",
+        "chapterId": "what-is-blockchain",
+        "track": "blockchain",
+        "path": "blockchain/what-is-blockchain",
+        "blockId": "trainer-pow-miner",
+        "trainerId": "trainer-pow-miner"
+      }
+    ]
+  },
+  {
+    "component": "PRTrainer",
+    "exercises": [
+      {
+        "title": "Мини-ревью: найди три проблемы в diff",
+        "chapterId": "git-remote",
+        "track": "foundation",
+        "path": "foundation/git-remote",
+        "blockId": "trainer-pr-review",
+        "trainerId": "trainer-pr-review"
+      }
+    ]
+  },
+  {
+    "component": "RecompositionCounter",
+    "exercises": [
+      {
+        "title": "Счётчик перерисовок: кто перерисовался",
+        "chapterId": "state-events",
+        "track": "mobile",
+        "path": "mobile/state-events",
+        "blockId": "trainer-recomposition-counter",
+        "trainerId": "trainer-recomposition-counter"
+      }
+    ]
+  },
+  {
+    "component": "RememberSim",
+    "exercises": [
+      {
+        "title": "Симулятор: с remember и без",
+        "chapterId": "state-events",
+        "track": "mobile",
+        "path": "mobile/state-events",
+        "blockId": "trainer-remember-sim",
+        "trainerId": "trainer-remember-sim"
+      }
+    ]
+  },
+  {
+    "component": "ReverseQuiz",
+    "exercises": [
+      {
+        "title": "Обратный квиз: с русского на английский",
+        "chapterId": "02b-english-practice",
+        "track": "foundation",
+        "path": "foundation/02b-english-practice",
+        "blockId": "trainer-reverse-quiz",
+        "trainerId": "trainer-reverse-quiz"
+      }
+    ]
+  },
+  {
+    "component": "SignatureBuilder",
+    "exercises": [
+      {
+        "title": "Собери сигнатуру из кусочков",
+        "chapterId": "functions-lambdas",
+        "track": "mobile",
+        "path": "mobile/functions-lambdas",
+        "blockId": "trainer-signature-builder",
+        "trainerId": "trainer-signature-builder"
+      }
+    ]
+  },
+  {
+    "component": "SignDemo",
+    "exercises": [
+      {
+        "title": "Живая подпись: подпиши и попробуй подделать",
+        "chapterId": "what-is-blockchain",
+        "track": "blockchain",
+        "path": "blockchain/what-is-blockchain",
+        "blockId": "trainer-sign-demo",
+        "trainerId": "trainer-sign-demo"
+      }
+    ]
+  },
+  {
+    "component": "SshQuest",
+    "exercises": [
+      {
+        "title": "Квест: подключись к серверу по ключу",
+        "chapterId": "ssh-keys-deep",
+        "track": "advanced",
+        "path": "advanced/ssh-keys-deep",
+        "blockId": "trainer-ssh-connect",
+        "trainerId": "ssh-connect"
+      }
+    ]
+  }
+]
