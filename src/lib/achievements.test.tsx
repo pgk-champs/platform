@@ -216,3 +216,37 @@ test('50 graded words unlock "50-слов", sim run records "место-в-ли�
   expect(unlocked).toContain('половина-критериев');
   expect(unlocked).not.toContain('результат-чемпиона');
 });
+
+test('достижения не ссылаются на несуществующие главы и тренажёры', async () => {
+  // В условиях достижений id глав и тренажёров зашиты руками. Пока реестра
+  // тренажёров не было, сверить их было не с чем; теперь есть. Проверка
+  // 17.09.2026 показала 15 ссылок и 0 битых — страж держит это состояние:
+  // переименуют тренажёр в главе, и достижение станет недостижимым молча.
+  const [src, km, reg] = await Promise.all([
+    import('fs').then((fs) => fs.readFileSync('src/lib/achievements.ts', 'utf8')),
+    import('../data/knowledge-map.json').then((m) => m.default),
+    import('../data/trainers.json').then((m) => m.default),
+  ]);
+  const chapters = new Set((km as { id: string }[]).map((c) => c.id));
+  const totals = Object.fromEntries(
+    (km as { id: string; totals: { trainers: number } }[]).map((c) => [c.id, c.totals.trainers]),
+  );
+  const pairs = new Set(
+    (reg as { exercises: { chapterId: string; trainerId: string }[] }[]).flatMap((m) =>
+      m.exercises.map((e) => `${e.chapterId}|${e.trainerId}`),
+    ),
+  );
+
+  const broken: string[] = [];
+  for (const m of src.matchAll(/trainerDone\(\s*s\s*,\s*'([^']+)'\s*,\s*'([^']+)'/g))
+    if (!pairs.has(`${m[1]}|${m[2]}`)) broken.push(`trainerDone ${m[1]}/${m[2]}`);
+  for (const m of src.matchAll(/s\.trainers\['([^']+)'\]\?\.\['([^']+)'\]/g))
+    if (!pairs.has(`${m[1]}|${m[2]}`)) broken.push(`s.trainers ${m[1]}/${m[2]}`);
+  for (const m of src.matchAll(/chapterTrainerCount\(\s*s\s*,\s*'([^']+)'\s*\)\s*>=\s*(\d+)/g)) {
+    if (!chapters.has(m[1])) broken.push(`нет главы ${m[1]}`);
+    else if (totals[m[1]] < Number(m[2]))
+      broken.push(`${m[1]}: нужно ${m[2]}, в главе ${totals[m[1]]}`);
+  }
+
+  expect(broken).toEqual([]);
+});
