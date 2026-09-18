@@ -1,5 +1,6 @@
 import { render, screen, act } from '@testing-library/react';
 import { store } from '../lib/store';
+import { xpForLevel } from '../lib/levels';
 import AchievementsWatcher from './AchievementsWatcher';
 
 beforeEach(() => {
@@ -62,7 +63,8 @@ test('shows a +N XP toast on every XP gain, but not for XP already stored before
 test('shows a big level-up toast when XP crosses into a new level', () => {
   render(<AchievementsWatcher />);
   act(() => {
-    store.addXp(60, 'test'); // порог 2-го уровня — 50 XP (см. lib/levels.ts)
+    // Порог берём из самой шкалы: её пересчитывают, когда растёт контент.
+    store.addXp(xpForLevel(2), 'test');
   });
   expect(screen.getByText(/Новый уровень 2:/)).toBeTruthy();
 });

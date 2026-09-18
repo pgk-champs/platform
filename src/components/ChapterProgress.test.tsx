@@ -3,6 +3,7 @@ import { render, screen, act } from '@testing-library/react';
 // чтобы проверить: первый рендер не заглядывает в store (hydration mismatch).
 import { renderToStaticMarkup } from 'react-dom/server';
 import { store } from '../lib/store';
+import { xpForLevel } from '../lib/levels';
 import ChapterProgress from './ChapterProgress';
 
 // ChapterTour (онбординг-тур Driver.js) — отдельная забота со своими
@@ -95,7 +96,8 @@ test('shows the level badge derived from total XP', () => {
   expect(screen.getByText(/Уровень 1 · Новичок/)).toBeTruthy();
 
   act(() => {
-    store.addXp(60, 'test'); // порог 2-го уровня — 50 XP
+    // Порог берём из самой шкалы: её пересчитывают, когда растёт контент.
+    store.addXp(xpForLevel(2), 'test');
   });
   expect(screen.getByText(/Уровень 2 · Стажёр/)).toBeTruthy();
 });
@@ -118,7 +120,7 @@ test('первый (серверный) рендер не зависит от st
   store.setSectionRead('typing', 'intro');
   store.markQuizDone('typing', 'q1', { correct: 2, total: 2 });
   store.markTrainerDone('typing', 't1', { cpm: 100, accuracy: 90 });
-  store.addXp(60, 'test');
+  store.addXp(xpForLevel(2), 'test');
 
   const html = renderToStaticMarkup(
     <ChapterProgress chapterId="typing" totalSections={4} totalQuizzes={2} totalTrainers={3} />,

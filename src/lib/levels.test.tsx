@@ -40,3 +40,29 @@ test('caps at MAX_LEVEL / Чемпион — no level beyond the last title', ()
   expect(info.progress).toBe(1);
   expect(info.xpToNext).toBe(0);
 });
+
+test('шкала откалибрована под реальный объём платформы', async () => {
+  // Тот самый дефект, ради которого шкалу и переписали 18.09.2026: её
+  // откалибровали при 22 главах, глав стало 137, а числа остались — максимум
+  // брался за шесть глав, и 95 % программы не двигали ничего.
+  //
+  // Оценка XP снизу: квиз 20, тренажёр 10. Настоящие начисления выше (экзамен
+  // главы 40, экзамен блока 100, часть тренажёров 25), поэтому это нижняя
+  // граница — если даже по ней максимум недосягаем, кривая точно задрана.
+  const km = (await import('../data/knowledge-map.json')).default as {
+    totals: { quizzes: number };
+  }[];
+  const reg = (await import('../data/trainers.json')).default as { exercises: unknown[] }[];
+  const quizzes = km.reduce((s, c) => s + c.totals.quizzes, 0);
+  const trainers = reg.reduce((s, m) => s + m.exercises.length, 0);
+  const contentXp = quizzes * 20 + trainers * 10;
+
+  const max = xpForLevel(MAX_LEVEL);
+  // Максимум обязан быть достижим, но не раньше самого конца программы.
+  expect(max).toBeGreaterThan(contentXp * 0.6);
+  expect(max).toBeLessThan(contentXp * 1.2);
+
+  // И при этом старт остаётся быстрым: второй уровень дешевле средней главы.
+  const avgChapter = contentXp / km.length;
+  expect(xpForLevel(2)).toBeLessThan(avgChapter);
+});
