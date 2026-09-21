@@ -77,6 +77,10 @@ export function mergeProgress(a = {}, b = {}) {
     achievementsUnlocked: mergeArray(a.achievementsUnlocked, b.achievementsUnlocked),
     dismissedHints: mergeArray(a.dismissedHints, b.dismissedHints),
     xpAwarded: mergeArray(a.xpAwarded, b.xpAwarded),
+    // Следы материалов сообщества: 'sub:<id>' отправлено, 'ok:<id>' принято.
+    // Один массив, а не объект с двумя полями: так работает то же слияние
+    // объединением, что и у xpAwarded, и достижения читают по префиксу.
+    community: mergeArray(a.community, b.community),
     xp: Math.max(num(a.xp), num(b.xp)),
     quizLog: dedupeLog([...(Array.isArray(a.quizLog) ? a.quizLog : []), ...(Array.isArray(b.quizLog) ? b.quizLog : [])]),
     wordWeights: mergeWordWeights(a.wordWeights, b.wordWeights),

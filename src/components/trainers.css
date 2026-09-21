@@ -10021,3 +10021,47 @@
 .fav-tools .gc-search {
   margin-bottom: 0.6rem;
 }
+
+/* «Моё» в каталоге: что я прислал и чем это кончилось. Статус первым — это
+   единственное, ради чего сюда смотрят. */
+.cc-mine {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.cc-mine-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+}
+
+.cc-mine-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--ifm-color-emphasis-100);
+}
+
+.cc-mine-status {
+  flex: none;
+  min-width: 7.5rem;
+  font-size: 0.78rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.cc-mine-approved .cc-mine-status {
+  color: var(--pgk-text-success);
+}
+
+.cc-mine-rejected .cc-mine-status {
+  color: var(--ifm-color-emphasis-600);
+  text-decoration: line-through;
+}
+
+.cc-mine-title {
+  flex: 1;
+  min-width: 0;
+}

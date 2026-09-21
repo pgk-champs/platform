@@ -224,6 +224,8 @@ const approvedCommunity = db.prepare(`SELECT id, type, chapter_id, title, data, 
 const communityByStatus = db.prepare(`SELECT id, type, chapter_id, title, data, author_login, status, created_at
   FROM community WHERE status = ? ORDER BY created_at DESC LIMIT 500`);
 const setCommunityStatus = db.prepare('UPDATE community SET status = ?, reviewed_by = ?, reviewed_at = ? WHERE id = ?');
+const myCommunity = db.prepare(`SELECT id, type, chapter_id, title, status, created_at, reviewed_at
+  FROM community WHERE author_gh_id = ? ORDER BY created_at DESC LIMIT 100`);
 const pendingCountForUser = db.prepare("SELECT COUNT(*) AS n FROM community WHERE author_gh_id = ? AND status = 'pending'");
 
 const COMMUNITY_TYPES = new Set(['preset', 'repo', 'link', 'video', 'source']);
@@ -1381,6 +1383,24 @@ const server = http.createServer(async (req, res) => {
         created_at: Date.now(),
       });
       return json(res, 200, { ok: true });
+    }
+
+    // Свои материалы: что я прислал и чем это кончилось. Без этой ручки
+    // автор отправлял в каталог и больше ничего не узнавал — ни «принято»,
+    // ни «отклонено» ему не показывалось нигде.
+    if (path === '/community/mine' && req.method === 'GET') {
+      const s2 = bearer(req);
+      if (!s2) return json(res, 401, { error: 'unauthorized' });
+      return json(res, 200, {
+        items: myCommunity.all(s2.id).map((r) => ({
+          id: r.id,
+          type: r.type,
+          title: r.title,
+          chapterId: r.chapter_id || undefined,
+          status: r.status,
+          addedAt: new Date(r.created_at).toISOString().slice(0, 10),
+        })),
+      });
     }
 
     // Очередь модерации (наставник).

@@ -12,7 +12,7 @@ test('в шапке рисует плашку со счётом достижен
   const link = container.querySelector('a.xpb');
   expect(link).toBeTruthy();
   expect(link).toHaveAttribute('href', '/achievements');
-  expect(container.querySelector('.xpb-ach')?.textContent).toContain('110');
+  expect(container.querySelector('.xpb-ach')?.textContent).toContain('112');
 });
 
 test('огонёк серии не рисуется, пока серии нет', () => {
@@ -28,7 +28,7 @@ test('в бургере это пункт списка, а не плашка', (
   const item = container.querySelector('li.menu__list-item a.menu__link');
   expect(item).toBeTruthy();
   expect(item).toHaveAttribute('href', '/achievements');
-  expect(screen.getByText(/Достижения 0\/110/)).toBeTruthy();
+  expect(screen.getByText(/Достижения 0\/112/)).toBeTruthy();
 });
 
 test('переход в бургере закрывает сайдбар', () => {

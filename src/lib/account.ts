@@ -733,3 +733,35 @@ export async function apiKeyLog(id: number): Promise<ApiLogRow[]> {
     return [];
   }
 }
+
+// --- свои материалы в каталоге ---
+
+export type MyMaterial = {
+  id: number;
+  type: string;
+  title: string;
+  chapterId?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  addedAt: string;
+};
+
+/**
+ * Что я прислал и чем это кончилось. Раньше автор отправлял материал и
+ * больше ничего не узнавал: ни «принято», ни «отклонено» не показывалось.
+ * Попутно оставляет след в store, чтобы достижения про вклад считались и
+ * без сети — их проверки читают снимок, а не сервер.
+ */
+export async function fetchMyMaterials(): Promise<MyMaterial[]> {
+  try {
+    const r = await api('/community/mine');
+    if (!r.ok) return [];
+    const items = ((await r.json()).items ?? []) as MyMaterial[];
+    store.noteCommunity([
+      ...items.map((i) => `sub:${i.id}`),
+      ...items.filter((i) => i.status === 'approved').map((i) => `ok:${i.id}`),
+    ]);
+    return items;
+  } catch {
+    return [];
+  }
+}

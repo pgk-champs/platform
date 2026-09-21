@@ -1303,6 +1303,24 @@ export const ACHIEVEMENTS: Achievement[] = [
     hidden: true,
     check: (s) => s.dismissedHints.length >= 10,
   },
+  {
+    id: 'поделился',
+    title: 'Поделился',
+    desc: 'Прислан материал в каталог сообщества',
+    icon: '📨',
+    category: 'вклад',
+    rarity: 'обычное',
+    check: (s) => s.community.some((m) => m.startsWith('sub:')),
+  },
+  {
+    id: 'приняли',
+    title: 'Приняли',
+    desc: 'Материал прошёл проверку и появился в каталоге',
+    icon: '🎁',
+    category: 'вклад',
+    rarity: 'редкое',
+    check: (s) => s.community.some((m) => m.startsWith('ok:')),
+  },
   // --- мета: только в самом конце ---
   {
     id: '20-достижений',

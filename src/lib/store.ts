@@ -71,6 +71,12 @@ type State = {
   /** Уже оплаченные разовые начисления — reason из addXp (см. addXp). */
   xpAwarded: string[];
   achievementsUnlocked: string[];
+  /**
+   * Следы материалов сообщества: 'sub:<id>' отправлено, 'ok:<id>' принято.
+   * Один массив, а не объект: так работает то же слияние объединением, что
+   * и у xpAwarded, а достижения читают его по префиксу.
+   */
+  community: string[];
   prefs: {
     os?: OsId;
     name?: string;
@@ -114,6 +120,7 @@ function emptyState(): State {
     xp: 0,
     xpAwarded: [],
     achievementsUnlocked: [],
+    community: [],
     prefs: {},
     tocCollapsed: {},
     quizLog: [],
@@ -407,6 +414,14 @@ function achUnlock(id: string): boolean {
   state.achievementsUnlocked = [...state.achievementsUnlocked, id];
   persist();
   return true;
+}
+
+/** Отметить свои материалы: дописывает то, чего ещё нет. */
+function noteCommunity(marks: string[]): void {
+  const свежие = marks.filter((m) => !state.community.includes(m));
+  if (свежие.length === 0) return;
+  state.community = [...state.community, ...свежие].slice(-500);
+  persist();
 }
 
 function achList(): string[] {
@@ -727,6 +742,7 @@ export const store = {
   markQuizDone,
   markTrainerDone,
   favorites: { add: favAdd, remove: favRemove, list: favList, isFavorite: favIsFavorite },
+  noteCommunity,
   dismissHint,
   isHintDismissed,
   addXp,

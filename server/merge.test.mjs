@@ -110,3 +110,10 @@ test('список надгробий не растёт бесконечно', (
   const out = mergeProgress({ removed: много }, { removed: [] });
   assert.equal(out.removed.length, 500);
 });
+
+test('следы материалов сообщества сливаются объединением', () => {
+  // Отправлял с ноутбука, приняли — увидел с телефона: следы должны сойтись,
+  // а не затереть друг друга.
+  const out = mergeProgress({ community: ['sub:1'] }, { community: ['sub:1', 'ok:1', 'sub:2'] });
+  assert.deepEqual(out.community.sort(), ['ok:1', 'sub:1', 'sub:2']);
+});

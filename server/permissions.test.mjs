@@ -194,3 +194,31 @@ test('карточка ученика говорит, КАКИЕ тренажё�
   assert.equal(зал.trainers, 2);
   assert.ok(зал.trainerIds.includes('preset:abc12'), 'набор не виден наставнику');
 });
+
+test('автор видит судьбу своего материала', пропуск, async () => {
+  // Раньше он отправлял в каталог и больше не узнавал ничего: ни «принято»,
+  // ни «отклонено» не показывалось нигде.
+  const root = await tok('root');
+  const автор = await tok('katya');
+  await call(автор, '/community', {
+    method: 'POST',
+    body: JSON.stringify({
+      type: 'preset',
+      title: 'Мой набор',
+      data: { name: 'Мой набор', engine: 'wordorder', phrase: 'раз два' },
+    }),
+  });
+
+  const моё = await call(автор, '/community/mine');
+  assert.equal(моё.status, 200);
+  assert.equal(моё.body.items.length, 1);
+  assert.equal(моё.body.items[0].status, 'pending');
+
+  await call(root, `/mentor/community/${моё.body.items[0].id}`, { method: 'POST', body: '{"action":"approve"}' });
+  const после = await call(автор, '/community/mine');
+  assert.equal(после.body.items[0].status, 'approved');
+
+  // чужого в своей выдаче нет
+  const другой = await call(await tok('petya'), '/community/mine');
+  assert.deepEqual(другой.body.items, []);
+});
