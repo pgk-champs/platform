@@ -5,7 +5,10 @@ description: Инструкция для внешних сервисов и не
 
 :::tip Для нейросети
 
-Отдай модели [сырой файл](/api.md) целиком — он самодостаточен: `https://edu.alspio.com/api.md`
+Отдай модели сырой файл целиком — он самодостаточен: <a href="https://edu.alspio.com/api.md">https://edu.alspio.com/api.md</a>
+
+Ссылка абсолютная НАМЕРЕННО: `/api.md` — статический файл, а не страница сайта,
+и markdown-ссылку на него Docusaurus считает битой (onBrokenLinks: throw).
 
 ```bash
 curl -s https://edu.alspio.com/api.md
