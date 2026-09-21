@@ -337,9 +337,16 @@ function readBody(req, limit = 1_000_000) {
   });
 }
 const safeReturn = (ret) => {
-  // возвращаем только на свой сайт, чужие адреса игнорируем
+  // Возвращаем ТОЛЬКО на свой сайт. Сравнивать надо разобранный origin, а не
+  // начало строки: проверка startsWith пропускала адрес вида
+  // https://edu.alspio.com.чужой.example/ — и после входа туда уезжал
+  // сессионный токен во фрагменте, то есть полный доступ к чужому аккаунту на
+  // 180 дней. Поймано 21.09.2026 при разборе публичного API.
   try {
-    if (ret && ORIGINS.some((o) => ret.startsWith(o))) return ret;
+    if (!ret) return `${BASE_URL}/`;
+    const u = new URL(ret, BASE_URL);
+    if (u.protocol !== 'https:' && u.protocol !== 'http:') return `${BASE_URL}/`;
+    if (ORIGINS.includes(u.origin)) return u.toString();
   } catch {}
   return `${BASE_URL}/`;
 };
