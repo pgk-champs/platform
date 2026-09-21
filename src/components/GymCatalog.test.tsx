@@ -80,3 +80,19 @@ test('метка «запускается» не врёт', () => {
   expect(container.querySelectorAll('.gc-tag-run')).toHaveLength(RUNNABLE.length);
   expect(container.querySelectorAll('.gc-run')).toHaveLength(RUNNABLE.length);
 });
+
+test('у каждой карточки есть глиф', () => {
+  const { container } = render(<GymCatalog />);
+  expect(container.querySelectorAll('.gc-card .gc-glyph')).toHaveLength(46);
+});
+
+test('глифов десять семейств, а не сорок шесть картинок', () => {
+  // На 22 пикселях сорок шесть уникальных значков не информативнее десяти,
+  // зато список стал бы неподъёмным. Тест стережёт это решение от разрастания.
+  const { container } = render(<GymCatalog />);
+  const shapes = new Set(
+    [...container.querySelectorAll('.gc-glyph')].map((g) => g.innerHTML),
+  );
+  expect(shapes.size).toBeLessThanOrEqual(12);
+  expect(shapes.size).toBeGreaterThanOrEqual(6);
+});

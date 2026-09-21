@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import Link from '@docusaurus/Link';
 import { buildCards, filterCards, chipCounts, type GymCard } from '../lib/gym';
 import { plural } from '../lib/plural';
+import TrainerGlyph from './TrainerGlyph';
 import CodeTyping, { PRESET_POOLS } from './CodeTyping';
 import TerminalSim, { type JsonTree } from './TerminalSim';
 import GitSim, { type GitSimScenario } from './GitSim';
@@ -124,6 +125,7 @@ function Card({ card }: { card: GymCard }) {
   return (
     <div className="gc-card">
       <div className="gc-head">
+        <TrainerGlyph id={card.glyph} />
         <span className="gc-name">{card.name}</span>
         <span className={`gc-tag ${Runner ? 'gc-tag-run' : ''}`}>
           {Runner ? 'запускается' : 'в главе'}

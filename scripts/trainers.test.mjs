@@ -92,3 +92,29 @@ test('у каждой механики есть подпись', () => {
   const extra = [...named].filter((c) => !REG.some((r) => r.component === c));
   assert.deepEqual(extra, [], `подпись есть, а тренажёра нет: ${extra.join(', ')}`);
 });
+
+test('у каждой механики есть глиф, и он из известного семейства', () => {
+  // Глифов десять на 46 механик — семейства по роду упражнения. Новая
+  // механика без глифа роняет тест: иначе карточка молча осталась бы без
+  // значка, а заметили бы это нескоро.
+  const names = fs.readFileSync('src/data/trainer-names.ts', 'utf8');
+  const known = new Set(
+    [...fs.readFileSync('src/components/TrainerGlyph.tsx', 'utf8').matchAll(/^  (\w+): '/gm)].map(
+      (m) => m[1],
+    ),
+  );
+  assert.ok(known.size >= 5, `семейств глифов найдено ${known.size}`);
+
+  const bad = [];
+  for (const { component } of REG) {
+    const row = new RegExp(`^  ${component}: \\{([^\n]*)\\},$`, 'm').exec(names);
+    if (!row) {
+      bad.push(`${component}: нет записи`);
+      continue;
+    }
+    const g = /glyph: '(\w+)'/.exec(row[1]);
+    if (!g) bad.push(`${component}: нет глифа`);
+    else if (!known.has(g[1])) bad.push(`${component}: неизвестное семейство ${g[1]}`);
+  }
+  assert.deepEqual(bad, [], `глифы:\n${bad.join('\n')}`);
+});

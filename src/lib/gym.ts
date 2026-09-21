@@ -1,6 +1,7 @@
 import trainers from '../data/trainers.json';
 import knowledgeMap from '../data/knowledge-map.json';
 import { TRAINER_NAMES } from '../data/trainer-names';
+import type { GlyphId } from '../components/TrainerGlyph';
 import { store } from './store';
 
 // Логика Зала отдельно от вёрстки: vitest не резолвит @docusaurus/*, а сборку
@@ -20,6 +21,7 @@ export type GymCard = {
   component: string;
   name: string;
   blurb: string;
+  glyph: GlyphId;
   tracks: string[];
   count: number;
   runnable: boolean;
@@ -51,11 +53,12 @@ const TITLE_BY_ID: Record<string, string> = Object.fromEntries(
 export function buildCards(): GymCard[] {
   const progress = store.getProgress();
   return (trainers as Mechanic[]).map((m) => {
-    const meta = TRAINER_NAMES[m.component] ?? { name: m.component, blurb: '' };
+    const meta = TRAINER_NAMES[m.component] ?? { name: m.component, blurb: '', glyph: 'code' as GlyphId };
     return {
       component: m.component,
       name: meta.name,
       blurb: meta.blurb,
+      glyph: meta.glyph,
       tracks: [...new Set(m.exercises.map((e) => e.track))],
       count: m.exercises.length,
       runnable: RUNNABLE.includes(m.component),

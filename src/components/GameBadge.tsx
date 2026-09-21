@@ -43,16 +43,16 @@ export default function GameBadge({
     );
 
   return (
-    <Link className="gb" to="/achievements" title={label} aria-label={label}>
+    <Link className="xpb" to="/achievements" title={label} aria-label={label}>
       {s.streak > 0 && (
-        <span className="gb-streak">
-          <span className="gb-flame" aria-hidden="true" />
+        <span className="xpb-streak">
+          <span className="xpb-flame" aria-hidden="true" />
           {s.streak}
         </span>
       )}
-      <span className="gb-ach">
+      <span className="xpb-ach">
         {s.unlocked}
-        <span className="gb-slash" aria-hidden="true">
+        <span className="xpb-slash" aria-hidden="true">
           /
         </span>
         {s.total}

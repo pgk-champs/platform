@@ -48,16 +48,16 @@ function Card({ c, fill }: { c: Entry; fill: number | null }) {
 
   const pct = fill === null ? 0 : Math.round(fill * 100);
   return (
-    <Link className="tc-card" to={`/docs/${c.path.replace(/\.mdx?$/, '')}`}>
-      <span className="tc-num">{c.num}</span>
-      <span className="tc-title">{c.title}</span>
-      <span className="tc-parts">{parts.join(' · ')}</span>
-      {c.blockExam && <span className="tc-exam">экзамен по блоку</span>}
+    <Link className="tch-card" to={`/docs/${c.path.replace(/\.mdx?$/, '')}`}>
+      <span className="tch-num">{c.num}</span>
+      <span className="tch-title">{c.title}</span>
+      <span className="tch-parts">{parts.join(' · ')}</span>
+      {c.blockExam && <span className="tch-exam">экзамен по блоку</span>}
       {/* Полоса появляется только у начатых: пустая шкала у каждой из 72 глав
           читалась бы как список невыполненных дел, а не как витрина. */}
       {pct > 0 && (
-        <span className="tc-bar" aria-label={`Пройдено ${pct}%`}>
-          <span className="tc-fill" style={{ width: `${pct}%` }} />
+        <span className="tch-bar" aria-label={`Пройдено ${pct}%`}>
+          <span className="tch-fill" style={{ width: `${pct}%` }} />
         </span>
       )}
     </Link>
@@ -76,20 +76,20 @@ export default function TrackChapters({ track }: { track: string }): React.React
     .sort((a, b) => a.order - b.order);
 
   return (
-    <div className="tc">
+    <div className="tch">
       {LEVELS.map((level) => {
         const list = all.filter((c) => c.level === level);
         if (list.length === 0) return null;
         return (
-          <section key={level} className="tc-group">
-            <h2 className="tc-group-title">
+          <section key={level} className="tch-group">
+            <h2 className="tch-group-title">
               {level[0].toUpperCase() + level.slice(1)}{' '}
-              <span className="tc-group-count">
+              <span className="tch-group-count">
                 {list.length} {plural(list.length, 'глава', 'главы', 'глав')}
               </span>
             </h2>
-            <p className="tc-group-note">{LEVEL_NOTE[level]}</p>
-            <div className="tc-grid">
+            <p className="tch-group-note">{LEVEL_NOTE[level]}</p>
+            <div className="tch-grid">
               {list.map((c) => (
                 <Card key={c.id} c={c} fill={mounted ? fillOf(c.id) : null} />
               ))}

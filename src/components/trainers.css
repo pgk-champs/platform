@@ -6755,11 +6755,13 @@
 .gc-head {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
   gap: 0.5rem;
 }
 
+/* Название занимает всё между глифом и меткой. */
 .gc-name {
+  flex: 1;
+  min-width: 0;
   font-family: var(--pgk-font-display);
   font-weight: var(--ifm-font-weight-bold);
   line-height: 1.25;
@@ -8647,98 +8649,6 @@
   text-align: center;
 }
 
-/* === beginners (волна 7): гайд сообщества «с нуля» и тренажёр сабмита === */
-
-.cg {
-  max-width: 760px;
-}
-
-.cg-teaser {
-  padding: 0.6rem 0.9rem;
-  border-left: 4px solid var(--ifm-color-primary);
-  background: var(--ifm-color-emphasis-100);
-  border-radius: 0 var(--ifm-global-radius) var(--ifm-global-radius) 0;
-}
-
-.st {
-  border: 1px solid var(--ifm-color-emphasis-300);
-  border-radius: var(--ifm-global-radius);
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  background: var(--ifm-background-surface-color);
-}
-
-.st-note {
-  margin: 0;
-  font-size: 0.9rem;
-  color: var(--ifm-color-emphasis-700);
-}
-
-.st-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.st-field input,
-.st-field select,
-.st-field textarea {
-  font: inherit;
-  font-weight: 400;
-  padding: 0.45rem 0.6rem;
-  border: 1px solid var(--ifm-color-emphasis-300);
-  border-radius: var(--ifm-global-radius);
-  background: var(--ifm-background-color);
-  color: var(--ifm-font-color-base);
-}
-
-.st-field textarea {
-  font-family: var(--ifm-font-family-monospace);
-  resize: vertical;
-}
-
-.st-help {
-  font-weight: 400;
-  font-size: 0.8rem;
-  color: var(--ifm-color-emphasis-700);
-}
-
-.st > .button {
-  align-self: flex-start;
-}
-
-.st-result {
-  border-radius: var(--ifm-global-radius);
-  padding: 0.8rem 1rem;
-}
-
-.st-result p {
-  margin: 0 0 0.5rem;
-}
-
-.st-result p:last-child {
-  margin-bottom: 0;
-}
-
-.st-ok {
-  background: var(--ifm-color-success-contrast-background);
-  border: 1px solid var(--ifm-color-success-dark);
-}
-
-.st-no {
-  background: var(--ifm-color-danger-contrast-background);
-  border: 1px solid var(--ifm-color-danger-dark);
-}
-
-.st-no ul {
-  margin: 0 0 0.5rem;
-  padding-left: 1.2rem;
-}
-
 /* ===== subtopics (волна 7): секция «Отдельные темы» на /route ===== */
 
 .rl-deep-note {
@@ -9743,36 +9653,36 @@
 
 /* Витрина трека: до неё на /docs/mobile и /docs/blockchain было ноль
    карточек на 46 и 72 главы — попасть в них можно было только сайдбаром. */
-.tc-group {
+.tch-group {
   margin-top: 2rem;
 }
 
-.tc-group-title {
+.tch-group-title {
   font-family: var(--pgk-font-display);
   font-size: 1.3rem;
   margin-bottom: 0.2rem;
 }
 
-.tc-group-count {
+.tch-group-count {
   font-family: var(--ifm-font-family-monospace);
   font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
   color: var(--ifm-color-emphasis-600);
 }
 
-.tc-group-note {
+.tch-group-note {
   margin: 0 0 0.9rem;
   font-size: 0.86rem;
   color: var(--ifm-color-emphasis-700);
 }
 
-.tc-grid {
+.tch-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));
   gap: 0.7rem;
 }
 
-.tc-card {
+.tch-card {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   grid-template-areas: 'num title' 'num parts' 'num exam' 'bar bar';
@@ -9787,13 +9697,13 @@
   text-decoration: none;
 }
 
-.tc-card:hover {
+.tch-card:hover {
   border-color: var(--ifm-color-primary);
   color: inherit;
   text-decoration: none;
 }
 
-.tc-num {
+.tch-num {
   grid-area: num;
   align-self: start;
   font-family: var(--ifm-font-family-monospace);
@@ -9802,20 +9712,20 @@
   color: var(--ifm-color-emphasis-500);
 }
 
-.tc-title {
+.tch-title {
   grid-area: title;
   font-weight: var(--ifm-font-weight-bold);
   line-height: 1.3;
 }
 
-.tc-parts {
+.tch-parts {
   grid-area: parts;
   margin-top: 0.25rem;
   font-size: 0.78rem;
   color: var(--ifm-color-emphasis-600);
 }
 
-.tc-exam {
+.tch-exam {
   grid-area: exam;
   justify-self: start;
   margin-top: 0.35rem;
@@ -9827,7 +9737,7 @@
 }
 
 /* Прогресс — медь: это «твоё». */
-.tc-bar {
+.tch-bar {
   grid-area: bar;
   margin-top: 0.6rem;
   height: 4px;
@@ -9836,8 +9746,19 @@
   overflow: hidden;
 }
 
-.tc-fill {
+.tch-fill {
   display: block;
   height: 100%;
   background: var(--pgk-you);
+}
+
+/* Глиф механики: цвет и толщина приходят от карточки, поэтому отдельного
+   набора под светлую тему не нужно. */
+.gc-glyph {
+  flex: none;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.gc-card:hover .gc-glyph {
+  color: var(--ifm-color-primary);
 }
