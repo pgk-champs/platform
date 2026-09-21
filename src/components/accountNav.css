@@ -29,7 +29,10 @@
   width: 30px;
   height: 30px;
   border-radius: 999px;
-  border: 2px solid var(--ifm-color-emphasis-300);
+  /* Оправа медью: аватар — это «твоё», тем же цветом, что печать и отметки
+     пройденного. Облик перекрашивает --pgk-you, значит оправа меняется
+     вместе с ним и без единой новой переменной. */
+  border: 2px solid var(--pgk-you);
   object-fit: cover;
 }
 

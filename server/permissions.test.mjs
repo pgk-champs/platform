@@ -174,3 +174,23 @@ test('чужой ключ не виден и не отзывается', про�
   const списокA = await call(a, '/keys');
   assert.equal((await call(b, `/keys/${списокA.body.ключи[0].id}/revoke`, { method: 'POST' })).status, 404);
 });
+
+test('карточка ученика говорит, КАКИЕ тренажёры пройдены', пропуск, async () => {
+  // Раньше id выбрасывались прямо в ответе, и «пять тренажёров» не отвечало
+  // на вопрос «прошёл ли он выданный набор»: у зала под одним chapterId
+  // лежат и механики, и наборы (preset:…).
+  const root = await tok('root');
+  const stud = await tok('dima');
+  await call(stud, '/progress', {
+    method: 'PUT',
+    body: JSON.stringify({
+      trainers: { gym: { 'gym-typing': { result: {}, ts: 1 }, 'preset:abc12': { result: {}, ts: 2 } } },
+    }),
+  });
+  const все = await call(root, '/mentor/students');
+  const id = все.body.students.find((s) => s.login === 'dima').gh_id;
+  const карточка = await call(root, `/mentor/students/${id}`);
+  const зал = карточка.body.chapters.find((c) => c.chapterId === 'gym');
+  assert.equal(зал.trainers, 2);
+  assert.ok(зал.trainerIds.includes('preset:abc12'), 'набор не виден наставнику');
+});

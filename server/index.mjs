@@ -1157,6 +1157,12 @@ const server = http.createServer(async (req, res) => {
           : [],
         exam: bestExam(examMap[ch]),
         trainers: trainMap[ch] && typeof trainMap[ch] === 'object' ? Object.keys(trainMap[ch]).length : 0,
+        // Id тренажёров выбрасывались прямо здесь, и наставник видел «пять
+        // тренажёров», не зная каких. Для зала это критично: под chapterId
+        // 'gym' лежат и механики зала, и пройденные НАБОРЫ (preset:…) — без
+        // имён не понять, прошёл ли ученик выданный набор.
+        trainerIds:
+          trainMap[ch] && typeof trainMap[ch] === 'object' ? Object.keys(trainMap[ch]).slice(0, 60) : [],
       }));
       // Группы этого ученика, которыми владеет ЭТОТ наставник (чужие не раскрываем).
       const groups = db

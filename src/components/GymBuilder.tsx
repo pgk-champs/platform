@@ -3,6 +3,9 @@ import { store, type CustomPreset, type CustomPresetData } from '../lib/store';
 import { isLoggedIn, submitCommunity } from '../lib/account';
 import Fold from './Fold';
 import PresetStar from './PresetStar';
+import { presetKey } from '../lib/presetKey';
+import { GYM_CHAPTER_ID } from './chapterLabels';
+import type { NormalizedPreset } from '../../server/preset.d.mts';
 import Flashcards from './Flashcards';
 import WordOrder from './WordOrder';
 import CodeTyping from './CodeTyping';
@@ -107,15 +110,36 @@ export function presetUrl(p: SharedPreset): string {
 // из карточки каталога. Второй экземпляр этого switch означал бы, что новый
 // движок появляется в одном месте и молча отсутствует в двух других.
 export function RunPreset({ preset }: { preset: SharedPreset }) {
+  // Прохождение набора ЗАСЧИТЫВАЕТСЯ: до этого чужой набор не давал ни XP, ни
+  // отметки, ни строки у наставника — мотивации пройти его не было никакой.
+  // Ключ считается от СОДЕРЖИМОГО (src/lib/presetKey.ts): по id пресета его
+  // можно было бы фармить пересохранением, по содержимому — только собрав
+  // другой набор, а это уже работа.
+  const id = presetKey(preset as unknown as NormalizedPreset);
   switch (preset.engine) {
     case 'flashcards':
+      // У карточек нет момента «сделано»: их листают, а не решают. Отметку
+      // ставить не за что, поэтому здесь её и нет.
       return <Flashcards cards={preset.cards} />;
     case 'wordorder':
-      return <WordOrder phrase={preset.phrase} />;
+      return <WordOrder phrase={preset.phrase} chapterId={GYM_CHAPTER_ID} trainerId={id} />;
     case 'codetyping':
-      return <CodeTyping pools={[{ label: preset.name, snippets: preset.snippets }]} />;
+      return (
+        <CodeTyping
+          pools={[{ label: preset.name, snippets: preset.snippets }]}
+          chapterId={GYM_CHAPTER_ID}
+          trainerId={id}
+        />
+      );
     case 'predict':
-      return <PredictOutput expected={preset.expected} code={preset.code} />;
+      return (
+        <PredictOutput
+          expected={preset.expected}
+          code={preset.code}
+          chapterId={GYM_CHAPTER_ID}
+          trainerId={id}
+        />
+      );
     default:
       return null;
   }

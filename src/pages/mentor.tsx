@@ -133,7 +133,23 @@ function StudentCard({ id, onClose }: { id: number; onClose: () => void }) {
                         <span className="sc-ch-title">{CH_TITLE.get(c.chapterId) ?? c.chapterId}</span>
                         <span className="sc-ch-stats">
                           {c.sections > 0 && <span title="секций прочитано">📖 {c.sections}</span>}
-                          {c.trainers > 0 && <span title="тренажёров пройдено">🎮 {c.trainers}</span>}
+                          {c.trainers > 0 && (
+                            <span
+                              // У зала под одним chapterId лежат и механики, и
+                              // пройденные НАБОРЫ: без имён «пять тренажёров»
+                              // не отвечает на вопрос «прошёл ли он мой набор».
+                              title={
+                                c.trainerIds?.length
+                                  ? `пройдено: ${c.trainerIds.join(', ')}`
+                                  : 'тренажёров пройдено'
+                              }
+                            >
+                              🎮 {c.trainers}
+                              {c.chapterId === 'gym' && c.trainerIds?.some((t) => t.startsWith('preset:'))
+                                ? ` · наборов ${c.trainerIds.filter((t) => t.startsWith('preset:')).length}`
+                                : ''}
+                            </span>
+                          )}
                           {c.quizzes.map((q) => (
                             <span key={q.id} className={`sc-quiz ${q.correct === q.total ? 'sc-quiz-full' : ''}`.trim()} title="квиз">
                               {q.correct}/{q.total}

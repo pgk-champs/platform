@@ -242,6 +242,8 @@ export type StudentDetail = {
     quizzes: { id: string; correct: number; total: number }[];
     exam: { correct: number; total: number } | null;
     trainers: number;
+    /** Id пройденных тренажёров. У зала ('gym') среди них наборы: preset:… */
+    trainerIds?: string[];
   }[];
   results: { module: string; title: string; score: number; max_score: number; duration_sec: number }[];
   achievements: string[];
