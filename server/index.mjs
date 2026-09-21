@@ -508,7 +508,7 @@ async function handleApiV1(req, res, url, sub) {
   const secret = m && looksLikeKey(m[1]) ? m[1] : null;
   if (!secret) {
     return apiError(res, 401, 'нужен ключ: заголовок Authorization: Bearer pgk_…', {
-      справка: `${BASE_URL}/api-dlya-neyroseti`,
+      справка: `${BASE_URL}/api.md`,
     });
   }
 
