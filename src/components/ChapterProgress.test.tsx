@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { store } from '../lib/store';
 import { xpForLevel } from '../lib/levels';
 import ChapterProgress from './ChapterProgress';
+import { partsOf } from '../lib/chapterFill';
 
 // ChapterTour (онбординг-тур Driver.js) — отдельная забота со своими
 // тестами в ChapterTour.test.tsx; здесь заглушен, чтобы тесты чистого
@@ -23,7 +24,11 @@ test('квизы: ряд делений по числу квизов главы'
   expect(container.querySelectorAll('.cp-cell--on').length).toBe(0);
 });
 
-test('квизы: закрашено ровно столько, сколько сделано', () => {
+test('квизы: закрашено столько, сколько ВЗЯТО, а не сколько тронуто', () => {
+  // Раньше шапка считала квизы по числу ключей, и проверка с ошибками
+  // закрашивала клетку наравне с безошибочной: студент, ответивший всё
+  // неверно, видел «Квизы 3/3», а сосуд Маршрута стоял пустой. Мера теперь
+  // одна на оба места — src/lib/chapterFill.ts.
   const { container } = render(
     <ChapterProgress chapterId="typing" totalSections={4} totalQuizzes={5} totalTrainers={3} />,
   );
@@ -31,7 +36,23 @@ test('квизы: закрашено ровно столько, сколько �
     store.markQuizDone('typing', 'q1', { correct: 3, total: 3 });
     store.markQuizDone('typing', 'q2', { correct: 1, total: 3 });
   });
-  expect(container.querySelectorAll('.cp-row--quizzes .cp-cell--on').length).toBe(2);
+  expect(container.querySelectorAll('.cp-row--quizzes .cp-cell--on').length).toBe(1);
+});
+
+test('шапка главы и сосуд Маршрута не расходятся ни на одну клетку', () => {
+  // Один и тот же прогресс считался в двух местах по разным правилам. Этот
+  // страж держит их вместе: показанное в шапке — ровно то, из чего сложен
+  // сосуд.
+  const { container } = render(<ChapterProgress chapterId="typing" />);
+  act(() => {
+    store.setSectionRead('typing', 'intro');
+    store.markQuizDone('typing', 'q1', { correct: 3, total: 3 });
+    store.markQuizDone('typing', 'q2', { correct: 0, total: 3 });
+    store.markTrainerDone('typing', 'trainer-typing', { cpm: 100 });
+  });
+  const parts = partsOf('typing');
+  expect(container.querySelectorAll('.cp-row--quizzes .cp-cell--on').length).toBe(parts.quizzes);
+  expect(parts.quizzes).toBe(1);
 });
 
 test('один тренажёр — не сетка, а состояние (так у 100 глав из 137)', () => {

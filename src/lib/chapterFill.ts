@@ -13,26 +13,39 @@ const TOTALS: Record<string, Totals> = Object.fromEntries(
   (knowledgeMap as { id: string; totals: Totals }[]).map((e) => [e.id, e.totals]),
 );
 
-/** Доля пройденного в главе, 0..1. Неизвестная глава — 0, без падения. */
-export function fillOf(chapterId: string): number {
+/**
+ * Из чего сложилось наполнение главы. Шапка главы и сосуд Маршрута обязаны
+ * брать эти числа ОТСЮДА: пока шапка считала квизы сама, по числу ключей, она
+ * показывала «Квизы 3/3» студенту, ответившему всё неверно, — а сосуд при
+ * этом стоял пустой. Одно и то же слово значило две разные вещи.
+ */
+export function partsOf(chapterId: string, progress = store.getProgress()): Totals {
   const t = TOTALS[chapterId];
-  if (!t) return 0;
-  const denom = t.sections + t.quizzes + t.trainers;
-  if (denom === 0) return 0;
-
-  const progress = store.getProgress();
   const sections = progress.sections[chapterId]?.length ?? 0;
   // Проверка засчитывается только целиком верной — так же, как это понимало
   // прежнее «пройдена». Иначе сосуд наполнялся бы провалами.
   const quizzes = Object.values(progress.quizzes[chapterId] ?? {}).filter(
     (q) => q.correct === q.total,
   ).length;
-
   // Тренажёр засчитывается фактом прохождения: общей шкалы «верно» у сорока
   // шести разных механик нет, и требовать её значило бы переписать их все.
-  const trainers = Math.min(Object.keys(progress.trainers[chapterId] ?? {}).length, t.trainers);
+  const trainers = Object.keys(progress.trainers[chapterId] ?? {}).length;
+  if (!t) return { sections, quizzes, trainers };
+  return {
+    sections: Math.min(sections, t.sections),
+    quizzes: Math.min(quizzes, t.quizzes),
+    trainers: Math.min(trainers, t.trainers),
+  };
+}
 
-  return Math.min(1, (sections + quizzes + trainers) / denom);
+/** Доля пройденного в главе, 0..1. Неизвестная глава — 0, без падения. */
+export function fillOf(chapterId: string): number {
+  const t = TOTALS[chapterId];
+  if (!t) return 0;
+  const denom = t.sections + t.quizzes + t.trainers;
+  if (denom === 0) return 0;
+  const p = partsOf(chapterId);
+  return Math.min(1, (p.sections + p.quizzes + p.trainers) / denom);
 }
 
 export function isFull(chapterId: string): boolean {

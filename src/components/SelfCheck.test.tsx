@@ -77,15 +77,27 @@ test('progress label tracks answered questions regardless of correctness', () =>
   expect(screen.getByText('Отвечено вопросов: 1 из 2')).toBeTruthy();
 });
 
-test('final result plate appears once every question has been attempted', () => {
+test('плашка результата говорит правду про зачёт, а не про экран', () => {
+  // Раньше строка печатала «Пройдено: N из M» по числу верных НА ЭКРАНЕ:
+  // ответившему всё неверно она сообщала «Пройдено: 0 из 3», а исправившему
+  // ошибку — «Пройдено: 2 из 2», хотя в зачёт ушло 1 из 2. Проверка идёт по
+  // первой попытке и засчитывается только целиком верной.
   render(<SelfCheck questions={questions} />);
-  expect(screen.queryByText(/Пройдено:/)).toBeNull();
-  fireEvent.click(screen.getByText('3')); // wrong, but still an attempt
-  expect(screen.queryByText(/Пройдено:/)).toBeNull();
-  fireEvent.click(screen.getByText('Москва')); // correct, second question -> all attempted
-  expect(screen.getByText('Пройдено: 1 из 2')).toBeTruthy();
-  fireEvent.click(screen.getByText('4')); // fix the wrong one -> perfect
-  expect(screen.getByText('Пройдено: 2 из 2')).toBeTruthy();
+  expect(screen.queryByText(/зачёт|Проверка пройдена/)).toBeNull();
+  fireEvent.click(screen.getByText('3')); // мимо, но попытка засчитана
+  expect(screen.queryByText(/зачёт|Проверка пройдена/)).toBeNull();
+  fireEvent.click(screen.getByText('Москва')); // ответили на оба
+  expect(screen.getByText(/В зачёт не пошло: 1 из 2/)).toBeTruthy();
+  fireEvent.click(screen.getByText('4')); // исправили — экран зелёный, зачёт прежний
+  expect(screen.getByText(/В зачёт не пошло: 1 из 2/)).toBeTruthy();
+  expect(screen.queryByText('Проверка пройдена')).toBeNull();
+});
+
+test('безошибочная проверка так и называется', () => {
+  render(<SelfCheck questions={questions} />);
+  fireEvent.click(screen.getByText('4'));
+  fireEvent.click(screen.getByText('Москва'));
+  expect(screen.getByText('Проверка пройдена')).toBeTruthy();
 });
 
 test('в зачёт идёт первая попытка: исправление неверного ответа не переписывает запись и не даёт XP', () => {
@@ -99,7 +111,7 @@ test('в зачёт идёт первая попытка: исправление
   expect(store.getProgress().quizzes.typing?.basics).toMatchObject({ correct: 1, total: 2 });
   expect(store.getXp()).toBe(0);
   expect(screen.queryByText(/Идеально/)).toBeNull();
-  expect(screen.getByText(/С первой попытки: 1 из 2/)).toBeTruthy();
+  expect(screen.getByText(/1 из 2 с первой попытки/)).toBeTruthy();
   // одна попытка на одно прохождение, а не запись на каждое исправление
   expect(store.quiz.stats('typing', 'basics').count).toBe(1);
 });

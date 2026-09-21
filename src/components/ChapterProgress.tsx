@@ -3,6 +3,7 @@ import Link from '@docusaurus/Link';
 import { store } from '../lib/store';
 import knowledgeMap from '../data/knowledge-map.json';
 import { levelForXp } from '../lib/levels';
+import { partsOf } from '../lib/chapterFill';
 import ChapterTour from './ChapterTour';
 import './trainers.css';
 
@@ -81,12 +82,15 @@ export default function ChapterProgress(props: ChapterProgressProps) {
   useEffect(() => setMounted(true), []);
   const progress = mounted ? store.getProgress() : EMPTY_PROGRESS;
 
-  const readSections = Math.min(progress.sections[chapterId]?.length ?? 0, totalSections);
-  // Math.min — страховка от рассинхрона «главы и виджета»: если в mdx
-  // забудут поднять totalQuizzes/totalTrainers при добавлении квиза или
-  // тренажёра, счётчик не покажет «5 из 4», а честно упрётся в знаменатель.
-  const quizzesDone = Math.min(Object.keys(progress.quizzes[chapterId] ?? {}).length, totalQuizzes);
-  const trainersDone = Math.min(Object.keys(progress.trainers[chapterId] ?? {}).length, totalTrainers);
+  // Числа берутся из chapterFill — там же, где их берёт сосуд Маршрута.
+  // Пока шапка считала сама, она считала квизы ПО ЧИСЛУ КЛЮЧЕЙ: студент,
+  // ответивший всё неверно, видел «Квизы 3/3», а сосуд оставался пустым.
+  // Math.min внутри partsOf — страховка от рассинхрона с mdx: счётчик не
+  // покажет «5 из 4», а упрётся в знаменатель.
+  const parts = partsOf(chapterId, progress);
+  const readSections = Math.min(parts.sections, totalSections);
+  const quizzesDone = Math.min(parts.quizzes, totalQuizzes);
+  const trainersDone = Math.min(parts.trainers, totalTrainers);
   const pct = totalSections > 0 ? Math.round((100 * readSections) / totalSections) : 0;
   const lvl = levelForXp(mounted ? store.getXp() : 0);
 

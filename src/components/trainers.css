@@ -9811,3 +9811,13 @@
   align-items: center;
   gap: 0.5rem;
 }
+
+
+/* Проверка, не пошедшая в зачёт: тон предупреждения, а не провала — ответы
+   можно исправить и перезайти. Зелёным тут светить нельзя: раньше строка
+   «Пройдено: 0 из 3» читалась как сданный квиз. */
+.sc-result-partial {
+  color: var(--ifm-color-emphasis-800);
+  border-left: 3px solid var(--ifm-color-emphasis-400);
+  padding-left: 0.6rem;
+}

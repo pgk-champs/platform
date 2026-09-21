@@ -133,13 +133,18 @@ export default function SelfCheck({
         Отвечено верно: {correctCount} из {questions.length}
       </div>
       {allAnswered ? (
-        <div className="sc-result">
-          Пройдено: {correctCount} из {questions.length}
-          {firstTryCorrect < correctCount ? (
+        // «Пройдено» — только когда действительно пройдено. Раньше эта строка
+        // печатала «Пройдено: 0 из 3» тому, кто ответил всё неверно, и квиз
+        // читался как сданный. В прогресс главы такая проверка не идёт: в
+        // зачёт берётся результат с первой попытки, и только целиком верный.
+        <div className={`sc-result${perfect ? '' : ' sc-result-partial'}`}>
+          {perfect ? 'Проверка пройдена' : `В зачёт не пошло: ${firstTryCorrect} из ${questions.length} с первой попытки`}
+          {!perfect ? (
             // Без своего класса: наследует оформление плашки результата —
             // трогать общий trainers.css ради одной строки незачем.
             <div>
-              С первой попытки: {firstTryCorrect} из {questions.length} — в зачёт идёт этот результат.
+              Проверка засчитывается целиком верной. Ответы можно исправлять — но в прогресс главы пойдёт
+              следующий заход, начатый заново.
             </div>
           ) : null}
         </div>
