@@ -42,6 +42,20 @@ export const ACHIEVEMENT_CATEGORIES: AchievementCategory[] = [
   'пасхалки',
 ];
 
+// Порядок показа: сперва категория, внутри неё — от обычного к эпическому.
+// В объявлении лестница ломалась у «обучения», «языка» и «серий»: эпическое
+// стояло вперемешку с обычным, и сетка читалась как случайная. Сортируем при
+// показе, а не перекладываем массив руками: объявления группируются по смыслу.
+const RARITY_ORDER: Record<AchievementRarity, number> = { обычное: 0, редкое: 1, эпическое: 2 };
+
+export function sortAchievements(list: Achievement[]): Achievement[] {
+  return [...list].sort(
+    (a, b) =>
+      ACHIEVEMENT_CATEGORIES.indexOf(a.category) - ACHIEVEMENT_CATEGORIES.indexOf(b.category) ||
+      RARITY_ORDER[a.rarity] - RARITY_ORDER[b.rarity],
+  );
+}
+
 function isPerfect(q: QuizLogEntry): boolean {
   return q.total > 0 && q.correct === q.total;
 }
@@ -536,11 +550,16 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'археолог',
     title: 'Археолог',
-    desc: 'Открыто 5 исторических врезок «Как это было»',
+    // Порог 4, а не 5: врезок всего восемь — четыре в фундаменте, три в
+    // мобилке, одна в блокчейне. При пороге 5 студент блокчейна обязан был
+    // найти ВСЕ доступные ему пять, а студент мобилки — пять из семи. Страж
+    // в scripts/history-notes.test.mjs считает врезки по трекам и требует
+    // запаса хотя бы в одну: появятся врезки — порог можно поднять.
+    desc: 'Открыто 4 исторических врезки «Как это было»',
     icon: '📜',
     category: 'пасхалки',
     rarity: 'редкое',
-    check: (s) => s.easter.historyOpened.length >= 5,
+    check: (s) => s.easter.historyOpened.length >= 4,
   },
   {
     id: 'спидраннер',

@@ -6,6 +6,7 @@ import { levelForXp } from '../lib/levels';
 import {
   ACHIEVEMENTS,
   ACHIEVEMENT_CATEGORIES,
+  sortAchievements,
   type AchievementCategory,
   type AchievementRarity,
 } from '../lib/achievements';
@@ -32,7 +33,7 @@ export default function Achievements() {
 
   const byCategory = (cat: AchievementCategory | 'все') =>
     cat === 'все' ? ACHIEVEMENTS : ACHIEVEMENTS.filter((a) => a.category === cat);
-  const shown = byCategory(filter);
+  const shown = sortAchievements(byCategory(filter));
   const countLabel = (cat: AchievementCategory | 'все') => {
     const list = byCategory(cat);
     return `${list.filter((a) => unlocked.has(a.id)).length}/${list.length}`;
