@@ -69,3 +69,21 @@ test('звезда на наборе пишет упражнение, а не с
   expect(saved.data).toMatchObject({ kind: 'preset', engine: 'wordorder', phrase: 'раз два три' });
   expect(saved.url).toBeUndefined();
 });
+
+test('поиск и чипы сужают подборку, а не прячут её', async () => {
+  // После сорока звёздочек страница была простынёй, сгруппированной по
+  // главам в порядке добавления: найти в ней что-то было нечем.
+  const { filterFavorites } = await import('../lib/favorites');
+  const items = [
+    { id: '1', type: 'word', chapterId: 'it-english', title: 'commit', ts: 1 },
+    { id: '2', type: 'cheatsheet', chapterId: 'typing', title: 'Домашний ряд', ts: 2 },
+    { id: '3', type: 'preset', chapterId: 'gym', title: 'Слова к зачёту', ts: 3 },
+  ] as Parameters<typeof filterFavorites>[0];
+
+  expect(filterFavorites(items, '', 'all')).toHaveLength(3);
+  expect(filterFavorites(items, '', 'word')).toHaveLength(1);
+  expect(filterFavorites(items, 'домашний', 'all')).toHaveLength(1);
+  // поиск смотрит и главу, а не только название
+  expect(filterFavorites(items, 'английск', 'all').map((i: { id: string }) => i.id)).toEqual(['1']);
+  expect(filterFavorites(items, 'йцукен', 'all')).toHaveLength(0);
+});

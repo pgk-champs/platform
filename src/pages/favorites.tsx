@@ -2,6 +2,7 @@ import React, { useState, useSyncExternalStore } from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import { store, type FavoriteItem } from '../lib/store';
+import { TYPE_LABELS, filterFavorites } from '../lib/favorites';
 import { RunPreset, ENGINE_LABELS, type SharedPreset } from '../components/GymBuilder';
 import WordExport from '../components/WordExport';
 import knowledgeMap from '../data/knowledge-map.json';
@@ -175,7 +176,17 @@ function FavoriteRow({ item }: { item: FavoriteItem }) {
 
 export default function Favorites() {
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
-  const items = store.favorites.list();
+  const all = store.favorites.list();
+  const [q, setQ] = useState('');
+  const [type, setType] = useState('all');
+  // Чипы строятся по тому, что ЕСТЬ: пустой чип «наборы» у того, кто ни
+  // одного не сохранил, — обещание, которое некому выполнить.
+  const chips = [...new Set(all.map((i) => i.type))].map((t) => ({
+    id: t,
+    label: TYPE_LABELS[t] ?? t,
+    n: all.filter((i) => i.type === t).length,
+  }));
+  const items = filterFavorites(all, q, type);
 
   return (
     <Layout title="Избранное" description="Сохранённые тренажёры, квизы и материалы платформы">
@@ -185,12 +196,45 @@ export default function Favorites() {
           <Link to="/words">Тренировать слова →</Link>
         </p>
         <WordExport />
-        <WordsBench items={items} />
-        {items.length === 0 ? (
+        <WordsBench items={all} />
+        {all.length > 8 ? (
+          <div className="fav-tools">
+            <input
+              type="search"
+              className="gc-search"
+              placeholder="название или глава…"
+              aria-label="Поиск в избранном"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+            />
+            <div className="gc-chips">
+              <button
+                type="button"
+                className={`gc-chip ${type === 'all' ? 'gc-chip-on' : ''}`}
+                onClick={() => setType('all')}
+              >
+                всё {all.length}
+              </button>
+              {chips.map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  className={`gc-chip ${type === c.id ? 'gc-chip-on' : ''}`}
+                  onClick={() => setType(c.id)}
+                >
+                  {c.label} {c.n}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
+        {all.length === 0 ? (
           <p className="fav-empty">
             Пока пусто. Отмечайте звёздочкой ★ тренажёры, квизы и другие блоки на страницах глав — здесь
             появится ваша подборка.
           </p>
+        ) : items.length === 0 ? (
+          <p className="fav-empty">Ничего не нашлось. Попробуй короче — поиск смотрит название и главу.</p>
         ) : (
           [...groupByChapter(items).entries()].map(([chapterId, chapterItems]) => (
             <section key={chapterId} className="fav-group">

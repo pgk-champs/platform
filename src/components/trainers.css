@@ -10011,3 +10011,13 @@
   color: var(--pgk-you);
   border-bottom-style: solid;
 }
+
+/* Поиск и чипы избранного показываются только когда список перерос десяток:
+   у новичка с тремя звёздочками это была бы панель управления пустотой. */
+.fav-tools {
+  margin: 0.75rem 0 1.25rem;
+}
+
+.fav-tools .gc-search {
+  margin-bottom: 0.6rem;
+}
