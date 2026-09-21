@@ -14,7 +14,9 @@
       "quizzes": 6,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "grep-regex",
@@ -31,7 +33,9 @@
       "quizzes": 9,
       "trainers": 2
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "typing",
@@ -48,7 +52,9 @@
       "quizzes": 6,
       "trainers": 8
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "ssh-keys-deep",
@@ -65,7 +71,9 @@
       "quizzes": 6,
       "trainers": 3
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "it-english",
@@ -82,7 +90,9 @@
       "quizzes": 6,
       "trainers": 10
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "02b-english-practice",
@@ -99,7 +109,9 @@
       "quizzes": 12,
       "trainers": 5
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "git-rebase",
@@ -116,7 +128,9 @@
       "quizzes": 6,
       "trainers": 3
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "linux-terminal",
@@ -133,7 +147,9 @@
       "quizzes": 6,
       "trainers": 6
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "repo-anatomy",
@@ -150,7 +166,9 @@
       "quizzes": 6,
       "trainers": 2
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "files-packages-ssh",
@@ -167,7 +185,9 @@
       "quizzes": 7,
       "trainers": 6
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "github-actions",
@@ -184,7 +204,9 @@
       "quizzes": 5,
       "trainers": 2
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "git-first-commit",
@@ -201,7 +223,9 @@
       "quizzes": 7,
       "trainers": 6
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "code-review-release",
@@ -218,7 +242,9 @@
       "quizzes": 6,
       "trainers": 2
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "git-branches",
@@ -235,7 +261,9 @@
       "quizzes": 6,
       "trainers": 5
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "sdacha-repo",
@@ -252,7 +280,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "git-remote",
@@ -269,7 +299,9 @@
       "quizzes": 8,
       "trainers": 5
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "demo-show",
@@ -286,7 +318,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": true
+    "blockExam": true,
+    "blockExamId": "sdacha",
+    "blockExamTitle": "Сдача и демонстрация"
   },
   {
     "id": "foundation-final",
@@ -303,7 +337,9 @@
       "quizzes": 6,
       "trainers": 0
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "sprint-format",
@@ -320,7 +356,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "android-studio",
@@ -337,7 +375,9 @@
       "quizzes": 6,
       "trainers": 6
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "kotlin-vars",
@@ -354,7 +394,9 @@
       "quizzes": 4,
       "trainers": 6
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "kotlin-null",
@@ -371,7 +413,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "kotlin-flow",
@@ -388,7 +432,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "functions-lambdas",
@@ -405,7 +451,9 @@
       "quizzes": 5,
       "trainers": 6
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "classes-collections",
@@ -422,7 +470,9 @@
       "quizzes": 4,
       "trainers": 3
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "kotlin-collections",
@@ -439,7 +489,9 @@
       "quizzes": 4,
       "trainers": 3
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "composition",
@@ -456,7 +508,9 @@
       "quizzes": 5,
       "trainers": 0
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "kotlin-oop",
@@ -473,7 +527,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "console-io",
@@ -490,7 +546,9 @@
       "quizzes": 5,
       "trainers": 0
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "debug-skill",
@@ -507,7 +565,9 @@
       "quizzes": 5,
       "trainers": 0
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "first-compose-screen",
@@ -524,7 +584,9 @@
       "quizzes": 6,
       "trainers": 5
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "state-events",
@@ -541,7 +603,9 @@
       "quizzes": 6,
       "trainers": 6
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "layout-by-mockup",
@@ -558,7 +622,9 @@
       "quizzes": 6,
       "trainers": 3
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "layout-card",
@@ -575,7 +641,9 @@
       "quizzes": 4,
       "trainers": 3
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "ui-kit",
@@ -592,7 +660,9 @@
       "quizzes": 7,
       "trainers": 5
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "lazy-lists",
@@ -609,7 +679,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "material-theme",
@@ -626,7 +698,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "scaffold-bars",
@@ -643,7 +717,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "kit-buttons",
@@ -660,7 +736,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "kit-inputs",
@@ -677,7 +755,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "kit-select",
@@ -694,7 +774,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "kit-search",
@@ -711,7 +793,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "kit-bars",
@@ -728,7 +812,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "kit-card",
@@ -745,7 +831,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "kit-icon-font",
@@ -762,7 +850,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": true
+    "blockExam": true,
+    "blockExamId": "uikit",
+    "blockExamTitle": "Библиотека компонентов"
   },
   {
     "id": "kotlin-coroutines",
@@ -779,7 +869,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "flow-streams",
@@ -796,7 +888,9 @@
       "quizzes": 6,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "viewmodel-state",
@@ -813,7 +907,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "app-layers",
@@ -830,7 +926,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "network-retrofit",
@@ -847,7 +945,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "network-errors",
@@ -864,7 +964,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "data-storage",
@@ -881,7 +983,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "cache-offline",
@@ -898,7 +1002,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "clean-code",
@@ -915,7 +1021,9 @@
       "quizzes": 6,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "auth-session",
@@ -932,7 +1040,9 @@
       "quizzes": 6,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "shop-catalog",
@@ -949,7 +1059,9 @@
       "quizzes": 5,
       "trainers": 0
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "shop-auth",
@@ -966,7 +1078,9 @@
       "quizzes": 4,
       "trainers": 0
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "shop-cart",
@@ -983,7 +1097,9 @@
       "quizzes": 4,
       "trainers": 0
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "shop-files",
@@ -1000,7 +1116,9 @@
       "quizzes": 4,
       "trainers": 0
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "shop-failures",
@@ -1017,7 +1135,9 @@
       "quizzes": 4,
       "trainers": 0
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "shop-day",
@@ -1034,7 +1154,9 @@
       "quizzes": 4,
       "trainers": 0
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "device-features",
@@ -1051,7 +1173,9 @@
       "quizzes": 6,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "testing-mobile",
@@ -1068,7 +1192,9 @@
       "quizzes": 7,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "kotlin-vs-java",
@@ -1085,7 +1211,9 @@
       "quizzes": 6,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "kotlin-history",
@@ -1102,7 +1230,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "what-is-blockchain",
@@ -1119,7 +1249,9 @@
       "quizzes": 5,
       "trainers": 7
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "code-editor",
@@ -1136,7 +1268,9 @@
       "quizzes": 6,
       "trainers": 0
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "solidity-hello",
@@ -1153,7 +1287,9 @@
       "quizzes": 6,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "solidity-types",
@@ -1170,7 +1306,9 @@
       "quizzes": 6,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "solidity-errors",
@@ -1187,7 +1325,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "solidity-flow",
@@ -1204,7 +1344,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "solidity-functions",
@@ -1221,7 +1363,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "solidity-storage",
@@ -1238,7 +1382,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": true
+    "blockExam": true,
+    "blockExamId": "solidity-basics",
+    "blockExamTitle": "Основы Solidity"
   },
   {
     "id": "sol-contracts-oop",
@@ -1255,7 +1401,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "sol-inheritance",
@@ -1272,7 +1420,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "sol-interfaces",
@@ -1289,7 +1439,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "sol-libraries",
@@ -1306,7 +1458,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "sol-patterns",
@@ -1323,7 +1477,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": true
+    "blockExam": true,
+    "blockExamId": "solidity-oop",
+    "blockExamTitle": "Контракты и связи"
   },
   {
     "id": "erc20-scratch",
@@ -1340,7 +1496,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "erc20-oz",
@@ -1357,7 +1515,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "erc4626",
@@ -1374,7 +1534,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "proxy-upgrade",
@@ -1391,7 +1553,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": true
+    "blockExam": true,
+    "blockExamId": "solidity-standards",
+    "blockExamTitle": "Стандарты и обновления"
   },
   {
     "id": "ts-vs-js",
@@ -1408,7 +1572,9 @@
       "quizzes": 6,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "ts-run",
@@ -1425,7 +1591,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "ts-values",
@@ -1442,7 +1610,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "ts-null",
@@ -1459,7 +1629,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "ts-flow",
@@ -1476,7 +1648,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "ts-functions",
@@ -1493,7 +1667,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "ts-collections",
@@ -1510,7 +1686,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "ts-types",
@@ -1527,7 +1705,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "ts-oop",
@@ -1544,7 +1724,9 @@
       "quizzes": 3,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "ts-inheritance",
@@ -1561,7 +1743,9 @@
       "quizzes": 3,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "ts-errors",
@@ -1578,7 +1762,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "ts-async",
@@ -1595,7 +1781,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "ts-async-net",
@@ -1612,7 +1800,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "ts-modules",
@@ -1629,7 +1819,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": true
+    "blockExam": true,
+    "blockExamId": "typescript",
+    "blockExamTitle": "TypeScript"
   },
   {
     "id": "ts-history",
@@ -1646,7 +1838,9 @@
       "quizzes": 5,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "geth-network",
@@ -1663,7 +1857,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "hh-start",
@@ -1680,7 +1876,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "hh-config",
@@ -1697,7 +1895,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "hh-test",
@@ -1714,7 +1914,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "hh-deploy",
@@ -1731,7 +1933,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": true
+    "blockExam": true,
+    "blockExamId": "tools",
+    "blockExamTitle": "Узел и инструменты"
   },
   {
     "id": "web-html",
@@ -1748,7 +1952,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "web-css",
@@ -1765,7 +1971,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "web-layout",
@@ -1782,7 +1990,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "web-dom",
@@ -1799,7 +2009,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "web-react",
@@ -1816,7 +2028,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "web-state",
@@ -1833,7 +2047,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "web-vite",
@@ -1850,7 +2066,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "web-fetch",
@@ -1867,7 +2085,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "web-forms",
@@ -1884,7 +2104,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "web-router",
@@ -1901,7 +2123,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "web-redux",
@@ -1918,7 +2142,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "web-rtk",
@@ -1935,7 +2161,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "web-rtk-async",
@@ -1952,7 +2180,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": true
+    "blockExam": true,
+    "blockExamId": "web",
+    "blockExamTitle": "Веб-интерфейс"
   },
   {
     "id": "wallet-connect",
@@ -1969,7 +2199,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "wallet-sign",
@@ -1986,7 +2218,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "dapp-full",
@@ -2003,7 +2237,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": true
+    "blockExam": true,
+    "blockExamId": "wallet",
+    "blockExamTitle": "Кошелёк и dApp"
   },
   {
     "id": "audit-vulns",
@@ -2020,7 +2256,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "audit-tools",
@@ -2037,7 +2275,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "audit-report",
@@ -2054,7 +2294,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": true
+    "blockExam": true,
+    "blockExamId": "security",
+    "blockExamTitle": "Безопасность и аудит"
   },
   {
     "id": "fabric-intro",
@@ -2071,7 +2313,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "fabric-network",
@@ -2088,7 +2332,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "fabric-chaincode",
@@ -2105,7 +2351,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "fabric-lifecycle",
@@ -2122,7 +2370,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "fabric-tx",
@@ -2139,7 +2389,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "fabric-vs-eth",
@@ -2156,7 +2408,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": true
+    "blockExam": true,
+    "blockExamId": "fabric",
+    "blockExamTitle": "Приватный блокчейн: Hyperledger Fabric"
   },
   {
     "id": "waves-first-network",
@@ -2173,7 +2427,9 @@
       "quizzes": 5,
       "trainers": 10
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "waves-account",
@@ -2190,7 +2446,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "waves-tx",
@@ -2207,7 +2465,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "waves-data",
@@ -2224,7 +2484,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "waves-assets",
@@ -2241,7 +2503,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "waves-ride",
@@ -2258,7 +2522,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "waves-smart-account",
@@ -2275,7 +2541,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "waves-dapp",
@@ -2292,7 +2560,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "waves-payments",
@@ -2309,7 +2579,9 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": false
+    "blockExam": false,
+    "blockExamId": null,
+    "blockExamTitle": null
   },
   {
     "id": "waves-client",
@@ -2326,6 +2598,8 @@
       "quizzes": 4,
       "trainers": 1
     },
-    "blockExam": true
+    "blockExam": true,
+    "blockExamId": "waves",
+    "blockExamTitle": "Waves: сеть, язык RIDE и приложения"
   }
 ]

@@ -52,6 +52,13 @@ export function buildMap(docsDir, kind = 'chapter') {
     // В totals не идёт: BlockExam пишет в свой ключ и в знаменатель главы
     // намеренно не входит (см. CLAUDE.md §4).
     const blockExam = /<BlockExam\b/.test(content);
+    // Ключ и название блока нужны таблице рекордов: BlockExam пишет результат
+    // под `block:<blockId>`, и без названия там светилось бы «block:sdacha».
+    // Тег читаем окном от открывающей скобки, а не до первого `>`: в
+    // questions={[…]} эти скобки есть, на этом уже обожглись с тренажёрами.
+    const head = blockExam ? content.slice(content.indexOf('<BlockExam')).slice(0, 400) : '';
+    const blockExamId = /blockId="([^"]+)"/.exec(head)?.[1] ?? null;
+    const blockExamTitle = /title="([^"]+)"/.exec(head)?.[1] ?? null;
     for (const f of ['audience', 'level', 'order', 'title'])
       if (data[f] === undefined) throw new Error(`missing frontmatter: ${p}: ${f}`);
     if (!AUD.includes(data.audience) || !LVL.includes(data.level))
@@ -82,6 +89,8 @@ export function buildMap(docsDir, kind = 'chapter') {
       cover: data.cover || data.title,
       totals,
       blockExam,
+      blockExamId,
+      blockExamTitle,
     });
   });
   walk(docsDir);

@@ -7,7 +7,13 @@ import knowledgeMap from '../data/knowledge-map.json';
 // результаты запусков из тренажёрного зала (GymCatalog), главы с таким id в
 // карте знаний нет, и без подписи в таблице рекордов светилось бы «gym».
 
-type MapEntry = { id: string; title: string; path: string };
+type MapEntry = {
+  id: string;
+  title: string;
+  path: string;
+  blockExamId?: string | null;
+  blockExamTitle?: string | null;
+};
 
 export const GYM_CHAPTER_ID = 'gym';
 
@@ -18,6 +24,17 @@ const CHAPTERS = new Map<string, { title: string; to: string }>(
   ]),
 );
 CHAPTERS.set(GYM_CHAPTER_ID, { title: 'Тренажёрный зал', to: '/gym' });
+
+// Экзамен по блоку глав пишется в store под `block:<blockId>` — своей главы у
+// него нет, и в таблице рекордов вместо названия светилось «block:sdacha».
+// Ключ и название кладёт knowledge-map прямо из тега, руками их не повторяют.
+for (const e of knowledgeMap as MapEntry[]) {
+  if (!e.blockExamId) continue;
+  CHAPTERS.set(`block:${e.blockExamId}`, {
+    title: `Экзамен блока «${e.blockExamTitle ?? e.blockExamId}»`,
+    to: `/docs/${e.path.replace(/\.mdx?$/, '')}`,
+  });
+}
 
 /** Название главы по id. Незнакомый id возвращаем как есть — выдумывать нечего. */
 export function chapterTitle(id: string): string {
@@ -37,6 +54,7 @@ export function chapterHref(id: string): string | null {
  */
 export function taskLabel(id: string): string {
   if (id === 'exam') return 'Экзамен главы';
+  if (id === 'block-exam') return 'Экзамен блока';
   const numbered = /^q(\d+)$/.exec(id);
   if (numbered) return `Проверка ${numbered[1]}`;
   const words = id.replace(/^(?:quiz|trainer|gym)-/, '').replace(/-/g, ' ');

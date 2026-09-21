@@ -1,6 +1,7 @@
 import React, { useState, useSyncExternalStore } from 'react';
 import Layout from '@theme/Layout';
-import { store, type TrainerResult } from '../lib/store';
+import { store } from '../lib/store';
+import { quizRecords, trainerRecords, blockExamRecords, ПОКАЗ } from '../lib/records';
 import { levelForXp } from '../lib/levels';
 import {
   ACHIEVEMENTS,
@@ -18,47 +19,16 @@ const RARITY_CLASS: Record<AchievementRarity, string> = {
   эпическое: 'ach-card-epic',
 };
 
-type QuizRecord = { chapterId: string; quizId: string; best: number; total: number; attempts: number };
-
-function quizRecords(quizLog: ReturnType<typeof store.snapshot>['quizLog']): QuizRecord[] {
-  const byKey = new Map<string, QuizRecord>();
-  for (const e of quizLog) {
-    const key = `${e.chapterId}:${e.quizId}`;
-    const row = byKey.get(key);
-    if (!row) {
-      byKey.set(key, { chapterId: e.chapterId, quizId: e.quizId, best: e.correct, total: e.total, attempts: 1 });
-    } else {
-      row.attempts += 1;
-      if (e.correct > row.best) {
-        row.best = e.correct;
-        row.total = e.total;
-      }
-    }
-  }
-  return [...byKey.values()];
-}
-
-type TrainerRecord = { chapterId: string; trainerId: string; cpm: number };
-
-function trainerRecords(trainers: Record<string, Record<string, TrainerResult>>): TrainerRecord[] {
-  const rows: TrainerRecord[] = [];
-  for (const [chapterId, byId] of Object.entries(trainers)) {
-    for (const [trainerId, entry] of Object.entries(byId)) {
-      const cpm = (entry.result as { cpm?: unknown } | undefined)?.cpm;
-      if (typeof cpm === 'number') rows.push({ chapterId, trainerId, cpm });
-    }
-  }
-  return rows;
-}
-
 export default function Achievements() {
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
   const [filter, setFilter] = useState<AchievementCategory | 'все'>('все');
   const xp = store.getXp();
   const unlocked = new Set(store.achievements.list());
   const snap = store.snapshot();
-  const quizRows = quizRecords(snap.quizLog);
+  const quizRows = [...blockExamRecords(snap.exams), ...quizRecords(snap.quizLog)];
   const trainerRows = trainerRecords(snap.trainers);
+  const [всеКвизы, показатьКвизы] = useState(false);
+  const [всеТренажёры, показатьТренажёры] = useState(false);
 
   const byCategory = (cat: AchievementCategory | 'все') =>
     cat === 'все' ? ACHIEVEMENTS : ACHIEVEMENTS.filter((a) => a.category === cat);
@@ -159,7 +129,7 @@ export default function Achievements() {
               </tr>
             </thead>
             <tbody>
-              {quizRows.map((r) => (
+              {(всеКвизы ? quizRows : quizRows.slice(0, ПОКАЗ)).map((r) => (
                 <tr key={`${r.chapterId}:${r.quizId}`}>
                   <td>{chapterTitle(r.chapterId)}</td>
                   <td>{taskLabel(r.quizId)}</td>
@@ -174,6 +144,11 @@ export default function Achievements() {
         ) : (
           <p className="fav-empty">Пока нет пройденных квизов.</p>
         )}
+        {quizRows.length > ПОКАЗ && !всеКвизы && (
+          <button type="button" className="button button--sm button--secondary" onClick={() => показатьКвизы(true)}>
+            Показать все {quizRows.length}
+          </button>
+        )}
 
         <h3>Тренажёры</h3>
         {trainerRows.length > 0 ? (
@@ -182,21 +157,30 @@ export default function Achievements() {
               <tr>
                 <th>Глава</th>
                 <th>Тренажёр</th>
-                <th>Лучшая скорость</th>
+                <th>Скорость</th>
               </tr>
             </thead>
             <tbody>
-              {trainerRows.map((r) => (
+              {(всеТренажёры ? trainerRows : trainerRows.slice(0, ПОКАЗ)).map((r) => (
                 <tr key={`${r.chapterId}:${r.trainerId}`}>
                   <td>{chapterTitle(r.chapterId)}</td>
                   <td>{taskLabel(r.trainerId)}</td>
-                  <td>{r.cpm} зн/мин</td>
+                  <td>{r.cpm === null ? '—' : `${r.cpm} зн/мин`}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         ) : (
-          <p className="fav-empty">Пока нет тренажёров с записанной скоростью.</p>
+          <p className="fav-empty">Пока нет пройденных тренажёров.</p>
+        )}
+        {trainerRows.length > ПОКАЗ && !всеТренажёры && (
+          <button
+            type="button"
+            className="button button--sm button--secondary"
+            onClick={() => показатьТренажёры(true)}
+          >
+            Показать все {trainerRows.length}
+          </button>
         )}
       </main>
     </Layout>
