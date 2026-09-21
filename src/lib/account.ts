@@ -657,3 +657,77 @@ export async function removeAuthor(login: string): Promise<boolean> {
   const r = await api(`/content/authors/${encodeURIComponent(login)}`, { method: 'DELETE' });
   return r.ok;
 }
+
+// --- ключи для внешних сервисов ---
+//
+// Ключ — не сессия: он ищется в базе по хешу на каждом запросе, поэтому отзыв
+// работает мгновенно, а права пересчитываются по живой роли владельца.
+
+export type ApiKeyRow = {
+  id: number;
+  имя: string;
+  подсказка: string;
+  права: string[];
+  действуют: string[];
+  создан: number;
+  последнийРаз: number | null;
+  истекает: number | null;
+  отозван: number | null;
+};
+
+export type ApiKeysView = {
+  доступныеПрава: { право: string; что: string }[];
+  все: { право: string; что: string; нужнаРоль: string | null }[];
+  ключи: ApiKeyRow[];
+};
+
+export async function listApiKeys(): Promise<ApiKeysView | null> {
+  // Сеть тоже может не ответить (нет входа, нет сервера, чужой origin) —
+  // тогда окно ключей должно сказать об этом, а не висеть в «Загрузка…».
+  try {
+    const r = await api('/keys');
+    if (!r.ok) return null;
+    return (await r.json()) as ApiKeysView;
+  } catch {
+    return null;
+  }
+}
+
+export async function createApiKey(
+  name: string,
+  scopes: string[],
+  days: number,
+): Promise<{ ok: boolean; ключ?: string; error?: string }> {
+  try {
+    const r = await api('/keys', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, scopes, days }),
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) return { ok: false, error: (d as { error?: string }).error || 'не вышло' };
+    return { ok: true, ключ: (d as { ключ?: string }).ключ };
+  } catch {
+    return { ok: false, error: 'сервер недоступен' };
+  }
+}
+
+export async function revokeApiKey(id: number): Promise<boolean> {
+  try {
+    return (await api(`/keys/${id}/revoke`, { method: 'POST' })).ok;
+  } catch {
+    return false;
+  }
+}
+
+export type ApiLogRow = { ts: number; method: string; path: string; status: number; note: string | null };
+
+export async function apiKeyLog(id: number): Promise<ApiLogRow[]> {
+  try {
+    const r = await api(`/keys/${id}/log`);
+    if (!r.ok) return [];
+    return ((await r.json()).записи ?? []) as ApiLogRow[];
+  } catch {
+    return [];
+  }
+}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import ModerationQueue from '../components/ModerationQueue';
+import ApiKeys from '../components/ApiKeys';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import knowledgeMap from '../data/knowledge-map.json';
 import { levelForXp } from '../lib/levels';
@@ -826,6 +827,8 @@ export default function MentorPage() {
           <Link to="/leaderboard">Рейтинг →</Link>
         </p>
         <BrowserOnly fallback={<p className="ac-muted">Загрузка…</p>}>{() => <Dashboard />}</BrowserOnly>
+        {/* Ключи — под дашбордом: ими пользуются редко, а занимают много. */}
+        <BrowserOnly>{() => <ApiKeys />}</BrowserOnly>
       </main>
     </Layout>
   );

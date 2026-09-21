@@ -119,3 +119,58 @@ test('слишком большое тело обрывает соединени
   }).catch((e) => ({ status: 0, err: e.cause?.code }));
   assert.ok(r.status === 0 || r.status === 400, `ответ ${r.status}`);
 });
+
+// --- ключи внешних сервисов, вживую ---
+
+test('ключ не ходит в кабинет и не может больше владельца', пропуск, async () => {
+  const stud = await tok('stud');
+  // право наставника студенту не выдадут
+  const отказ = await call(stud, '/keys', { method: 'POST', body: '{"name":"бот","scopes":["groups:read"]}' });
+  assert.equal(отказ.status, 403);
+
+  const made = await call(stud, '/keys', { method: 'POST', body: '{"name":"читатель","scopes":["content:read"]}' });
+  assert.equal(made.status, 200);
+  const key = made.body.ключ;
+  assert.match(key, /^pgk_/);
+
+  // ключ отвергается ВСЕМИ ручками кабинета — это главное свойство модели
+  for (const p of ['/me', '/progress', '/mentor/students', '/keys']) {
+    assert.equal((await call(key, p)).status, 401, `ключ пустили в ${p}`);
+  }
+  assert.equal((await call(key, '/progress', { method: 'PUT', body: '{"xp":999999}' })).status, 401);
+
+  // а в своё API — ходит
+  const me = await call(key, '/v1/me');
+  assert.equal(me.status, 200);
+  assert.deepEqual(me.body.ключ.права, ['content:read']);
+
+  // чего не выдано — нельзя
+  assert.equal((await call(key, '/v1/groups')).status, 403);
+  // чего нет в белом списке — нет вовсе
+  assert.equal((await call(key, '/v1/chapters/typing', { method: 'DELETE' })).status, 404);
+});
+
+test('отзыв действует мгновенно и остаётся след в журнале', пропуск, async () => {
+  const stud = await tok('stud2');
+  const key = (await call(stud, '/keys', { method: 'POST', body: '{"name":"временный","scopes":["content:read"]}' })).body.ключ;
+  assert.equal((await call(key, '/v1/me')).status, 200);
+
+  const список = await call(stud, '/keys');
+  const id = список.body.ключи[0].id;
+  assert.equal((await call(stud, `/keys/${id}/revoke`, { method: 'POST' })).status, 200);
+  assert.equal((await call(key, '/v1/me')).status, 401);
+
+  const журнал = await call(stud, `/keys/${id}/log`);
+  assert.ok(журнал.body.записи.length >= 1, 'журнал пуст');
+  assert.equal(журнал.body.записи.at(-1).path, '/me');
+});
+
+test('чужой ключ не виден и не отзывается', пропуск, async () => {
+  const a = await tok('anna');
+  const b = await tok('boris');
+  await call(a, '/keys', { method: 'POST', body: '{"name":"аннин","scopes":["content:read"]}' });
+  const чужие = await call(b, '/keys');
+  assert.deepEqual(чужие.body.ключи, []);
+  const списокA = await call(a, '/keys');
+  assert.equal((await call(b, `/keys/${списокA.body.ключи[0].id}/revoke`, { method: 'POST' })).status, 404);
+});

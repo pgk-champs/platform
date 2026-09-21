@@ -16,7 +16,8 @@
     "kmap": "node scripts/knowledge-map.mjs",
     "test": "node --test scripts/*.test.mjs server/*.test.mjs",
     "test:ui": "vitest run",
-    "prebuild": "npm run kmap"
+    "apidocs": "node scripts/api-docs.mjs",
+    "prebuild": "npm run kmap && npm run apidocs"
   },
   "dependencies": {
     "@docusaurus/core": "3.10.2",
