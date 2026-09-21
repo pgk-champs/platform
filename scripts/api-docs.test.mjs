@@ -6,12 +6,20 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { renderDocs } from './api-docs.mjs';
+import { renderDocs, renderPage } from './api-docs.mjs';
 import { ROUTES } from '../server/api-routes.mjs';
 
-test('static/api.md совпадает с генератором', () => {
-  const было = fs.readFileSync('static/api.md', 'utf8');
-  assert.equal(было, renderDocs(), 'перегенерируй: node scripts/api-docs.mjs');
+test('оба файла совпадают с генератором', () => {
+  // Их два из одного текста: сырой для машины и страница для человека.
+  // Сырой сервер отдаёт как octet-stream, то есть по ссылке он скачивается —
+  // без страницы пункт в навигации вёл бы в загрузки.
+  assert.equal(fs.readFileSync('static/api.md', 'utf8'), renderDocs(), 'перегенерируй: node scripts/api-docs.mjs');
+  assert.equal(fs.readFileSync('src/pages/api.md', 'utf8'), renderPage(), 'перегенерируй: node scripts/api-docs.mjs');
+});
+
+test('на API ведёт ссылка из навигации, а не только из кабинета', () => {
+  const cfg = fs.readFileSync('docusaurus.config.ts', 'utf8');
+  assert.match(cfg, /to: '\/api'/, 'в навбаре или подвале нет пункта про API');
 });
 
 test('в документации есть каждый адрес', () => {

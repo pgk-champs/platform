@@ -6853,10 +6853,6 @@
   font-size: 0.85rem;
 }
 
-.gc-runner {
-  margin-top: 0.8rem;
-}
-
 .gc-empty {
   color: var(--ifm-color-emphasis-700);
 }
@@ -9888,4 +9884,54 @@
 .ak-log {
   font-size: 0.85rem;
   line-height: 1.7;
+}
+
+/* ── Сцена зала: тренажёр во всю ширину ─────────────────────────────────── */
+/*
+   Раньше механика запускалась ВНУТРИ своей карточки: клавиатурный тренажёр и
+   терминал ужимались в колонку 300 px, а четыре соседние карточки
+   растягивались до его высоты и стояли пустыми. Теперь запуск поднимает
+   механику над сеткой, на всю ширину страницы.
+*/
+.gc-stage {
+  margin: 0 0 1.5rem;
+  padding: 1rem 1.25rem 1.25rem;
+  border: 1px solid var(--pgk-you);
+  border-radius: var(--ifm-card-border-radius);
+  background: var(--ifm-card-background-color);
+}
+
+.gc-stage-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.gc-stage-name {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+/* Описание уходит первым при нехватке места: кнопка «Закрыть» важнее. */
+.gc-stage-blurb {
+  flex: 1;
+  min-width: 0;
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 700px) {
+  .gc-stage-blurb {
+    display: none;
+  }
+}
+
+/* Якорь прокрутки стоит ВЫШЕ сцены: браузер должен показать её заголовок,
+   а не середину движка. */
+.gc-stage-anchor {
+  scroll-margin-top: 4rem;
 }

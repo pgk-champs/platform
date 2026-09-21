@@ -126,6 +126,9 @@ const config: Config = {
           items: [
             {to: '/community', label: 'Каталог — видео, ссылки, пресеты'},
             {to: '/docs/advanced/kak-dobavit-stranicu', label: 'Как добавить материал'},
+            // API — здесь, а не отдельным пунктом сверху: он нужен наставнику
+            // и тому, кто подключает свой сервис, а не первокурснику.
+            {to: '/api', label: 'API для внешних сервисов'},
           ],
         },
         {
@@ -159,6 +162,10 @@ const config: Config = {
             {
               label: 'Как добавить страницу',
               to: '/docs/advanced/kak-dobavit-stranicu',
+            },
+            {
+              label: 'API и ключи',
+              to: '/api',
             },
             {
               label: 'GitHub',

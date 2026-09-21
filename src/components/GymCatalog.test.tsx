@@ -96,3 +96,38 @@ test('глифов десять семейств, а не сорок шесть 
   expect(shapes.size).toBeLessThanOrEqual(12);
   expect(shapes.size).toBeGreaterThanOrEqual(6);
 });
+
+test('тренажёр открывается во всю ширину, а не внутри карточки', () => {
+  // В колонке 300px клавиатурный тренажёр и терминал нечитаемы, а соседние
+  // четыре карточки растягивались до высоты запущенного.
+  const { container } = render(<GymCatalog />);
+  expect(container.querySelector('.gc-stage')).toBeNull();
+
+  const card = [...container.querySelectorAll('.gc-card')].find((c) =>
+    c.textContent?.includes('Слепая печать'),
+  )!;
+  fireEvent.click(card.querySelector('.gc-run')!);
+
+  const stage = container.querySelector('.gc-stage')!;
+  expect(stage).toBeTruthy();
+  expect(stage.querySelector('.gc-stage-name')?.textContent).toBe('Слепая печать');
+  // движок живёт в сцене, а не в карточке
+  expect(card.querySelector('.gc-stage')).toBeNull();
+  expect(card.textContent).toContain('Идёт наверху');
+});
+
+test('повторное нажатие закрывает, а другая механика подменяет сцену', () => {
+  const { container } = render(<GymCatalog />);
+  const найти = (имя: string) =>
+    [...container.querySelectorAll('.gc-card')].find((c) => c.textContent?.includes(имя))!;
+
+  fireEvent.click(найти('Слепая печать').querySelector('.gc-run')!);
+  expect(container.querySelector('.gc-stage-name')?.textContent).toBe('Слепая печать');
+
+  fireEvent.click(найти('Терминал Linux').querySelector('.gc-run')!);
+  expect(container.querySelectorAll('.gc-stage')).toHaveLength(1);
+  expect(container.querySelector('.gc-stage-name')?.textContent).toBe('Терминал Linux');
+
+  fireEvent.click(найти('Терминал Linux').querySelector('.gc-run')!);
+  expect(container.querySelector('.gc-stage')).toBeNull();
+});

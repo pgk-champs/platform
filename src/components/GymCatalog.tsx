@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import Link from '@docusaurus/Link';
 import { buildCards, filterCards, chipCounts, type GymCard } from '../lib/gym';
 import { plural } from '../lib/plural';
@@ -117,7 +117,7 @@ const RUNNERS: Partial<Record<string, () => React.ReactElement>> = {
   ),
 };
 
-function Card({ card }: { card: GymCard }) {
+function Card({ card, onRun, running }: { card: GymCard; onRun: () => void; running: boolean }) {
   const [open, setOpen] = useState(false);
   const Runner = RUNNERS[card.component];
   const pct = card.count > 0 ? Math.round((100 * card.done) / card.count) : 0;
@@ -151,16 +151,17 @@ function Card({ card }: { card: GymCard }) {
       )}
 
       {Runner ? (
-        <>
-          <button
-            type="button"
-            className="button button--sm button--primary gc-run"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? 'Свернуть' : 'Запустить'}
-          </button>
-          {open && <div className="gc-runner">{Runner()}</div>}
-        </>
+        // Тренажёр открывается НАД сеткой во всю ширину, а не внутри
+        // карточки: в колонке 300px клавиатурный тренажёр и терминал
+        // нечитаемы, а соседние четыре карточки растягивались до его высоты.
+        <button
+          type="button"
+          className={`button button--sm gc-run ${running ? 'button--secondary' : 'button--primary'}`}
+          onClick={onRun}
+          aria-pressed={running}
+        >
+          {running ? 'Идёт наверху ↑' : 'Запустить'}
+        </button>
       ) : card.count === 1 ? (
         <Link className="gc-link" to={card.exercises[0].href}>
           Открыть в главе «{card.exercises[0].chapterTitle}» →
@@ -190,8 +191,18 @@ export default function GymCatalog(): React.ReactElement {
   const chips = useMemo(() => chipCounts(cards), [cards]);
   const [q, setQ] = useState('');
   const [chip, setChip] = useState('all');
+  const [running, setRunning] = useState<GymCard | null>(null);
+  const stage = useRef<HTMLDivElement>(null);
   const shown = filterCards(cards, q, chip);
   const total = cards.reduce((s, c) => s + c.count, 0);
+
+  const run = (card: GymCard) => {
+    setRunning((cur) => (cur?.component === card.component ? null : card));
+    // Показать сцену сразу: иначе нажатие в конце длинной сетки выглядит как
+    // «кнопка не сработала» — тренажёр открылся за экраном, наверху.
+    requestAnimationFrame(() => stage.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  };
+  const Runner = running ? RUNNERS[running.component] : undefined;
 
   return (
     <div className="gc">
@@ -209,6 +220,29 @@ export default function GymCatalog(): React.ReactElement {
         value={q}
         onChange={(e) => setQ(e.target.value)}
       />
+
+      <div ref={stage} className="gc-stage-anchor" />
+      {running && Runner ? (
+        <section className="gc-stage" aria-label={`Тренажёр: ${running.name}`}>
+          <div className="gc-stage-head">
+            <TrainerGlyph id={running.glyph} />
+            <h2 className="gc-stage-name">{running.name}</h2>
+            <span className="gc-stage-blurb">{running.blurb}</span>
+            <button
+              type="button"
+              className="button button--sm button--secondary"
+              onClick={() => setRunning(null)}
+            >
+              Закрыть
+            </button>
+          </div>
+          {/* key — чтобы при переключении механики движок начинался заново,
+              а не донашивал состояние прошлого. */}
+          <div className="gc-stage-body" key={running.component}>
+            {Runner()}
+          </div>
+        </section>
+      ) : null}
 
       <div className="gc-chips">
         {chips.map((c) => (
@@ -230,7 +264,12 @@ export default function GymCatalog(): React.ReactElement {
       ) : (
         <div className="gc-grid">
           {shown.map((c) => (
-            <Card key={c.component} card={c} />
+            <Card
+              key={c.component}
+              card={c}
+              running={running?.component === c.component}
+              onRun={() => run(c)}
+            />
           ))}
         </div>
       )}

@@ -5,6 +5,13 @@
 //
 // Формат — один самодостаточный markdown. Его отдают нейросети целиком:
 // отсюда и подробные объяснения того, чего делать нельзя, прямо в тексте.
+//
+// Файлов два, и оба из одного текста:
+//   static/api.md  — сырой, для машины (curl, «скопируй и вставь в модель»);
+//   src/pages/api.md — та же страница для человека, по адресу /api.
+// Сырой файл сервер отдаёт как application/octet-stream, то есть по ссылке
+// он СКАЧИВАЕТСЯ, а не открывается: без второй, отрисованной страницы ссылка
+// в навигации вела бы в загрузки.
 
 import fs from 'node:fs';
 import { pathToFileURL } from 'node:url';
@@ -154,9 +161,28 @@ export function renderDocs() {
 // Пишем файл ТОЛЬКО при прямом запуске. Иначе импорт из теста сам бы его
 // перезаписал — и сверка «файл совпадает с генератором» всегда проходила бы,
 // что бы ни случилось.
+export function renderPage() {
+  return `---
+title: API платформы
+description: Инструкция для внешних сервисов и нейросетей — адреса, права, ключи
+---
+
+:::tip Для нейросети
+
+Отдай модели [сырой файл](/api.md) целиком — он самодостаточен: \`${BASE}/api.md\`
+
+\`\`\`bash
+curl -s ${BASE}/api.md
+\`\`\`
+
+:::
+
+${renderDocs().replace(/^# .*\n/, '')}`;
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const out = 'static/api.md';
-  const text = renderDocs();
-  fs.writeFileSync(out, text);
-  console.log(`${out}: ${text.split('\n').length} строк, ${ROUTES.length} адресов`);
+  const raw = renderDocs();
+  fs.writeFileSync('static/api.md', raw);
+  fs.writeFileSync('src/pages/api.md', renderPage());
+  console.log(`static/api.md и src/pages/api.md: ${raw.split('\n').length} строк, ${ROUTES.length} адресов`);
 }
