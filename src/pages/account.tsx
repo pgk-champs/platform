@@ -2,6 +2,7 @@ import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import Layout from '@theme/Layout';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import { looksWithState } from '../lib/looks';
+import { sealOptions, effectiveSeal } from '../lib/seal';
 import { store } from '../lib/store';
 import { levelForXp } from '../lib/levels';
 import Link from '@docusaurus/Link';
@@ -264,6 +265,58 @@ function AuthorLink(): React.ReactElement | null {
 
 // Оформление сосудов Маршрута. Стоит на уровне страницы, а не внутри кабинета:
 // это местная настройка, она работает и без входа.
+function SealPicker() {
+  useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+
+  const unlocked = store.achievements.list();
+  const options = sealOptions(unlocked);
+  const worn = effectiveSeal(store.prefs.getSeal(), unlocked);
+
+  return (
+    <div className="ac-card">
+      <h2>Печать</h2>
+      <p className="ac-muted">
+        {options.length === 0
+          ? 'Одно из открытых достижений можно носить рядом со счётом в шапке — оно будет видно на каждой странице. Пока открывать нечего: пройди первую секцию главы.'
+          : 'Одно из открытых достижений носится рядом со счётом в шапке, на каждой странице. Выбирай, чем хвастаться.'}
+      </p>
+      {options.length > 0 ? (
+        <div className="ac-seals">
+          <button
+            type="button"
+            className="ac-seal"
+            aria-pressed={worn === null}
+            onClick={() => store.prefs.setSeal('')}
+          >
+            <span className="ac-seal-icon" aria-hidden="true">
+              —
+            </span>
+            Без печати
+          </button>
+          {options.map((a) => (
+            <button
+              key={a.id}
+              type="button"
+              className="ac-seal"
+              aria-pressed={worn?.id === a.id}
+              onClick={() => store.prefs.setSeal(a.id)}
+              title={a.desc}
+            >
+              <span className="ac-seal-icon" aria-hidden="true">
+                {a.icon}
+              </span>
+              {a.title}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function SkinPicker() {
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
   const [mounted, setMounted] = useState(false);
@@ -330,6 +383,7 @@ export default function AccountPage() {
             <>
               <Cabinet />
               <SkinPicker />
+        <SealPicker />
             </>
           )}
         </BrowserOnly>

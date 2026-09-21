@@ -2,6 +2,7 @@ import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import Link from '@docusaurus/Link';
 import { store } from '../lib/store';
 import { badgeState, badgeLabel } from '../lib/gameBadge';
+import { effectiveSeal } from '../lib/seal';
 import './accountNav.css';
 
 // Постоянный след игрового слоя в шапке. До него игровой слой жил на трёх
@@ -31,6 +32,9 @@ export default function GameBadge({
 
   const s = badgeState();
   const label = badgeLabel(s);
+  // Печать — носимое достижение. Показывается только если оно ДЕЙСТВИТЕЛЬНО
+  // выдано: сбросили прогресс — печать исчезла сама, отдельного флага нет.
+  const seal = effectiveSeal(store.prefs.getSeal(), store.achievements.list());
 
   if (mobile)
     return (
@@ -43,7 +47,17 @@ export default function GameBadge({
     );
 
   return (
-    <Link className="xpb" to="/achievements" title={label} aria-label={label}>
+    <Link
+      className="xpb"
+      to="/achievements"
+      title={seal ? `${label} · печать: ${seal.title}` : label}
+      aria-label={label}
+    >
+      {seal ? (
+        <span className="xpb-seal" title={seal.title} aria-hidden="true">
+          {seal.icon}
+        </span>
+      ) : null}
       {s.streak > 0 && (
         <span className="xpb-streak">
           <span className="xpb-flame" aria-hidden="true" />

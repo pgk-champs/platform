@@ -572,3 +572,35 @@
   border-radius: 999px;
   background: var(--pgk-you);
 }
+
+/* Выбор печати: значок и название достижения. Одна строка на штуку —
+   открытых достижений бывает много, и сетка плиток превратилась бы в ковёр. */
+.ac-seals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.ac-seal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 999px;
+  background: var(--ifm-background-surface-color);
+  color: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.ac-seal[aria-pressed='true'] {
+  border-color: var(--pgk-you);
+  box-shadow: inset 0 0 0 1px var(--pgk-you);
+}
+
+.ac-seal-icon {
+  font-size: 1.05em;
+  line-height: 1;
+}

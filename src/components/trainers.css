@@ -7991,6 +7991,13 @@
   margin: 0 0 1.5rem;
 }
 
+/* Печать «пройдено» висит в углу обложки абсолютом — значит обложке нужна
+   своя система координат, иначе печать улетит к ближайшему позиционированному
+   предку (это была бы вся страница). */
+.chapter-cover {
+  position: relative;
+}
+
 /* Чип трека на обложке. Префикс cov-, а НЕ cc-: cc-* занят каталогом
    сообщества (CommunityCatalog), и его .cc-chip перебивал здесь цвет. */
 .cov-track {
@@ -9934,4 +9941,21 @@
    а не середину движка. */
 .gc-stage-anchor {
   scroll-margin-top: 4rem;
+}
+
+/* Печать «пройдено» на обложке главы: медь — «твоё». Висит в углу поверх
+   обложки, потому что относится к читателю, а не к содержанию главы. */
+.cov-seal {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 2;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--pgk-you);
+  border-radius: 999px;
+  background: var(--ifm-background-color);
+  color: var(--pgk-you);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
 }

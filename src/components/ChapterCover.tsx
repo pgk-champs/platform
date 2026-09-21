@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState, useSyncExternalStore } from 'react';
+import { store } from '../lib/store';
+import { isFull } from '../lib/chapterFill';
 import knowledgeMap from '../data/knowledge-map.json';
 import tracks from '../data/tracks.json';
 
@@ -2521,9 +2523,23 @@ function Frame({
 
 export default function ChapterCover({ chapterId }: { chapterId: string }) {
   const ch = CHAPTERS[chapterId];
+  // Печать «глава пройдена» — след дела прямо на обложке. Прогресс живёт в
+  // localStorage, который store поднимает при импорте, поэтому спрашивать
+  // его до монтирования нельзя: статика собрана с пустым прогрессом, и
+  // первый клиентский рендер обязан ей совпасть.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
+  const full = mounted && isFull(chapterId);
+
   if (!ch) return null;
   return (
     <div className="chapter-cover">
+      {full ? (
+        <span className="cov-seal" title="Глава налита до крышки: секции, проверки и тренажёры">
+          пройдено
+        </span>
+      ) : null}
       {/* Трек — цветным чипом, а не заливкой: четыре цветных плашки рядом
           читались бы как реклама. В подписи SVG он больше не повторяется. */}
       <span className={`cov-track trk-${ch.track}`}>{TRACK_LABEL[ch.track]}</span>

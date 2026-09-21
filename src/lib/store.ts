@@ -71,7 +71,17 @@ type State = {
   /** Уже оплаченные разовые начисления — reason из addXp (см. addXp). */
   xpAwarded: string[];
   achievementsUnlocked: string[];
-  prefs: { os?: OsId; name?: string; ide?: IdeId; skin?: string };
+  prefs: {
+    os?: OsId;
+    name?: string;
+    ide?: IdeId;
+    /** Облик: тема сосудов и акцент «твоё» (src/lib/looks.ts). */
+    skin?: string;
+    /** Печать: id носимого достижения (src/lib/seal.ts). */
+    seal?: string;
+    /** Какой трек открывать на Маршруте — чтобы не сбрасывался на «Мобилку». */
+    track?: string;
+  };
   tocCollapsed: Record<string, boolean>;
   quizLog: QuizLogEntry[];
   blocksCollapsed: Record<string, boolean>;
@@ -428,6 +438,27 @@ function getSkin(): Skin {
   return SKINS.includes(v ?? '') ? v! : 'classic';
 }
 
+// Печать — id достижения. Проверять здесь нечем: выдано ли оно, знает реестр
+// достижений, а store ему не сосед (он импортирует store, а не наоборот).
+// Поэтому проверка живёт в src/lib/seal.ts, там же, где печать показывают.
+function setSeal(id: string): void {
+  state.prefs = { ...state.prefs, seal: id || undefined };
+  persist();
+}
+
+function getSeal(): string | undefined {
+  return state.prefs.seal;
+}
+
+function setTrack(track: string): void {
+  state.prefs = { ...state.prefs, track };
+  persist();
+}
+
+function getTrack(): string | undefined {
+  return state.prefs.track;
+}
+
 function setOs(os: OsId): void {
   state.prefs = { ...state.prefs, os };
   persist();
@@ -702,7 +733,20 @@ export const store = {
   getXp,
   getXpMultiplier,
   achievements: { unlock: achUnlock, list: achList, isUnlocked: achIsUnlocked },
-  prefs: { setOs, getOs, setName, getName, setIde, getIde, setSkin, getSkin },
+  prefs: {
+    setOs,
+    getOs,
+    setName,
+    getName,
+    setIde,
+    getIde,
+    setSkin,
+    getSkin,
+    setSeal,
+    getSeal,
+    setTrack,
+    getTrack,
+  },
   words: { queue: wordsQueue, grade: gradeWord, weight: wordWeight },
   toc: { setCollapsed: setTocCollapsed, isCollapsed: isTocCollapsed },
   block: { setCollapsed: setBlockCollapsed, isCollapsed: isBlockCollapsed },

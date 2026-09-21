@@ -1,4 +1,4 @@
-import React, { useState, useSyncExternalStore } from 'react';
+import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import { TrackBanner } from '../components/ChapterCover';
@@ -27,8 +27,22 @@ type Entry = {
 
 type TrackDef = { dir: string; label: string; position: number };
 
+const TRACKS = ['мобилка', 'блокчейн'] as const;
+type TrackId = (typeof TRACKS)[number];
+
 export default function Route(): React.ReactElement {
-  const [track, setTrack] = useState<'мобилка' | 'блокчейн'>('мобилка');
+  // Выбор трека запоминается: раньше это был обычный useState, и студент
+  // блокчейна при КАЖДОМ заходе видел чужую мобилку и переключал заново.
+  // Значение из хранилища — данные пользователя, поэтому проверяется списком.
+  const [track, setTrackState] = useState<TrackId>('мобилка');
+  useEffect(() => {
+    const saved = store.prefs.getTrack();
+    if (saved && (TRACKS as readonly string[]).includes(saved)) setTrackState(saved as TrackId);
+  }, []);
+  const setTrack = (t: TrackId) => {
+    setTrackState(t);
+    store.prefs.setTrack(t);
+  };
   // Наполнение сосудов живёт в store: без подписки полоса не обновится, пока
   // страницу не перезагрузят.
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);

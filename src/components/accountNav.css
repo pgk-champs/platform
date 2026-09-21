@@ -147,3 +147,14 @@
     display: none;
   }
 }
+
+/* Печать — носимое достижение рядом со счётом. Значок и так эмодзи, поэтому
+   размер задаётся кеглем, а не картинкой; от цифр отделён волоском, иначе
+   читается как часть счёта. */
+.xpb-seal {
+  font-size: 0.95em;
+  line-height: 1;
+  padding-right: 0.35rem;
+  margin-right: 0.1rem;
+  border-right: 1px solid var(--ifm-color-emphasis-300);
+}
