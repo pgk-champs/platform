@@ -21,7 +21,6 @@ import path from 'node:path';
 const РАЗРЕШЕНО = new Set([
   'ce', // BlockExam переиспользует вид ChapterExam
   'chsrc', // ChapterVideos переиспользует вид ChapterSources
-  'cc', // CommunityCatalog сидит на корне ChmodCalc (досталось в наследство)
 ]);
 
 const файлы = [];

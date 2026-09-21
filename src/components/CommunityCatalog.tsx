@@ -5,8 +5,8 @@ import { decodePreset, encodePreset, ENGINE_LABELS, type SharedPreset } from './
 import { chapterHref, chapterTitle } from './chapterLabels';
 import './trainers.css';
 
-// Каталог контента от студентов (/community, пакет community): клиентский
-// fetch публичного community.json из pgk-champs/community, карточки с
+// Каталог контента от студентов (/community, пакет community): читает
+// /api/community нашего сервера (модерация наставником), карточки с
 // фильтрами по типу/главе/автору. Пресеты запускаются в конструкторе /gym
 // через тот же URL-hash, что и «Поделиться» наставника; ссылки и репозитории
 // открываются наружу. Никакого исполнения чужого кода — только данные для
@@ -163,7 +163,7 @@ export default function CommunityCatalog() {
   );
 
   return (
-    <section className="cc">
+    <section className="cmc">
       <div className="cc-head">
         <p>
           Материалы, которые собрали кураторы и принесли студенты. Пресеты запускаются прямо в
@@ -233,7 +233,7 @@ export default function CommunityCatalog() {
             groupItems(filtered)
               .filter((g) => type === ALL || g.key === type)
               .map((g) => (
-                <section className="cc-group" key={g.key}>
+                <section className="cmc-group" key={g.key}>
                   <div className="cc-ghead">
                     <h3>{g.label}</h3>
                     <span className="cc-n">{g.items.length}</span>

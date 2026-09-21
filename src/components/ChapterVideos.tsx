@@ -4,8 +4,8 @@ import YoutubeFacade from './YoutubeFacade';
 import './trainers.css';
 
 // Подборка видео по теме главы — куратор (не студенты, в отличие от
-// ChapterSources): статичный локальный JSON вместо fetch на чужой репозиторий,
-// работает и при недоступном community.json. videoId уже вырезаны из ссылок
+// ChapterSources): статичный локальный JSON вместо запроса на сервер —
+// подборка куратора не модерируется и не меняется. videoId вырезаны из ссылок
 // и проверены через YouTube oEmbed на существование при добавлении записи.
 export type ChapterVideoEntry = { videoId: string; title: string; channel: string };
 

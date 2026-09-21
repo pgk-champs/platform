@@ -181,8 +181,8 @@ const removeModeratorRow = db.prepare('DELETE FROM moderators WHERE login = ?');
 const isModerator = (u) => !!u && (isMentor(u) || !!moderatorRow.get(String(u.login).toLowerCase()));
 
 // Каталог сообщества с модерацией: ученик присылает материал (pending),
-// наставник одобряет/отклоняет. Одобренные отдаются публично и ложатся в
-// каталог поверх статичного community.json.
+// наставник одобряет/отклоняет. Одобренные отдаются публично — это
+// единственный источник каталога с 21.09.2026 (24 материала перевезены).
 db.exec(`CREATE TABLE IF NOT EXISTS community (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   type TEXT NOT NULL,
