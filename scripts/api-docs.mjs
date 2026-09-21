@@ -8,7 +8,9 @@
 //
 // Файлов два, и оба из одного текста:
 //   static/api.md  — сырой, для машины (curl, «скопируй и вставь в модель»);
-//   src/pages/api.md — та же страница для человека, по адресу /api.
+//   src/pages/integrations.md — та же страница для человека, /integrations.
+// Адрес НЕ /api: по этому префиксу обратный прокси отдаёт сам сервер, и
+// страница там отвечала бы {"error":"not found"}. Проверено на проде.
 // Сырой файл сервер отдаёт как application/octet-stream, то есть по ссылке
 // он СКАЧИВАЕТСЯ, а не открывается: без второй, отрисованной страницы ссылка
 // в навигации вела бы в загрузки.
@@ -183,6 +185,6 @@ ${renderDocs().replace(/^# .*\n/, '')}`;
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const raw = renderDocs();
   fs.writeFileSync('static/api.md', raw);
-  fs.writeFileSync('src/pages/api.md', renderPage());
-  console.log(`static/api.md и src/pages/api.md: ${raw.split('\n').length} строк, ${ROUTES.length} адресов`);
+  fs.writeFileSync('src/pages/integrations.md', renderPage());
+  console.log(`static/api.md и src/pages/integrations.md: ${raw.split('\n').length} строк, ${ROUTES.length} адресов`);
 }

@@ -14,12 +14,15 @@ test('оба файла совпадают с генератором', () => {
   // Сырой сервер отдаёт как octet-stream, то есть по ссылке он скачивается —
   // без страницы пункт в навигации вёл бы в загрузки.
   assert.equal(fs.readFileSync('static/api.md', 'utf8'), renderDocs(), 'перегенерируй: node scripts/api-docs.mjs');
-  assert.equal(fs.readFileSync('src/pages/api.md', 'utf8'), renderPage(), 'перегенерируй: node scripts/api-docs.mjs');
+  assert.equal(fs.readFileSync('src/pages/integrations.md', 'utf8'), renderPage(), 'перегенерируй: node scripts/api-docs.mjs');
 });
 
 test('на API ведёт ссылка из навигации, а не только из кабинета', () => {
   const cfg = fs.readFileSync('docusaurus.config.ts', 'utf8');
-  assert.match(cfg, /to: '\/api'/, 'в навбаре или подвале нет пункта про API');
+  assert.match(cfg, /to: '\/integrations'/, 'в навбаре или подвале нет пункта про API');
+  // Адрес страницы НЕ может начинаться с /api/: этот префикс занят самим
+  // сервером через обратный прокси, страница там отдаёт not found.
+  assert.doesNotMatch(cfg, /to: '\/api'/, 'страница на /api перехватывается прокси');
 });
 
 test('в документации есть каждый адрес', () => {

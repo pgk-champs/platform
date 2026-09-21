@@ -46,7 +46,7 @@ export default function ApiKeys() {
         <h2 className="mn-h">Ключи для сервисов</h2>
         <p className="ac-muted">
           Ключи выдаются вошедшему: войди через GitHub на этой странице.{' '}
-          <a href="/api">Что умеет API</a>.
+          <a href="/integrations">Что умеет API</a>.
         </p>
       </section>
     );
@@ -76,7 +76,7 @@ export default function ApiKeys() {
       <h2 className="mn-h">Ключи для сервисов</h2>
       <p className="ac-muted">
         Чтобы внешний сервис или нейросеть работали с платформой по HTTP, не трогая её код.{' '}
-        <a href="/api">Что умеет API</a> · <a href="/api.md">сырой файл для модели</a>.
+        <a href="/integrations">Что умеет API</a> · <a href="/api.md">сырой файл для модели</a>.
       </p>
 
       {fresh ? (
