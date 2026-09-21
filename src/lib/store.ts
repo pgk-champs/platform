@@ -59,6 +59,8 @@ type State = {
   trainers: Record<string, Record<string, TrainerResult>>;
   favorites: FavoriteItem[];
   dismissedHints: string[];
+  /** Ключи уже показанных вопросов дня — чтобы не спрашивать одно и то же. */
+  dailySeen: string[];
   xp: number;
   /** Уже оплаченные разовые начисления — reason из addXp (см. addXp). */
   xpAwarded: string[];
@@ -83,6 +85,7 @@ function emptyState(): State {
     trainers: {},
     favorites: [],
     dismissedHints: [],
+    dailySeen: [],
     xp: 0,
     xpAwarded: [],
     achievementsUnlocked: [],
@@ -537,6 +540,18 @@ function completeDaily(dateKey: string, score: { correct: number; total: number 
  * и серия подряд идущих дней. Если сегодня ещё не пройден, серия
  * считается от вчера — день ещё не потерян.
  */
+/** Отмечает вопросы дня показанными. Круг пройден целиком — начинаем заново,
+ *  иначе список рос бы вечно, а выбирать было бы уже не из чего. */
+function markDailySeen(keys: string[], poolSize: number): void {
+  const merged = [...new Set([...(state.dailySeen ?? []), ...keys])];
+  state.dailySeen = merged.length >= poolSize ? [] : merged;
+  persist();
+}
+
+function dailySeenList(): string[] {
+  return state.dailySeen ?? [];
+}
+
 function dailyState(todayKey: string): { done: boolean; today?: DailyEntry; streak: number } {
   const today = state.daily[todayKey];
   let key = today ? todayKey : prevDayKey(todayKey);
@@ -666,6 +681,8 @@ export const store = {
   getExamStats,
   completeDaily,
   dailyState,
+  markDailySeen,
+  dailySeenList,
   sim: { addRun: addSimRun, stats: getSimStats },
   customPresets: { add: customPresetAdd, list: customPresetList, remove: customPresetRemove },
   easter: { markKonami: easterMarkKonami, markSpeedrun: easterMarkSpeedrun, openHistory: easterOpenHistory },

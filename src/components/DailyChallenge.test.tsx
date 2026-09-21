@@ -1,6 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { store } from '../lib/store';
+import knowledgeMap from '../data/knowledge-map.json';
 import DailyChallenge, {
+  questionKey,
   CHAPTER_META,
   DAILY_BANK,
   DAILY_SIZE,
@@ -9,6 +11,7 @@ import DailyChallenge, {
   STARTER_CHAPTERS,
   dailyPool,
   eligibleChapters,
+  ownChapters,
   pickDaily,
   todayKey,
 } from './DailyChallenge';
@@ -37,11 +40,48 @@ test('банк: каждая глава карты знаний представ
   }
 });
 
-test('новичок без прогресса: доступны только первые две главы Фундамента', () => {
+test('новичку хватает вопросов больше чем на день', () => {
+  // Стартовыми были две главы — шесть вопросов на пять в день, то есть весь
+  // первый месяц один и тот же квиз (ожидаемое совпадение со вчерашним
+  // набором 4,2 из 5). Теперь стартовый пул — весь Фундамент: он общий для
+  // обоих треков, и его главы студент так или иначе проходит.
   expect(eligibleChapters()).toEqual(STARTER_CHAPTERS);
   const pool = dailyPool();
-  expect(pool.length).toBeGreaterThanOrEqual(DAILY_SIZE);
+  expect(pool.length).toBeGreaterThanOrEqual(DAILY_SIZE * 5);
   for (const q of pool) expect(STARTER_CHAPTERS).toContain(q.chapterId);
+});
+
+test('стартовые главы берутся из карты знаний, а не перечисляются руками', () => {
+  const foundation = (knowledgeMap as { id: string; track: string }[])
+    .filter((c) => c.track === 'foundation')
+    .map((c) => c.id);
+  expect([...STARTER_CHAPTERS].sort()).toEqual([...foundation].sort());
+});
+
+test('вчерашние вопросы не приходят снова, пока есть непоказанные', () => {
+  const pool = dailyPool();
+  const day1 = pickDaily('2026-09-21', pool);
+  const seen = day1.map(questionKey);
+  const day2 = pickDaily('2026-09-22', pool, seen);
+  expect(day2).toHaveLength(DAILY_SIZE);
+  expect(day2.filter((q) => seen.includes(questionKey(q)))).toEqual([]);
+});
+
+test('когда непоказанных не осталось, круг начинается заново', () => {
+  const pool = dailyPool().slice(0, 7); // маленький пул: 7 вопросов, берём 5
+  const all = pool.map(questionKey);
+  const next = pickDaily('2026-09-30', pool, all);
+  expect(next).toHaveLength(DAILY_SIZE);
+});
+
+test('непоказанных меньше пяти — добираем, а не отдаём огрызок', () => {
+  const pool = dailyPool().slice(0, 8);
+  const seen = pool.slice(0, 6).map(questionKey); // непоказанных 2
+  const day = pickDaily('2026-10-01', pool, seen);
+  expect(day).toHaveLength(DAILY_SIZE);
+  // оба непоказанных обязаны попасть в набор
+  const keys = day.map(questionKey);
+  for (const q of pool.slice(6)) expect(keys).toContain(questionKey(q));
 });
 
 test('фильтрация по прогрессу: глава попадает в пул через секцию, квиз или тренажёр', () => {
@@ -53,7 +93,9 @@ test('фильтрация по прогрессу: глава попадает 
   expect(eligible).toEqual(
     expect.arrayContaining(['typing', 'it-english', 'kotlin-vars', 'git-branches', 'what-is-blockchain']),
   );
-  expect(eligible).toHaveLength(5);
+  // Фундамент лежит в пуле бесплатно, поэтому считаем СВОИ главы.
+  // git-branches — глава Фундамента, она и так была доступна.
+  expect([...ownChapters()].sort()).toEqual(['kotlin-vars', 'what-is-blockchain'].sort());
 
   const pool = dailyPool(eligible);
   expect(pool.length).toBeGreaterThan(0);
@@ -97,10 +139,12 @@ test('новичок в квизе: вопросы только из старт�
 });
 
 test('при достаточном прогрессе честная строка не показывается', async () => {
-  for (const id of ['linux-terminal', 'git-first-commit', 'kotlin-vars', 'what-is-blockchain']) {
+  // Главы НЕ из Фундамента: он в пуле бесплатно и «своим» прогрессом не
+  // считается, иначе строка исчезала бы у того, кто ещё ничего не открыл.
+  for (const id of ['kotlin-vars', 'what-is-blockchain', 'kotlin-null', 'ts-vs-js']) {
     store.setSectionRead(id, 's1');
   }
-  expect(eligibleChapters().length).toBeGreaterThanOrEqual(FEW_CHAPTERS);
+  expect(ownChapters().length).toBeGreaterThanOrEqual(FEW_CHAPTERS);
   render(<DailyChallenge />);
   fireEvent.click(await screen.findByText('Вызов дня'));
   expect(screen.queryByText('Изучай больше глав — вызовы станут разнообразнее.')).toBeNull();
@@ -168,4 +212,29 @@ test('если день уже пройден — квиз не открывае
   const streak = screen.getByLabelText('Серия: 1');
   expect(streak.textContent).toContain('день подряд');
   expect(streak.querySelectorAll('.st-pip.on')).toHaveLength(1);
+});
+
+test('пройденный вызов запоминается — назавтра вопросы другие', async () => {
+  // Раньше набор дня выбирался независимо, и при полном банке первый повтор
+  // приходил на восьмой день, а у новичка — на второй.
+  const { container } = render(<DailyChallenge />);
+  fireEvent.click(await screen.findByText('Вызов дня'));
+  const shown = pickDaily(todayKey(), dailyPool(), store.dailySeenList());
+
+  // отвечаем на все вопросы — как в тесте прохождения выше
+  container.querySelectorAll('.dc-question').forEach((q) => {
+    const opt = q.querySelector('button');
+    if (opt) fireEvent.click(opt);
+  });
+
+  expect(store.dailySeenList().length).toBeGreaterThan(0);
+  const tomorrow = pickDaily('2099-01-01', dailyPool(), store.dailySeenList());
+  const seen = new Set(shown.map(questionKey));
+  expect(tomorrow.filter((q) => seen.has(questionKey(q)))).toEqual([]);
+});
+
+test('круг пройден — память обнуляется, а не копится вечно', () => {
+  const pool = dailyPool();
+  store.markDailySeen(pool.map(questionKey), pool.length);
+  expect(store.dailySeenList()).toEqual([]);
 });

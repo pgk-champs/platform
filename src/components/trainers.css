@@ -917,9 +917,13 @@
   text-align: center;
 }
 
-.ach-card-on {
-  background: var(--ifm-color-success-contrast-background);
-  border-color: var(--pgk-text-success);
+/* Специфичность в два класса нарочно: правила редкости ниже в файле задают
+   border ШОРТКАТОМ, и он перебивал border-color отсюда — у 17 редких и 10
+   эпических достижений из 43 рамка «выдано» не появлялась никогда.
+   Цвет — медь: выданное достижение это «твоё», а не «сошлось». */
+.ach-card.ach-card-on {
+  background: color-mix(in srgb, var(--pgk-you) 12%, transparent);
+  border-color: var(--pgk-you);
 }
 
 .ach-card-off {
@@ -9701,4 +9705,38 @@
   .cl-layer {
     top: 38%;
   }
+}
+
+/* Сколько достижений собрано — главное число страницы. Жило в чипе фильтра
+   кеглем 11px: ради него на страницу и приходят, а увидеть было негде. */
+.ach-score {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.1rem;
+  color: var(--ifm-color-emphasis-700);
+  margin-bottom: 0.4rem;
+}
+
+.ach-score b {
+  font-family: var(--pgk-font-display);
+  font-size: 2rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--pgk-you);
+}
+
+.ach-score-bar {
+  flex: 1;
+  max-width: 16rem;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--ifm-color-emphasis-300);
+  overflow: hidden;
+}
+
+.ach-score-fill {
+  display: block;
+  height: 100%;
+  background: var(--pgk-you);
 }

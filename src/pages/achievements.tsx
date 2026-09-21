@@ -72,6 +72,18 @@ export default function Achievements() {
     <Layout title="Достижения" description="Достижения и опыт на платформе PGK Champs">
       <main className="container margin-vert--lg">
         <h1>Достижения</h1>
+        {/* Главное число страницы — сколько собрано из сорока трёх. Оно жило
+            только в чипе фильтра кеглем 11px, то есть ради него сюда и
+            приходят, а увидеть его было негде. */}
+        <div className="ach-score">
+          <b>{unlocked.size}</b> из {ACHIEVEMENTS.length}
+          <span className="ach-score-bar" aria-hidden="true">
+            <span
+              className="ach-score-fill"
+              style={{ width: `${Math.round((100 * unlocked.size) / ACHIEVEMENTS.length)}%` }}
+            />
+          </span>
+        </div>
         <div className="ach-xp">XP: {xp}</div>
         {(() => {
           const lvl = levelForXp(xp);

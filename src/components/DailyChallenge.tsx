@@ -16,13 +16,33 @@ export const DAILY_XP_PER_CORRECT = 5;
 
 export type DailyQuestion = Question & { chapterId: string };
 
-/** Первые две главы Фундамента — всегда в пуле, даже без прогресса. */
-export const STARTER_CHAPTERS = ['typing', 'it-english'];
+/** Фундамент целиком — всегда в пуле, даже без прогресса.
+ *
+ *  Стартовыми были две главы, и это давало шесть вопросов на пять в день:
+ *  ожидаемое совпадение со вчерашним набором 4,2 из 5, то есть весь первый
+ *  месяц один и тот же квиз. Фундамент — общая база обоих треков (CLAUDE.md
+ *  §1), его главы студент так или иначе проходит, и вопрос из непрочитанной
+ *  главы работает подсказкой, что такая глава есть.
+ *
+ *  Список НЕ перечисляется руками: главы Фундамента берутся из карты знаний,
+ *  иначе он отстанет при первой же новой главе. */
+export const STARTER_CHAPTERS = (knowledgeMap as MapEntry[])
+  .filter((e) => e.track === 'foundation')
+  .map((e) => e.id);
 
-/** Порог «изучено мало»: меньше этого числа глав в пуле — показываем честную строку. */
+/** Порог «изучено мало»: меньше этого числа СВОИХ глав — показываем честную
+ *  строку. Своих, а не всех в пуле: Фундамент лежит там бесплатно, и после
+ *  его добавления условие «мало глав в пуле» стало недостижимым — строка
+ *  превратилась бы в мёртвый код. */
 export const FEW_CHAPTERS = 4;
 
-type MapEntry = { id: string; title: string; path: string };
+/** Главы, которые студент открыл сам, сверх бесплатного Фундамента. */
+export function ownChapters(eligible: string[] = eligibleChapters()): string[] {
+  const free = new Set(STARTER_CHAPTERS);
+  return eligible.filter((id) => !free.has(id));
+}
+
+type MapEntry = { id: string; title: string; path: string; track: string };
 
 export const CHAPTER_META: Record<string, { title: string; path: string }> = Object.fromEntries(
   (knowledgeMap as MapEntry[]).map((e) => [
@@ -974,8 +994,24 @@ export function dailyPool(eligible: string[] = eligibleChapters()): DailyQuestio
   return DAILY_BANK.filter((q) => allowed.has(q.chapterId));
 }
 
-/** Детерминированный выбор DAILY_SIZE вопросов по дате: seeded Fisher–Yates. */
-export function pickDaily(dateKey: string, bank: DailyQuestion[] = DAILY_BANK): DailyQuestion[] {
+/** Ключ вопроса: по нему помним, что уже показывали. Текст, а не индекс —
+ *  индекс поедет при первой же правке банка. */
+export function questionKey(q: DailyQuestion): string {
+  return `${q.chapterId}::${q.q}`;
+}
+
+/** Детерминированный выбор DAILY_SIZE вопросов по дате: seeded Fisher–Yates.
+ *
+ *  seen — что уже показывали. Без него каждый день выбирался независимо, и
+ *  вопросы повторялись задолго до исчерпания банка: при полном банке первый
+ *  повтор приходил на восьмой день, у новичка — на второй. Сначала берём
+ *  непоказанные; если их меньше пяти, добираем из показанных, а когда круг
+ *  пройден целиком — начинаем заново. */
+export function pickDaily(
+  dateKey: string,
+  bank: DailyQuestion[] = DAILY_BANK,
+  seen: string[] = [],
+): DailyQuestion[] {
   let s = hashDate(dateKey);
   const rand = () => {
     // mulberry32
@@ -984,12 +1020,21 @@ export function pickDaily(dateKey: string, bank: DailyQuestion[] = DAILY_BANK): 
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-  const idx = bank.map((_, i) => i);
-  for (let i = idx.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(rand() * (i + 1));
-    [idx[i], idx[j]] = [idx[j], idx[i]];
-  }
-  return idx.slice(0, DAILY_SIZE).map((i) => bank[i]);
+  const shuffle = (list: DailyQuestion[]) => {
+    const idx = list.map((_, i) => i);
+    for (let i = idx.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(rand() * (i + 1));
+      [idx[i], idx[j]] = [idx[j], idx[i]];
+    }
+    return idx.map((i) => list[i]);
+  };
+
+  const shown = new Set(seen);
+  const fresh = bank.filter((q) => !shown.has(questionKey(q)));
+  const rest = bank.filter((q) => shown.has(questionKey(q)));
+  // Непоказанные вперёд, добор — из показанных. Оба перемешиваются одним и тем
+  // же генератором, поэтому набор дня остаётся детерминированным по дате.
+  return [...shuffle(fresh), ...shuffle(rest)].slice(0, DAILY_SIZE);
 }
 
 export default function DailyChallenge() {
@@ -1007,7 +1052,10 @@ export default function DailyChallenge() {
   // Пул зависит от прогресса, выбор из пула — только от даты: при одном и том
   // же прогрессе набор дня детерминирован.
   const eligible = today ? eligibleChapters() : [];
-  const questions = today ? pickDaily(today, dailyPool(eligible)) : [];
+  // Память о показанном: без неё каждый день выбирался независимо и вопросы
+  // повторялись задолго до исчерпания банка.
+  const pool = dailyPool(eligible);
+  const questions = today ? pickDaily(today, pool, store.dailySeenList()) : [];
   const answeredCount = Object.keys(answers).length;
   const correctCount = Object.entries(answers).filter(
     ([qi, oi]) => oi === questions[Number(qi)]?.correct,
@@ -1017,6 +1065,7 @@ export default function DailyChallenge() {
   useEffect(() => {
     if (!allAnswered) return;
     const key = todayKey();
+    store.markDailySeen(questions.map(questionKey), pool.length);
     if (store.completeDaily(key, { correct: correctCount, total: questions.length })) {
       if (correctCount > 0) store.addXp(correctCount * DAILY_XP_PER_CORRECT, `daily:${key}`);
     }
@@ -1049,7 +1098,7 @@ export default function DailyChallenge() {
           <div className="dc-intro">
             5 вопросов по пройденным темам. Ответ засчитывается с первой попытки — подумай, прежде чем жать.
           </div>
-          {eligible.length < FEW_CHAPTERS ? (
+          {ownChapters(eligible).length < FEW_CHAPTERS ? (
             <div className="dc-more">Изучай больше глав — вызовы станут разнообразнее.</div>
           ) : null}
           {questions.map((item, qi) => {
