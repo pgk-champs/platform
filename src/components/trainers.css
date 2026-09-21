@@ -9740,3 +9740,104 @@
   height: 100%;
   background: var(--pgk-you);
 }
+
+/* Витрина трека: до неё на /docs/mobile и /docs/blockchain было ноль
+   карточек на 46 и 72 главы — попасть в них можно было только сайдбаром. */
+.tc-group {
+  margin-top: 2rem;
+}
+
+.tc-group-title {
+  font-family: var(--pgk-font-display);
+  font-size: 1.3rem;
+  margin-bottom: 0.2rem;
+}
+
+.tc-group-count {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.tc-group-note {
+  margin: 0 0 0.9rem;
+  font-size: 0.86rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.tc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));
+  gap: 0.7rem;
+}
+
+.tc-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: 'num title' 'num parts' 'num exam' 'bar bar';
+  align-items: baseline;
+  column-gap: 0.6rem;
+  min-width: 0;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-card-border-radius);
+  background: var(--ifm-card-background-color);
+  color: inherit;
+  text-decoration: none;
+}
+
+.tc-card:hover {
+  border-color: var(--ifm-color-primary);
+  color: inherit;
+  text-decoration: none;
+}
+
+.tc-num {
+  grid-area: num;
+  align-self: start;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ifm-color-emphasis-500);
+}
+
+.tc-title {
+  grid-area: title;
+  font-weight: var(--ifm-font-weight-bold);
+  line-height: 1.3;
+}
+
+.tc-parts {
+  grid-area: parts;
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.tc-exam {
+  grid-area: exam;
+  justify-self: start;
+  margin-top: 0.35rem;
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--ifm-color-emphasis-400);
+  color: var(--ifm-color-emphasis-700);
+}
+
+/* Прогресс — медь: это «твоё». */
+.tc-bar {
+  grid-area: bar;
+  margin-top: 0.6rem;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pgk-you) 18%, transparent);
+  overflow: hidden;
+}
+
+.tc-fill {
+  display: block;
+  height: 100%;
+  background: var(--pgk-you);
+}
