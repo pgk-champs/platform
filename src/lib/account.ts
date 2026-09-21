@@ -17,7 +17,18 @@ function apiBase(): string {
 }
 
 const TOKEN_KEY = 'pgk-account-token';
-export type Profile = { id: number; login: string; name: string; avatar: string; mentor?: boolean; root?: boolean };
+export type Profile = {
+  id: number;
+  login: string;
+  name: string;
+  avatar: string;
+  mentor?: boolean;
+  root?: boolean;
+  /** Группы, в которых состоит студент. Приходят вместе с профилем: иначе
+   *  вступивший по коду видел подтверждение один раз и после перезагрузки
+   *  терял всякий след — проверить, в той ли он группе, было негде. */
+  groups?: { id: number; name: string }[];
+};
 
 export type MentorStudent = {
   gh_id: number;

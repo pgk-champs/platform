@@ -118,8 +118,6 @@ db.exec(`CREATE TABLE IF NOT EXISTS group_members (
 const createGroup = db.prepare('INSERT INTO groups (name, code, owner, created_at) VALUES (?, ?, ?, ?)');
 const groupByCode = db.prepare('SELECT * FROM groups WHERE code = ?');
 const groupById = db.prepare('SELECT * FROM groups WHERE id = ?');
-const groupsByOwner = db.prepare(`SELECT g.*, (SELECT COUNT(*) FROM group_members m WHERE m.group_id = g.id) AS members
-  FROM groups g WHERE g.owner = ? ORDER BY g.created_at DESC`);
 const deleteGroup = db.prepare('DELETE FROM groups WHERE id = ? AND owner = ?');
 const deleteGroupMembers = db.prepare('DELETE FROM group_members WHERE group_id = ?');
 
@@ -423,7 +421,19 @@ const server = http.createServer(async (req, res) => {
       if (!s) return json(res, 401, { error: 'unauthorized' });
       const u = getUser.get(s.id);
       if (!u) return json(res, 401, { error: 'unauthorized' });
-      return json(res, 200, { id: u.gh_id, login: u.login, name: u.name, avatar: u.avatar, mentor: isMentor(u), root: isRootMentor(u) });
+      // Свои группы отдаём вместе с профилем: запрос myGroups был написан
+      // и НИ РАЗУ не вызван, поэтому студент, вступивший по коду, видел
+      // подтверждение один раз и после перезагрузки терял всякий след —
+      // проверить, в той ли он группе, было негде.
+      return json(res, 200, {
+        id: u.gh_id,
+        login: u.login,
+        name: u.name,
+        avatar: u.avatar,
+        mentor: isMentor(u),
+        root: isRootMentor(u),
+        groups: myGroups.all(u.gh_id),
+      });
     }
 
     if (path === '/progress' && req.method === 'GET') {

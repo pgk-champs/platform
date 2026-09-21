@@ -21,13 +21,24 @@ import {
   fetchContentMeta,
 } from '../lib/account';
 
-function JoinGroup() {
+function JoinGroup({ groups }: { groups?: { id: number; name: string }[] }) {
   const [code, setCode] = useState('');
   const [state, setState] = useState<{ kind: 'idle' | 'joined' | 'error'; name?: string }>({ kind: 'idle' });
+  const mine = groups ?? [];
   return (
     <div className="ac-card ac-join">
-      <strong>Присоединиться к группе</strong>
-      <p className="ac-muted">Наставник дал код группы? Введи его, чтобы попасть в его список.</p>
+      <strong>{mine.length ? 'Твоя группа' : 'Присоединиться к группе'}</strong>
+      {mine.length > 0 ? (
+        <p className="ac-join-ok">
+          Ты в {mine.length === 1 ? 'группе' : 'группах'}: {mine.map((g) => `«${g.name}»`).join(', ')}.
+          Наставник видит твой прогресс.
+        </p>
+      ) : null}
+      <p className="ac-muted">
+        {mine.length
+          ? 'Можно вступить ещё в одну — по коду от другого наставника.'
+          : 'Наставник дал код группы? Введи его, чтобы попасть в его список.'}
+      </p>
       <form
         className="ac-join-form"
         onSubmit={async (e) => {
@@ -56,7 +67,13 @@ function JoinGroup() {
 }
 import '../components/trainers.css';
 
-type Profile = { id: number; login: string; name: string; avatar: string };
+type Profile = {
+  id: number;
+  login: string;
+  name: string;
+  avatar: string;
+  groups?: { id: number; name: string }[];
+};
 
 function Cabinet() {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -217,7 +234,7 @@ function Cabinet() {
         </button>
       </div>
 
-      <JoinGroup />
+      <JoinGroup groups={profile.groups} />
 
       <button type="button" className="ac-logout" onClick={logout}>
         Выйти из аккаунта
