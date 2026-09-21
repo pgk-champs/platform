@@ -1,3 +1,4 @@
+import { LOOKS } from '../lib/looks';
 import { ACHIEVEMENTS, ACHIEVEMENT_CATEGORIES, sortAchievements } from '../lib/achievements';
 import { readFileSync } from 'fs';
 
@@ -26,5 +27,15 @@ test('карточки идут категориями, внутри — от о
     if (эта === прошлая) {
       expect(порядок[list[i].rarity]).toBeGreaterThanOrEqual(порядок[list[i - 1].rarity]);
     }
+  }
+});
+
+test('каждый облик обещан на карточке своего достижения', () => {
+  // Награда, о которой узнаёшь уже получив, ни к чему не ведёт. Подпись
+  // берётся из реестра обликов — разойтись с реальностью ей нечем.
+  const byAch = new Map(LOOKS.filter((l) => l.achievement).map((l) => [l.achievement!, l.name]));
+  expect(byAch.size).toBeGreaterThanOrEqual(5);
+  for (const id of byAch.keys()) {
+    expect(ACHIEVEMENTS.some((a) => a.id === id), `нет достижения ${id}`).toBe(true);
   }
 });

@@ -9990,3 +9990,19 @@
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+
+/* «Откроет облик …» — медью, потому что это про тебя, и ссылкой, потому что
+   вести должно туда, где облик потом выбирают. */
+.ach-gives {
+  display: inline-block;
+  margin-top: 0.45rem;
+  font-size: 0.74rem;
+  color: var(--pgk-you);
+  text-decoration: none;
+  border-bottom: 1px dashed currentColor;
+}
+
+.ach-gives:hover {
+  color: var(--pgk-you);
+  border-bottom-style: solid;
+}

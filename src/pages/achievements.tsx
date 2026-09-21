@@ -1,6 +1,8 @@
 import React, { useState, useSyncExternalStore } from 'react';
 import Layout from '@theme/Layout';
+import Link from '@docusaurus/Link';
 import { store } from '../lib/store';
+import { LOOKS } from '../lib/looks';
 import { quizRecords, trainerRecords, blockExamRecords, ПОКАЗ } from '../lib/records';
 import { levelForXp } from '../lib/levels';
 import {
@@ -20,6 +22,12 @@ const RARITY_CLASS: Record<AchievementRarity, string> = {
   редкое: 'ach-card-rare',
   эпическое: 'ach-card-epic',
 };
+
+// Какое достижение какой облик открывает — из реестра обликов, чтобы
+// подпись не разошлась с тем, что реально откроется.
+const LOOK_BY_ACHIEVEMENT: Record<string, string> = Object.fromEntries(
+  LOOKS.filter((l) => l.achievement).map((l) => [l.achievement!, l.name]),
+);
 
 function Step({ now, goal }: { now: number; goal: number }) {
   const pct = Math.min(100, Math.round((100 * now) / goal));
@@ -129,6 +137,13 @@ export default function Achievements() {
                     Показываем только закрытым и только там, где есть счёт. */}
                 {!isUnlocked && !a.hidden && a.progress && stepGoal(a.id) ? (
                   <Step now={a.progress(snap)} goal={stepGoal(a.id)!} />
+                ) : null}
+                {/* Награда видна ДО получения: иначе к ней не стремятся, а
+                    узнают о ней случайно, уже получив. */}
+                {LOOK_BY_ACHIEVEMENT[a.id] ? (
+                  <Link className="ach-gives" to="/account">
+                    {isUnlocked ? 'открыт облик' : 'откроет облик'} «{LOOK_BY_ACHIEVEMENT[a.id]}»
+                  </Link>
                 ) : null}
                 <div className={`ach-rarity ach-rarity-${a.rarity === 'эпическое' ? 'epic' : a.rarity === 'редкое' ? 'rare' : 'common'}`}>
                   {a.rarity}
