@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 import { store } from './store';
-import { ACHIEVEMENTS, ACHIEVEMENT_CATEGORIES, RARITY_XP, evaluate } from './achievements';
+import { ACHIEVEMENTS, ACHIEVEMENT_CATEGORIES, RARITY_XP, stepGoal, evaluate } from './achievements';
 import knowledgeMap from '../data/knowledge-map.json';
 
 beforeEach(() => {
@@ -359,4 +359,41 @@ test('в каждом треке есть что открыть', () => {
     expect(src.includes(`'${track}'`) || ACHIEVEMENTS.some((a) => a.category === 'треки')).toBe(true);
   }
   expect(ACHIEVEMENTS.filter((a) => a.category === 'треки').length).toBeGreaterThanOrEqual(5);
+});
+
+// --- путь к закрытой ступени (21.09.2026) ---
+
+test('у каждой ступени лестницы есть счётчик пути', () => {
+  // Витрина печатала только условие: «25 тренажёров» и молчание про «18».
+  const без: string[] = [];
+  for (const a of ACHIEVEMENTS) {
+    if (!/^\d+-/.test(a.id)) continue;
+    if (!a.progress) без.push(a.id);
+  }
+  expect(без).toEqual([]);
+  expect(ACHIEVEMENTS.filter((a) => a.progress).length).toBeGreaterThanOrEqual(30);
+});
+
+test('порог читается из id и совпадает с проверкой', () => {
+  // Если счётчик считает не то, чем меряет проверка, полоса будет врать:
+  // «25 из 25» при закрытом достижении. Догоняем счётчик до порога и
+  // требуем, чтобы проверка в этот момент сработала.
+  expect(stepGoal('25-тренажёров')).toBe(25);
+  expect(stepGoal('нелестница')).toBeNull();
+
+  store.__resetForTests();
+  for (let i = 0; i < 10; i += 1) store.markTrainerDone(`гл${i}`, 'т', { ok: true });
+  const a = ACHIEVEMENTS.find((x) => x.id === '10-тренажёров')!;
+  const snap = store.snapshot();
+  expect(a.progress!(snap)).toBe(10);
+  expect(a.check(snap)).toBe(true);
+});
+
+test('счётчик не обгоняет проверку: на шаг меньше — ещё закрыто', () => {
+  store.__resetForTests();
+  for (let i = 0; i < 9; i += 1) store.markTrainerDone(`гл${i}`, 'т', { ok: true });
+  const a = ACHIEVEMENTS.find((x) => x.id === '10-тренажёров')!;
+  const snap = store.snapshot();
+  expect(a.progress!(snap)).toBe(9);
+  expect(a.check(snap)).toBe(false);
 });

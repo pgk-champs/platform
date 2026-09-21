@@ -9959,3 +9959,34 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
 }
+
+/* Путь к закрытой ступени. Полоса тонкая и без подписи-заголовка: карточек
+   на витрине сто десять, и каждая лишняя строка превращает её в таблицу. */
+.ach-step {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+}
+
+.ach-step-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--ifm-color-emphasis-300);
+  overflow: hidden;
+}
+
+.ach-step-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--pgk-you);
+}
+
+.ach-step-num {
+  font-size: 0.72rem;
+  color: var(--ifm-color-emphasis-600);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

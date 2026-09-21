@@ -7,6 +7,7 @@ import {
   ACHIEVEMENTS,
   ACHIEVEMENT_CATEGORIES,
   sortAchievements,
+  stepGoal,
   type AchievementCategory,
   type AchievementRarity,
 } from '../lib/achievements';
@@ -19,6 +20,20 @@ const RARITY_CLASS: Record<AchievementRarity, string> = {
   редкое: 'ach-card-rare',
   эпическое: 'ach-card-epic',
 };
+
+function Step({ now, goal }: { now: number; goal: number }) {
+  const pct = Math.min(100, Math.round((100 * now) / goal));
+  return (
+    <div className="ach-step">
+      <span className="ach-step-bar" aria-hidden="true">
+        <span className="ach-step-fill" style={{ width: `${pct}%` }} />
+      </span>
+      <span className="ach-step-num">
+        {Math.min(now, goal)} из {goal}
+      </span>
+    </div>
+  );
+}
 
 export default function Achievements() {
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
@@ -110,6 +125,11 @@ export default function Achievements() {
                 <div className="ach-desc">
                   {isUnlocked || !a.hidden ? a.desc : 'Найдётся само — если делать по-своему'}
                 </div>
+                {/* Путь к ступени: «18 из 25» двигает, голое условие — нет.
+                    Показываем только закрытым и только там, где есть счёт. */}
+                {!isUnlocked && !a.hidden && a.progress && stepGoal(a.id) ? (
+                  <Step now={a.progress(snap)} goal={stepGoal(a.id)!} />
+                ) : null}
                 <div className={`ach-rarity ach-rarity-${a.rarity === 'эпическое' ? 'epic' : a.rarity === 'редкое' ? 'rare' : 'common'}`}>
                   {a.rarity}
                 </div>

@@ -33,6 +33,12 @@ export type Achievement = {
   rarity: AchievementRarity;
   check: (snap: Snapshot) => boolean;
   /**
+   * Сколько уже есть — для ступеней лестниц. Порог берётся из самого id
+   * («25-тренажёров» → 25), поэтому здесь только счётчик. Проставляется
+   * автоматически ниже, руками у каждой ступени не пишется.
+   */
+  progress?: (snap: Snapshot) => number;
+  /**
    * Скрытое: пока не выдано, страница печатает «???» вместо названия и
    * описания. Нужно, чтобы находка оставалась находкой; на счётчик
    * «столько-то из стольких» скрытые влияют наравне с остальными — иначе
@@ -1326,6 +1332,44 @@ export const ACHIEVEMENTS: Achievement[] = [
     check: (s) => { const un = new Set(s.achievementsUnlocked); const cats = new Set(ACHIEVEMENTS.filter((a) => a.id !== 'по-всем-фронтам' && un.has(a.id)).map((a) => a.category)); return ACHIEVEMENT_CATEGORIES.every((c) => cats.has(c)); },
   },
 ];
+
+// ─── Путь к закрытой ступени ──────────────────────────────────────────────
+//
+// Витрина печатала только условие: «25 тренажёров» и молчание про «у тебя
+// 18». К такой награде не идут — её не видно приближающейся. У ступеней
+// лестниц порог уже зашит в id, поэтому достаточно СЧЁТЧИКА на семейство:
+// семнадцать строк вместо progress у каждой из сорока с лишним ступеней.
+
+const LADDER: Record<string, (s: Snapshot) => number> = {
+  'в-избранном': (s) => s.favorites.length,
+  главы: (s) => Object.keys(s.sections).length,
+  xp: (s) => s.xp,
+  квизов: (s) => s.quizLog.length,
+  'зн-мин': (s) => Math.max(0, ...typingResults(s).map((r) => r.cpm)),
+  слов: (s) => Object.keys(s.wordWeights).length,
+  'дня-подряд': (s) => maxDailyStreak(s),
+  'дней-подряд': (s) => maxDailyStreak(s),
+  'квизов-без-ошибок': (s) => perfectQuizIds(s).size,
+  тренажёров: (s) => trainersDone(s),
+  'глав-до-крышки': (s) => filledChapters(s).length,
+  экзаменов: (s) => chapterExamsPassed(s),
+  'с-первой-попытки': (s) => firstTryQuizIds(s).size,
+  'целей-тренажёров': (s) => s.xpAwarded.filter((r) => r.startsWith('trainer-goal:')).length,
+  'вызовов-дня': (s) => Object.keys(s.daily).length,
+  'своих-наборов': (s) => s.customPresets.length,
+  достижений: (s) => s.achievementsUnlocked.length,
+};
+
+/** Порог ступени — из её же id, чтобы число не пришлось дублировать. */
+export function stepGoal(id: string): number | null {
+  const m = /^(\d+)-/.exec(id);
+  return m ? Number(m[1]) : null;
+}
+
+for (const a of ACHIEVEMENTS) {
+  const m = /^(\d+)-(.+)$/.exec(a.id);
+  if (m && LADDER[m[2]]) a.progress = LADDER[m[2]];
+}
 
 // Гвард от реентрантности: achievements.unlock() пишет в store, что бьёт
 // событием 'change', на которое подписан этот же evaluate() (см.
