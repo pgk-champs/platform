@@ -3,6 +3,8 @@
 // отсутствие window при сборке Docusaurus). Подписка на изменения — простой
 // EventTarget, чтобы виджеты (через useSyncExternalStore) перерисовывались.
 
+import { LOOK_IDS } from './looks';
+
 const STORAGE_KEY = 'pgk-store';
 
 export type OsId = 'mac' | 'win' | 'linux';
@@ -410,8 +412,11 @@ function achIsUnlocked(id: string): boolean {
 // Оформление сосудов Маршрута. Значение уходит в атрибут data-skin, поэтому на
 // ЧТЕНИИ проверяется по списку: тема, которой больше нет (или мусор из чужой
 // вкладки), не должна оставить сосуды без переменных — молча откатываемся.
-export const SKINS = ['classic', 'cola', 'energy'] as const;
-export type Skin = (typeof SKINS)[number];
+// Список — из реестра обликов (src/lib/looks.ts), чтобы не вести его дважды.
+// Здесь проверяется только «такой облик существует»; ОТКРЫТ ли он — вопрос
+// достижений, и решается там, где облик применяется (src/theme/Root.tsx).
+export const SKINS: readonly string[] = LOOK_IDS;
+export type Skin = string;
 
 function setSkin(skin: Skin): void {
   state.prefs = { ...state.prefs, skin };
@@ -420,7 +425,7 @@ function setSkin(skin: Skin): void {
 
 function getSkin(): Skin {
   const v = state.prefs.skin;
-  return (SKINS as readonly string[]).includes(v ?? '') ? (v as Skin) : 'classic';
+  return SKINS.includes(v ?? '') ? v! : 'classic';
 }
 
 function setOs(os: OsId): void {

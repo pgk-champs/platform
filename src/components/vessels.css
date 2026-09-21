@@ -305,6 +305,105 @@
   --st-mult-ink: #14210a;
 }
 
+/* ── Облики: темы, которые заслуживают делом (src/lib/looks.ts) ─────────────
+   Каждый висит на уже выданном достижении, флага «открыто» нигде не хранится.
+   Кроме сосудов облик перекрашивает --pgk-you — акцент «твоё»: плашку в
+   шапке, огонёк серии и отметки пройденного. Палитру платформы
+   (--ifm-color-primary и шесть оттенков, 274 обращения) облик НЕ трогает:
+   это ссылки, кнопки и подсветка кода, и перекрасить их значило бы менять
+   читаемость сайта ради украшения. */
+
+/* «Терминал» — все шесть тренажёров главы про Linux. Фосфорная зелень. */
+[data-skin='terminal'] {
+  --v-body: linear-gradient(180deg, #11160f, #080b07);
+  --v-edge: rgba(94, 222, 94, 0.45);
+  --v-liquid: linear-gradient(180deg, #7dfc7d, #23a723);
+  --v-lid: linear-gradient(180deg, #5ede5e, #2c7f2c);
+  --v-bubble: rgba(190, 255, 190, 0.8);
+  --foam-h: 0;
+  --lid-h: 10px;
+  --v-radius: 2px;
+  --st-glow: rgba(94, 222, 94, 0.5);
+  --st-mult-ink: #081408;
+}
+
+/* «Цепь» — все семь тренажёров главы про блокчейн. Звенья и фиолет. */
+[data-skin='chain'] {
+  --v-body: linear-gradient(180deg, #221a3a, #120d21);
+  --v-edge: rgba(167, 139, 250, 0.45);
+  --v-liquid: linear-gradient(180deg, #a78bfa, #6d4bd8);
+  --v-lid: linear-gradient(180deg, #c4b5fd, #7c5cf0);
+  --v-bubble: rgba(230, 220, 255, 0.8);
+  --foam-h: 0;
+  --lid-h: 11px;
+  --v-radius: 4px;
+  --st-glow: rgba(167, 139, 250, 0.5);
+  --st-mult-ink: #16102b;
+}
+
+/* «Пергамент» — исторические врезки прочитаны, а не пролистаны. */
+[data-skin='paper'] {
+  --v-body: linear-gradient(180deg, #efe3cc, #d9c8a8);
+  --v-edge: rgba(120, 92, 54, 0.45);
+  --v-liquid: linear-gradient(180deg, #b98b4e, #825c2c);
+  --v-lid: linear-gradient(180deg, #c9a46d, #8a6636);
+  --v-bubble: rgba(255, 249, 235, 0.85);
+  --foam-h: 0;
+  --lid-h: 10px;
+  --v-radius: 7px;
+  --st-glow: rgba(185, 139, 78, 0.5);
+  --st-mult-ink: #2a1d0c;
+}
+
+/* «Огонь» — тридцать дней подряд. Тот самый огонёк серии, но целиком. */
+[data-skin='fire'] {
+  --v-body: linear-gradient(180deg, #2a1410, #170a08);
+  --v-edge: rgba(255, 138, 61, 0.45);
+  --v-liquid: linear-gradient(180deg, #ffb457, #e2561b);
+  --v-lid: linear-gradient(180deg, #ffd08a, #ef7a2a);
+  --v-bubble: rgba(255, 233, 205, 0.85);
+  --foam-h: 0;
+  --lid-h: 11px;
+  --v-radius: 4px;
+  --st-glow: rgba(255, 138, 61, 0.6);
+  --st-mult-ink: #24100a;
+}
+
+/* «Чемпион» — пятнадцатое звание. Виден редко и потому дорого. */
+[data-skin='champion'] {
+  --v-body: linear-gradient(180deg, #2b2410, #17130a);
+  --v-edge: rgba(226, 188, 92, 0.5);
+  --v-liquid: linear-gradient(180deg, #f2d585, #c79a2e);
+  --v-lid: linear-gradient(180deg, #ffe9a8, #cfa73c);
+  --v-bubble: rgba(255, 248, 220, 0.9);
+  --foam-h: 0;
+  --lid-h: 12px;
+  --v-radius: 3px;
+  --st-glow: rgba(226, 188, 92, 0.6);
+  --st-mult-ink: #241c08;
+}
+
+/* Акцент «твоё» у обликов задаётся ПАРОЙ правил на каждую тему.
+   Причина: в светлой теме --pgk-you это #b4550f, в тёмной #ffb05c
+   (src/css/custom.css), и одиночный [data-skin=…] имеет ту же специфичность,
+   что [data-theme='dark'] — исход решал бы порядок файлов. Два атрибута
+   разом дают специфичность выше обоих, и результат перестаёт зависеть от
+   того, чей импорт раньше. */
+[data-skin='terminal'] { --pgk-you: #1f7a1f; }
+[data-theme='dark'][data-skin='terminal'] { --pgk-you: #5ede5e; }
+
+[data-skin='chain'] { --pgk-you: #6d4bd8; }
+[data-theme='dark'][data-skin='chain'] { --pgk-you: #a78bfa; }
+
+[data-skin='paper'] { --pgk-you: #8a5a22; }
+[data-theme='dark'][data-skin='paper'] { --pgk-you: #d6a45f; }
+
+[data-skin='fire'] { --pgk-you: #c2521a; }
+[data-theme='dark'][data-skin='fire'] { --pgk-you: #ff9a4d; }
+
+[data-skin='champion'] { --pgk-you: #8a6b12; }
+[data-theme='dark'][data-skin='champion'] { --pgk-you: #e2bc5c; }
+
 /* Тема ещё не выбрана (первый заход, приватный режим) — сосуд всё равно должен
    быть виден, а не остаться прозрачным прямоугольником без переменных. */
 :root:not([data-skin]) {
@@ -416,4 +515,60 @@
   background: var(--st-on, var(--v-liquid));
   color: var(--st-mult-ink, #fff);
   white-space: nowrap;
+}
+
+/* ── Витрина обликов в кабинете ─────────────────────────────────────────── */
+.ac-looks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.ac-look {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: 'chip name' 'tells tells' 'bar bar' 'at at';
+  align-items: center;
+  gap: 4px 9px;
+  padding: 10px 12px;
+  text-align: left;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-surface-color);
+  color: inherit;
+  cursor: pointer;
+}
+
+.ac-look .ac-skin-chip { grid-area: chip; }
+.ac-look-name { grid-area: name; font-weight: var(--ifm-font-weight-bold); }
+.ac-look-tells { grid-area: tells; font-size: 0.78rem; color: var(--ifm-color-emphasis-600); }
+.ac-look-at { grid-area: at; font-size: 0.75rem; color: var(--ifm-color-emphasis-600); font-variant-numeric: tabular-nums; }
+
+.ac-look[aria-pressed='true'] {
+  border-color: var(--pgk-you);
+  box-shadow: inset 0 0 0 1px var(--pgk-you);
+}
+
+/* Закрытый облик виден целиком: спрятать его значило бы не дать к нему
+   стремиться. Приглушён, но образец показывает, ради чего стараться. */
+.ac-look-shut {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.ac-look-bar {
+  grid-area: bar;
+  height: 4px;
+  margin-top: 3px;
+  border-radius: 999px;
+  background: var(--ifm-color-emphasis-300);
+  overflow: hidden;
+}
+
+.ac-look-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--pgk-you);
 }

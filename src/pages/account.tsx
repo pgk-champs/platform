@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import Layout from '@theme/Layout';
 import BrowserOnly from '@docusaurus/BrowserOnly';
-import { store, SKINS, type Skin } from '../lib/store';
+import { looksWithState } from '../lib/looks';
+import { store } from '../lib/store';
 import { levelForXp } from '../lib/levels';
 import Link from '@docusaurus/Link';
 import './edit.css';
@@ -263,36 +264,57 @@ function AuthorLink(): React.ReactElement | null {
 
 // Оформление сосудов Маршрута. Стоит на уровне страницы, а не внутри кабинета:
 // это местная настройка, она работает и без входа.
-const SKIN_LABELS: Record<Skin, string> = {
-  classic: 'Без темы',
-  cola: 'Кола',
-  energy: 'Энергетик',
-};
-
 function SkinPicker() {
   useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
-  const active = store.prefs.getSkin();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  // До монтирования store спрашивать нельзя: он читает localStorage при
+  // импорте, и серверная разметка разошлась бы с первой клиентской.
+  const looks = mounted ? looksWithState(store.snapshot()) : [];
+  const active = mounted ? store.prefs.getSkin() : 'classic';
+
+  if (!mounted) return null;
 
   return (
     <div className="ac-card">
-      <h2>Оформление полосы</h2>
-      <p className="ac-muted">Как выглядят сосуды глав на Маршруте.</p>
-      <div className="ac-skins">
-        {SKINS.map((value) => (
-          <button
-            key={value}
-            type="button"
-            className="ac-skin"
-            // data-skin на самой кнопке обязателен: без него все образцы
-            // показали бы текущую тему вместо своей.
-            data-skin={value}
-            aria-pressed={active === value}
-            onClick={() => store.prefs.setSkin(value)}
-          >
-            <i className="ac-skin-chip" aria-hidden="true" />
-            {SKIN_LABELS[value]}
-          </button>
-        ))}
+      <h2>Облик</h2>
+      <p className="ac-muted">
+        Как выглядят сосуды глав, огонёк серии и акцент «твоё». Три первых — просто на вкус, остальные
+        открываются делом: облик не покупается, он говорит, чем ты занимался.
+      </p>
+      <div className="ac-looks">
+        {looks.map((l) => {
+          const путь = l.at ? Math.min(100, Math.round((100 * l.at.now) / l.at.need)) : 0;
+          return (
+            <button
+              key={l.id}
+              type="button"
+              className={`ac-look${l.open ? '' : ' ac-look-shut'}`}
+              // data-skin на самой кнопке обязателен: без него все образцы
+              // показали бы текущий облик вместо своего.
+              data-skin={l.id}
+              aria-pressed={active === l.id}
+              disabled={!l.open}
+              onClick={() => store.prefs.setSkin(l.id)}
+              title={l.open ? l.tells : undefined}
+            >
+              <i className="ac-skin-chip" aria-hidden="true" />
+              <span className="ac-look-name">{l.name}</span>
+              <span className="ac-look-tells">{l.tells}</span>
+              {/* Закрытое не молчит: «18 из 25» двигает, а голое условие — нет. */}
+              {!l.open && l.at ? (
+                <>
+                  <span className="ac-look-bar" aria-hidden="true">
+                    <span className="ac-look-fill" style={{ width: `${путь}%` }} />
+                  </span>
+                  <span className="ac-look-at">
+                    {l.at.now} из {l.at.need} · {l.at.unit}
+                  </span>
+                </>
+              ) : null}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

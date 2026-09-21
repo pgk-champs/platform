@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import AchievementsWatcher from '../components/AchievementsWatcher';
 import { store } from '../lib/store';
+import { effectiveLook } from '../lib/looks';
 
 // Non-swizzlable wrapper Docusaurus mounts around the whole app. Used to host
 // the achievements toast watcher globally, and to stamp the chosen vessel skin
@@ -10,7 +11,14 @@ export default function Root({ children }: { children: React.ReactNode }) {
     // Тема читается только в браузере: при сборке localStorage нет, а атрибут
     // всё равно должен появиться до того, как пользователь увидит сосуды.
     const apply = () => {
-      document.documentElement.dataset.skin = store.prefs.getSkin();
+      // Выбранный облик применяется, только если он ОТКРЫТ: факт открытия
+      // нигде не хранится, он выводится из выданных достижений. Чужая
+      // вкладка, ручная правка localStorage или сброс достижений — и облик
+      // молча откатывается к обычному, а не остаётся «купленным навсегда».
+      document.documentElement.dataset.skin = effectiveLook(
+        store.prefs.getSkin(),
+        store.achievements.list(),
+      );
     };
     apply();
     return store.subscribe(apply);
