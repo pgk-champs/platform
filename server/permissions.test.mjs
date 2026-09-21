@@ -11,6 +11,18 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { createRequire } from 'node:module';
+
+// Сервер нельзя поднять без своих зависимостей (better-sqlite3 лежит в
+// server/package.json). У того, кто их не ставил, тест не должен падать
+// красным — он должен честно сказать, чего не хватает. В CI они ставятся
+// отдельным шагом, так что там проверка идёт по-настоящему.
+let готов = true;
+try {
+  createRequire(import.meta.url)('better-sqlite3');
+} catch {
+  готов = false;
+}
 
 const PORT = 4873; // высокий и свободный; занят — тест честно упадёт на ожидании
 const B = `http://localhost:${PORT}`;
@@ -30,6 +42,7 @@ const call = async (t, p, opts = {}) => {
 };
 
 before(async () => {
+  if (!готов) return;
   srv = spawn(process.execPath, ['server/index.mjs'], {
     env: { ...process.env, DEV_LOGIN: '1', MENTORS: 'root', SESSION_SECRET: 'тест', DB_PATH: DB, PORT: String(PORT), BASE_URL: B },
     stdio: 'ignore',
@@ -48,7 +61,9 @@ after(() => {
   for (const f of [DB, `${DB}-wal`, `${DB}-shm`]) fs.rmSync(f, { force: true });
 });
 
-test('роли раздаёт только владелец платформы', async () => {
+const пропуск = { skip: готов ? false : 'нет зависимостей сервера: npm ci --prefix server' };
+
+test('роли раздаёт только владелец платформы', пропуск, async () => {
   const root = await tok('root');
   const alice = await tok('alice');
   // до выдачи роли алиса вообще не наставник
@@ -60,7 +75,7 @@ test('роли раздаёт только владелец платформы',
   assert.equal((await call(alice, '/moderate/people', { method: 'POST', body: '{"login":"alice"}' })).status, 403);
 });
 
-test('наставник видит только своих учеников, а проваленный квиз не засчитан', async () => {
+test('наставник видит только своих учеников, а проваленный квиз не засчитан', пропуск, async () => {
   const alice = await tok('alice');
   const bob = await tok('bob');
   const carol = await tok('carol');
@@ -82,7 +97,7 @@ test('наставник видит только своих учеников, а
   assert.equal(b.quizzesDone, 1, 'верный квиз не засчитан');
 });
 
-test('результат ученика стирает только его наставник', async () => {
+test('результат ученика стирает только его наставник', пропуск, async () => {
   const alice = await tok('alice');
   const root = await tok('root');
   const bob = await tok('bob');
@@ -94,7 +109,7 @@ test('результат ученика стирает только его на�
   assert.equal((await call(root, `/mentor/results/${bobId}/a`, { method: 'DELETE' })).status, 200);
 });
 
-test('слишком большое тело обрывает соединение, а не копится в памяти', async () => {
+test('слишком большое тело обрывает соединение, а не копится в памяти', пропуск, async () => {
   const bob = await tok('bob');
   const big = JSON.stringify({ junk: 'x'.repeat(2_000_000) });
   const r = await fetch(`${B}/progress`, {
