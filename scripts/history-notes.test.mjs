@@ -26,10 +26,14 @@ const врезкиПоТрекам = () => {
 };
 
 test('у каждого трека есть запас врезок сверх порога «Археолога»', () => {
-  const порог = Number(
-    /historyOpened\.length >= (\d+)/.exec(fs.readFileSync('src/lib/achievements.ts', 'utf8'))?.[1],
+  // Порогов на врезки теперь два: «Археолог» — рабочая ступень, «Полный
+  // архив» — завершающее «собери все восемь», и оно намеренно требует уйти в
+  // чужой трек. Стережём НИЖНИЙ: он и должен быть посилен каждому.
+  const пороги = [...fs.readFileSync('src/lib/achievements.ts', 'utf8').matchAll(/historyOpened\.length >= (\d+)/g)].map(
+    (m) => Number(m[1]),
   );
-  assert.ok(Number.isFinite(порог), 'порог «Археолога» не нашёлся в achievements.ts');
+  assert.ok(пороги.length > 0, 'порог «Археолога» не нашёлся в achievements.ts');
+  const порог = Math.min(...пороги);
 
   const счёт = врезкиПоТрекам();
   const фундамент = счёт.foundation ?? 0;
@@ -47,7 +51,7 @@ test('у каждого трека есть запас врезок сверх �
 
 test('в описании «Археолога» стоит то же число, что и в проверке', () => {
   const src = fs.readFileSync('src/lib/achievements.ts', 'utf8');
-  const порог = /historyOpened\.length >= (\d+)/.exec(src)[1];
+  const порог = String(Math.min(...[...src.matchAll(/historyOpened\.length >= (\d+)/g)].map((m) => Number(m[1]))));
   const подпись = /desc: 'Открыт[оы] (\d+) историческ/.exec(src)?.[1];
   assert.equal(подпись, порог, 'подпись достижения разошлась с проверкой');
 });

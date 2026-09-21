@@ -981,6 +981,16 @@
 }
 
 
+/* Награда печатается на самой плашке достижения: отдельным тостом «+10 XP»
+   она приезжала вторым сообщением и читалась как ещё одно событие. */
+.ach-toast-xp {
+  margin-left: 0.45rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8em;
+  font-variant-numeric: tabular-nums;
+  color: var(--pgk-you);
+}
+
 .ach-toast-icon {
   font-size: 1.2rem;
 }

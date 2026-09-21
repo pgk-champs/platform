@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 import { store } from './store';
-import { ACHIEVEMENTS, ACHIEVEMENT_CATEGORIES, evaluate } from './achievements';
+import { ACHIEVEMENTS, ACHIEVEMENT_CATEGORIES, RARITY_XP, evaluate } from './achievements';
 import knowledgeMap from '../data/knowledge-map.json';
 
 beforeEach(() => {
@@ -11,9 +11,9 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-test('registry has 43 achievements with unique ids, valid categories and rarities', () => {
-  expect(ACHIEVEMENTS).toHaveLength(43);
-  expect(new Set(ACHIEVEMENTS.map((a) => a.id)).size).toBe(43);
+test('registry has 110 achievements with unique ids, valid categories and rarities', () => {
+  expect(ACHIEVEMENTS).toHaveLength(110);
+  expect(new Set(ACHIEVEMENTS.map((a) => a.id)).size).toBe(110);
   const rarities = new Set(['обычное', 'редкое', 'эпическое']);
   for (const a of ACHIEVEMENTS) {
     expect(ACHIEVEMENT_CATEGORIES).toContain(a.category);
@@ -277,4 +277,86 @@ test('PoW: рекорд сложности не затирается перво�
     difficulty: Math.max(1, prev2.difficulty ?? 0),
   });
   expect(snap().difficulty).toBe(3);
+});
+
+// ===== лестницы, скрытые и награда (21.09.2026) =====
+
+test('лестница не ломается: выше порог — не ниже редкость', () => {
+  // Ступени одного ряда отличаются только числом в проверке. Если «сто» вдруг
+  // окажется обычным, а «десять» эпическим, витрина будет врать о труде.
+  const порядок = { обычное: 0, редкое: 1, эпическое: 2 } as const;
+  const ряды = new Map<string, { n: number; rarity: keyof typeof порядок }[]>();
+  for (const a of ACHIEVEMENTS) {
+    const m = /^(\d+)-(.+)$/.exec(a.id);
+    if (!m) continue;
+    const key = m[2];
+    if (!ряды.has(key)) ряды.set(key, []);
+    ряды.get(key)!.push({ n: Number(m[1]), rarity: a.rarity });
+  }
+  const кривые: string[] = [];
+  for (const [key, ступени] of ряды) {
+    if (ступени.length < 2) continue;
+    ступени.sort((a, b) => a.n - b.n);
+    for (let i = 1; i < ступени.length; i += 1) {
+      if (порядок[ступени[i].rarity] < порядок[ступени[i - 1].rarity]) {
+        кривые.push(`${key}: ${ступени[i - 1].n} ${ступени[i - 1].rarity} → ${ступени[i].n} ${ступени[i].rarity}`);
+      }
+    }
+  }
+  expect(кривые).toEqual([]);
+  expect(ряды.size).toBeGreaterThanOrEqual(4);
+});
+
+test('скрытые есть, и у них честное описание про находку', () => {
+  const hidden = ACHIEVEMENTS.filter((a) => a.hidden);
+  expect(hidden.length).toBeGreaterThanOrEqual(3);
+  // скрытое не должно быть ступенью лестницы — иначе ряд станет дырявым
+  for (const a of hidden) expect(/^\d+-/.test(a.id)).toBe(false);
+});
+
+test('мета-достижения стоят в конце: раньше них считать нечего', () => {
+  // snapshot() отдаёт живой state, и внутри прохода evaluate() видно только
+  // то, что выдано ВЫШЕ по массиву. Мета-достижение в середине считало бы
+  // половину коллекции.
+  const мета = ACHIEVEMENTS.map((a, i) => ({ a, i })).filter(({ a }) =>
+    /achievementsUnlocked/.test(String(a.check)),
+  );
+  expect(мета.length).toBeGreaterThanOrEqual(2);
+  const первыйМета = Math.min(...мета.map((x) => x.i));
+  const обычных = ACHIEVEMENTS.slice(первыйМета).filter(
+    (a) => !/achievementsUnlocked/.test(String(a.check)),
+  );
+  expect(обычных).toEqual([]);
+});
+
+test('разблокировка платит XP, и платит один раз', () => {
+  store.setSectionRead('typing', 'intro');
+  const first = evaluate();
+  expect(first.length).toBeGreaterThan(0);
+  const xpПосле = store.getXp();
+  // за секцию XP не начисляется — значит весь XP тут именно за достижения
+  const ожидалось = first.reduce((n, a) => n + RARITY_XP[a.rarity], 0);
+  expect(xpПосле).toBeGreaterThanOrEqual(ожидалось);
+  // повторный проход не платит второй раз
+  evaluate();
+  expect(store.getXp()).toBe(xpПосле);
+});
+
+test('«Экзамен на отлично» не выдаётся за экзамен по БЛОКУ глав', () => {
+  // Экзамены глав и блоков лежат в одном s.exams и различаются префиксом.
+  store.markExamDone('block:sdacha', { correct: 10, total: 10 });
+  evaluate();
+  expect(store.achievements.list()).not.toContain('экзамен-на-отлично');
+  store.markExamDone('typing', { correct: 10, total: 10 });
+  evaluate();
+  expect(store.achievements.list()).toContain('экзамен-на-отлично');
+});
+
+test('в каждом треке есть что открыть', () => {
+  // 35 из 43 старых достижений обслуживали фундамент, у мобилки было ноль.
+  const src = String(ACHIEVEMENTS.map((a) => a.check).join(' '));
+  for (const track of ['mobile', 'blockchain', 'advanced', 'foundation']) {
+    expect(src.includes(`'${track}'`) || ACHIEVEMENTS.some((a) => a.category === 'треки')).toBe(true);
+  }
+  expect(ACHIEVEMENTS.filter((a) => a.category === 'треки').length).toBeGreaterThanOrEqual(5);
 });

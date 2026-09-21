@@ -100,10 +100,16 @@ export default function Achievements() {
                 className={`ach-card ${RARITY_CLASS[a.rarity]} ${isUnlocked ? 'ach-card-on' : 'ach-card-off'}`.trim()}
               >
                 <div className="ach-icon" aria-hidden="true">
-                  {isUnlocked ? a.icon : '🔒'}
+                  {isUnlocked ? a.icon : a.hidden ? '❔' : '🔒'}
                 </div>
-                <div className="ach-title">{a.title}</div>
-                <div className="ach-desc">{a.desc}</div>
+                {/* Скрытое до находки не называет себя: иначе «найди сам» —
+                    это просто список дел с лишним шагом. В счётчике «столько
+                    из стольких» оно участвует наравне, чтобы витрина не врала
+                    о размере коллекции. */}
+                <div className="ach-title">{isUnlocked || !a.hidden ? a.title : '???'}</div>
+                <div className="ach-desc">
+                  {isUnlocked || !a.hidden ? a.desc : 'Найдётся само — если делать по-своему'}
+                </div>
                 <div className={`ach-rarity ach-rarity-${a.rarity === 'эпическое' ? 'epic' : a.rarity === 'редкое' ? 'rare' : 'common'}`}>
                   {a.rarity}
                 </div>
