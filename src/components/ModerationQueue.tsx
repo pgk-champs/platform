@@ -1,5 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { decideMaterial, fetchModerationQueue, type PendingItem } from '../lib/account';
+import type { NormalizedPreset } from '../../server/preset.d.mts';
+
+type PresetData = NormalizedPreset;
+
+/** Первые строки набора — столько, чтобы решение принималось глазами. */
+export function presetPeek(p: PresetData, limit = 5): string[] {
+  switch (p.engine) {
+    case 'flashcards':
+      return p.cards.slice(0, limit).map((c) => `${c.term} — ${c.translation}`);
+    case 'wordorder':
+      return [p.phrase];
+    case 'codetyping':
+      return p.snippets.slice(0, limit);
+    case 'predict':
+      return [p.code.split('\n').slice(0, limit).join('\n'), `→ ${p.expected}`];
+    default:
+      return [];
+  }
+}
 import './trainers.css';
 
 // Вынесено из раздела наставника, чтобы этой же очередью пользовалась страница
@@ -27,6 +46,10 @@ export default function ModerationQueue() {
         <div className="mn-queue">
           {items.map((it) => {
             const url = typeof it.data === 'string' ? it.data : null;
+            // Набор — это данные, а не ссылка. Пока карточка умела только
+            // ссылку, модератор одобрял набор вслепую: ни движка, ни единой
+            // карточки видно не было.
+            const preset = it.type === 'preset' ? (it.data as PresetData) : null;
             return (
               <div key={it.id} className="ac-card mn-qcard">
                 <div className="mn-qmain">
@@ -36,6 +59,16 @@ export default function ModerationQueue() {
                     <a href={url} target="_blank" rel="noopener noreferrer nofollow" className="mn-qurl">
                       {url}
                     </a>
+                  )}
+                  {preset && (
+                    <div className="mn-qpreset">
+                      <span className="mn-qsummary">{it.summary ?? preset.engine}</span>
+                      <ol className="mn-qpeek">
+                        {presetPeek(preset).map((line, i) => (
+                          <li key={i}>{line}</li>
+                        ))}
+                      </ol>
+                    </div>
                   )}
                   <span className="ac-muted mn-qmeta">
                     от @{it.author}

@@ -10,6 +10,7 @@ import crypto from 'node:crypto';
 import Database from 'better-sqlite3';
 import { mergeProgress } from './merge.mjs';
 import { checkLink } from './linkcheck.mjs';
+import { normalizePreset, presetSummary } from './preset.mjs';
 
 const PORT = Number(process.env.PORT || 3000);
 const CLIENT_ID = process.env.GH_CLIENT_ID || '';
@@ -200,7 +201,7 @@ const insertCommunity = db.prepare(`INSERT INTO community
   (type, chapter_id, title, data, author_gh_id, author_login, status, created_at)
   VALUES (@type, @chapter_id, @title, @data, @author_gh_id, @author_login, 'pending', @created_at)`);
 const approvedCommunity = db.prepare(`SELECT id, type, chapter_id, title, data, author_login, created_at
-  FROM community WHERE status = 'approved' ORDER BY created_at DESC`);
+  FROM community WHERE status = 'approved' ORDER BY created_at DESC LIMIT 500`);
 const communityByStatus = db.prepare(`SELECT id, type, chapter_id, title, data, author_login, status, created_at
   FROM community WHERE status = ? ORDER BY created_at DESC LIMIT 500`);
 const setCommunityStatus = db.prepare('UPDATE community SET status = ?, reviewed_by = ?, reviewed_at = ? WHERE id = ?');
@@ -799,7 +800,12 @@ const server = http.createServer(async (req, res) => {
       // исполняется: фронт рендерит только данные для своих движков и https.
       let data = body.data;
       if (type === 'preset') {
-        if (!data || typeof data !== 'object' || Array.isArray(data)) return json(res, 400, { error: 'пресет должен быть объектом' });
+        // Правила набора общие с сайтом (./preset.mjs). Раньше здесь стояло
+        // «объект и не массив», и одобренная запись могла не пройти кодек на
+        // клиенте — материал молча пропадал уже после проверки модератором.
+        const ok = normalizePreset(data);
+        if (!ok) return json(res, 400, { error: 'набор не по правилам: проверь название, движок и размер' });
+        data = ok;
       } else {
         if (typeof data !== 'string' || !/^https:\/\//.test(data) || data.length > 500) {
           return json(res, 400, { error: 'нужна https-ссылка' });
@@ -831,16 +837,24 @@ const server = http.createServer(async (req, res) => {
       const g = mentorGuard();
       if (g.err) return json(res, g.err[0], { error: g.err[1] });
       const status = url.searchParams.get('status') || 'pending';
-      const items = communityByStatus.all(status).map((r) => ({
-        id: r.id,
-        type: r.type,
-        title: r.title,
-        author: r.author_login,
-        chapterId: r.chapter_id || undefined,
-        data: safeParse(r.data),
-        status: r.status,
-        addedAt: new Date(r.created_at).toISOString().slice(0, 10),
-      }));
+      // summary — чтобы модератор не одобрял набор вслепую: очередь рисовала
+      // только тип, заголовок и ссылку, а у набора data — объект, и в
+      // карточке не было видно ни движка, ни единой карточки.
+      const items = communityByStatus.all(status).map((r) => {
+        const data = safeParse(r.data);
+        const preset = r.type === 'preset' ? normalizePreset(data) : null;
+        return {
+          id: r.id,
+          type: r.type,
+          title: r.title,
+          author: r.author_login,
+          chapterId: r.chapter_id || undefined,
+          data,
+          summary: preset ? presetSummary(preset) : undefined,
+          status: r.status,
+          addedAt: new Date(r.created_at).toISOString().slice(0, 10),
+        };
+      });
       return json(res, 200, { items });
     }
 

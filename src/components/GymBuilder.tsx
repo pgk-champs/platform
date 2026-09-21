@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import { store, type CustomPreset, type CustomPresetData } from '../lib/store';
+import { isLoggedIn, submitCommunity } from '../lib/account';
 import Fold from './Fold';
 import Flashcards from './Flashcards';
 import WordOrder from './WordOrder';
 import CodeTyping from './CodeTyping';
 import PredictOutput from './PredictOutput';
+import { normalizePreset } from '../../server/preset.mjs';
 import './trainers.css';
 
 // Конструктор тренажёров (/gym): движки WordOrder / Flashcards / CodeTyping /
@@ -32,37 +34,10 @@ export function encodePreset(p: SharedPreset): string {
 export function decodePreset(encoded: string): SharedPreset | null {
   try {
     const obj = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(encoded)))));
-    if (!obj || typeof obj.name !== 'string' || obj.name === '') return null;
-    switch (obj.engine) {
-      case 'flashcards':
-        if (
-          !Array.isArray(obj.cards) ||
-          obj.cards.length === 0 ||
-          obj.cards.some((c: unknown) => {
-            const card = c as { term?: unknown; translation?: unknown };
-            return typeof card?.term !== 'string' || typeof card?.translation !== 'string';
-          })
-        )
-          return null;
-        return { name: obj.name, engine: 'flashcards', cards: obj.cards };
-      case 'wordorder':
-        if (typeof obj.phrase !== 'string' || obj.phrase.trim().split(/\s+/).length < 2) return null;
-        return { name: obj.name, engine: 'wordorder', phrase: obj.phrase };
-      case 'codetyping':
-        if (
-          !Array.isArray(obj.snippets) ||
-          obj.snippets.length === 0 ||
-          obj.snippets.some((s: unknown) => typeof s !== 'string' || s === '')
-        )
-          return null;
-        return { name: obj.name, engine: 'codetyping', snippets: obj.snippets };
-      case 'predict':
-        if (typeof obj.code !== 'string' || obj.code === '' || typeof obj.expected !== 'string' || obj.expected === '')
-          return null;
-        return { name: obj.name, engine: 'predict', code: obj.code, expected: obj.expected };
-      default:
-        return null;
-    }
+    // Правила набора — в server/preset.mjs, общем для сайта и сервера.
+    // Пока они жили здесь, сервер принимал в каталог «объект и не массив»:
+    // одобренная запись могла не пройти этот же кодек и не рисовалась вовсе.
+    return normalizePreset(obj) as SharedPreset | null;
   } catch {
     return null;
   }
@@ -152,6 +127,7 @@ export default function GymBuilder() {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [publishing, setPublishing] = useState('');
   const [running, setRunning] = useState<SharedPreset | null>(null);
   const [runKey, setRunKey] = useState(0);
   // Пресет из ссылки #preset=... — баннер «Вам передали набор».
@@ -210,6 +186,25 @@ export default function GymBuilder() {
     } catch {
       setNotice(`Скопируй ссылку вручную: ${url}`);
     }
+  };
+
+  // Половина дороги была построена с обеих сторон и не соединена: сервер тип
+  // 'preset' принимал, каталог его рисовал и запускал, а отправить набор было
+  // неоткуда — в форме «Поделиться материалом» четыре типа и все со ссылкой.
+  const publish = async (p: SharedPreset) => {
+    if (!isLoggedIn()) {
+      setNotice('Чтобы выложить набор в каталог, нужно войти через GitHub — наставник его проверит.');
+      return;
+    }
+    setPublishing(p.name);
+    const { name, ...data } = p;
+    const r = await submitCommunity({ type: 'preset', title: name, data: { name, ...data } });
+    setPublishing('');
+    setNotice(
+      r.ok
+        ? `Набор «${name}» отправлен на проверку наставнику. После одобрения он появится в каталоге сообщества.`
+        : `Не отправилось: ${r.error}`,
+    );
   };
 
   const saveShared = () => {
@@ -348,6 +343,15 @@ export default function GymBuilder() {
                 </button>
                 <button type="button" className="button button--sm button--secondary" onClick={() => share(p)}>
                   Поделиться
+                </button>
+                <button
+                  type="button"
+                  className="button button--sm button--secondary"
+                  onClick={() => publish(p)}
+                  disabled={publishing === p.name}
+                  aria-label={`Выложить набор ${p.name} в каталог сообщества`}
+                >
+                  {publishing === p.name ? 'Отправляю…' : 'В сообщество'}
                 </button>
                 <button
                   type="button"

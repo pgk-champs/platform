@@ -372,6 +372,8 @@ export type PendingItem = {
   author: string;
   chapterId?: string;
   data: unknown;
+  /** Короткая подпись набора («карточки: 12») — сервер считает её сам. */
+  summary?: string;
   status: string;
   addedAt: string;
 };
