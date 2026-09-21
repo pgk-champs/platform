@@ -49,6 +49,13 @@ const isMentor = (u) => isRootMentor(u) || (!!u && !!mentorRow.get(String(u.logi
 const canManageGroup = (u, g) =>
   !!u && !!g && (g.owner === u.gh_id || !!isGroupMentor.get(g.id, String(u.login).toLowerCase()));
 
+/** Учится ли этот человек хоть в одной группе наставника. */
+const teaches = (u, ghId) =>
+  !!u &&
+  groupsIManage
+    .all({ gh_id: u.gh_id, login: String(u.login).toLowerCase() })
+    .some((g) => memberIds.all(g.id).some((r) => r.gh_id === ghId));
+
 if (!SESSION_SECRET) {
   console.error('SESSION_SECRET обязателен'); // подпись токенов без него небезопасна
   process.exit(1);
@@ -327,12 +334,27 @@ function bearer(req) {
 }
 function readBody(req, limit = 1_000_000) {
   return new Promise((resolve, reject) => {
-    let data = '';
+    // Считаем БАЙТЫ и рвём соединение при переполнении. Раньше промис просто
+    // реджектился: слушатель оставался, клиент продолжал лить тело, строка
+    // росла дальше — то есть лимит не ограничивал ничего, кроме ответа.
+    const chunks = [];
+    let size = 0;
+    let done = false;
+    const stop = (err) => {
+      if (done) return;
+      done = true;
+      req.removeAllListeners('data');
+      req.destroy();
+      reject(err);
+    };
     req.on('data', (c) => {
-      data += c;
-      if (data.length > limit) reject(new Error('too large'));
+      size += c.length;
+      if (size > limit) return stop(new Error('too large'));
+      chunks.push(c);
     });
-    req.on('end', () => resolve(data));
+    req.on('end', () => {
+      if (!done) resolve(Buffer.concat(chunks.map((c) => Buffer.from(c))).toString('utf8'));
+    });
     req.on('error', reject);
   });
 }
@@ -541,6 +563,9 @@ const server = http.createServer(async (req, res) => {
       const me = getUser.get(s.id);
       if (!isMentor(me)) return json(res, 403, { error: 'forbidden' });
       const overall = new Map(boardOverall.all().map((r) => [r.gh_id, r]));
+      // Без ?group отдаём только СВОИХ учеников. Раньше здесь был allUsers, то
+      // есть любой наставник выгружал всю базу платформы с логинами, аватарами
+      // и разобранным прогрессом — включая чужие группы.
       // Фильтр по группе: ?group=<id> ограничивает выборку её участниками.
       const groupId = Number(url.searchParams.get('group'));
       let roster = allUsers.all();
@@ -549,6 +574,15 @@ const server = http.createServer(async (req, res) => {
         if (!canManageGroup(me, g)) return json(res, 403, { error: 'forbidden' });
         const ids = new Set(memberIds.all(groupId).map((r) => r.gh_id));
         roster = roster.filter((u) => ids.has(u.gh_id));
+      } else if (!isRootMentor(me)) {
+        // Корневой наставник (из .env) видит платформу целиком — это владелец.
+        // Обычный видит только тех, кто состоит в его группах.
+        const mine = new Set(
+          groupsIManage.all({ gh_id: me.gh_id, login: String(me.login).toLowerCase() }).flatMap((g) =>
+            memberIds.all(g.id).map((r) => r.gh_id),
+          ),
+        );
+        roster = roster.filter((u) => mine.has(u.gh_id));
       }
       const students = roster.map((row) => {
         let p = {};
@@ -569,6 +603,20 @@ const server = http.createServer(async (req, res) => {
           m && typeof m === 'object'
             ? Object.values(m).reduce((a, v) => a + (v && typeof v === 'object' ? Object.keys(v).length : 0), 0)
             : 0;
+        // Квиз засчитывается ТОЛЬКО целиком верным — так же, как считает сосуд
+        // главы (src/lib/chapterFill.ts). Пока здесь стоял countInner, наставник
+        // видел проверку, проваленную целиком, наравне с безошибочной.
+        const countPerfect = (m) =>
+          m && typeof m === 'object'
+            ? Object.values(m).reduce(
+                (a, byId) =>
+                  a +
+                  (byId && typeof byId === 'object'
+                    ? Object.values(byId).filter((q) => q && q.total > 0 && q.correct === q.total).length
+                    : 0),
+                0,
+              )
+            : 0;
         const examsDone = p.exams && typeof p.exams === 'object' ? Object.keys(p.exams).length : 0;
         const best = overall.get(row.gh_id);
         return {
@@ -579,7 +627,7 @@ const server = http.createServer(async (req, res) => {
           xp: Number(p.xp) || 0,
           chaptersStarted: Object.keys(coverage).length,
           sectionsRead,
-          quizzesDone: countInner(p.quizzes),
+          quizzesDone: countPerfect(p.quizzes),
           trainersDone: countInner(p.trainers),
           examsDone,
           achievements: Array.isArray(p.achievementsUnlocked) ? p.achievementsUnlocked.length : 0,
@@ -765,7 +813,14 @@ const server = http.createServer(async (req, res) => {
     if (rm && req.method === 'DELETE') {
       const guard = mentorGuard();
       if (guard.err) return json(res, guard.err[0], { error: guard.err[1] });
-      deleteResult.run(Number(rm[1]), rm[2]);
+      // Только своему ученику. Раньше ЛЮБОЙ наставник мог стереть результат
+      // ЛЮБОГО человека в базе: ни группа, ни владение не проверялись, а
+      // удаление необратимо — истории результатов нет.
+      const target = Number(rm[1]);
+      if (!isRootMentor(guard.u) && !teaches(guard.u, target)) {
+        return json(res, 403, { error: 'этот ученик не в ваших группах' });
+      }
+      deleteResult.run(target, rm[2]);
       return json(res, 200, { ok: true });
     }
 
@@ -911,6 +966,11 @@ const server = http.createServer(async (req, res) => {
     if (path === '/mentor/mentors' && req.method === 'POST') {
       const g = mentorGuard();
       if (g.err) return json(res, g.err[0], { error: g.err[1] });
+      // Раздавать роли может ТОЛЬКО корневой наставник из .env. Раньше это
+      // мог любой наставник, включая только что добавленного: цепочка
+      // «наставник → назначил себя автором → коммит в main → деплой на прод»
+      // замыкалась без участия владельца платформы.
+      if (!isRootMentor(g.u)) return json(res, 403, { error: 'раздавать роли может только владелец платформы' });
       let body;
       try {
         body = JSON.parse(await readBody(req, 1000));
@@ -1046,6 +1106,11 @@ const server = http.createServer(async (req, res) => {
     if (path === '/moderate/people' && req.method === 'POST') {
       const gm = mentorGuardTop();
       if (gm.err) return json(res, gm.err[0], { error: gm.err[1] });
+      // Раздавать роли может ТОЛЬКО корневой наставник из .env. Раньше это
+      // мог любой наставник, включая только что добавленного: цепочка
+      // «наставник → назначил себя автором → коммит в main → деплой на прод»
+      // замыкалась без участия владельца платформы.
+      if (!isRootMentor(gm.u)) return json(res, 403, { error: 'раздавать роли может только владелец платформы' });
       let body;
       try {
         body = JSON.parse(await readBody(req, 1000));
@@ -1175,6 +1240,11 @@ const server = http.createServer(async (req, res) => {
     if (path === '/content/authors' && req.method === 'POST') {
       const gm = mentorGuardTop();
       if (gm.err) return json(res, gm.err[0], { error: gm.err[1] });
+      // Раздавать роли может ТОЛЬКО корневой наставник из .env. Раньше это
+      // мог любой наставник, включая только что добавленного: цепочка
+      // «наставник → назначил себя автором → коммит в main → деплой на прод»
+      // замыкалась без участия владельца платформы.
+      if (!isRootMentor(gm.u)) return json(res, 403, { error: 'раздавать роли может только владелец платформы' });
       let body;
       try {
         body = JSON.parse(await readBody(req, 1000));
