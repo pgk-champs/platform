@@ -194,6 +194,34 @@ function persist(): void {
   bus?.dispatchEvent(new Event('change'));
 }
 
+/** Перечитывает снимок из хранилища и будит подписчиков.
+ *
+ *  Нужно потому, что persist() пишет ВЕСЬ снимок из памяти. Пока вкладка не
+ *  знала о чужих записях, она стирала сделанное в соседней: студент держит
+ *  открытыми несколько глав (их 137, вкладки копятся сами), работает в одной,
+ *  возвращается в другую — и любое действие там откатывало всё. Молча.
+ *
+ *  Слиянием это НЕ лечится: mergeProgress объединяет «по лучшему», а в store
+ *  есть настоящие удаления (избранное, пресеты) — они бы воскресали. Проще и
+ *  честнее держать память вкладки свежей. */
+function reloadFromStorage(): void {
+  state = loadState();
+  version += 1;
+  bus?.dispatchEvent(new Event('change'));
+}
+
+if (typeof window !== 'undefined') {
+  // Пишет соседняя вкладка — браузер сообщает об этом сразу.
+  window.addEventListener('storage', (e) => {
+    if (e.key === STORAGE_KEY) reloadFromStorage();
+  });
+  // Замороженная вкладка (bfcache) обработчиков не выполняет и событие
+  // пропускает; возврат к ней — второй шанс перечитать.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'hidden') reloadFromStorage();
+  });
+}
+
 function subscribe(cb: () => void): () => void {
   if (!bus) return () => {};
   bus.addEventListener('change', cb);

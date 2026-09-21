@@ -490,3 +490,62 @@ test('addXp возвращает фактически начисленное, а
   expect(store.addXp(0, 'пусто')).toBe(0);
   expect(store.getXp()).toBe(20);
 });
+
+// --- несколько вкладок ---
+//
+// Студент держит открытыми несколько глав — на платформе из 137 вкладки
+// копятся сами собой. persist() пишет ВЕСЬ снимок из памяти, и пока вкладка
+// не знала о чужих записях, она стирала всё, что сделано в соседней. Молча.
+
+/** Пишет в хранилище мимо нашей памяти и поднимает событие, как настоящий
+ *  браузер при записи из другой вкладки. */
+function otherTabWrites(mutate: (s: Record<string, unknown>) => void) {
+  // После сброса снимка может ещё не быть — соседняя вкладка пишет с нуля.
+  const stored = localStorage.getItem('pgk-store');
+  const raw = stored ? JSON.parse(stored) : { sections: {}, xp: 0 };
+  mutate(raw);
+  const next = JSON.stringify(raw);
+  localStorage.setItem('pgk-store', next);
+  window.dispatchEvent(new StorageEvent('storage', { key: 'pgk-store', newValue: next }));
+}
+
+test('запись соседней вкладки не теряется при следующем действии', () => {
+  store.__resetForTests();
+  store.setSectionRead('typing', 'a');
+
+  otherTabWrites((s) => {
+    (s.sections as Record<string, string[]>)['git-first-commit'] = ['intro'];
+  });
+
+  // наша вкладка делает следующее действие уже поверх свежего состояния
+  store.setSectionRead('typing', 'b');
+
+  const saved = JSON.parse(localStorage.getItem('pgk-store') as string);
+  expect(saved.sections.typing).toEqual(expect.arrayContaining(['a', 'b']));
+  expect(saved.sections['git-first-commit']).toEqual(['intro']);
+});
+
+test('чужая запись видна сразу, без перезагрузки страницы', () => {
+  store.__resetForTests();
+  const before = store.getVersion();
+  otherTabWrites((s) => {
+    s.xp = 777;
+  });
+  expect(store.getXp()).toBe(777);
+  // и подписчики об этом узнали — иначе шапка и сосуды остались бы старыми
+  expect(store.getVersion()).not.toBe(before);
+});
+
+test('вкладка подхватывает чужие правки, когда на неё возвращаются', () => {
+  // Замороженная вкладка (bfcache) обработчиков не выполняет и событие
+  // пропускает. Возврат к ней — второй шанс перечитать.
+  store.__resetForTests();
+  const stored = localStorage.getItem('pgk-store');
+  const raw = stored ? JSON.parse(stored) : { sections: {}, xp: 0 };
+  raw.xp = 555;
+  localStorage.setItem('pgk-store', JSON.stringify(raw)); // БЕЗ события
+  expect(store.getXp()).toBe(0);
+
+  document.dispatchEvent(new Event('visibilitychange'));
+  expect(store.getXp()).toBe(555);
+});
