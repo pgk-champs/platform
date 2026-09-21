@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { fetchApprovedCommunity } from '../lib/account';
 import Link from '@docusaurus/Link';
 import { decodePreset, encodePreset, ENGINE_LABELS, type SharedPreset } from './GymBuilder';
+import PresetStar from './PresetStar';
 import { chapterHref, chapterTitle } from './chapterLabels';
 import './trainers.css';
 
@@ -287,7 +288,18 @@ export default function CommunityCatalog() {
                               {TYPE_LABELS.preset}
                               {engine && ENGINE_LABELS[engine] ? ` · ${ENGINE_LABELS[engine]}` : ''}
                             </span>
-                            <h4 className="cc-title">{item.title}</h4>
+                            <div className="cc-titlerow">
+                              <h4 className="cc-title">{item.title}</h4>
+                              {/* Звезда кладёт САМ набор, а не ссылку на карточку:
+                                  материал могут снять с публикации, а у студента
+                                  он останется и запустится с /favorites. */}
+                              {item.data ? (
+                                <PresetStar
+                                  id={`community:${item.id}`}
+                                  preset={item.data as SharedPreset}
+                                />
+                              ) : null}
+                            </div>
                             <p className="cc-meta">
                               автор: {item.author}
                               {item.chapterId ? <span className="cc-tag">{chapterTitle(item.chapterId)}</span> : null}

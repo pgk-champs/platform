@@ -1,14 +1,52 @@
-import React, { useSyncExternalStore } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import { store, type FavoriteItem } from '../lib/store';
+import { RunPreset, ENGINE_LABELS, type SharedPreset } from '../components/GymBuilder';
 import WordExport from '../components/WordExport';
 import knowledgeMap from '../data/knowledge-map.json';
 import '../components/trainers.css';
 
-const CHAPTER_TITLES: Record<string, string> = Object.fromEntries(
+// Заголовок группы берётся из общей таблицы подписей: у набора chapterId
+// 'gym', у материала сообщества — 'community', и главы с такими id нет. Пока
+// заголовок читался только из карты знаний, вместо названия светился id.
+function chapterTitle(id: string): string {
+  return CHAPTER_LABELS[id] ?? TITLES[id] ?? id;
+}
+
+const TITLES: Record<string, string> = Object.fromEntries(
   (knowledgeMap as { id: string; title: string }[]).map((e) => [e.id, e.title]),
 );
+
+const CHAPTER_LABELS: Record<string, string> = {
+  gym: 'Тренажёрный зал',
+  community: 'Из сообщества',
+};
+
+/**
+ * Верстак: отмеченные слова из РАЗНЫХ глав — уже готовый набор карточек
+ * (форма данных у избранного слова и у карточки движка одна и та же). Раньше
+ * их можно было только экспортировать в Anki; потренировать подборку прямо
+ * здесь было нельзя.
+ */
+function WordsBench({ items }: { items: FavoriteItem[] }) {
+  const [running, setRunning] = useState(false);
+  const cards = items
+    .map((i) => i.data)
+    .filter((d): d is { kind: 'word'; term: string; translation: string; note?: string } => d?.kind === 'word')
+    .map((d) => ({ term: d.term, translation: d.translation, note: d.note }));
+
+  if (cards.length < 2) return null;
+
+  return (
+    <div className="fav-bench">
+      <button type="button" className="button button--sm button--primary" onClick={() => setRunning((r) => !r)}>
+        {running ? 'Свернуть' : `Собрать тренажёр из ${cards.length} слов`}
+      </button>
+      {running ? <RunPreset preset={{ name: 'Мои слова', engine: 'flashcards', cards }} /> : null}
+    </div>
+  );
+}
 
 function groupByChapter(items: FavoriteItem[]): Map<string, FavoriteItem[]> {
   const grouped = new Map<string, FavoriteItem[]>();
@@ -37,8 +75,35 @@ function RemoveButton({ item }: { item: FavoriteItem }) {
 // таблицей, ссылка — ссылкой с описанием, слово — карточкой термина.
 // Всё остальное (нет data, или незнакомый kind) — старым способом:
 // заголовок и ссылка-якорь на сам блок в главе.
+/** Набор в избранном: его можно запустить прямо здесь, не уходя в зал. */
+function FavoritePreset({ item, preset }: { item: FavoriteItem; preset: SharedPreset }) {
+  const [running, setRunning] = useState(false);
+  return (
+    <li className="fav-item fav-item-preset">
+      <div className="fav-item-row">
+        <span className="fav-item-title">{preset.name}</span>
+        <span className="fav-preset-engine">{ENGINE_LABELS[preset.engine]}</span>
+        <button
+          type="button"
+          className="button button--sm button--primary"
+          onClick={() => setRunning((r) => !r)}
+        >
+          {running ? 'Свернуть' : 'Запустить'}
+        </button>
+        <RemoveButton item={item} />
+      </div>
+      {running ? <RunPreset preset={preset} /> : null}
+    </li>
+  );
+}
+
 function FavoriteRow({ item }: { item: FavoriteItem }) {
   const data = item.data;
+
+  if (data?.kind === 'preset') {
+    const { kind, ...preset } = data;
+    return <FavoritePreset item={item} preset={preset as SharedPreset} />;
+  }
 
   if (data?.kind === 'table') {
     return (
@@ -120,6 +185,7 @@ export default function Favorites() {
           <Link to="/words">Тренировать слова →</Link>
         </p>
         <WordExport />
+        <WordsBench items={items} />
         {items.length === 0 ? (
           <p className="fav-empty">
             Пока пусто. Отмечайте звёздочкой ★ тренажёры, квизы и другие блоки на страницах глав — здесь
@@ -128,7 +194,7 @@ export default function Favorites() {
         ) : (
           [...groupByChapter(items).entries()].map(([chapterId, chapterItems]) => (
             <section key={chapterId} className="fav-group">
-              <h2>{CHAPTER_TITLES[chapterId] ?? chapterId}</h2>
+              <h2>{chapterTitle(chapterId)}</h2>
               <ul className="fav-list">
                 {chapterItems.map((item) => (
                   <FavoriteRow key={item.id} item={item} />

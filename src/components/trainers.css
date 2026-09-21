@@ -9786,3 +9786,28 @@
 .gc-card:hover .gc-glyph {
   color: var(--ifm-color-primary);
 }
+
+
+/* Звезда рядом с названием карточки набора: заголовок тянется, звезда — нет. */
+.cc-titlerow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.cc-titlerow .cc-title {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Набор в избранном: строка запуска и сам движок под ней. */
+.fav-preset-engine {
+  font-size: 0.8rem;
+  color: var(--ifm-color-emphasis-600);
+  margin-right: auto;
+}
+
+.fav-item-preset .fav-item-row {
+  align-items: center;
+  gap: 0.5rem;
+}

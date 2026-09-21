@@ -17,11 +17,15 @@ export type BlockKind = 'trainer' | 'quiz' | 'breakdown' | 'vocab' | 'cheatsheet
 export type FavPayload =
   | { kind: 'table'; head: string[]; rows: string[][] }
   | { kind: 'link'; url: string; desc?: string }
-  | { kind: 'word'; term: string; translation: string; note?: string };
+  | { kind: 'word'; term: string; translation: string; note?: string }
+  // Набор упражнений целиком: с ним избранное перестаёт быть закладкой и
+  // начинает ХРАНИТЬ упражнение — его можно запустить прямо на /favorites,
+  // даже если глава переехала, а карточку в каталоге сняли с публикации.
+  | ({ kind: 'preset'; name: string } & CustomPresetData);
 
 export type FavoriteItem = {
   id: string;
-  type: BlockKind | 'link' | 'word';
+  type: BlockKind | 'link' | 'word' | 'preset';
   chapterId: string;
   title: string;
   url?: string;
@@ -74,6 +78,15 @@ type State = {
   daily: Record<string, DailyEntry>;
   simRuns: Record<string, SimRunResult[]>;
   customPresets: CustomPreset[];
+  /**
+   * Надгробия: что студент УБРАЛ руками и когда. Слияние на сервере
+   * объединяет множества (server/merge.mjs), поэтому без этого списка снятая
+   * звёздочка и удалённый набор возвращались через пять секунд — молча, и
+   * так каждый раз. Дата обязательна: без неё надгробие блокировало бы
+   * повторное добавление навсегда, ведь на сервере оно остаётся жить.
+   * Побеждает более поздняя правка. Список подрезан до 500 последних.
+   */
+  removed: { id: string; ts: number }[];
   easter: EasterState;
   toursSeen: string[];
 };
@@ -98,6 +111,7 @@ function emptyState(): State {
     daily: {},
     simRuns: {},
     customPresets: [],
+    removed: [],
     easter: { konami: false, speedrun: false, historyOpened: [] },
     toursSeen: [],
   };
@@ -154,6 +168,13 @@ function migrateChapterIds(st: State): State {
 // гарантия (правка руками, старый формат, оборванная запись), и один null
 // вместо массива роняет проверку достижений, а с ней — весь сайт: watcher
 // смонтирован в Root на каждой странице.
+/** Дописывает надгробие, держа список коротким: важны последние удаления. */
+const TOMBSTONE_LIMIT = 500;
+
+function tombstone(list: State['removed'], id: string): State['removed'] {
+  return [...list.filter((r) => r.id !== id), { id, ts: Date.now() }].slice(-TOMBSTONE_LIMIT);
+}
+
 function sameShape(value: unknown, def: unknown): boolean {
   if (Array.isArray(def)) return Array.isArray(value);
   if (def !== null && typeof def === 'object') {
@@ -271,12 +292,14 @@ function markTrainerDone(chapterId: string, trainerId: string, result: unknown):
 function favAdd(item: Omit<FavoriteItem, 'ts'>): void {
   if (state.favorites.some((f) => f.id === item.id)) return;
   state.favorites = [...state.favorites, { ...item, ts: Date.now() }];
+  state.removed = state.removed.filter((r) => r.id !== item.id);
   persist();
 }
 
 function favRemove(id: string): void {
   if (!state.favorites.some((f) => f.id === id)) return;
   state.favorites = state.favorites.filter((f) => f.id !== id);
+  state.removed = tombstone(state.removed, id);
   persist();
 }
 
@@ -587,6 +610,7 @@ function customPresetAdd(preset: Omit<CustomPreset, 'id' | 'ts'>): CustomPreset 
     ts: Date.now(),
   } as CustomPreset;
   state.customPresets = [...state.customPresets, item];
+  state.removed = state.removed.filter((r) => r.id !== item.id);
   persist();
   return item;
 }
@@ -598,6 +622,7 @@ function customPresetList(): CustomPreset[] {
 function customPresetRemove(id: string): void {
   if (!state.customPresets.some((p) => p.id === id)) return;
   state.customPresets = state.customPresets.filter((p) => p.id !== id);
+  state.removed = tombstone(state.removed, id);
   persist();
 }
 

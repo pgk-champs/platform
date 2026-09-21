@@ -75,3 +75,38 @@ test('пасхалки — логическое ИЛИ: открыто на лю
   assert.equal(m.easter.konami, true);
   assert.equal(m.easter.speedrun, true);
 });
+
+// --- надгробия (21.09.2026) ---
+//
+// Слияние объединяет множества, поэтому снятая звёздочка возвращалась с
+// сервера через пять секунд после автосинка. Молча, и так каждый раз.
+
+test('убранное руками не воскресает при слиянии', () => {
+  const наСервере = {
+    favorites: [{ id: 'typing:home-row', title: 'Домашний ряд', ts: 100 }],
+    customPresets: [{ id: 'cp-1', name: 'Набор', ts: 100 }],
+  };
+  const сУстройства = {
+    favorites: [],
+    customPresets: [],
+    removed: [{ id: 'typing:home-row', ts: 200 }, { id: 'cp-1', ts: 200 }],
+  };
+  const out = mergeProgress(наСервере, сУстройства);
+  assert.deepEqual(out.favorites, []);
+  assert.deepEqual(out.customPresets, []);
+  assert.equal(out.removed.length, 2);
+});
+
+test('надгробие не мешает добавить то же самое заново', () => {
+  // Клиент при повторном добавлении стирает надгробие (см. favAdd в store).
+  const было = { favorites: [], removed: [{ id: 'typing:home-row', ts: 100 }] };
+  const стало = { favorites: [{ id: 'typing:home-row', title: 'Домашний ряд', ts: 300 }], removed: [] };
+  const out = mergeProgress(было, стало);
+  assert.equal(out.favorites.length, 1, 'добавленное ПОЗЖЕ удаления должно остаться');
+});
+
+test('список надгробий не растёт бесконечно', () => {
+  const много = Array.from({ length: 700 }, (_, i) => ({ id: `id-${i}`, ts: i }));
+  const out = mergeProgress({ removed: много }, { removed: [] });
+  assert.equal(out.removed.length, 500);
+});

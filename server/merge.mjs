@@ -57,6 +57,13 @@ export function mergeProgress(a = {}, b = {}) {
   // плоские структуры; xpAwarded и dismissedHints — массивы, которые тоже надо
   // объединять, иначе после входа очки начислятся заново.
   const betterByEntry = (x, y) => (num(y.correct) > num(x.correct) ? y : x);
+  // Надгробия: что студент убрал руками и когда. Без них слияние — чистое
+  // объединение, и снятая звёздочка возвращалась через пять секунд после
+  // автосинка. Молча, и так каждый раз. Дата обязательна: надгробие живёт на
+  // сервере, и без сравнения по времени оно запрещало бы добавить то же
+  // самое заново навсегда. Побеждает более поздняя правка.
+  const removed = tombstones(a.removed, b.removed);
+
   return {
     ...a,
     ...b,
@@ -66,7 +73,7 @@ export function mergeProgress(a = {}, b = {}) {
     exams: mergeMapOfArraysBest(a.exams, b.exams),
     simRuns: mergeMapOfArraysBest(a.simRuns, b.simRuns),
     daily: mergeMapOfEntries(a.daily, b.daily, betterByEntry),
-    favorites: mergeFavorites(a.favorites, b.favorites),
+    favorites: mergeFavorites(a.favorites, b.favorites, removed),
     achievementsUnlocked: mergeArray(a.achievementsUnlocked, b.achievementsUnlocked),
     dismissedHints: mergeArray(a.dismissedHints, b.dismissedHints),
     xpAwarded: mergeArray(a.xpAwarded, b.xpAwarded),
@@ -76,7 +83,8 @@ export function mergeProgress(a = {}, b = {}) {
     tocCollapsed: { ...obj(a.tocCollapsed), ...obj(b.tocCollapsed) },
     blocksCollapsed: { ...obj(a.blocksCollapsed), ...obj(b.blocksCollapsed) },
     prefs: { ...obj(a.prefs), ...obj(b.prefs) },
-    customPresets: mergePresets(a.customPresets, b.customPresets),
+    customPresets: mergePresets(a.customPresets, b.customPresets, removed),
+    removed: [...removed.entries()].map(([id, ts]) => ({ id, ts })).slice(-500),
     easter: mergeEaster(a.easter, b.easter),
     toursSeen: mergeArray(a.toursSeen, b.toursSeen),
   };
@@ -104,11 +112,28 @@ function mergeMapOfArraysBest(a = {}, b = {}) {
 }
 
 // Избранное — массив объектов; ключ уникальности — chapterId+blockId (или id).
-function mergeFavorites(a = [], b = []) {
+/** id → время удаления; из двух надгробий одного id берём позднее. */
+function tombstones(a = [], b = []) {
+  const out = new Map();
+  for (const r of [...(Array.isArray(a) ? a : []), ...(Array.isArray(b) ? b : [])]) {
+    if (!r || typeof r.id !== 'string') continue;
+    const ts = num(r.ts);
+    if (!out.has(r.id) || out.get(r.id) < ts) out.set(r.id, ts);
+  }
+  return out;
+}
+
+/** Убрано ли позже, чем добавлено. Без ts у записи считаем, что раньше. */
+function killed(removed, key, item) {
+  const at = removed.get(key);
+  return at !== undefined && at >= num(item && item.ts);
+}
+
+function mergeFavorites(a = [], b = [], removed = new Map()) {
   const seen = new Map();
   for (const f of [...(a || []), ...(b || [])]) {
     const key = f && (f.id ?? `${f.chapterId}:${f.blockId}`);
-    if (key != null && !seen.has(key)) seen.set(key, f);
+    if (key != null && !seen.has(key) && !killed(removed, key, f)) seen.set(key, f);
   }
   return [...seen.values()];
 }
@@ -120,11 +145,11 @@ function mergeWordWeights(a = {}, b = {}) {
 }
 
 
-function mergePresets(a = [], b = []) {
+function mergePresets(a = [], b = [], removed = new Map()) {
   const seen = new Map();
   for (const p of [...(a || []), ...(b || [])]) {
     const key = p && (p.id ?? JSON.stringify(p));
-    if (key != null && !seen.has(key)) seen.set(key, p);
+    if (key != null && !seen.has(key) && !killed(removed, key, p)) seen.set(key, p);
   }
   return [...seen.values()];
 }

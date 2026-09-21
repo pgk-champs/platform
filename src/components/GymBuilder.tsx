@@ -2,6 +2,7 @@ import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import { store, type CustomPreset, type CustomPresetData } from '../lib/store';
 import { isLoggedIn, submitCommunity } from '../lib/account';
 import Fold from './Fold';
+import PresetStar from './PresetStar';
 import Flashcards from './Flashcards';
 import WordOrder from './WordOrder';
 import CodeTyping from './CodeTyping';
@@ -102,7 +103,10 @@ export function presetUrl(p: SharedPreset): string {
 
 // Запуск движка с данными пресета. Без chapterId/trainerId — зал не трогает
 // прогресс глав, а свои данные не должны фармить XP.
-function RunPreset({ preset }: { preset: SharedPreset }) {
+// Наружу: тот же движок запускает набор и в конструкторе, и в избранном, и
+// из карточки каталога. Второй экземпляр этого switch означал бы, что новый
+// движок появляется в одном месте и молча отсутствует в двух других.
+export function RunPreset({ preset }: { preset: SharedPreset }) {
   switch (preset.engine) {
     case 'flashcards':
       return <Flashcards cards={preset.cards} />;
@@ -335,6 +339,7 @@ export default function GymBuilder() {
           <h3>Мои пресеты</h3>
           {presets.map((p: CustomPreset) => (
             <div key={p.id} className="gb-preset-row">
+              <PresetStar id={`gym:${p.id}`} preset={p} />
               <span className="gb-preset-name">{p.name}</span>
               <span className="gb-preset-engine">{ENGINE_LABELS[p.engine]}</span>
               <span className="gb-preset-actions">
