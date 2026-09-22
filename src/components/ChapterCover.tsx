@@ -13,8 +13,10 @@ const TRACK_LABEL: Record<string, string> = Object.fromEntries(
   (tracks as TrackDef[]).map((t) => [t.dir, t.label]),
 );
 
-const ACCENT = 'var(--ifm-color-primary-lightest)';
-const DARK = 'var(--ifm-color-primary-darkest)';
+// Токены обложки, а не палитра платформы: облик красит обложку, не трогая
+// ссылки, кнопки и подсветку кода (см. src/css/custom.css).
+const ACCENT = 'var(--pgk-cover-accent)';
+const DARK = 'var(--pgk-cover-b)';
 const INK = 'rgba(255,255,255,0.9)';
 const SOFT = 'rgba(255,255,255,0.14)';
 const MONO = 'var(--ifm-font-family-monospace)';
@@ -2497,8 +2499,8 @@ function Frame({
     <svg viewBox="0 0 800 240" role="img" aria-label={aria} style={{ fontFamily: 'var(--ifm-font-family-base)' }}>
       <defs>
         <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="var(--ifm-color-primary-dark)" />
-          <stop offset="1" stopColor="var(--ifm-color-primary-darkest)" />
+          <stop offset="0" stopColor="var(--pgk-cover-a)" />
+          <stop offset="1" stopColor="var(--pgk-cover-b)" />
         </linearGradient>
       </defs>
       <rect width="800" height="240" fill={`url(#${id})`} />
