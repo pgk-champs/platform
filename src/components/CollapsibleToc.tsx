@@ -2,6 +2,7 @@ import React, { useSyncExternalStore } from 'react';
 import TOCInline from '@theme/TOCInline';
 import type { TOCItem } from '@docusaurus/mdx-loader';
 import { store } from '../lib/store';
+import ReadingPrefs from './ReadingPrefs';
 import './trainers.css';
 
 export default function CollapsibleToc({
@@ -20,6 +21,9 @@ export default function CollapsibleToc({
 
   return (
     <div className="ctoc">
+      {/* Настройки чтения стоят здесь, потому что этот блок есть в каждой
+          главе: ноль правок в 137 mdx. */}
+      <ReadingPrefs />
       <button
         type="button"
         className="ctoc-toggle"

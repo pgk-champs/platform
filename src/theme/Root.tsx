@@ -15,10 +15,13 @@ export default function Root({ children }: { children: React.ReactNode }) {
       // нигде не хранится, он выводится из выданных достижений. Чужая
       // вкладка, ручная правка localStorage или сброс достижений — и облик
       // молча откатывается к обычному, а не остаётся «купленным навсегда».
-      document.documentElement.dataset.skin = effectiveLook(
-        store.prefs.getSkin(),
-        store.achievements.list(),
-      );
+      const html = document.documentElement;
+      html.dataset.skin = effectiveLook(store.prefs.getSkin(), store.achievements.list());
+      // Настройки чтения тем же штампом. Кегль вдобавок ставится ДО отрисовки
+      // маленьким скриптом из headTags (docusaurus.config.ts): иначе каждая
+      // загрузка начиналась бы с перекладки всей страницы.
+      html.dataset.motion = store.prefs.getMotion();
+      html.dataset.read = store.prefs.getRead();
     };
     apply();
     return store.subscribe(apply);

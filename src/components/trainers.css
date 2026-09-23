@@ -10065,3 +10065,88 @@
   flex: 1;
   min-width: 0;
 }
+
+/* ── Настройки чтения в главе ───────────────────────────────────────────── */
+.ctoc {
+  position: relative;
+}
+
+/* Кнопка «Aa» — в правом верхнем углу блока с содержанием: рядом с текстом,
+   но не в потоке чтения. */
+.rp-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  background: transparent;
+  color: var(--ifm-color-emphasis-700);
+  font-family: var(--ifm-heading-font-family);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.rp-toggle:hover {
+  border-color: var(--pgk-you);
+  color: var(--pgk-you);
+}
+
+.rp-panel {
+  position: absolute;
+  top: 2rem;
+  right: 0;
+  z-index: 3;
+  width: min(19rem, 90vw);
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-surface-color);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.rp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+}
+
+.rp-calm {
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+  justify-content: flex-start;
+  cursor: pointer;
+}
+
+.rp-hint {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.rp-sizes {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+/* Три «A» разного кегля — образец показывает сам себя, подписи не нужны. */
+.rp-size {
+  min-width: 1.9rem;
+  padding: 0.1rem 0.3rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  background: transparent;
+  color: inherit;
+  line-height: 1.1;
+  cursor: pointer;
+}
+
+.rp-size.rp-on {
+  border-color: var(--pgk-you);
+  color: var(--pgk-you);
+}

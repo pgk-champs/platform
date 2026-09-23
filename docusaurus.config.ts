@@ -55,6 +55,17 @@ const config: Config = {
         href: 'https://fonts.googleapis.com/css2?family=Onest:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap',
       },
     },
+    {
+      // Кегль чтения ставится ДО первой отрисовки. Через Root.tsx (useEffect)
+      // атрибут появляется уже после гидратации, и каждая загрузка начиналась
+      // бы с перекладки всей страницы. Так же поступает сам Docusaurus со
+      // светлой/тёмной темой. Ключ хранилища продублирован здесь сознательно:
+      // импортировать модуль в конфиг нельзя, а страж это стережёт
+      // (scripts/read-stamp.test.mjs).
+      tagName: 'script',
+      attributes: {},
+      innerHTML: `(function(){try{var s=JSON.parse(localStorage.getItem('pgk-store')||'{}');var p=s.prefs||{};if(['l','xl'].indexOf(p.read)>=0)document.documentElement.dataset.read=p.read;if(p.motion==='calm')document.documentElement.dataset.motion='calm';}catch(e){}})();`,
+    },
   ],
 
   clientModules: ['./src/clientModules/readingProgress.ts', './src/clientModules/konami.ts', './src/clientModules/account.ts'],

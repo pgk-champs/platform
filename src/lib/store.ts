@@ -87,6 +87,10 @@ type State = {
     seal?: string;
     /** Какой трек открывать на Маршруте — чтобы не сбрасывался на «Мобилку». */
     track?: string;
+    /** Спокойный режим: 'calm' гасит движение по решению студента. */
+    motion?: string;
+    /** Кегль чтения: 'm' | 'l' | 'xl'. Растёт текст, а не макет. */
+    read?: string;
   };
   tocCollapsed: Record<string, boolean>;
   quizLog: QuizLogEntry[];
@@ -465,6 +469,32 @@ function getSeal(): string | undefined {
   return state.prefs.seal;
 }
 
+// Настройки чтения. Как и облик, на ЧТЕНИИ проверяются списком: в
+// localStorage может лежать что угодно, а значение уезжает в атрибут на
+// <html> и правит вид всего сайта.
+const MOTIONS = ['full', 'calm'];
+const READS = ['m', 'l', 'xl'];
+
+function setMotion(v: string): void {
+  state.prefs = { ...state.prefs, motion: MOTIONS.includes(v) ? v : 'full' };
+  persist();
+}
+
+function getMotion(): string {
+  const v = state.prefs.motion;
+  return MOTIONS.includes(v ?? '') ? v! : 'full';
+}
+
+function setRead(v: string): void {
+  state.prefs = { ...state.prefs, read: READS.includes(v) ? v : 'm' };
+  persist();
+}
+
+function getRead(): string {
+  const v = state.prefs.read;
+  return READS.includes(v ?? '') ? v! : 'm';
+}
+
 function setTrack(track: string): void {
   state.prefs = { ...state.prefs, track };
   persist();
@@ -762,6 +792,10 @@ export const store = {
     getSeal,
     setTrack,
     getTrack,
+    setMotion,
+    getMotion,
+    setRead,
+    getRead,
   },
   words: { queue: wordsQueue, grade: gradeWord, weight: wordWeight },
   toc: { setCollapsed: setTocCollapsed, isCollapsed: isTocCollapsed },

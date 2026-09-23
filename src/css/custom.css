@@ -192,10 +192,22 @@ h1 {
   font-weight: 800;
 }
 
-/* Длинную строку тяжело читать: держим комфортную меру в тексте главы. */
+/* Длинную строку тяжело читать: держим комфортную меру в тексте главы.
+   Правило било только по ПРЯМЫМ детям .markdown, поэтому основной текст
+   внутри подсказок (их 510 в главах), складок и цитат меры не знал вовсе:
+   при колонке 868 px соседние абзацы шли 734 и 831 — один и тот же текст,
+   разной длины строки. Таблицы, код и тренажёры сюда намеренно не входят:
+   им ширина нужна вся. */
 .markdown > p,
 .markdown > ul,
-.markdown > ol {
+.markdown > ol,
+.hint p,
+.hint ul,
+.hint ol,
+.fold-body > p,
+.fold-body > ul,
+.fold-body > ol,
+.markdown blockquote p {
   max-width: 74ch;
 }
 
@@ -307,6 +319,40 @@ html {
     transition-delay: 0s !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Спокойный режим — то же самое, но по решению студента, а не системы.
+   Системная настройка в Windows спрятана глубоко, а на учебной машине до неё
+   не добраться; при этом .pgk-reveal проигрывается на КАЖДОМ переходе между
+   главами лесенкой до 450 мс, и на третьем часу чтения это самое назойливое,
+   что есть на странице. Объявления продублированы, а не вынесены в общий
+   селектор: @media и атрибут в одном правиле не соединить. */
+html[data-motion='calm'] {
+  scroll-behavior: auto;
+}
+
+html[data-motion='calm'] *,
+html[data-motion='calm'] *::before,
+html[data-motion='calm'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  animation-delay: 0s !important;
+  transition-delay: 0s !important;
+  scroll-behavior: auto !important;
+}
+
+/* Кегль: растёт только ТЕКСТ, а не макет. Браузерный зум масштабирует всё,
+   включая сайдбар и колонку, и двухколоночная страница ломается; здесь
+   меняется только rem через --ifm-font-size-base (Infima применяет её
+   шорткатом на html). Потолок 125 %: выше начинают обрезаться подписи в
+   тренажёрах, у которых холсты заданы в пикселях. */
+html[data-read='l'] {
+  --ifm-font-size-base: 112%;
+}
+
+html[data-read='xl'] {
+  --ifm-font-size-base: 125%;
 }
 
 /* Карточки раздела (DocCardList). Docusaurus вешает на заголовок и описание
