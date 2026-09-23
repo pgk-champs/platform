@@ -1,15 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import Link from '@docusaurus/Link';
 import knowledgeMap from '../data/knowledge-map.json';
 import tracks from '../data/tracks.json';
 import { ACHIEVEMENTS } from '../lib/achievements';
 import { plural } from '../lib/plural';
+import { store } from '../lib/store';
+import { nextChapter, fillOf } from '../lib/chapterFill';
+import { badgeState } from '../lib/gameBadge';
+import { levelForXp } from '../lib/levels';
 import ComposeLayers from './ComposeLayers';
 import './trainers.css';
 
 // Числа считаются из данных, а не вписываются руками: «22 главы с разбором»
 // дожили на первом экране до 137 настоящих и никого не смутили.
 type MapEntry = { track: string; totals?: { trainers?: number } };
+type ChapterEntry = { id: string; title: string; path: string; audience: string; level: string };
 const CHAPTERS = (knowledgeMap as MapEntry[]).length;
 const TRAINERS = (knowledgeMap as MapEntry[]).reduce((sum, e) => sum + (e.totals?.trainers ?? 0), 0);
 
@@ -109,33 +114,98 @@ function HeroScene() {
 }
 
 export default function HomeHero() {
+  useSyncExternalStore(store.subscribe, store.getVersion, () => 0);
+  // store поднимает localStorage ещё при импорте модуля, поэтому его нельзя
+  // спрашивать до монтирования — иначе первый клиентский рендер разойдётся с
+  // серверным (пустым) и React пожалуется на гидрацию. До монтирования (и
+  // любому, кто и правда впервые здесь) страница выглядит ровно как сейчас.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  // «Начал» — та же проверка, что у достижения «Первая прочитанная глава»:
+  // хотя бы одна секция хотя бы одной главы прочитана. nextChapter() одна
+  // не годится веха: она всегда возвращает ПЕРВУЮ нетронутую главу, поэтому
+  // не отличает «здесь ещё никого не было» от «читает первую главу».
+  const started = mounted && Object.keys(store.snapshot().sections).length >= 1;
+
+  let current: { title: string; path: string; pct: number } | null = null;
+  let trackLabel = '';
+  let filled = 0;
+  let trackTotal = 0;
+  if (started) {
+    // Трек — из сохранённого выбора на Маршруте (src/lib/store.ts), с тем же
+    // умолчанием, что там: студент фундамента мог накопить прогресс, ни разу
+    // не выбирая трек руками.
+    const savedTrack = store.prefs.getTrack();
+    const track = savedTrack === 'блокчейн' ? 'блокчейн' : 'мобилка';
+    trackLabel = track[0].toUpperCase() + track.slice(1);
+    const main = (knowledgeMap as ChapterEntry[]).filter(
+      (e) => (e.audience === 'все' || e.audience === track) && e.level !== 'углубление',
+    );
+    trackTotal = main.length;
+    filled = main.filter((e) => fillOf(e.id) >= 1).length;
+    const nextId = nextChapter(main.map((e) => e.id));
+    const chapter = nextId ? main.find((e) => e.id === nextId) ?? null : null;
+    if (chapter) current = { title: chapter.title, path: chapter.path, pct: Math.round(fillOf(chapter.id) * 100) };
+  }
+
+  const badge = started ? badgeState() : null;
+  const level = started ? levelForXp(store.getXp()) : null;
+
+  const stats =
+    started && badge && level
+      ? [
+          { num: String(level.level), label: level.title },
+          { num: `${badge.unlocked}/${badge.total}`, label: 'достижений' },
+          { num: String(badge.streak), label: `${plural(badge.streak, 'день', 'дня', 'дней')} подряд` },
+        ]
+      : STATS;
+
   return (
     <div className="hh">
       <section className="hh-hero hh-hero--v2">
         <div className="hh-hero-inner">
           <div className="hh-hero-copy">
             <p className="hh-kicker pgk-reveal" style={{ ['--i' as string]: 0 }}>
-              Учебная платформа ПГК · подготовка к чемпионату
+              {started ? 'С возвращением' : 'Учебная платформа ПГК · подготовка к чемпионату'}
             </p>
             <h1 className="hh-title pgk-reveal" style={{ ['--i' as string]: 1 }}>
               От нуля до чемпиона
             </h1>
             <p className="hh-subtitle pgk-reveal" style={{ ['--i' as string]: 2 }}>
-              Мобилка и блокчейн: интерактивные главы, тренажёры и симулятор чемпионата.
+              {current
+                ? `Сейчас: «${current.title}» — пройдено ${current.pct}%.`
+                : started
+                  ? `Трек «${trackLabel}» пройден целиком — загляни в другой на Маршруте.`
+                  : 'Мобилка и блокчейн: интерактивные главы, тренажёры и симулятор чемпионата.'}
             </p>
             <div className="hh-actions pgk-reveal" style={{ ['--i' as string]: 3 }}>
-              <Link className="button button--primary" to="/route">
-                Начать маршрут
-              </Link>
-              <Link className="button button--secondary" to="/playground">
-                Попробовать сразу
-              </Link>
+              {current ? (
+                <Link className="button button--primary" to={`/docs/${current.path.replace(/\.mdx?$/, '')}`}>
+                  Продолжить главу
+                </Link>
+              ) : (
+                <Link className="button button--primary" to="/route">
+                  {started ? 'Открыть другой трек' : 'Начать маршрут'}
+                </Link>
+              )}
+              {started ? (
+                <Link className="button button--secondary" to={current ? '/route' : '/achievements'}>
+                  {current ? 'Маршрут целиком' : 'Мои достижения'}
+                </Link>
+              ) : (
+                <Link className="button button--secondary" to="/playground">
+                  Попробовать сразу
+                </Link>
+              )}
             </div>
             <p className="hh-note pgk-reveal" style={{ ['--i' as string]: 4 }}>
-              Первый тренажёр открывается сразу, регистрация не нужна.
+              {started
+                ? `${filled} из ${trackTotal} ${plural(trackTotal, 'глава', 'главы', 'глав')} трека «${trackLabel}» пройдено.`
+                : 'Первый тренажёр открывается сразу, регистрация не нужна.'}
             </p>
             <dl className="hh-nums pgk-reveal" style={{ ['--i' as string]: 5 }}>
-              {STATS.map((s) => (
+              {stats.map((s) => (
                 <div key={s.label} className="hh-num">
                   <dt>
                     <b>{s.num}</b>

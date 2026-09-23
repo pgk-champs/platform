@@ -77,3 +77,81 @@ test('треки идут по объёму, крупные — первыми',
   // Цвет трека приходит общим классом, а не своим набором на каждой странице.
   expect(cards[0].className).toContain('trk-blockchain');
 });
+
+// --- главная знает о студенте (23.09.2026) ---
+//
+// До этого HomeHero не импортировал store вовсе: витрина не менялась ни на
+// йоту для того, кто уже прошёл половину трека. Тесты выше держат «холодный»
+// вариант (store пуст в этом файле по умолчанию — конвенция без beforeEach);
+// здесь — то, что видит вернувшийся студент.
+
+import { store } from '../lib/store';
+import { fillOf } from '../lib/chapterFill';
+import { badgeState } from '../lib/gameBadge';
+import { levelForXp } from '../lib/levels';
+
+beforeEach(() => {
+  store.__resetForTests();
+});
+
+test('вернувшийся студент видит «Продолжить главу», а не «Начать маршрут»', () => {
+  // Тот же признак, что у достижения «Первая прочитанная глава»: секция
+  // прочитана. nextChapter() сам по себе не отличает «никого не было» от
+  // «читает первую главу» — оба раза вернёт её же.
+  store.setSectionRead('github-start', 'intro');
+  render(<HomeHero />);
+  expect(screen.getByText('С возвращением')).toBeTruthy();
+  const link = screen.getByRole('link', { name: 'Продолжить главу' });
+  expect(link.getAttribute('href')).toBe('/docs/foundation/github-start');
+  expect(screen.getByText(/GitHub с нуля: регистрация и первые шаги/)).toBeTruthy();
+  // «Начать маршрут» пропал целиком — не просто спрятан рядом со своим двойником
+  expect(screen.queryByText('Начать маршрут')).toBeNull();
+  expect(screen.queryByText('Попробовать сразу')).toBeNull();
+});
+
+test('процент в подзаголовке — тот же, что у сосуда Маршрута', () => {
+  store.setSectionRead('github-start', 'intro');
+  render(<HomeHero />);
+  const pct = Math.round(fillOf('github-start') * 100);
+  expect(screen.getByText(new RegExp(`пройдено ${pct}%`))).toBeTruthy();
+});
+
+test('свежий гость (без чтения) не видит персональных чисел', () => {
+  // Мусор в сторе типа prefs.track без единой прочитанной секции не должен
+  // включать персонализацию — иначе «started» отвечал бы не на тот вопрос.
+  store.prefs.setTrack('блокчейн');
+  render(<HomeHero />);
+  expect(screen.getByRole('link', { name: 'Начать маршрут' }).getAttribute('href')).toBe('/route');
+  expect(screen.queryByText('С возвращением')).toBeNull();
+});
+
+test('уровень, достижения и серия в персональных числах — те же, что в шапке', () => {
+  store.setSectionRead('github-start', 'intro');
+  store.addXp(50, 'test-seed');
+  const { container } = render(<HomeHero />);
+  const badge = badgeState();
+  const level = levelForXp(store.getXp());
+  const nums = [...container.querySelectorAll('.hh-num dt b')].map((el) => el.textContent);
+  expect(nums).toEqual([String(level.level), `${badge.unlocked}/${badge.total}`, String(badge.streak)]);
+});
+
+test('трек, пройденный целиком, ведёт на другой трек и на достижения', () => {
+  // Реальный список фундамента у теста нет смысла проходить целиком — берём
+  // главы своего трека и наполняем их через store, без обхода мимо DOM.
+  type Full = { id: string; audience: string; level: string; totals: { sections: number; quizzes: number; trainers: number } };
+  const chapters = (knowledgeMap as Full[]).filter(
+    (e) => (e.audience === 'все' || e.audience === 'мобилка') && e.level !== 'углубление',
+  );
+  expect(chapters.length).toBeGreaterThan(0);
+  for (const c of chapters) {
+    for (let i = 0; i < c.totals.sections; i += 1) store.setSectionRead(c.id, `s${i}`);
+    for (let i = 0; i < c.totals.quizzes; i += 1) store.markQuizDone(c.id, `q${i}`, { correct: 1, total: 1 });
+    for (let i = 0; i < c.totals.trainers; i += 1) store.markTrainerDone(c.id, `t${i}`, {});
+  }
+  render(<HomeHero />);
+  expect(screen.getByText(/Трек «Мобилка» пройден целиком/)).toBeTruthy();
+  const primary = screen.getByRole('link', { name: 'Открыть другой трек' });
+  expect(primary.getAttribute('href')).toBe('/route');
+  const secondary = screen.getByRole('link', { name: 'Мои достижения' });
+  expect(secondary.getAttribute('href')).toBe('/achievements');
+});
