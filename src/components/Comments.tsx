@@ -22,8 +22,14 @@ const GISCUS = {
 export default function Comments() {
   const ref = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
+  // Скрипт giscus.app грузится ТОЛЬКО по нажатию. Раньше он вставлялся
+  // безусловно на КАЖДОЙ из 137 глав: сторонний домен, iframe и запрос к
+  // GitHub на странице, где комментариев обычно нет вовсе. Теперь страница
+  // не зовёт наружу, пока человек сам не попросит.
+  const [asked, setAsked] = useState(false);
 
   useEffect(() => {
+    if (!asked) return;
     const el = ref.current;
     if (!el || el.childElementCount > 0) return;
     const s = document.createElement('script');
@@ -51,18 +57,31 @@ export default function Comments() {
     };
     window.addEventListener('message', onMsg);
     return () => window.removeEventListener('message', onMsg);
-  }, []);
+  }, [asked]);
 
   return (
     <section className="cm-comments">
       <h3 className="cm-title">Комментарии</h3>
-      <div ref={ref} />
-      {!ready && (
-        <p className="cm-fallback">
-          Комментарии появятся после настройки. Нужен аккаунт GitHub — вход
-          прямо в виджете выше.
-        </p>
+      {!asked ? (
+        <button type="button" className="button button--sm button--secondary" onClick={() => setAsked(true)}>
+          Показать обсуждение главы
+        </button>
+      ) : (
+        <>
+          <div ref={ref} />
+          {!ready && (
+            <p className="cm-fallback">
+              Комментарии появятся после настройки. Нужен аккаунт GitHub — вход
+              прямо в виджете выше.
+            </p>
+          )}
+        </>
       )}
+      {!asked ? (
+        <p className="cm-fallback">
+          Обсуждение живёт в GitHub Discussions и грузится с чужого домена — поэтому только по нажатию.
+        </p>
+      ) : null}
     </section>
   );
 }

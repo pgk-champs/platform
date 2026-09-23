@@ -66,6 +66,17 @@ export default function ReadingPrefs(): React.ReactElement | null {
           <label className="rp-row rp-calm">
             <input
               type="checkbox"
+              checked={store.prefs.getTocDefault() === 'closed'}
+              onChange={(e) => store.prefs.setTocDefault(e.target.checked ? 'closed' : 'open')}
+            />
+            <span>
+              Оглавление свёрнуто
+              <span className="rp-hint">по умолчанию во всех главах</span>
+            </span>
+          </label>
+          <label className="rp-row rp-calm">
+            <input
+              type="checkbox"
               checked={calm}
               onChange={(e) => store.prefs.setMotion(e.target.checked ? 'calm' : 'full')}
             />

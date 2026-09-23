@@ -44,3 +44,23 @@ test('облик и настройки чтения живут в одном pre
   expect(store.prefs.getRead()).toBe('xl');
   expect(store.prefs.getSeal()).toBe('первая-прочитанная-глава');
 });
+
+test('оглавление главы уважает общее умолчание, но своё решение по главе важнее', () => {
+  expect(store.prefs.getTocDefault()).toBe('open');
+  expect(store.toc.isCollapsed('typing')).toBe(false);
+
+  store.prefs.setTocDefault('closed');
+  expect(store.toc.isCollapsed('typing')).toBe(true);
+  // другая глава без своего решения тоже подхватывает умолчание
+  expect(store.toc.isCollapsed('git-first-commit')).toBe(true);
+
+  // развернул руками одну главу — именно она остаётся развёрнутой
+  store.toc.setCollapsed('typing', false);
+  expect(store.toc.isCollapsed('typing')).toBe(false);
+  expect(store.toc.isCollapsed('git-first-commit')).toBe(true);
+});
+
+test('мусор в toc-умолчании откатывается на открытое', () => {
+  store.prefs.setTocDefault('всегда');
+  expect(store.prefs.getTocDefault()).toBe('open');
+});

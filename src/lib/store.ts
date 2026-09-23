@@ -91,6 +91,8 @@ type State = {
     motion?: string;
     /** Кегль чтения: 'm' | 'l' | 'xl'. Растёт текст, а не макет. */
     read?: string;
+    /** Оглавление главы по умолчанию: 'open' | 'closed'. */
+    toc?: string;
   };
   tocCollapsed: Record<string, boolean>;
   quizLog: QuizLogEntry[];
@@ -564,7 +566,24 @@ function setTocCollapsed(chapterId: string, collapsed: boolean): void {
 }
 
 function isTocCollapsed(chapterId: string): boolean {
-  return state.tocCollapsed[chapterId] ?? false;
+  // Своё решение по КОНКРЕТНОЙ главе важнее общего умолчания: человек
+  // развернул оглавление здесь — здесь оно и останется, даже если по
+  // умолчанию всё свёрнуто.
+  const own = state.tocCollapsed[chapterId];
+  if (typeof own === 'boolean') return own;
+  return getTocDefault() === 'closed';
+}
+
+const TOC_DEFAULTS = ['open', 'closed'];
+
+function setTocDefault(v: string): void {
+  state.prefs = { ...state.prefs, toc: TOC_DEFAULTS.includes(v) ? v : 'open' };
+  persist();
+}
+
+function getTocDefault(): string {
+  const v = state.prefs.toc;
+  return TOC_DEFAULTS.includes(v ?? '') ? v! : 'open';
 }
 
 // --- collapsible block state (per blockId, default expanded) ---
@@ -796,6 +815,8 @@ export const store = {
     getMotion,
     setRead,
     getRead,
+    setTocDefault,
+    getTocDefault,
   },
   words: { queue: wordsQueue, grade: gradeWord, weight: wordWeight },
   toc: { setCollapsed: setTocCollapsed, isCollapsed: isTocCollapsed },

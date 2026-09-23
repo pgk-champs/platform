@@ -101,6 +101,16 @@ const config: Config = {
     colorMode: {
       respectPrefersColorScheme: true,
     },
+    docs: {
+      sidebar: {
+        // Обе возможности уже написаны в установленном Docusaurus и просто не
+        // включены. Меню слева — 137 глав в четырёх треках: без сворачивания
+        // оно занимает треть экрана на каждой странице, а чужие треки при
+        // этом всё равно не нужны.
+        hideable: true,
+        autoCollapseCategories: true,
+      },
+    },
     navbar: {
       title: 'PGK Champs',
       logo: {

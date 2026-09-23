@@ -11,7 +11,10 @@ test('футер главы: оригинал + «Предложить прав�
   const link = screen.getByRole('link', { name: /Предложить правку/ });
   expect(link.getAttribute('href')).toContain('issues/new');
   expect(link.getAttribute('href')).toContain('template=edit-suggestion.yml');
-  // Комментарии: заголовок и заглушка до ответа giscus.
+  // Комментарии: заголовок есть, но виджет — по нажатию, не сразу. Скрипт
+  // giscus.app грузился на всех 137 главах безусловно, даже там, где
+  // комментариев никогда не было — теперь страница не зовёт наружу сама.
   expect(screen.getByText('Комментарии')).toBeInTheDocument();
-  expect(screen.getByText(/Комментарии появятся после настройки/)).toBeInTheDocument();
+  expect(screen.getByText('Показать обсуждение главы')).toBeInTheDocument();
+  expect(document.querySelector('script[src="https://giscus.app/client.js"]')).toBeNull();
 });
