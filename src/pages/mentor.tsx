@@ -8,6 +8,7 @@ import knowledgeMap from '../data/knowledge-map.json';
 import { levelForXp } from '../lib/levels';
 import { ACHIEVEMENTS } from '../lib/achievements';
 import {
+  addAllToGroup,
   addGroupComentor,
   addAuthor,
   addMentor,
@@ -328,6 +329,16 @@ function Dashboard() {
     await Promise.all([reloadGroups(), reloadStudents(activeGroup === g.id ? 0 : activeGroup)]);
   };
 
+  const onAddAll = async (g: MentorGroup) => {
+    if (!window.confirm(`Добавить в «${g.name}» ВСЕХ, кто зарегистрирован на платформе?`)) return;
+    setBusy(true);
+    const added = await addAllToGroup(g.id);
+    setBusy(false);
+    await Promise.all([reloadGroups(), reloadStudents(activeGroup)]);
+    if (added === null) window.alert('Не вышло — доступно только владельцу платформы.');
+    else window.alert(added > 0 ? `Добавлено: ${added}.` : 'Новых не нашлось — все уже в группе.');
+  };
+
   const onAddComentor = async (g: MentorGroup) => {
     const login = window.prompt(`GitHub-логин со-наставника для группы «${g.name}»:`);
     if (!login || !login.trim()) return;
@@ -430,6 +441,21 @@ function Dashboard() {
                 onClick={() => onAddComentor(g)}
               >
                 +👤{g.comentors && g.comentors.length ? ` ${g.comentors.length}` : ''}
+              </button>
+            )}
+            {/* Только владельцу платформы: иначе любой наставник мог бы
+                затащить к себе в группу чужих студентов и обойти границу
+                видимости, которую эта же кнопка формально не нарушает —
+                добавляет исполняющий владелец, а не кто угодно. */}
+            {isRoot && (
+              <button
+                type="button"
+                className="mn-group-co-add"
+                title="Добавить в группу всех, кто зарегистрирован на платформе"
+                onClick={() => onAddAll(g)}
+                disabled={busy}
+              >
+                +👥 все
               </button>
             )}
             {g.owner !== false && (

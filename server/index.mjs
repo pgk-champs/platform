@@ -1249,7 +1249,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     // /mentor/groups/<id> · /remove · /comentor · /comentor/<login>
-    const gm = path.match(/^\/mentor\/groups\/(\d+)(\/remove|\/comentor(?:\/([A-Za-z\d-]+))?)?$/);
+    const gm = path.match(/^\/mentor\/groups\/(\d+)(\/remove|\/add-all|\/comentor(?:\/([A-Za-z\d-]+))?)?$/);
     if (gm) {
       const guard = mentorGuard();
       if (guard.err) return json(res, guard.err[0], { error: guard.err[1] });
@@ -1276,6 +1276,24 @@ const server = http.createServer(async (req, res) => {
         }
         removeMember.run(id, Number(body.gh_id));
         return json(res, 200, { ok: true });
+      }
+      // Добавить ВСЕХ зарегистрированных — только владельцу платформы. Не
+      // владельцу группы: иначе любой наставник мог бы затащить к себе в
+      // группу чужих студентов и обойти фикс от 21.09.2026 («роль — не
+      // право»), где видимость всей базы отдельно ограничена корневым.
+      if (gm[2] === '/add-all' && req.method === 'POST') {
+        if (!isRootMentor(guard.u)) return json(res, 403, { error: 'доступно только владельцу платформы' });
+        const now = Date.now();
+        const added = db.transaction(() => {
+          let n = 0;
+          for (const row of allUsers.all()) {
+            if (row.gh_id === g.owner) continue; // владелец не студент своей же группы
+            const r = addMember.run(id, row.gh_id, now);
+            if (r.changes > 0) n += 1;
+          }
+          return n;
+        })();
+        return json(res, 200, { ok: true, added });
       }
       // Добавить со-наставника группы — только владелец.
       if (gm[2] === '/comentor' && req.method === 'POST') {

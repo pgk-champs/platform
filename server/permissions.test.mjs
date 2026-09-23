@@ -109,6 +109,39 @@ test('результат ученика стирает только его на�
   assert.equal((await call(root, `/mentor/results/${bobId}/a`, { method: 'DELETE' })).status, 200);
 });
 
+test('добавить всех в группу — только владельцу платформы, идемпотентно', пропуск, async () => {
+  const root = await tok('root');
+  const alice = await tok('alice');
+  const dima = await tok('dima');
+  const zoya = await tok('zoya');
+
+  // группа root'а
+  const rg = await call(root, '/mentor/groups', { method: 'POST', body: '{"name":"Все"}' });
+  const rid = rg.body.group?.id ?? rg.body.id;
+  // группа обычного наставника
+  const ag = await call(alice, '/mentor/groups', { method: 'POST', body: '{"name":"Алисина"}' });
+  const aid = ag.body.group?.id ?? ag.body.id;
+
+  await call(dima, '/progress', { method: 'PUT', body: '{}' });
+  await call(zoya, '/progress', { method: 'PUT', body: '{}' });
+
+  // обычный наставник не может затащить к себе чужих студентов
+  assert.equal((await call(alice, `/mentor/groups/${aid}/add-all`, { method: 'POST' })).status, 403);
+
+  const first = await call(root, `/mentor/groups/${rid}/add-all`, { method: 'POST' });
+  assert.equal(first.status, 200);
+  assert.ok(first.body.added >= 2, `добавлено ${first.body.added}`);
+
+  const roster = await call(root, `/mentor/students?group=${rid}`);
+  const logins = roster.body.students.map((s) => s.login);
+  assert.ok(logins.includes('dima') && logins.includes('zoya'));
+  assert.ok(!logins.includes('root'), 'владелец не должен стать студентом своей же группы');
+
+  // повторный вызов не плодит дублей
+  const second = await call(root, `/mentor/groups/${rid}/add-all`, { method: 'POST' });
+  assert.equal(second.body.added, 0);
+});
+
 test('слишком большое тело обрывает соединение, а не копится в памяти', пропуск, async () => {
   const bob = await tok('bob');
   const big = JSON.stringify({ junk: 'x'.repeat(2_000_000) });

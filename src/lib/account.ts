@@ -334,6 +334,21 @@ export async function createGroup(name: string): Promise<MentorGroup | null> {
   }
 }
 
+/**
+ * Добавляет в группу ВСЕХ зарегистрированных на платформе. Доступно только
+ * владельцу платформы (сервер проверяет это отдельно от владения группой) —
+ * иначе любой наставник мог бы затащить к себе чужих студентов.
+ */
+export async function addAllToGroup(id: number): Promise<number | null> {
+  try {
+    const r = await api(`/mentor/groups/${id}/add-all`, { method: 'POST' });
+    if (!r.ok) return null;
+    return ((await r.json()).added as number) ?? 0;
+  } catch {
+    return null;
+  }
+}
+
 export async function deleteGroup(id: number): Promise<boolean> {
   try {
     return (await api(`/mentor/groups/${id}`, { method: 'DELETE' })).ok;
