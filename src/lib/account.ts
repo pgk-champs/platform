@@ -472,6 +472,29 @@ export async function submitCommunity(item: CommunitySubmission): Promise<{ ok: 
   }
 }
 
+export type ContributorRow = {
+  gh_id: number;
+  login: string;
+  name: string;
+  avatar: string;
+  submitted: number;
+  approved: number;
+  place: number;
+  me: boolean;
+};
+
+/** Рейтинг вклада: кто сколько прислал и сколько из этого приняли. Публичный —
+ *  как и обычный /leaderboard, только по каталогу материалов. */
+export async function fetchCommunityBoard(): Promise<ContributorRow[] | null> {
+  try {
+    const r = await api('/community/leaderboard');
+    if (!r.ok) return null;
+    return ((await r.json()).rows as ContributorRow[]) ?? [];
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchPendingCommunity(status = 'pending'): Promise<PendingItem[]> {
   try {
     const r = await api(`/mentor/community?status=${status}`);

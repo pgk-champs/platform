@@ -1,5 +1,6 @@
 import React from 'react';
 import Layout from '@theme/Layout';
+import CommunityBoard from '../components/CommunityBoard';
 import CommunityCatalog from '../components/CommunityCatalog';
 import MyMaterials from '../components/MyMaterials';
 import SubmitCommunity from '../components/SubmitCommunity';
@@ -15,6 +16,7 @@ export default function Community() {
         <h1>Сообщество</h1>
         <SubmitCommunity />
         <CommunityCatalog />
+        <CommunityBoard />
         <MyMaterials />
       </main>
     </Layout>

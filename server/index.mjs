@@ -227,6 +227,15 @@ const setCommunityStatus = db.prepare('UPDATE community SET status = ?, reviewed
 const myCommunity = db.prepare(`SELECT id, type, chapter_id, title, status, created_at, reviewed_at
   FROM community WHERE author_gh_id = ? ORDER BY created_at DESC LIMIT 100`);
 const pendingCountForUser = db.prepare("SELECT COUNT(*) AS n FROM community WHERE author_gh_id = ? AND status = 'pending'");
+// Рейтинг вклада: сколько прислал и сколько из этого приняли. Тот же приём,
+// что у boardOverall — джойн на users за живым аватаром и именем, а не по
+// снимку author_login, который в community не обновляется задним числом.
+const communityBoard = db.prepare(`SELECT c.author_gh_id AS gh_id, u.login, u.name, u.avatar,
+    COUNT(*) AS submitted, SUM(c.status = 'approved') AS approved
+  FROM community c JOIN users u ON u.gh_id = c.author_gh_id
+  GROUP BY c.author_gh_id
+  ORDER BY approved DESC, submitted DESC
+  LIMIT 200`);
 
 const COMMUNITY_TYPES = new Set(['preset', 'repo', 'link', 'video', 'source']);
 
@@ -1459,6 +1468,17 @@ const server = http.createServer(async (req, res) => {
           status: r.status,
           addedAt: new Date(r.created_at).toISOString().slice(0, 10),
         })),
+      });
+    }
+
+    // Рейтинг вклада в сообщество — публичный, как и обычный /leaderboard:
+    // разница только в том, что считает по каталогу материалов, а не по
+    // result'ам симулятора.
+    if (path === '/community/leaderboard' && req.method === 'GET') {
+      const me = bearer(req);
+      const rows = communityBoard.all();
+      return json(res, 200, {
+        rows: rows.map((r, i) => ({ ...r, place: i + 1, me: !!(me && me.id === r.gh_id) })),
       });
     }
 

@@ -197,6 +197,14 @@ function trainersDone(s: Snapshot): number {
   return n;
 }
 
+/** Сколько РАЗНЫХ материалов приняли в каталог. Считаем по множеству id из
+ *  меток `ok:<id>`, а не по длине community — там же лежат и метки sub:. */
+function acceptedMaterials(s: Snapshot): number {
+  const ids = new Set<string>();
+  for (const m of s.community) if (m.startsWith('ok:')) ids.add(m.slice(3));
+  return ids.size;
+}
+
 function perfectQuizIds(s: Snapshot): Set<string> {
   const out = new Set<string>();
   for (const e of s.quizLog) if (isPerfect(e)) out.add(`${e.chapterId}:${e.quizId}`);
@@ -1321,6 +1329,36 @@ export const ACHIEVEMENTS: Achievement[] = [
     rarity: 'редкое',
     check: (s) => s.community.some((m) => m.startsWith('ok:')),
   },
+  // «Поделился»/«Приняли» — это «в первый раз». Дальше — лестница по числу
+  // РАЗНЫХ принятых материалов: одна отправка, дважды одобренная задним
+  // числом, не должна закрывать ступень выше «одного».
+  {
+    id: '3-принятых-материалов',
+    title: 'Постоянный автор',
+    desc: 'Принято 3 разных материала в каталог',
+    icon: '🧰',
+    category: 'вклад',
+    rarity: 'обычное',
+    check: (s) => acceptedMaterials(s) >= 3,
+  },
+  {
+    id: '10-принятых-материалов',
+    title: 'Опора каталога',
+    desc: 'Принято 10 разных материалов в каталог',
+    icon: '🏛️',
+    category: 'вклад',
+    rarity: 'редкое',
+    check: (s) => acceptedMaterials(s) >= 10,
+  },
+  {
+    id: '25-принятых-материалов',
+    title: 'Легенда каталога',
+    desc: 'Принято 25 разных материалов в каталог',
+    icon: '👑',
+    category: 'вклад',
+    rarity: 'эпическое',
+    check: (s) => acceptedMaterials(s) >= 25,
+  },
   // --- мета: только в самом конце ---
   {
     id: '20-достижений',
@@ -1376,6 +1414,7 @@ const LADDER: Record<string, (s: Snapshot) => number> = {
   'вызовов-дня': (s) => Object.keys(s.daily).length,
   'своих-наборов': (s) => s.customPresets.length,
   достижений: (s) => s.achievementsUnlocked.length,
+  'принятых-материалов': acceptedMaterials,
 };
 
 /** Порог ступени — из её же id, чтобы число не пришлось дублировать. */

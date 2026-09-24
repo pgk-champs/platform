@@ -292,3 +292,43 @@ test('автор видит судьбу своего материала', пр�
   const другой = await call(await tok('petya'), '/community/mine');
   assert.deepEqual(другой.body.items, []);
 });
+
+test('рейтинг вклада в сообщество считает отправленное и принятое, публичен без токена', пропуск, async () => {
+  const root = await tok('root');
+  const nina = await tok('nina');
+  const pasha = await tok('pasha');
+  const submit = (t) =>
+    call(t, '/community', {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'preset',
+        title: 'Набор',
+        data: { name: 'Набор', engine: 'wordorder', phrase: 'раз два' },
+      }),
+    });
+
+  await submit(nina);
+  await submit(nina); // у нины два отправленных, один из них примут
+  await submit(pasha); // у паши один отправленный, ни один не примут
+
+  const pending = (await call(root, '/mentor/community?status=pending')).body.items;
+  const ninaItem = pending.find((i) => i.author === 'nina');
+  await call(root, `/mentor/community/${ninaItem.id}`, { method: 'POST', body: '{"action":"approve"}' });
+
+  const board = await call(root, '/community/leaderboard');
+  assert.equal(board.status, 200);
+  const ninaRow = board.body.rows.find((r) => r.login === 'nina');
+  const pashaRow = board.body.rows.find((r) => r.login === 'pasha');
+  assert.equal(ninaRow.submitted, 2);
+  assert.equal(ninaRow.approved, 1);
+  assert.equal(pashaRow.submitted, 1);
+  assert.equal(pashaRow.approved, 0);
+  // у кого больше принято — тот выше в списке
+  assert.ok(board.body.rows.indexOf(ninaRow) < board.body.rows.indexOf(pashaRow));
+
+  // публичный: без токена тоже отдаёт, просто me всегда false
+  const anon = await fetch(`${B}/community/leaderboard`);
+  assert.equal(anon.status, 200);
+  const anonBody = await anon.json();
+  assert.ok(anonBody.rows.length > 0 && anonBody.rows.every((r) => r.me === false));
+});
