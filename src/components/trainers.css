@@ -9174,6 +9174,8 @@
 .button--sm { padding: 0.35rem 0.8rem; font-size: 0.85rem; }
 .mn-kick { border: none; background: none; cursor: pointer; color: var(--pgk-text-danger); font-size: 0.95rem; padding: 0.2rem 0.4rem; border-radius: var(--pgk-radius-sm); }
 .mn-kick:hover { background: color-mix(in srgb, var(--pgk-text-danger) 12%, transparent); }
+.mn-note-btn { border: none; background: none; cursor: pointer; color: var(--ifm-color-emphasis-500); font-size: 0.85rem; padding: 0.15rem 0.35rem; border-radius: var(--pgk-radius-sm); vertical-align: middle; }
+.mn-note-btn:hover { background: color-mix(in srgb, var(--ifm-color-emphasis-500) 12%, transparent); color: var(--ifm-color-primary); }
 /* Присоединение к группе в кабинете */
 .ac-join-form { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
 .ac-join-input { flex: 1; min-width: 8rem; padding: 0.5rem 0.7rem; border: 1px solid var(--ifm-color-emphasis-300); border-radius: var(--pgk-radius-sm); background: var(--ifm-background-color); color: var(--ifm-font-color-base); font-family: var(--ifm-font-family-monospace); letter-spacing: 0.15em; text-transform: uppercase; }

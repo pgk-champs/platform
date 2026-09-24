@@ -34,6 +34,7 @@ import {
   removeMentor,
   removeStudent,
   reviewCommunity,
+  saveStudentNote,
   type AuthorEntry,
   type MentorEntry,
   type MentorGroup,
@@ -98,7 +99,7 @@ function StudentCard({ id, onClose }: { id: number; onClose: () => void }) {
                 </div>
               )}
               <div>
-                <h3 className="sc-name">{d.student.name || d.student.login}</h3>
+                <h3 className="sc-name">{d.student.note || d.student.name || d.student.login}</h3>
                 <p className="sc-sub">
                   @{d.student.login} · уровень {levelForXp(d.student.xp).level} · {d.student.xp} XP · был активен {ago(d.student.updatedAt)}
                 </p>
@@ -193,7 +194,7 @@ function StudentCard({ id, onClose }: { id: number; onClose: () => void }) {
 
 // Выгрузка группы в CSV — открывается в Excel/Google Sheets.
 function downloadCsv(students: MentorStudent[], groupName: string): void {
-  const head = ['Логин', 'Имя', 'XP', 'Главы', 'Секции', 'Квизы', 'Экзамены', 'Симулятор', 'Активность'];
+  const head = ['Логин', 'Имя', 'Заметка', 'XP', 'Главы', 'Секции', 'Квизы', 'Экзамены', 'Симулятор', 'Активность'];
   const esc = (v: string | number) => {
     const s = String(v ?? '');
     return /[",;\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
@@ -202,6 +203,7 @@ function downloadCsv(students: MentorStudent[], groupName: string): void {
     [
       s.login,
       s.name || s.login,
+      s.note || '',
       s.xp,
       s.chaptersStarted,
       s.sectionsRead,
@@ -363,6 +365,17 @@ function Dashboard() {
     await reloadStudents(activeGroup);
   };
 
+  // Своя заметка об ученике: GitHub отдаёт только ник, а вести группу удобнее
+  // по имени. Заметка видна только тому наставнику, который её поставил.
+  const onEditNote = async (s: MentorStudent) => {
+    const note = window.prompt(`Заметка об ученике @${s.login} (например, ФИО):`, s.note || '');
+    if (note === null || note.trim() === (s.note || '')) return;
+    setBusy(true);
+    await saveStudentNote(s.gh_id, note.trim());
+    setBusy(false);
+    await reloadStudents(activeGroup);
+  };
+
   if (loading) return <p className="ac-muted">Загрузка…</p>;
 
   if (!allowed) {
@@ -505,6 +518,7 @@ function Dashboard() {
           active={active}
           onRemoveStudent={onRemoveStudent}
           onOpenStudent={setOpenStudent}
+          onEditNote={onEditNote}
         />
       )}
 
@@ -723,6 +737,7 @@ function RosterView({
   active,
   onRemoveStudent,
   onOpenStudent,
+  onEditNote,
 }: {
   list: MentorStudent[];
   activeGroup: number;
@@ -731,6 +746,7 @@ function RosterView({
   active: number;
   onRemoveStudent: (s: MentorStudent) => void;
   onOpenStudent: (ghId: number) => void;
+  onEditNote: (s: MentorStudent) => void;
 }) {
   return (
     <div>
@@ -777,7 +793,12 @@ function RosterView({
               return (
                 <tr key={s.gh_id} className={stale ? 'mn-stale' : undefined}>
                   <td>
-                    <button type="button" className="lb-user mn-open" onClick={() => onOpenStudent(s.gh_id)} title="Открыть карточку ученика">
+                    <button
+                      type="button"
+                      className="lb-user mn-open"
+                      onClick={() => onOpenStudent(s.gh_id)}
+                      title={s.note ? `@${s.login} · открыть карточку ученика` : 'Открыть карточку ученика'}
+                    >
                       {s.avatar ? (
                         <img className="lb-avatar" src={s.avatar} alt="" width={28} height={28} />
                       ) : (
@@ -785,7 +806,15 @@ function RosterView({
                           {s.login.slice(0, 1).toUpperCase()}
                         </span>
                       )}
-                      <span className="lb-name mn-open-name">{s.name || s.login}</span>
+                      <span className="lb-name mn-open-name">{s.note || s.name || s.login}</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="mn-note-btn"
+                      title="Заметка об ученике (например, ФИО)"
+                      onClick={() => onEditNote(s)}
+                    >
+                      ✎
                     </button>
                   </td>
                   <td className="lb-secondary">
@@ -837,7 +866,7 @@ function RosterView({
           <tbody>
             {list.map((s) => (
               <tr key={s.gh_id}>
-                <td className="mn-heat-name">{s.name || s.login}</td>
+                <td className="mn-heat-name">{s.note || s.name || s.login}</td>
                 {CHAPTERS.map((c) => {
                   const n = s.coverage[c.id] || 0;
                   return (

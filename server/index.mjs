@@ -234,6 +234,23 @@ const COMMUNITY_TYPES = new Set(['preset', 'repo', 'link', 'video', 'source']);
 // появилось после этой отметки.
 db.exec(`CREATE TABLE IF NOT EXISTS mentor_seen (login TEXT PRIMARY KEY, last_seen INTEGER NOT NULL)`);
 
+// Заметка наставника об ученике — своя, а не общая: GitHub отдаёт только ник,
+// а вести группу удобнее по имени (ФИО и т.п.). У разных наставников одного
+// ученика заметки не пересекаются намеренно — это не общий справочник.
+db.exec(`CREATE TABLE IF NOT EXISTS mentor_notes (
+  mentor_gh_id INTEGER NOT NULL,
+  student_gh_id INTEGER NOT NULL,
+  note TEXT NOT NULL,
+  updated_at INTEGER NOT NULL,
+  PRIMARY KEY (mentor_gh_id, student_gh_id)
+)`);
+const setNote = db.prepare(`INSERT INTO mentor_notes (mentor_gh_id, student_gh_id, note, updated_at)
+  VALUES (?, ?, ?, ?)
+  ON CONFLICT(mentor_gh_id, student_gh_id) DO UPDATE SET note = excluded.note, updated_at = excluded.updated_at`);
+const deleteNote = db.prepare('DELETE FROM mentor_notes WHERE mentor_gh_id = ? AND student_gh_id = ?');
+const notesOfMentor = db.prepare('SELECT student_gh_id, note FROM mentor_notes WHERE mentor_gh_id = ?');
+const noteFor = db.prepare('SELECT note FROM mentor_notes WHERE mentor_gh_id = ? AND student_gh_id = ?');
+
 // Ключи внешних сервисов. Отдельная таблица, а не колонка у users: миграций
 // в проекте нет вообще (ни одного ALTER TABLE), новая таблица заводится сама
 // при старте, а новая колонка на проде не появилась бы и уронила prepare().
@@ -1048,6 +1065,7 @@ const server = http.createServer(async (req, res) => {
       const me = getUser.get(s.id);
       if (!isMentor(me)) return json(res, 403, { error: 'forbidden' });
       const overall = new Map(boardOverall.all().map((r) => [r.gh_id, r]));
+      const notes = new Map(notesOfMentor.all(me.gh_id).map((r) => [r.student_gh_id, r.note]));
       // Без ?group отдаём только СВОИХ учеников. Раньше здесь был allUsers, то
       // есть любой наставник выгружал всю базу платформы с логинами, аватарами
       // и разобранным прогрессом — включая чужие группы.
@@ -1109,6 +1127,7 @@ const server = http.createServer(async (req, res) => {
           login: row.login,
           name: row.name,
           avatar: row.avatar,
+          note: notes.get(row.gh_id) || '',
           xp: Number(p.xp) || 0,
           chaptersStarted: Object.keys(coverage).length,
           sectionsRead,
@@ -1180,6 +1199,7 @@ const server = http.createServer(async (req, res) => {
           login: row.login,
           name: row.name,
           avatar: row.avatar,
+          note: noteFor.get(me.gh_id, row.gh_id)?.note || '',
           xp: Number(p.xp) || 0,
           updatedAt: row.updated_at || 0,
         },
@@ -1315,6 +1335,27 @@ const server = http.createServer(async (req, res) => {
         removeGroupMentor.run(id, gm[3].toLowerCase());
         return json(res, 200, { ok: true });
       }
+    }
+
+    // Заметка наставника об ученике — своя, не общая (см. комментарий у таблицы).
+    const nt = path.match(/^\/mentor\/students\/(\d+)\/note$/);
+    if (nt && req.method === 'PUT') {
+      const guard = mentorGuard();
+      if (guard.err) return json(res, guard.err[0], { error: guard.err[1] });
+      const target = Number(nt[1]);
+      if (!isRootMentor(guard.u) && !teaches(guard.u, target)) {
+        return json(res, 403, { error: 'этот ученик не в ваших группах' });
+      }
+      let body;
+      try {
+        body = JSON.parse(await readBody(req, 1000));
+      } catch {
+        return json(res, 400, { error: 'bad json' });
+      }
+      const note = String(body.note ?? '').trim().slice(0, 200);
+      if (note) setNote.run(guard.u.gh_id, target, note, Date.now());
+      else deleteNote.run(guard.u.gh_id, target);
+      return json(res, 200, { ok: true, note });
     }
 
     // Модерация рейтинга: наставник удаляет подозрительный результат ученика.

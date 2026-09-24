@@ -17,6 +17,27 @@ function apiBase(): string {
 }
 
 const TOKEN_KEY = 'pgk-account-token';
+// Последний известный профиль — чтобы шапка не мигала пустотой на каждой
+// полной загрузке страницы, пока /me не ответит. Показывается сразу, сеть
+// сверяет и обновляет следом; сам /me быстрый (SQLite без сети), но нулевой
+// латентности не бывает, а рисовать в это время нечего было незачем.
+const PROFILE_CACHE_KEY = 'pgk-profile-cache';
+function getCachedProfile(): Profile | null {
+  try {
+    const raw = localStorage.getItem(PROFILE_CACHE_KEY);
+    return raw ? (JSON.parse(raw) as Profile) : null;
+  } catch {
+    return null;
+  }
+}
+function setCachedProfile(p: Profile | null): void {
+  try {
+    if (p) localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(p));
+    else localStorage.removeItem(PROFILE_CACHE_KEY);
+  } catch {
+    // приватный режим — переживём лишнюю секунду мигания, не критично
+  }
+}
 export type Profile = {
   id: number;
   login: string;
@@ -35,6 +56,8 @@ export type MentorStudent = {
   login: string;
   name: string;
   avatar: string;
+  /** Своя заметка наставника — например, ФИО. Пусто, если не поставлена. */
+  note: string;
   xp: number;
   chaptersStarted: number;
   sectionsRead: number;
@@ -88,7 +111,13 @@ export function login(): void {
 
 export function logout(): void {
   setToken(null);
+  setCachedProfile(null);
   notify();
+}
+
+/** Профиль из кеша — рисовать сразу, не дожидаясь ответа /me. */
+export function cachedProfile(): Profile | null {
+  return getCachedProfile();
 }
 
 /** Считать токен из #pgk_token=... после возврата с сервера и убрать из URL. */
@@ -120,11 +149,14 @@ export async function fetchProfile(): Promise<Profile | null> {
     const r = await api('/me');
     if (r.status === 401) {
       setToken(null);
+      setCachedProfile(null);
       notify();
       return null;
     }
     if (!r.ok) return null;
-    return (await r.json()) as Profile;
+    const p = (await r.json()) as Profile;
+    setCachedProfile(p);
+    return p;
   } catch {
     return null;
   }
@@ -235,7 +267,7 @@ export async function fetchMentorStudents(groupId?: number): Promise<MentorStude
 
 // Детальная карточка ученика для наставника.
 export type StudentDetail = {
-  student: { gh_id: number; login: string; name: string; avatar: string; xp: number; updatedAt: number };
+  student: { gh_id: number; login: string; name: string; avatar: string; note: string; xp: number; updatedAt: number };
   chapters: {
     chapterId: string;
     sections: number;
@@ -364,6 +396,21 @@ export async function removeStudent(groupId: number, ghId: number): Promise<bool
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ gh_id: ghId }),
+      })
+    ).ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Своя заметка наставника об ученике (например, ФИО) — не общая для всех наставников. */
+export async function saveStudentNote(ghId: number, note: string): Promise<boolean> {
+  try {
+    return (
+      await api(`/mentor/students/${ghId}/note`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note }),
       })
     ).ok;
   } catch {

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from '@docusaurus/Link';
 import {
+  cachedProfile,
   fetchContentMeta,
   fetchProfile,
   isLoggedIn,
@@ -60,6 +61,13 @@ export default function AccountNav({
         setCanEdit(false);
         setState('anon');
         return;
+      }
+      // Кеш рисуется немедленно: без него шапка пустует на весь /me — на
+      // каждой полной загрузке страницы, а не только при первом входе.
+      const cached = cachedProfile();
+      if (cached) {
+        setProfile(cached);
+        setState('user');
       }
       void fetchProfile().then((p) => {
         if (!alive) return;

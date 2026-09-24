@@ -109,6 +109,43 @@ test('результат ученика стирает только его на�
   assert.equal((await call(root, `/mentor/results/${bobId}/a`, { method: 'DELETE' })).status, 200);
 });
 
+test('заметка об ученике — своя у каждого наставника, чужому ученику не поставить', пропуск, async () => {
+  const root = await tok('root');
+  const fedor = await tok('fedor');
+  const grisha = await tok('grisha');
+  const egor = await tok('egor');
+  await call(root, '/mentor/mentors', { method: 'POST', body: '{"login":"fedor"}' });
+  await call(root, '/mentor/mentors', { method: 'POST', body: '{"login":"grisha"}' });
+
+  const g = await call(fedor, '/mentor/groups', { method: 'POST', body: '{"name":"Фёдорова"}' });
+  const code = g.body.group?.code ?? g.body.code;
+  await call(egor, '/groups/join', { method: 'POST', body: JSON.stringify({ code }) });
+  const egorId = (await call(fedor, '/mentor/students')).body.students.find((s) => s.login === 'egor').gh_id;
+
+  // гриша — настоящий наставник, но егора не ведёт: не может поставить заметку
+  assert.equal(
+    (await call(grisha, `/mentor/students/${egorId}/note`, { method: 'PUT', body: '{"note":"x"}' })).status,
+    403,
+  );
+
+  // фёдор егора ведёт — заметка ставится и видна в его же сводке
+  assert.equal(
+    (await call(fedor, `/mentor/students/${egorId}/note`, { method: 'PUT', body: '{"note":"Егоров Егор"}' })).status,
+    200,
+  );
+  assert.equal(
+    (await call(fedor, '/mentor/students')).body.students.find((s) => s.login === 'egor').note,
+    'Егоров Егор',
+  );
+
+  // у root (видит платформу целиком) заметки нет вовсе — заметки не общие
+  assert.equal((await call(root, '/mentor/students')).body.students.find((s) => s.login === 'egor').note, '');
+
+  // пустая строка стирает заметку
+  await call(fedor, `/mentor/students/${egorId}/note`, { method: 'PUT', body: '{"note":"  "}' });
+  assert.equal((await call(fedor, '/mentor/students')).body.students.find((s) => s.login === 'egor').note, '');
+});
+
 test('добавить всех в группу — только владельцу платформы, идемпотентно', пропуск, async () => {
   const root = await tok('root');
   const alice = await tok('alice');
