@@ -790,6 +790,11 @@ function RosterView({
             {list.map((s) => {
               const lvl = levelForXp(s.xp);
               const stale = Date.now() - s.updatedAt > 14 * 86400000;
+              // Заметка и имя из GitHub — это ДОБАВКА к нику, а не замена: тот,
+              // кто ведёт группу по спискам класса, всё ещё сверяется по нику,
+              // кто есть кто на самой платформе.
+              const primary = s.note || s.name || s.login;
+              const loginTag = primary === s.login ? null : s.login;
               return (
                 <tr key={s.gh_id} className={stale ? 'mn-stale' : undefined}>
                   <td>
@@ -797,7 +802,7 @@ function RosterView({
                       type="button"
                       className="lb-user mn-open"
                       onClick={() => onOpenStudent(s.gh_id)}
-                      title={s.note ? `@${s.login} · открыть карточку ученика` : 'Открыть карточку ученика'}
+                      title="Открыть карточку ученика"
                     >
                       {s.avatar ? (
                         <img className="lb-avatar" src={s.avatar} alt="" width={28} height={28} />
@@ -806,7 +811,10 @@ function RosterView({
                           {s.login.slice(0, 1).toUpperCase()}
                         </span>
                       )}
-                      <span className="lb-name mn-open-name">{s.note || s.name || s.login}</span>
+                      <span className="mn-name-stack">
+                        <span className="lb-name mn-open-name">{primary}</span>
+                        {loginTag && <span className="mn-login-tag">@{loginTag}</span>}
+                      </span>
                     </button>
                     <button
                       type="button"
@@ -866,7 +874,9 @@ function RosterView({
           <tbody>
             {list.map((s) => (
               <tr key={s.gh_id}>
-                <td className="mn-heat-name">{s.note || s.name || s.login}</td>
+                <td className="mn-heat-name" title={`@${s.login}`}>
+                  {s.note || s.name || s.login}
+                </td>
                 {CHAPTERS.map((c) => {
                   const n = s.coverage[c.id] || 0;
                   return (
