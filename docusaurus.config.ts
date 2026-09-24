@@ -95,6 +95,26 @@ const config: Config = {
     ],
   ],
 
+  // Поиска не было вовсе ни по одной из 137 глав: единственный способ найти
+  // «где-то было про Х» — листать сайдбар руками. Локальный движок вместо
+  // Algolia — работает офлайн, не требует стороннего аккаунта и краулера,
+  // индекс строится прямо при сборке. `hashed` — чтобы имя файла индекса
+  // менялось при смене содержимого и не залипало в кеше браузера.
+  // Языка два: текст глав русский, но термины (Gradle, RecyclerView, GitHub)
+  // латиницей — с одним `ru` русский стеммер такой запрос не находил вовсе.
+  themes: [
+    [
+      require.resolve('@easyops-cn/docusaurus-search-local'),
+      {
+        hashed: true,
+        language: ['ru', 'en'],
+        indexDocs: true,
+        indexPages: false,
+        indexBlog: false,
+      },
+    ],
+  ],
+
   themeConfig: {
     // Replace with your project's social card
     image: 'img/og-edu.png',
