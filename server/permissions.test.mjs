@@ -331,4 +331,25 @@ test('рейтинг вклада в сообщество считает отп�
   assert.equal(anon.status, 200);
   const anonBody = await anon.json();
   assert.ok(anonBody.rows.length > 0 && anonBody.rows.every((r) => r.me === false));
+
+  // Автор без строки в users (перевезённый из старого community.json
+  // материал, найдено вживую на проде 24.09.2026: INNER JOIN стирал таких
+  // из рейтинга молча — 2 из 3 реальных авторов пропадали). Пишем такую
+  // строку напрямую в базу, в обход /community — так и появлялись старые
+  // записи, ни разу не пройдя через bearer()/getUser.
+  const Database = createRequire(import.meta.url)('better-sqlite3');
+  const direct = new Database(DB);
+  direct
+    .prepare(
+      `INSERT INTO community (type, chapter_id, title, data, author_gh_id, author_login, status, created_at)
+       VALUES ('link', NULL, 'Древний материал', '"https://example.com"', 999999, 'призрак-миграции', 'approved', ?)`,
+    )
+    .run(Date.now());
+  direct.close();
+
+  const afterGhost = await call(root, '/community/leaderboard');
+  const ghostRow = afterGhost.body.rows.find((r) => r.login === 'призрак-миграции');
+  assert.ok(ghostRow, 'автор без users выпал из рейтинга');
+  assert.equal(ghostRow.approved, 1);
+  assert.equal(ghostRow.avatar, null);
 });

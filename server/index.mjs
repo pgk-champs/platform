@@ -230,9 +230,13 @@ const pendingCountForUser = db.prepare("SELECT COUNT(*) AS n FROM community WHER
 // Рейтинг вклада: сколько прислал и сколько из этого приняли. Тот же приём,
 // что у boardOverall — джойн на users за живым аватаром и именем, а не по
 // снимку author_login, который в community не обновляется задним числом.
-const communityBoard = db.prepare(`SELECT c.author_gh_id AS gh_id, u.login, u.name, u.avatar,
+// LEFT JOIN, не JOIN: часть авторов (перевезённые из старого community.json
+// материалы, боты) не имеет строки в users вовсе — INNER JOIN их молча
+// стирал бы из рейтинга. Без users берём снимок логина из самой community.
+const communityBoard = db.prepare(`SELECT c.author_gh_id AS gh_id,
+    COALESCE(u.login, c.author_login) AS login, u.name, u.avatar,
     COUNT(*) AS submitted, SUM(c.status = 'approved') AS approved
-  FROM community c JOIN users u ON u.gh_id = c.author_gh_id
+  FROM community c LEFT JOIN users u ON u.gh_id = c.author_gh_id
   GROUP BY c.author_gh_id
   ORDER BY approved DESC, submitted DESC
   LIMIT 200`);

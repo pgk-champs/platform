@@ -475,8 +475,10 @@ export async function submitCommunity(item: CommunitySubmission): Promise<{ ok: 
 export type ContributorRow = {
   gh_id: number;
   login: string;
-  name: string;
-  avatar: string;
+  /** null у авторов без строки в users — перевезённые из старого каталога
+   *  материалы и боты. Витрина в этом случае берёт login. */
+  name: string | null;
+  avatar: string | null;
   submitted: number;
   approved: number;
   place: number;
