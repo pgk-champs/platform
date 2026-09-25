@@ -70,6 +70,17 @@ export function buildMap(docsDir, kind = 'chapter') {
     // extension is stripped before stripNumberPrefix (same order as the id above / Docusaurus), then reattached to the file segment only
     const relDir = path.relative(docsDir, d).split(path.sep).filter(Boolean).map(stripNumberPrefix);
     const relPath = [...relDir, id + ext].join('/');
+    // Путь НА ДИСКЕ, с числовым префиксом как у настоящего файла. relPath выше
+    // специально БЕЗ префикса — это URL-слаг (Docusaurus сам режет его у
+    // ссылок), а не файловый путь. Сервер запрашивает исходник главы у GitHub
+    // по имени файла (server/index.mjs, /api/v1/chapters/:id): взять для этого
+    // relPath значило бы просить `docs/foundation/typing.mdx`, которого не
+    // существует — реальный файл «01-typing.mdx». num не годится в замену:
+    // у части глав (docs/advanced/*) он чисто декоративный, без префикса в
+    // имени файла вовсе, и `${num}-${relPath}` для них указал бы на
+    // несуществующий файл.
+    const realDir = path.relative(docsDir, d).split(path.sep).filter(Boolean);
+    const file = [...realDir, e.name].join('/');
     const track = path.relative(docsDir, d).split(path.sep)[0] || '';
     // файл прямо в корне docs/ трека не имеет — это нормально; а вот папка,
     // которой нет в конфиге треков, почти всегда опечатка в имени каталога
@@ -82,6 +93,8 @@ export function buildMap(docsDir, kind = 'chapter') {
       level: data.level,
       order: data.order,
       path: relPath,
+      // Настоящее имя файла на диске (с префиксом) — см. комментарий выше.
+      file,
       // трек и номер выводятся из места файла — руками их нигде не дублируют
       track,
       num: data.num !== undefined ? String(data.num) : numberPrefix(base),

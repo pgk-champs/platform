@@ -633,7 +633,12 @@ async function handleApiV1(req, res, url, sub) {
     const chapters = await chapterMap();
     const ch = chapters.find((c) => c.id === params.id);
     if (!ch) return finish(apiError(res, 404, 'нет главы с таким id'));
-    const file = `docs/${ch.path}`;
+    // ch.path — это URL-слаг БЕЗ числового префикса (Docusaurus сам режет его
+    // у ссылок), не файловый путь. ch.file — настоящее имя файла на диске;
+    // до 25.09.2026 здесь стоял ch.path, и запрос уходил на несуществующий
+    // `docs/foundation/typing.mdx` вместо `01-typing.mdx` — 404 на каждой
+    // главе с цифровым префиксом, то есть почти на всех.
+    const file = `docs/${ch.file}`;
     if (!safeDocPath(file)) return finish(apiError(res, 400, 'путь главы вне docs/<трек>/*.mdx'));
     if (!CONTENT_TOKEN) return finish(apiError(res, 503, 'на сервере не настроен CONTENT_TOKEN'));
     const r = await gh(`contents/${encodeURI(file)}?ref=${CONTENT_BRANCH}`);
@@ -649,7 +654,12 @@ async function handleApiV1(req, res, url, sub) {
     const chapters = await chapterMap();
     const ch = chapters.find((c) => c.id === params.id);
     if (!ch) return finish(apiError(res, 404, 'нет главы с таким id'));
-    const file = `docs/${ch.path}`;
+    // ch.path — это URL-слаг БЕЗ числового префикса (Docusaurus сам режет его
+    // у ссылок), не файловый путь. ch.file — настоящее имя файла на диске;
+    // до 25.09.2026 здесь стоял ch.path, и запрос уходил на несуществующий
+    // `docs/foundation/typing.mdx` вместо `01-typing.mdx` — 404 на каждой
+    // главе с цифровым префиксом, то есть почти на всех.
+    const file = `docs/${ch.file}`;
     if (!safeDocPath(file)) return finish(apiError(res, 400, 'путь главы вне docs/<трек>/*.mdx'));
     const text = String(b.текст ?? b.text ?? '');
     if (!text.trim()) return finish(apiError(res, 400, 'пустая страница'));
