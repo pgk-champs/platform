@@ -149,6 +149,9 @@ export default function AccountNav({
             <Link className="dropdown__link" to="/favorites">Избранное</Link>
           </li>
           <li>
+            <Link className="dropdown__link" to="/notes">Мои заметки</Link>
+          </li>
+          <li>
             <button type="button" className="dropdown__link an-logout" onClick={() => logout()}>
               Выйти
             </button>

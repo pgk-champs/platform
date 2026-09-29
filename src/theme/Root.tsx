@@ -22,6 +22,12 @@ export default function Root({ children }: { children: React.ReactNode }) {
       // загрузка начиналась бы с перекладки всей страницы.
       html.dataset.motion = store.prefs.getMotion();
       html.dataset.read = store.prefs.getRead();
+      // Режим чтения и свёрнутая плашка прогресса: атрибут есть — правило
+      // в custom.css действует, нет — страница обычная.
+      if (store.prefs.getFocus()) html.dataset.focus = 'on';
+      else delete html.dataset.focus;
+      if (store.prefs.getProgressMini()) html.dataset.cp = 'mini';
+      else delete html.dataset.cp;
     };
     apply();
     return store.subscribe(apply);

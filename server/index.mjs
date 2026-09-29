@@ -264,6 +264,42 @@ const deleteNote = db.prepare('DELETE FROM mentor_notes WHERE mentor_gh_id = ? A
 const notesOfMentor = db.prepare('SELECT student_gh_id, note FROM mentor_notes WHERE mentor_gh_id = ?');
 const noteFor = db.prepare('SELECT note FROM mentor_notes WHERE mentor_gh_id = ? AND student_gh_id = ?');
 
+// Заметки ученика — его собственный блокнот, не путать с mentor_notes выше
+// (там наставник пишет ОБ ученике). Заметок много, глава необязательна:
+// «шпаргалка по git» не принадлежит одной главе. Читают их трое: сам автор,
+// наставник его группы (корневой — любого) и тот, кому автор дал ссылку.
+// Ссылка — случайный токен, а не id: id перебирается подряд.
+db.exec(`CREATE TABLE IF NOT EXISTS student_notes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  gh_id INTEGER NOT NULL,
+  chapter_id TEXT,
+  title TEXT NOT NULL,
+  body TEXT NOT NULL,
+  share_token TEXT UNIQUE,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+)`);
+db.exec('CREATE INDEX IF NOT EXISTS student_notes_owner ON student_notes (gh_id, updated_at)');
+const NOTE_TITLE_MAX = 200;
+const NOTE_BODY_MAX = 20_000;
+const NOTES_PER_USER = 300;
+const NOTE_COLS = 'id, chapter_id, title, body, share_token, created_at, updated_at';
+const notesOfUser = db.prepare(`SELECT ${NOTE_COLS} FROM student_notes WHERE gh_id = ? ORDER BY updated_at DESC`);
+const noteOfUser = db.prepare(`SELECT ${NOTE_COLS} FROM student_notes WHERE id = ? AND gh_id = ?`);
+const countNotes = db.prepare('SELECT COUNT(*) AS n FROM student_notes WHERE gh_id = ?');
+const insertNote = db.prepare(`INSERT INTO student_notes (gh_id, chapter_id, title, body, created_at, updated_at)
+  VALUES (@gh_id, @chapter_id, @title, @body, @now, @now)`);
+const updateNote = db.prepare(`UPDATE student_notes SET chapter_id = @chapter_id, title = @title, body = @body, updated_at = @now
+  WHERE id = @id AND gh_id = @gh_id`);
+const deleteStudentNote = db.prepare('DELETE FROM student_notes WHERE id = ? AND gh_id = ?');
+const setNoteShare = db.prepare('UPDATE student_notes SET share_token = ? WHERE id = ? AND gh_id = ?');
+const sharedNote = db.prepare(`SELECT n.id, n.chapter_id, n.title, n.body, n.updated_at, u.login, u.name, u.avatar
+  FROM student_notes n JOIN users u ON u.gh_id = n.gh_id WHERE n.share_token = ?`);
+const notesForMentor = db.prepare(`SELECT n.id, n.gh_id, n.chapter_id, n.title, n.body, n.share_token, n.created_at, n.updated_at,
+    u.login, u.name, u.avatar
+  FROM student_notes n JOIN users u ON u.gh_id = n.gh_id
+  ORDER BY n.updated_at DESC LIMIT 2000`);
+
 // Ключи внешних сервисов. Отдельная таблица, а не колонка у users: миграций
 // в проекте нет вообще (ни одного ALTER TABLE), новая таблица заводится сама
 // при старте, а новая колонка на проде не появилась бы и уронила prepare().
@@ -1395,6 +1431,125 @@ const server = http.createServer(async (req, res) => {
       }
       deleteResult.run(target, rm[2]);
       return json(res, 200, { ok: true });
+    }
+
+    // --- Заметки ученика ---
+    // Чтение по ссылке — без входа: ссылку отдают однокурснику, у которого
+    // может не быть аккаунта. Отдаём только саму заметку и имя автора.
+    const ns = path.match(/^\/notes\/shared\/([A-Za-z0-9_-]{16,64})$/);
+    if (ns && req.method === 'GET') {
+      const row = sharedNote.get(ns[1]);
+      if (!row) return json(res, 404, { error: 'not found' });
+      return json(res, 200, {
+        note: { title: row.title, body: row.body, chapterId: row.chapter_id, updatedAt: row.updated_at },
+        author: { login: row.login, name: row.name, avatar: row.avatar },
+      });
+    }
+
+    // Все заметки учеников, которых этот наставник ведёт. Корневой видит всех:
+    // он и есть администратор платформы. Остальные — только свои группы, тот
+    // же принцип, что у /mentor/students (чужие группы не раскрываем).
+    if (path === '/mentor/student-notes' && req.method === 'GET') {
+      const s = bearer(req);
+      if (!s) return json(res, 401, { error: 'unauthorized' });
+      const me = getUser.get(s.id);
+      if (!isMentor(me)) return json(res, 403, { error: 'forbidden' });
+      let rows = notesForMentor.all();
+      if (!isRootMentor(me)) {
+        const mine = new Set();
+        for (const g of groupsIManage.all({ gh_id: me.gh_id, login: String(me.login).toLowerCase() })) {
+          for (const m of memberIds.all(g.id)) mine.add(m.gh_id);
+        }
+        rows = rows.filter((r) => mine.has(r.gh_id));
+      }
+      const student = Number(url.searchParams.get('student'));
+      if (student) rows = rows.filter((r) => r.gh_id === student);
+      return json(res, 200, {
+        notes: rows.map((r) => ({
+          id: r.id,
+          chapterId: r.chapter_id,
+          title: r.title,
+          body: r.body,
+          shared: !!r.share_token,
+          createdAt: r.created_at,
+          updatedAt: r.updated_at,
+          author: { gh_id: r.gh_id, login: r.login, name: r.name, avatar: r.avatar },
+        })),
+      });
+    }
+
+    if (path === '/notes' || path.startsWith('/notes/')) {
+      const s = bearer(req);
+      if (!s) return json(res, 401, { error: 'unauthorized' });
+      const me = getUser.get(s.id);
+      if (!me) return json(res, 401, { error: 'unauthorized' });
+      const view = (r) => ({
+        id: r.id,
+        chapterId: r.chapter_id,
+        title: r.title,
+        body: r.body,
+        shareToken: r.share_token,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at,
+      });
+      // Глава — тот же chapterId, что в knowledge-map. Пустая — заметка общая.
+      const readNote = async () => {
+        let body;
+        try {
+          body = JSON.parse(await readBody(req, 100_000));
+        } catch {
+          return { err: 'bad json' };
+        }
+        const title = String(body?.title ?? '').trim().slice(0, NOTE_TITLE_MAX);
+        const text = String(body?.body ?? '').slice(0, NOTE_BODY_MAX);
+        const ch = body?.chapterId ? String(body.chapterId) : '';
+        if (ch && !/^[a-z0-9][a-z0-9-]{0,80}$/.test(ch)) return { err: 'bad chapter' };
+        if (!title && !text.trim()) return { err: 'пустая заметка' };
+        return { title: title || text.trim().split('\n')[0].slice(0, 80), body: text, chapter_id: ch || null };
+      };
+
+      if (path === '/notes' && req.method === 'GET') {
+        const ch = url.searchParams.get('chapter');
+        const rows = notesOfUser.all(me.gh_id).filter((r) => !ch || r.chapter_id === ch);
+        return json(res, 200, { notes: rows.map(view) });
+      }
+      if (path === '/notes' && req.method === 'POST') {
+        if (countNotes.get(me.gh_id).n >= NOTES_PER_USER) {
+          return json(res, 400, { error: `не больше ${NOTES_PER_USER} заметок` });
+        }
+        const n = await readNote();
+        if (n.err) return json(res, 400, { error: n.err });
+        const info = insertNote.run({ ...n, gh_id: me.gh_id, now: Date.now() });
+        return json(res, 200, { note: view(noteOfUser.get(info.lastInsertRowid, me.gh_id)) });
+      }
+
+      const one = path.match(/^\/notes\/(\d+)(\/share)?$/);
+      if (!one) return json(res, 404, { error: 'not found' });
+      const id = Number(one[1]);
+      // Чужая и несуществующая отвечают одинаково — id заметок не угадать по коду ответа.
+      if (!noteOfUser.get(id, me.gh_id)) return json(res, 404, { error: 'not found' });
+
+      if (one[2]) {
+        if (req.method === 'POST') {
+          const cur = noteOfUser.get(id, me.gh_id);
+          if (!cur.share_token) setNoteShare.run(crypto.randomBytes(18).toString('base64url'), id, me.gh_id);
+        } else if (req.method === 'DELETE') {
+          // Отзыв ссылки: следующая выдача даст НОВЫЙ токен, старая ссылка мертва.
+          setNoteShare.run(null, id, me.gh_id);
+        } else return json(res, 405, { error: 'method not allowed' });
+        return json(res, 200, { note: view(noteOfUser.get(id, me.gh_id)) });
+      }
+      if (req.method === 'PUT') {
+        const n = await readNote();
+        if (n.err) return json(res, 400, { error: n.err });
+        updateNote.run({ ...n, id, gh_id: me.gh_id, now: Date.now() });
+        return json(res, 200, { note: view(noteOfUser.get(id, me.gh_id)) });
+      }
+      if (req.method === 'DELETE') {
+        deleteStudentNote.run(id, me.gh_id);
+        return json(res, 200, { ok: true });
+      }
+      return json(res, 405, { error: 'method not allowed' });
     }
 
     // --- Каталог сообщества с модерацией ---

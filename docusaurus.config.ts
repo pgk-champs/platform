@@ -64,7 +64,7 @@ const config: Config = {
       // (scripts/read-stamp.test.mjs).
       tagName: 'script',
       attributes: {},
-      innerHTML: `(function(){try{var s=JSON.parse(localStorage.getItem('pgk-store')||'{}');var p=s.prefs||{};if(['l','xl'].indexOf(p.read)>=0)document.documentElement.dataset.read=p.read;if(p.motion==='calm')document.documentElement.dataset.motion='calm';}catch(e){}})();`,
+      innerHTML: `(function(){try{var s=JSON.parse(localStorage.getItem('pgk-store')||'{}');var p=s.prefs||{};if(['l','xl'].indexOf(p.read)>=0)document.documentElement.dataset.read=p.read;if(p.motion==='calm')document.documentElement.dataset.motion='calm';if(p.focus==='on')document.documentElement.dataset.focus='on';if(p.cp==='mini')document.documentElement.dataset.cp='mini';}catch(e){}})();`,
     },
   ],
 

@@ -852,3 +852,89 @@ export async function fetchMyMaterials(): Promise<MyMaterial[]> {
     return [];
   }
 }
+
+// --- Заметки ученика: свой блокнот, много заметок, глава необязательна ---
+export type StudentNote = {
+  id: number;
+  chapterId: string | null;
+  title: string;
+  body: string;
+  /** Есть — заметка открыта по ссылке /notes?s=<токен>. */
+  shareToken: string | null;
+  createdAt: number;
+  updatedAt: number;
+};
+export type NoteDraft = { title: string; body: string; chapterId?: string | null };
+export type NoteAuthor = { gh_id?: number; login: string; name: string | null; avatar: string | null };
+export type MentorNote = Omit<StudentNote, 'shareToken'> & { shared: boolean; author: NoteAuthor };
+export type SharedNote = {
+  note: { title: string; body: string; chapterId: string | null; updatedAt: number };
+  author: NoteAuthor;
+};
+
+const JSON_HEADERS = { 'Content-Type': 'application/json' };
+
+async function noteCall(path: string, init?: RequestInit): Promise<StudentNote | null> {
+  try {
+    const r = await api(path, init);
+    if (!r.ok) return null;
+    return ((await r.json()) as { note: StudentNote }).note;
+  } catch {
+    return null;
+  }
+}
+
+export async function listNotes(chapterId?: string): Promise<StudentNote[] | null> {
+  try {
+    const r = await api(chapterId ? `/notes?chapter=${encodeURIComponent(chapterId)}` : '/notes');
+    if (!r.ok) return null;
+    return ((await r.json()) as { notes: StudentNote[] }).notes;
+  } catch {
+    return null;
+  }
+}
+
+export function createNote(d: NoteDraft): Promise<StudentNote | null> {
+  return noteCall('/notes', { method: 'POST', headers: JSON_HEADERS, body: JSON.stringify(d) });
+}
+
+export function updateNote(id: number, d: NoteDraft): Promise<StudentNote | null> {
+  return noteCall(`/notes/${id}`, { method: 'PUT', headers: JSON_HEADERS, body: JSON.stringify(d) });
+}
+
+export async function deleteNote(id: number): Promise<boolean> {
+  try {
+    return (await api(`/notes/${id}`, { method: 'DELETE' })).ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Открыть по ссылке (on) или отозвать ссылку (off). Отозванная больше не работает. */
+export function shareNote(id: number, on: boolean): Promise<StudentNote | null> {
+  return noteCall(`/notes/${id}/share`, { method: on ? 'POST' : 'DELETE' });
+}
+
+export function noteShareUrl(token: string): string {
+  const origin = typeof window === 'undefined' ? 'https://edu.alspio.com' : window.location.origin;
+  return `${origin}/notes?s=${encodeURIComponent(token)}`;
+}
+
+export async function fetchSharedNote(token: string): Promise<SharedNote | null> {
+  try {
+    const r = await api(`/notes/shared/${encodeURIComponent(token)}`);
+    return r.ok ? ((await r.json()) as SharedNote) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchStudentNotes(): Promise<MentorNote[] | null> {
+  try {
+    const r = await api('/mentor/student-notes');
+    if (!r.ok) return null;
+    return ((await r.json()) as { notes: MentorNote[] }).notes;
+  } catch {
+    return null;
+  }
+}

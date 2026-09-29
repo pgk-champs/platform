@@ -93,6 +93,7 @@ export default function ChapterProgress(props: ChapterProgressProps) {
   const trainersDone = Math.min(parts.trainers, totalTrainers);
   const pct = totalSections > 0 ? Math.round((100 * readSections) / totalSections) : 0;
   const lvl = levelForXp(mounted ? store.getXp() : 0);
+  const mini = mounted && store.prefs.getProgressMini();
 
   return (
     <>
@@ -103,6 +104,18 @@ export default function ChapterProgress(props: ChapterProgressProps) {
             <span className="cp-read-fill" style={{ width: `${pct}%` }} />
           </span>
           <span className="cp-row-num">{pct}%</span>
+          {/* Плашка липкая и висит над текстом всю главу, поэтому сворачивается
+              в одну строку. Выбор общий на все главы (prefs.cp) и ставится на
+              <html> до отрисовки — стрелку разворачивает CSS по тому же атрибуту. */}
+          <button
+            type="button"
+            className="cp-fold"
+            aria-expanded={!mini}
+            title={mini ? 'Показать квизы, тренажёры и уровень' : 'Свернуть в одну строку'}
+            onClick={() => store.prefs.setProgressMini(!mini)}
+          >
+            <span aria-hidden="true">▾</span>
+          </button>
         </div>
         <Row kind="quizzes" label="Квизы" done={quizzesDone} total={totalQuizzes} />
         <Row kind="trainers" label="Тренажёры" done={trainersDone} total={totalTrainers} />

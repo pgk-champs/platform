@@ -20,7 +20,7 @@ test('предотрисовочный скрипт читает тот же к�
 
 test('он ставит те же атрибуты, что и Root после гидратации', () => {
   const root = fs.readFileSync('src/theme/Root.tsx', 'utf8');
-  for (const attr of ['read', 'motion']) {
+  for (const attr of ['read', 'motion', 'focus', 'cp']) {
     assert.match(root, new RegExp(`dataset\\.${attr}`), `Root не ставит ${attr}`);
     assert.match(конфиг, new RegExp(`dataset\\.${attr}`), `предотрисовка не ставит ${attr}`);
   }
@@ -32,4 +32,6 @@ test('значения кегля из скрипта существуют в CS
     assert.match(css, new RegExp(`html\\[data-read='${v}'\\]`), `нет правила для кегля ${v}`);
   }
   assert.match(css, /html\[data-motion='calm'\]/);
+  assert.match(css, /html\[data-focus='on'\]/);
+  assert.match(css, /html\[data-cp='mini'\]/);
 });

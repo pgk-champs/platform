@@ -1383,6 +1383,31 @@
   color: var(--pgk-you);
 }
 
+.cp-fold {
+  flex: none;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-right: -0.4rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.cp-fold:hover {
+  background: var(--ifm-color-emphasis-200);
+}
+.cp-fold span {
+  display: inline-block;
+  transform: rotate(180deg);
+  transition: transform var(--pgk-dur) var(--pgk-ease);
+}
+html[data-cp='mini'] .cp-fold span {
+  transform: none;
+}
+
 .cp-level {
   display: flex;
   align-items: center;

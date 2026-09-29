@@ -93,6 +93,10 @@ type State = {
     read?: string;
     /** Оглавление главы по умолчанию: 'open' | 'closed'. */
     toc?: string;
+    /** Режим чтения: 'on' прячет сайдбар и оглавление — статье вся ширина. */
+    focus?: string;
+    /** Плашка прогресса главы: 'mini' — одна строка вместо четырёх. */
+    cp?: string;
   };
   tocCollapsed: Record<string, boolean>;
   quizLog: QuizLogEntry[];
@@ -497,6 +501,26 @@ function getRead(): string {
   return READS.includes(v ?? '') ? v! : 'm';
 }
 
+// Режим чтения и свёрнутая плашка — тоже атрибуты на <html> (data-focus,
+// data-cp), и тоже ставятся до отрисовки скриптом из headTags.
+function setFocus(on: boolean): void {
+  state.prefs = { ...state.prefs, focus: on ? 'on' : undefined };
+  persist();
+}
+
+function getFocus(): boolean {
+  return state.prefs.focus === 'on';
+}
+
+function setProgressMini(on: boolean): void {
+  state.prefs = { ...state.prefs, cp: on ? 'mini' : undefined };
+  persist();
+}
+
+function getProgressMini(): boolean {
+  return state.prefs.cp === 'mini';
+}
+
 function setTrack(track: string): void {
   state.prefs = { ...state.prefs, track };
   persist();
@@ -817,6 +841,10 @@ export const store = {
     getRead,
     setTocDefault,
     getTocDefault,
+    setFocus,
+    getFocus,
+    setProgressMini,
+    getProgressMini,
   },
   words: { queue: wordsQueue, grade: gradeWord, weight: wordWeight },
   toc: { setCollapsed: setTocCollapsed, isCollapsed: isTocCollapsed },

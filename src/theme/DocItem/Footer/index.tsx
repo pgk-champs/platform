@@ -6,6 +6,7 @@ import SuggestEdit from '../../../components/SuggestEdit';
 import Comments from '../../../components/Comments';
 import ChapterSources from '../../../components/ChapterSources';
 import ChapterVideos from '../../../components/ChapterVideos';
+import ChapterDock from '../../../components/ChapterDock';
 
 // Swizzle-safe обёртка футера главы: кураторские «Видео по теме» + «Материалы от сообщества»
 // (пакет sources) + оригинальный футер (с «Редактировать страницу» от editUrl)
@@ -40,6 +41,8 @@ export default function FooterWrapper(props: Record<string, unknown>) {
         <SuggestEdit />
       </div>
       <Comments />
+      {/* Режим чтения и заметки ученика — кнопки у правого края главы. */}
+      <ChapterDock chapterId={chapterId} />
     </>
   );
 }

@@ -355,6 +355,41 @@ html[data-read='xl'] {
   --ifm-font-size-base: 125%;
 }
 
+/* Режим чтения: статье вся ширина. Прячется сайдбар и колонка оглавления
+   справа; сам Docusaurus умеет сворачивать только сайдбар, и то не помнит
+   этого между главами. Абзацы при этом держат свою меру строки (734 px) —
+   шире становятся код, схемы и таблицы, а колонка встаёт по центру. */
+html[data-focus='on'] .theme-doc-sidebar-container,
+html[data-focus='on'] .col--3:has(> .theme-doc-toc-desktop),
+html[data-focus='on'] .theme-doc-toc-mobile {
+  display: none !important;
+}
+html[data-focus='on'] main[class*='docMainContainer'] {
+  max-width: 100% !important;
+  flex-grow: 1;
+}
+html[data-focus='on'] main[class*='docMainContainer'] > .container {
+  max-width: 1080px;
+}
+/* max-width: 75% у колонки Docusaurus ставит с !important ИЗНУТРИ @layer, а
+   важное из слоя сильнее важного без слоя — перебить его нельзя. min-width
+   побеждает max-width по самому алгоритму размеров, без борьбы за приоритет. */
+html[data-focus='on'] [class*='docItemCol'] {
+  min-width: 100%;
+}
+
+/* Свёрнутая плашка прогресса главы: остаётся одна строка «Прочитано». Она
+   липкая и висит над текстом всю главу — четыре ряда съедали ~170 px экрана. */
+html[data-cp='mini'] .cp {
+  padding-block: 0.3rem;
+  gap: 0;
+}
+html[data-cp='mini'] .cp-row--quizzes,
+html[data-cp='mini'] .cp-row--trainers,
+html[data-cp='mini'] .cp-level {
+  display: none;
+}
+
 /* Карточки раздела (DocCardList). Docusaurus вешает на заголовок и описание
    text--truncate — одна строка с многоточием, и русские заголовки обрезаются
    уже на 1280px («Регулярные выражения для grep» не влезает). Пусть переносятся. */
