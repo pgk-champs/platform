@@ -35,3 +35,19 @@ test('плашка прогресса сворачивается в одну с�
   expect(store.prefs.getProgressMini()).toBe(true);
   expect(screen.getByTitle('Показать квизы, тренажёры и уровень').getAttribute('aria-expanded')).toBe('false');
 });
+
+test('выключенный режим чтения не возвращается после слияния с сервером', async () => {
+  // Сервер сливает prefs как { ...серверные, ...пришедшие }. Пока выключение
+  // удаляло ключ, серверное 'on' переживало слияние и включало режим обратно.
+  // @ts-ignore — серверный модуль без типов
+  const { mergeProgress } = await import('../../server/merge.mjs');
+  store.prefs.setFocus(true);
+  store.prefs.setProgressMini(true);
+  const наСервере = JSON.parse(JSON.stringify(store.snapshot()));
+  store.prefs.setFocus(false);
+  store.prefs.setProgressMini(false);
+  const пришло = JSON.parse(JSON.stringify(store.snapshot()));
+  act(() => store.importState(mergeProgress(наСервере, пришло)));
+  expect(store.prefs.getFocus()).toBe(false);
+  expect(store.prefs.getProgressMini()).toBe(false);
+});

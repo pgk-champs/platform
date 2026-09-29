@@ -503,8 +503,13 @@ function getRead(): string {
 
 // Режим чтения и свёрнутая плашка — тоже атрибуты на <html> (data-focus,
 // data-cp), и тоже ставятся до отрисовки скриптом из headTags.
+//
+// Выключение пишется ЯВНЫМ значением, а не удалением ключа. Сервер сливает
+// prefs как { ...свои, ...пришедшие } (server/merge.mjs): undefined выпадает
+// из JSON, серверное 'on' переживало слияние и возвращалось в браузер —
+// режим чтения нельзя было выключить, он включался сам (29.09.2026).
 function setFocus(on: boolean): void {
-  state.prefs = { ...state.prefs, focus: on ? 'on' : undefined };
+  state.prefs = { ...state.prefs, focus: on ? 'on' : 'off' };
   persist();
 }
 
@@ -513,7 +518,7 @@ function getFocus(): boolean {
 }
 
 function setProgressMini(on: boolean): void {
-  state.prefs = { ...state.prefs, cp: on ? 'mini' : undefined };
+  state.prefs = { ...state.prefs, cp: on ? 'mini' : 'full' };
   persist();
 }
 
